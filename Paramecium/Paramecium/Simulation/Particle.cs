@@ -263,9 +263,9 @@ namespace Paramecium.Simulation
             }
 
             InCollision = false;
-            for (int x = Math.Max(GridPosition.X - 3, 0); x <= Math.Min(GridPosition.X + 3, local_env_SizeX - 1); x++)
+            for (int x = Math.Max(GridPosition.X - 1, 0); x <= Math.Min(GridPosition.X + 1, local_env_SizeX - 1); x++)
             {
-                for (int y = Math.Max(GridPosition.Y - 3, 0); y <= Math.Min(GridPosition.Y + 3, local_env_SizeY - 1); y++)
+                for (int y = Math.Max(GridPosition.Y - 1, 0); y <= Math.Min(GridPosition.Y + 1, local_env_SizeY - 1); y++)
                 {
                     if (Variables.SoupInstance.TileMap[x + y * Variables.SoupInstance.env_SizeX].Type == TileType.Wall)
                     {
@@ -472,7 +472,8 @@ namespace Paramecium.Simulation
 
         public Gene(Gene parentGenes)
         {
-            gene_Size = TryMutationSize(parentGenes.gene_Size);
+            //gene_Size = TryMutationSize(parentGenes.gene_Size);
+            gene_Size = 0.5d;
             gene_Color = parentGenes.gene_Color;
             gene_InputWallAngleMultiplier = TryMutation(parentGenes.gene_InputWallAngleMultiplier);
             gene_InputWallAngleAddend = TryMutation(parentGenes.gene_InputWallAngleAddend);
