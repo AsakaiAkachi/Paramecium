@@ -23,7 +23,6 @@ namespace Paramecium.Simulation
         public ColorInt3 Color { get; set; }
 
         public double Satiety { get; set; }
-        public double BonusSatiety { get; set; }
 
         public bool InCollision { get; set; }
 
@@ -63,7 +62,6 @@ namespace Paramecium.Simulation
                     Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
                     break;
                 case ParticleType.Animal:
-                    BonusSatiety = 64;
                     Genes = new Gene(rnd);
                     Angle = rnd.NextDouble() * 360d;
                     Satiety = 64;
@@ -259,8 +257,7 @@ namespace Paramecium.Simulation
                         Velocity += Vector2D.FromAngle(Angle) * 0.01d * (Math.Max(distance, 1d) / RaycastRange);
 
                         Variables.SoupInstance.TileMap[(GridPosition.X) + (GridPosition.Y) * local_env_SizeX].Fertility += Math.Min(0.075d * (Math.Max(distance, 1d) / RaycastRange), Satiety);
-                        if (BonusSatiety > 0) BonusSatiety -= Math.Min(0.075d * (Math.Max(distance, 1d) / 8d), BonusSatiety);
-                        else Satiety -= Math.Min(0.075d * (Math.Max(distance, 1d) / 8d), Satiety);
+                        Satiety -= Math.Min(0.075d * (Math.Max(distance, 1d) / RaycastRange), Satiety);
                     }
                     break;
             }
@@ -382,11 +379,8 @@ namespace Paramecium.Simulation
 
                     Variables.SoupInstance.TileMap[(GridPosition.X) + (GridPosition.Y) * Variables.SoupInstance.env_SizeX].Fertility += Math.Min(0.025d, Satiety);
                     Satiety -= Math.Min(0.025d, Satiety);
-                    if (Satiety <= 0)
-                    {
-                        if (BonusSatiety > 0) BonusSatiety -= Math.Min(0.025d, Satiety);
-                        else IsAlive = false;
-                    }
+
+                    if (Satiety <= 0) IsAlive = false;
                 }
 
                 if (Age == 0)
