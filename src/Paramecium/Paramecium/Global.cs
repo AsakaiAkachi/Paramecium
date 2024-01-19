@@ -7,5 +7,7 @@ namespace Paramecium
     public static class Global
     {
         public static Soup? global_Soup;
+
+        public static FormMain? global_FormMain;
     }
 }
