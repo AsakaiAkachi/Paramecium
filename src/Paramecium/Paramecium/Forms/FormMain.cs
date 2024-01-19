@@ -36,6 +36,8 @@ namespace Paramecium.Forms
         {
             InitializeComponent();
 
+            MouseWheel += SimulationView_MouseWheel;
+
             zoomFactor = 0;
             zoomFactorActual = 1d;
             cameraX = Variables.SoupInstance.env_SizeX / 2d;
@@ -84,7 +86,7 @@ namespace Paramecium.Forms
                         PixelFormat.Format8bppIndexed
                     );
 
-                    if (zoomFactor >= 3)
+                    if (zoomFactor >= 4)
                     {
                         Marshal.Copy(Variables.SoupInstance.GridMapBg, 0, bmpdata.Scan0, Variables.SoupInstance.GridMapBg.Length);
                     }
@@ -110,7 +112,7 @@ namespace Paramecium.Forms
                         (float)(bgCanvas2.Height * zoomFactorActual)
                     );
 
-                    if (zoomFactor >= 3)
+                    if (zoomFactor >= 4)
                     {
                         /**
                         float x1 = WorldPosXToCanvasPosX(CanvasPosXToWorldPosX(0d));
@@ -173,25 +175,25 @@ namespace Paramecium.Forms
                                                                 DrawLine(
                                                                     canvas_g,
                                                                     Pens.White,
-                                                                    Target.Position.X - (Vector2D.FromAngle(Target.Angle) * Target.Genes.gene_Size).X,
-                                                                    Target.Position.Y - (Vector2D.FromAngle(Target.Angle) * Target.Genes.gene_Size).Y,
-                                                                    Target.Position.X - (Vector2D.FromAngle(Target.Angle) * Target.Genes.gene_Size).X - (Vector2D.FromAngle(Target.Angle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * Target.Genes.gene_Size * 1.5d).X,
-                                                                    Target.Position.Y - (Vector2D.FromAngle(Target.Angle) * Target.Genes.gene_Size).Y - (Vector2D.FromAngle(Target.Angle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * Target.Genes.gene_Size * 1.5d).Y
+                                                                    Target.Position.X - (Vector2D.FromAngle(Target.Angle) * Target.Radius).X,
+                                                                    Target.Position.Y - (Vector2D.FromAngle(Target.Angle) * Target.Radius).Y,
+                                                                    Target.Position.X - (Vector2D.FromAngle(Target.Angle) * Target.Radius).X - (Vector2D.FromAngle(Target.Angle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * Target.Radius * 1.5d).X,
+                                                                    Target.Position.Y - (Vector2D.FromAngle(Target.Angle) * Target.Radius).Y - (Vector2D.FromAngle(Target.Angle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * Target.Radius * 1.5d).Y
                                                                 );
                                                                 SolidBrush bBlack = new SolidBrush(Color.FromArgb(0, 0, 0));
                                                                 FillCircle(
                                                                     canvas_g,
                                                                     bBlack,
-                                                                    Target.Position.X + (Vector2D.FromAngle(Target.Angle - 30) * 0.7d * Target.Genes.gene_Size).X,
-                                                                    Target.Position.Y + (Vector2D.FromAngle(Target.Angle - 30) * 0.7d * Target.Genes.gene_Size).Y,
-                                                                    0.1d * Target.Genes.gene_Size
+                                                                    Target.Position.X + (Vector2D.FromAngle(Target.Angle - 30) * 0.7d * Target.Radius).X,
+                                                                    Target.Position.Y + (Vector2D.FromAngle(Target.Angle - 30) * 0.7d * Target.Radius).Y,
+                                                                    0.1d * Target.Radius
                                                                 );
                                                                 FillCircle(
                                                                     canvas_g,
                                                                     bBlack,
-                                                                    Target.Position.X + (Vector2D.FromAngle(Target.Angle + 30) * 0.7d * Target.Genes.gene_Size).X,
-                                                                    Target.Position.Y + (Vector2D.FromAngle(Target.Angle + 30) * 0.7d * Target.Genes.gene_Size).Y,
-                                                                    0.1d * Target.Genes.gene_Size
+                                                                    Target.Position.X + (Vector2D.FromAngle(Target.Angle + 30) * 0.7d * Target.Radius).X,
+                                                                    Target.Position.Y + (Vector2D.FromAngle(Target.Angle + 30) * 0.7d * Target.Radius).Y,
+                                                                    0.1d * Target.Radius
                                                                 );
                                                                 bBlack.Dispose();
                                                             }
@@ -504,7 +506,7 @@ namespace Paramecium.Forms
                         if (zoomFactor < 8) zoomFactor++;
                         break;
                     case (MouseButtons.Right):
-                        if (zoomFactor > -4) zoomFactor--;
+                        if (zoomFactor > 0) zoomFactor--;
                         break;
                 }
                 zoomFactorActual = Math.Pow(2, zoomFactor);
@@ -531,6 +533,11 @@ namespace Paramecium.Forms
                 prevX = e.X;
                 prevY = e.Y;
             }
+        }
+        private void SimulationView_MouseWheel(object? sender, MouseEventArgs e)
+        {
+            zoomFactor = Math.Min(Math.Max(zoomFactor + e.Delta / 100, 0), 8);
+            zoomFactorActual = Math.Pow(2, zoomFactor);
         }
 
         private void FormMain_KeyDown(object sender, KeyEventArgs e)

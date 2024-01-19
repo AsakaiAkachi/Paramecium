@@ -79,7 +79,7 @@
             SoupSizeX.Name = "SoupSizeX";
             SoupSizeX.Size = new Size(48, 23);
             SoupSizeX.TabIndex = 0;
-            SoupSizeX.Value = new decimal(new int[] { 256, 0, 0, 0 });
+            SoupSizeX.Value = new decimal(new int[] { 512, 0, 0, 0 });
             // 
             // label1
             // 
@@ -296,7 +296,7 @@
             TotalBiomassAmount.Name = "TotalBiomassAmount";
             TotalBiomassAmount.Size = new Size(85, 23);
             TotalBiomassAmount.TabIndex = 25;
-            TotalBiomassAmount.Value = new decimal(new int[] { 65536, 0, 0, 0 });
+            TotalBiomassAmount.Value = new decimal(new int[] { 262144, 0, 0, 0 });
             // 
             // label15
             // 
@@ -324,7 +324,7 @@
             InitialAnimalCount.Name = "InitialAnimalCount";
             InitialAnimalCount.Size = new Size(48, 23);
             InitialAnimalCount.TabIndex = 28;
-            InitialAnimalCount.Value = new decimal(new int[] { 16, 0, 0, 0 });
+            InitialAnimalCount.Value = new decimal(new int[] { 8, 0, 0, 0 });
             // 
             // WallPerlinNoisePositionRandomize
             // 

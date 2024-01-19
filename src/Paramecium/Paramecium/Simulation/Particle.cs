@@ -32,6 +32,8 @@ namespace Paramecium.Simulation
         public int Generation { get; set; }
         public int Age { get; set; }
 
+        const double CellSize = 0.5;
+
         public Particle()
         {
             Type = ParticleType.Plant;
@@ -51,22 +53,22 @@ namespace Paramecium.Simulation
             IsAlive = true;
             Random rnd = new Random();
             Position = new Vector2D(rnd, 0, 0, Variables.SoupInstance.env_SizeX, Variables.SoupInstance.env_SizeY);
-            Velocity = new Vector2D();
             GridPosition = Vector2D.ToGridPosition(Position);
+            Velocity = new Vector2D();
 
             switch (type)
             {
                 case ParticleType.Plant:
-                    Satiety = 0;
-                    Radius = (0.1d + Math.Log2(Math.Max(Satiety, 1)) * 0.1d);
+                    Satiety = rnd.NextDouble() * 8d + 4d;
+                    Radius = Math.Max(Math.Sqrt(Satiety) / 8d * CellSize, 0.025d);
                     Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
                     break;
                 case ParticleType.Animal:
                     Genes = new Gene(rnd);
                     Angle = rnd.NextDouble() * 360d;
-                    Satiety = 64;
-                    Radius = Genes.gene_Size;
-                    Color = Genes.gene_Color;
+                    Radius = 0.5 * CellSize;
+                    Satiety = 64d;
+                    Color = new ColorInt3(Genes.gene_ColorRed, Genes.gene_ColorGreen, Genes.gene_ColorBlue);
                     RaceId = rnd.Next(0, 2147483647);
                     Generation = 1;
                     Age = 0;
@@ -78,12 +80,12 @@ namespace Paramecium.Simulation
             Type = ParticleType.Plant;
             IsAlive = true;
             Random rnd = new Random();
-            Position = position;
-            Velocity = new Vector2D();
+            Position = new Vector2D(rnd, 0, 0, Variables.SoupInstance.env_SizeX, Variables.SoupInstance.env_SizeY);
             GridPosition = Vector2D.ToGridPosition(Position);
+            Velocity = new Vector2D();
 
             Satiety = satiety;
-            Radius = (0.1d + Math.Log2(Math.Max(Satiety, 1)) * 0.1d);
+            Radius = Math.Max(Math.Sqrt(Satiety) / 8d * CellSize, 0.025d);
             Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
         }
         public Particle(Particle parent, double satiety)
@@ -100,17 +102,18 @@ namespace Paramecium.Simulation
 
             if (parent.Type == ParticleType.Plant)
             {
-                Position = parent.Position + new Vector2D(rnd, -0.5, -0.5, 0.5, 0.5);
-                Velocity = new Vector2D(rnd, -0.5d, -0.5d, 0.5d, 0.5d);
-                Radius = (0.1d + Math.Log2(Math.Max(Satiety, 1)) * 0.1d);
+                Position = parent.Position + new Vector2D(rnd, -0.25, -0.25, 0.25, 0.25);
+                Velocity = new Vector2D(rnd, -0.1d, -0.1d, 0.1d, 0.1d);
+                Radius = Math.Max(Math.Sqrt(Satiety) / 8d * CellSize, 0.025d);
                 Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
+                Age = -50;
             }
             else if (parent.Type == ParticleType.Animal)
             {
                 Genes = new Gene(parent.Genes);
                 Angle = parent.Angle + 180;
-                Position = parent.Position + Vector2D.FromAngle(Angle) * Genes.gene_Size;
-                Radius = 0.25d;
+                Position = parent.Position + Vector2D.FromAngle(Angle) * parent.Radius * 0.75d;
+                Radius = 0.25 * CellSize;
                 RaceId = parent.RaceId;
                 Color = new ColorInt3(255, 127, 255);
                 Generation = parent.Generation + 1;
@@ -130,7 +133,10 @@ namespace Paramecium.Simulation
 
         public void EarlyUpdate()
         {
-            Velocity *= 0.9d;
+            if (Type == ParticleType.Animal || (Type == ParticleType.Plant && Age >= 0))
+            {
+                Velocity *= 0.9d;
+            }
         }
         public void MiddleUpdate()
         {
@@ -140,6 +146,40 @@ namespace Paramecium.Simulation
             switch (Type)
             {
                 case ParticleType.Plant:
+                    Random rnd = new Random();
+                    int xOffset = 0;
+                    int yOffset = 0;
+
+                    for (int i = 0; i < 6; i++)
+                    {
+                        int xOffsetNext = xOffset;
+                        int yOffsetNext = yOffset;
+
+                        if (rnd.Next(0, 2) == 0)
+                        {
+                            if (rnd.Next(0, 2) == 0) xOffsetNext++;
+                            else xOffsetNext--;
+                        }
+                        else
+                        {
+                            if (rnd.Next(0, 2) == 0) yOffsetNext++;
+                            else yOffsetNext--;
+                        }
+
+                        if (GridPosition.X + xOffsetNext < 0 || GridPosition.X + xOffsetNext >= local_env_SizeX || GridPosition.Y + yOffsetNext < 0 || GridPosition.Y + yOffsetNext >= local_env_SizeY) { }
+                        else if (Variables.SoupInstance.TileMap[(GridPosition.X + xOffsetNext) + (GridPosition.Y + yOffsetNext) * local_env_SizeX].Type == TileType.Wall) { }
+                        else
+                        {
+                            xOffset = xOffsetNext;
+                            yOffset = yOffsetNext;
+                        }
+                    }
+
+                    Grid TargetGrid = Variables.SoupInstance.TileMap[(GridPosition.X + xOffset) + (GridPosition.Y + yOffset) * local_env_SizeX];
+                    Satiety += Math.Min(0.1d, TargetGrid.Fertility);
+                    TargetGrid.Fertility -= Math.Min(0.1d, TargetGrid.Fertility);
+
+                    /**
                     if (!InCollision)
                     {
                         for (int x = Math.Max(GridPosition.X - 3, 0); x <= Math.Min(GridPosition.X + 3, local_env_SizeX - 1); x++)
@@ -147,33 +187,26 @@ namespace Paramecium.Simulation
                             for (int y = Math.Max(GridPosition.Y - 3, 0); y <= Math.Min(GridPosition.Y + 3, local_env_SizeY - 1); y++)
                             {
                                 Grid TargetGrid = Variables.SoupInstance.TileMap[x + y * local_env_SizeX];
-                                Satiety += TargetGrid.Fertility * 0.001d;
-                                TargetGrid.Fertility *= 0.999d;
+                                Satiety += TargetGrid.Fertility * 0.005d;
+                                TargetGrid.Fertility *= 0.995d;
                             }
                         }
                     }
+                    **/
                     break;
                 case ParticleType.Animal:
                     if (Age > 0)
                     {
-
-                        Random rnd = new Random(Index);
-
                         bool breakFlag = false;
 
-                        int RaycastIteration = 100;
-                        double RaycastRange = 10d;
+                        int RaycastIteration = 20;
+                        double RaycastRange = 5;
 
-                        double InputWallAngle = 0;
-                        double InputWallDistance = RaycastRange;
-                        double InputPlantAngle = 0;
-                        double InputPlantDistance = RaycastRange;
-                        double InputAnimalSameSpeciesAngle = 0;
-                        double InputAnimalSameSpeciesDistance = RaycastRange;
-                        double InputAnimalDifferentSpeciesAngle = 0;
-                        double InputAnimalDifferentSpeciesDistance = RaycastRange;
+                        double RaycastResultWall = 0d;
+                        double RaycastResultPlant = 0d;
 
-                        double distance = RaycastRange;
+                        Particle? Target = null;
+                        double TargetDistance = RaycastRange;
 
                         for (int i = -6; i <= 6; i++)
                         {
@@ -187,8 +220,7 @@ namespace Paramecium.Simulation
                                     Position.Y + RaycastVector.Y < 0 || Position.Y + RaycastVector.Y >= local_env_SizeY
                                 )
                                 {
-                                    InputWallAngle += (1.0d * (i / 6d) + Genes.gene_InputWallAngleAddend * 0.1d) * ((RaycastIteration - j) / (double)RaycastIteration) * 0.1d;
-                                    if (RaycastRange / RaycastIteration * j < InputWallDistance) InputWallDistance = RaycastRange / RaycastIteration * j;
+                                    RaycastResultWall += 1d * ((RaycastIteration - j) / (double)RaycastIteration);
                                     break;
                                 }
                                 else
@@ -199,8 +231,7 @@ namespace Paramecium.Simulation
 
                                     if (Variables.SoupInstance.TileMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].Type == TileType.Wall)
                                     {
-                                        InputWallAngle += (1.0d * (i / 6d) + Genes.gene_InputWallAngleAddend * 0.1d) * ((RaycastIteration - j) / (double)RaycastIteration) * 0.1d;
-                                        if (RaycastRange / RaycastIteration * j < InputWallDistance) InputWallDistance = RaycastRange / RaycastIteration * j;
+                                        RaycastResultWall += 1d * ((RaycastIteration - j) / (double)RaycastIteration);
                                         break;
                                     }
                                     else
@@ -217,21 +248,24 @@ namespace Paramecium.Simulation
 
                                                     if (TargetParticle.Type == ParticleType.Plant)
                                                     {
-                                                        InputPlantAngle += 1.0d * (i / 6d) * ((RaycastIteration - j) / (double)RaycastIteration);
-                                                        if (RaycastRange / RaycastIteration * j < InputPlantDistance) InputPlantDistance = j * (RaycastRange / RaycastIteration);
+                                                        //RaycastResultPlant += 1d * (i / 6d) * ((RaycastIteration - j) / (double)RaycastIteration);
+                                                        if (Vector2D.Size(TargetParticle.Position - Position) < TargetDistance)
+                                                        {
+                                                            Target = TargetParticle;
+                                                        }
                                                     }
-                                                    else if (TargetParticle.Type == ParticleType.Plant)
+                                                    else if (TargetParticle.Type == ParticleType.Animal)
                                                     {
+                                                        /**
                                                         if (RaceId == TargetParticle.RaceId)
                                                         {
-                                                            InputAnimalSameSpeciesAngle += 1.0d * (i / 6d) * ((RaycastIteration - j) / (double)RaycastIteration);
-                                                            if (RaycastRange / RaycastIteration * j < InputAnimalSameSpeciesDistance) InputAnimalSameSpeciesDistance = j * (RaycastRange / RaycastIteration);
+                                                            RaycastResultPlant += 0d * (i / 6d) * ((RaycastIteration - j) / (double)RaycastIteration);
                                                         }
                                                         else
                                                         {
-                                                            InputAnimalDifferentSpeciesAngle += 1.0d * (i / 6d) * ((RaycastIteration - j) / (double)RaycastIteration);
-                                                            if (RaycastRange / RaycastIteration * j < InputAnimalDifferentSpeciesDistance) InputAnimalDifferentSpeciesDistance = j * (RaycastRange / RaycastIteration);
+                                                            RaycastResultPlant += 0d * (i / 6d) * ((RaycastIteration - j) / (double)RaycastIteration);
                                                         }
+                                                        **/
                                                     }
                                                 }
                                                 breakFlag = true;
@@ -253,19 +287,40 @@ namespace Paramecium.Simulation
                             }
                         }
 
-                        Angle += InputWallAngle * Genes.gene_InputWallAngleMultiplier + InputPlantAngle * Genes.gene_InputPlantAngleMultiplier + InputAnimalSameSpeciesAngle * Genes.gene_InputAnimalSameSpeciesAngleMultiplier + InputAnimalDifferentSpeciesAngle * Genes.gene_InputAnimalDifferentSpeciesAngleMultiplier;
-                        Velocity += Vector2D.FromAngle(Angle) * 0.01d * (Math.Max(distance, 1d) / RaycastRange);
+                        /**
+                        if (RaycastResultPlant > 0)
+                        {
+                            Angle += RaycastResultPlant;
+                            Velocity += Vector2D.FromAngle(Angle) * 0.01d * 0.25d;
+                        }
+                        else
+                        {
+                            Angle += RaycastResultWall;
+                            Velocity += Vector2D.FromAngle(Angle) * 0.01d * 0.5d;
+                        }
+                        **/
 
-                        Variables.SoupInstance.TileMap[(GridPosition.X) + (GridPosition.Y) * local_env_SizeX].Fertility += Math.Min(0.075d * (Math.Max(distance, 1d) / RaycastRange), Satiety);
-                        Satiety -= Math.Min(0.075d * (Math.Max(distance, 1d) / RaycastRange), Satiety);
+                        if (Target is not null)
+                        {
+                            Angle = Vector2D.ToAngle(Target.Position - Position);
+                            Velocity += Vector2D.Normalization(Target.Position - Position) * Math.Max(Vector2D.Size(Target.Position - Position) / RaycastRange, 1d / RaycastRange) * 0.01d;
+                        }
+                        else
+                        {
+                            Angle += Math.Sin(((Age % 628) + (Index % 628)) * 0.01d) * 3d;
+                            Velocity += Vector2D.FromAngle(Angle) * 0.01d;
+                        }
+
+                        Variables.SoupInstance.TileMap[(GridPosition.X) + (GridPosition.Y) * local_env_SizeX].Fertility += Math.Min(0.075d * Vector2D.Size(Velocity), Satiety);
+                        Satiety -= Math.Min(0.075d * Vector2D.Size(Velocity), Satiety);
                     }
                     break;
             }
 
             InCollision = false;
-            for (int x = Math.Max(GridPosition.X - 1, 0); x <= Math.Min(GridPosition.X + 1, local_env_SizeX - 1); x++)
+            for (int x = Math.Max((int)Math.Floor(Position.X - 0.5d), 0); x <= Math.Min((int)Math.Ceiling(Position.X + 0.5d), local_env_SizeX - 1); x++)
             {
-                for (int y = Math.Max(GridPosition.Y - 1, 0); y <= Math.Min(GridPosition.Y + 1, local_env_SizeY - 1); y++)
+                for (int y = Math.Max((int)Math.Floor(Position.Y - 0.5d), 0); y <= Math.Min((int)Math.Ceiling(Position.Y + 0.5d), local_env_SizeY - 1); y++)
                 {
                     if (Variables.SoupInstance.TileMap[x + y * Variables.SoupInstance.env_SizeX].Type == TileType.Wall)
                     {
@@ -282,27 +337,27 @@ namespace Paramecium.Simulation
 
                         if (WallDistance1 < 0.353553 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition1) * (Radius + 0.353553 - WallDistance1) * Math.Min((Vector2D.Size(Velocity) + 0.05d), 0.2d);
+                            Velocity += Vector2D.Normalization(Position - WallPosition1) * (Radius + 0.353553 - WallDistance1) * (Vector2D.Size(Velocity) + 0.05d);
                             InCollision = true;
                         }
                         if (WallDistance2 < 0.353553 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition2) * (Radius + 0.353553 - WallDistance2) * Math.Min((Vector2D.Size(Velocity) + 0.05d), 0.2d);
+                            Velocity += Vector2D.Normalization(Position - WallPosition2) * (Radius + 0.353553 - WallDistance2) * (Vector2D.Size(Velocity) + 0.05d);
                             InCollision = true;
                         }
                         if (WallDistance3 < 0.353553 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition3) * (Radius + 0.353553 - WallDistance3) * Math.Min((Vector2D.Size(Velocity) + 0.05d), 0.2d);
+                            Velocity += Vector2D.Normalization(Position - WallPosition3) * (Radius + 0.353553 - WallDistance3) * (Vector2D.Size(Velocity) + 0.05d);
                             InCollision = true;
                         }
                         if (WallDistance4 < 0.353553 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition4) * (Radius + 0.353553 - WallDistance4) * Math.Min((Vector2D.Size(Velocity) + 0.05d), 0.2d);
+                            Velocity += Vector2D.Normalization(Position - WallPosition4) * (Radius + 0.353553 - WallDistance4) * (Vector2D.Size(Velocity) + 0.05d);
                             InCollision = true;
                         }
                         if (WallDistance5 < 0.5 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition5) * (Radius + 0.5 - WallDistance5) * Math.Min((Vector2D.Size(Velocity) + 0.05d), 0.2d);
+                            Velocity += Vector2D.Normalization(Position - WallPosition5) * (Radius + 0.5 - WallDistance5) * (Vector2D.Size(Velocity) + 0.05d);
                             InCollision = true;
                         }
                     }
@@ -320,7 +375,7 @@ namespace Paramecium.Simulation
                                 double Distance = Vector2D.Distance(Position, collidedParticlePosition);
                                 if (Distance < Radius + Target.Radius)
                                 {
-                                    Velocity += Vector2D.Normalization(Position - Target.Position) * Math.Min(Radius + Target.Radius - Distance, 0.1d) * Math.Min(Vector2D.Size(Velocity + Target.Velocity), 0.2d);
+                                    Velocity += Vector2D.Normalization(Position - Target.Position) * Math.Min(Radius + Target.Radius - Distance, 0.1d) * (Vector2D.Size(Velocity) + 0.05d);
                                     InCollision = true;
                                     Target.InCollision = true;
 
@@ -346,7 +401,7 @@ namespace Paramecium.Simulation
             if (Type == ParticleType.Plant)
             {
                 Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
-                Radius = (0.1d + Math.Log2(Math.Max(Satiety, 1)) * 0.1d);
+                Radius = Math.Max(Math.Sqrt(Satiety) / 8d * CellSize, 0.025d);
 
                 if (Satiety >= 16)
                 {
@@ -359,6 +414,7 @@ namespace Paramecium.Simulation
                         Satiety -= SatietySwap;
                     }
                     Variables.SoupInstance.ParticlesBuffer[threadId].Add(new Particle(this, Satiety));
+                    Satiety = 0;
 
                     IsAlive = false;
 
@@ -385,11 +441,16 @@ namespace Paramecium.Simulation
 
                 if (Age == 0)
                 {
-                    Radius = Genes.gene_Size;
-                    Color = Genes.gene_Color;
+                    Radius = 0.5 * CellSize;
+                    Color = new ColorInt3(Genes.gene_ColorRed, Genes.gene_ColorGreen, Genes.gene_ColorBlue);
                 }
+            }
 
-                Age++;
+            Age++;
+
+            if (Vector2D.Size(Velocity) > 0.1d)
+            {
+                Velocity = Vector2D.Normalization(Velocity) * 0.1d;
             }
 
             Position += Velocity;
@@ -421,34 +482,38 @@ namespace Paramecium.Simulation
         public void OnStepFinish()
         {
             Int2D NextGridPosition = Vector2D.ToGridPosition(Position);
-            if (GridPosition != NextGridPosition)
-            {
-                Variables.SoupInstance.TileMap[GridPosition.X + GridPosition.Y * Variables.SoupInstance.env_SizeX].LocalParticles.Remove(Index);
-                GridPosition = NextGridPosition;
-                Variables.SoupInstance.TileMap[GridPosition.X + GridPosition.Y * Variables.SoupInstance.env_SizeX].LocalParticles.Add(Index);
-            }
-        }
 
-        public void OnDisable()
-        {
-            Variables.SoupInstance.TileMap[GridPosition.X + GridPosition.Y * Variables.SoupInstance.env_SizeX].LocalParticles.Remove(Index);
-            Variables.SoupInstance.UnassignedParticleIds.Add(Index);
+            if (Variables.SoupInstance.TileMap[NextGridPosition.X + NextGridPosition.Y * Variables.SoupInstance.env_SizeX].Type == TileType.Wall)
+            {
+                IsAlive = false;
+            }
+
+            if (IsAlive)
+            {
+                if (GridPosition != NextGridPosition)
+                {
+                    Variables.SoupInstance.TileMap[GridPosition.X + GridPosition.Y * Variables.SoupInstance.env_SizeX].LocalParticles.Remove(Index);
+                    GridPosition = NextGridPosition;
+                    Variables.SoupInstance.TileMap[GridPosition.X + GridPosition.Y * Variables.SoupInstance.env_SizeX].LocalParticles.Add(Index);
+                }
+            }
+
+            if (!IsAlive)
+            {
+                Variables.SoupInstance.TileMap[GridPosition.X + GridPosition.Y * Variables.SoupInstance.env_SizeX].Fertility += Satiety;
+                Variables.SoupInstance.TileMap[GridPosition.X + GridPosition.Y * Variables.SoupInstance.env_SizeX].LocalParticles.Remove(Index);
+                Variables.SoupInstance.UnassignedParticleIds.Add(Index);
+                return;
+            }
         }
     }
 
     public class Gene
     {
         public double gene_Size { get; set; }
-        public ColorInt3 gene_Color { get; set; }
-        public double gene_InputWallAngleMultiplier { get; set; }
-        public double gene_InputWallAngleAddend { get; set; }
-        public double gene_InputWallDistanceMultiplier { get; set; }
-        public double gene_InputPlantAngleMultiplier { get; set; }
-        public double gene_InputPlantDistanceMultiplier { get; set; }
-        public double gene_InputAnimalSameSpeciesAngleMultiplier { get; set; }
-        public double gene_InputAnimalSameSpeciesDistanceMultiplier { get; set; }
-        public double gene_InputAnimalDifferentSpeciesAngleMultiplier { get; set; }
-        public double gene_InputAnimalDifferentSpeciesDistanceMultiplier { get; set; }
+        public int gene_ColorRed { get; set; }
+        public int gene_ColorGreen { get; set; }
+        public int gene_ColorBlue { get; set; }
 
         public Gene()
         {
@@ -457,33 +522,26 @@ namespace Paramecium.Simulation
 
         public Gene(Random random)
         {
-            gene_Size = 0.5d;
-            gene_Color = new ColorInt3(random);
-            gene_InputWallAngleMultiplier = random.NextDouble() * 2d;
-            gene_InputWallAngleAddend = random.NextDouble() * 2d - 1d;
-            gene_InputWallDistanceMultiplier = random.NextDouble() * 2d;
-            gene_InputPlantAngleMultiplier = random.NextDouble() * 2d;
-            gene_InputPlantDistanceMultiplier = random.NextDouble() * 2d;
-            gene_InputAnimalSameSpeciesAngleMultiplier = random.NextDouble() * 2d;
-            gene_InputAnimalSameSpeciesDistanceMultiplier = random.NextDouble() * 2d;
-            gene_InputAnimalDifferentSpeciesAngleMultiplier = random.NextDouble() * 2d;
-            gene_InputAnimalDifferentSpeciesDistanceMultiplier = random.NextDouble() * 2d;
+            Random rnd = new Random();
+
+            gene_Size = rnd.NextDouble() * 2d;
+            gene_ColorRed = rnd.Next(0, 256);
+            gene_ColorGreen = rnd.Next(0, 256);
+            gene_ColorBlue = rnd.Next(0, 256);
         }
 
         public Gene(Gene parentGenes)
         {
-            //gene_Size = TryMutationSize(parentGenes.gene_Size);
-            gene_Size = 0.5d;
-            gene_Color = parentGenes.gene_Color;
-            gene_InputWallAngleMultiplier = TryMutation(parentGenes.gene_InputWallAngleMultiplier);
-            gene_InputWallAngleAddend = TryMutation(parentGenes.gene_InputWallAngleAddend);
-            gene_InputWallDistanceMultiplier = TryMutation(parentGenes.gene_InputWallDistanceMultiplier);
-            gene_InputPlantAngleMultiplier = TryMutation(parentGenes.gene_InputPlantAngleMultiplier);
-            gene_InputPlantDistanceMultiplier = TryMutation(parentGenes.gene_InputPlantDistanceMultiplier);
-            gene_InputAnimalSameSpeciesAngleMultiplier = TryMutation(parentGenes.gene_InputPlantDistanceMultiplier);
-            gene_InputAnimalSameSpeciesDistanceMultiplier = TryMutation(parentGenes.gene_InputPlantDistanceMultiplier);
-            gene_InputAnimalDifferentSpeciesAngleMultiplier = TryMutation(parentGenes.gene_InputPlantDistanceMultiplier);
-            gene_InputAnimalDifferentSpeciesDistanceMultiplier = TryMutation(parentGenes.gene_InputPlantDistanceMultiplier);
+            Random rnd = new Random();
+
+            gene_Size = Math.Min(Math.Max(parentGenes.gene_Size + (new Random().NextDouble() * 0.1d - 0.05d), 0.0), 2.0);
+            
+            if (rnd.NextDouble() < 0.01d) gene_ColorRed = rnd.Next(0, 256);
+            else gene_ColorRed = parentGenes.gene_ColorRed;
+            if (rnd.NextDouble() < 0.01d) gene_ColorGreen = rnd.Next(0, 256);
+            else gene_ColorGreen = parentGenes.gene_ColorGreen;
+            if (rnd.NextDouble() < 0.01d) gene_ColorBlue = rnd.Next(0, 256);
+            else gene_ColorBlue = parentGenes.gene_ColorBlue;
         }
 
         public static double TryMutation(double targetGene)
