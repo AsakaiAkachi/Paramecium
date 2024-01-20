@@ -182,8 +182,8 @@ namespace Paramecium.Simulation
                     }
 
                     Grid TargetGrid = Global.SoupInstance.GridMap[(GridPosition.X + xOffset) + (GridPosition.Y + yOffset) * local_env_SizeX];
-                    Satiety += Math.Min(Math.Max(TargetGrid.Fertility * 0.1d, 0.1d), Math.Min(1.0, TargetGrid.Fertility));
-                    TargetGrid.Fertility -= Math.Min(Math.Max(TargetGrid.Fertility * 0.1d, 0.1d), Math.Min(1.0, TargetGrid.Fertility));
+                    Satiety += Math.Min(Math.Max(TargetGrid.Biomass * 0.1d, 0.1d), Math.Min(1.0, TargetGrid.Biomass));
+                    TargetGrid.Biomass -= Math.Min(Math.Max(TargetGrid.Biomass * 0.1d, 0.1d), Math.Min(1.0, TargetGrid.Biomass));
 
                     /**
                     if (!InCollision)

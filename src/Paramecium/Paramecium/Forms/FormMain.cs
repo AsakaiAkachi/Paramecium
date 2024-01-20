@@ -281,16 +281,16 @@ namespace Paramecium.Forms
                 {
                     switch (Global.SoupInstance.SoupState)
                     {
-                        case SoupState.Stop:
+                        case SoupStatus.Stop:
                             StatSoupStatus.Text = "Status : Stop";
                             break;
-                        case SoupState.Pause:
+                        case SoupStatus.Pause:
                             StatSoupStatus.Text = "Status : Pause";
                             break;
-                        case SoupState.Running:
+                        case SoupStatus.Running:
                             StatSoupStatus.Text = "Status : Running";
                             break;
-                        case SoupState.StepRun:
+                        case SoupStatus.StepRun:
                             StatSoupStatus.Text = "Status : Step Run";
                             break;
                     }
@@ -398,7 +398,7 @@ namespace Paramecium.Forms
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                Global.SoupInstance.SetSoupState(SoupState.Stop);
+                Global.SoupInstance.SetSoupState(SoupStatus.Stop);
 
                 string jsonString;
 
@@ -415,7 +415,7 @@ namespace Paramecium.Forms
 
         private void TopMenu_File_Save_Click(object sender, EventArgs e)
         {
-            Global.SoupInstance.SetSoupState(SoupState.Pause);
+            Global.SoupInstance.SetSoupState(SoupStatus.Pause);
 
             string jsonString = JsonSerializer.Serialize(Global.SoupInstance);
 
@@ -437,7 +437,7 @@ namespace Paramecium.Forms
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                Global.SoupInstance.SetSoupState(SoupState.Pause);
+                Global.SoupInstance.SetSoupState(SoupStatus.Pause);
 
                 string jsonString = JsonSerializer.Serialize(Global.SoupInstance);
 
@@ -498,7 +498,7 @@ namespace Paramecium.Forms
 
         private void TopMenu_Simulation_NewSimulation_Click(object sender, EventArgs e)
         {
-            Global.SoupInstance.SetSoupState(SoupState.Pause);
+            Global.SoupInstance.SetSoupState(SoupStatus.Pause);
 
             FormNewSimulation FormNewSimulation = new FormNewSimulation();
             FormNewSimulation.ShowDialog();
@@ -555,8 +555,8 @@ namespace Paramecium.Forms
             switch (e.KeyCode)
             {
                 case Keys.Space:
-                    if (Global.SoupInstance.SoupState == SoupState.Pause) Global.SoupInstance.SetSoupState(SoupState.Running);
-                    else Global.SoupInstance.SetSoupState(SoupState.Pause);
+                    if (Global.SoupInstance.SoupState == SoupStatus.Pause) Global.SoupInstance.SetSoupState(SoupStatus.Running);
+                    else Global.SoupInstance.SetSoupState(SoupStatus.Pause);
                     break;
                 case Keys.OemPeriod:
                     Global.SoupInstance.sim_ParallelLimit++;
@@ -568,7 +568,7 @@ namespace Paramecium.Forms
                     }
                     break;
                 case Keys.OemQuestion:
-                    Global.SoupInstance.SetSoupState(SoupState.StepRun);
+                    Global.SoupInstance.SetSoupState(SoupStatus.StepRun);
                     break;
             }
         }
