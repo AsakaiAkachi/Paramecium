@@ -40,8 +40,8 @@ namespace Paramecium.Forms
 
             zoomFactor = 0;
             zoomFactorActual = 1d;
-            cameraX = Global.SoupInstance.env_SizeX / 2d;
-            cameraY = Global.SoupInstance.env_SizeY / 2d;
+            cameraX = Global.global_Soup.env_SizeX / 2d;
+            cameraY = Global.global_Soup.env_SizeY / 2d;
 
             canvas = new Bitmap(1, 1);
 
@@ -53,7 +53,7 @@ namespace Paramecium.Forms
 
         private async void FormMain_Shown(object sender, EventArgs e)
         {
-            Global.SoupInstance.SoupRun();
+            Global.global_Soup.SoupRun();
 
             FilePath = $@"{Path.GetDirectoryName(Application.ExecutablePath)}\New Soup.soup";
 
@@ -65,7 +65,7 @@ namespace Paramecium.Forms
                     Bitmap canvasOld = canvas;
                     canvas = new Bitmap(SimulationView.Width, SimulationView.Height);
 
-                    Bitmap bgCanvas = new Bitmap(Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY, PixelFormat.Format8bppIndexed);
+                    Bitmap bgCanvas = new Bitmap(Global.global_Soup.env_SizeX, Global.global_Soup.env_SizeY, PixelFormat.Format8bppIndexed);
                     SolidBrush brush1 = new SolidBrush(Color.FromArgb(255, 0, 0, 0));
                     brush1.Dispose();
 
@@ -81,22 +81,22 @@ namespace Paramecium.Forms
                     bgCanvas.Palette = pal;
 
                     BitmapData bmpdata = bgCanvas.LockBits(
-                        new Rectangle(0, 0, Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY),
+                        new Rectangle(0, 0, Global.global_Soup.env_SizeX, Global.global_Soup.env_SizeY),
                         ImageLockMode.WriteOnly,
                         PixelFormat.Format8bppIndexed
                     );
 
                     if (zoomFactor >= 4)
                     {
-                        Marshal.Copy(Global.SoupInstance.GridMapBg, 0, bmpdata.Scan0, Global.SoupInstance.GridMapBg.Length);
+                        Marshal.Copy(Global.global_Soup.GridMapBg, 0, bmpdata.Scan0, Global.global_Soup.GridMapBg.Length);
                     }
                     else
                     {
-                        Marshal.Copy(Global.SoupInstance.GridMapBgParticle, 0, bmpdata.Scan0, Global.SoupInstance.GridMapBgParticle.Length);
+                        Marshal.Copy(Global.global_Soup.GridMapBgParticle, 0, bmpdata.Scan0, Global.global_Soup.GridMapBgParticle.Length);
                     }
                     bgCanvas.UnlockBits(bmpdata);
 
-                    Bitmap bgCanvas2 = new Bitmap(Global.SoupInstance.env_SizeX + 1, Global.SoupInstance.env_SizeY + 1);
+                    Bitmap bgCanvas2 = new Bitmap(Global.global_Soup.env_SizeX + 1, Global.global_Soup.env_SizeY + 1);
 
                     Graphics bgCanvas2_g = Graphics.FromImage(bgCanvas2);
                     bgCanvas2_g.DrawImage(bgCanvas, 1, 1, bgCanvas.Width, bgCanvas.Height);
@@ -136,15 +136,15 @@ namespace Paramecium.Forms
                         {
                             for (int y = y1; y < y2; y++)
                             {
-                                if (x >= 0 && x < Global.SoupInstance.env_SizeX && y >= 0 && y < Global.SoupInstance.env_SizeY)
+                                if (x >= 0 && x < Global.global_Soup.env_SizeX && y >= 0 && y < Global.global_Soup.env_SizeY)
                                 {
                                     try
                                     {
-                                        if (Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles.Count > 0)
+                                        if (Global.global_Soup.GridMap[x + y * Global.global_Soup.env_SizeX].LocalParticles.Count > 0)
                                         {
-                                            for (int i = 0; i < Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles.Count; i++)
+                                            for (int i = 0; i < Global.global_Soup.GridMap[x + y * Global.global_Soup.env_SizeX].LocalParticles.Count; i++)
                                             {
-                                                Particle Target = Global.SoupInstance.Particles[Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles[i]];
+                                                Particle Target = Global.global_Soup.Particles[Global.global_Soup.GridMap[x + y * Global.global_Soup.env_SizeX].LocalParticles[i]];
 
                                                 if (Target is not null)
                                                 {
@@ -166,7 +166,7 @@ namespace Paramecium.Forms
 
                                                     if (Target.Type == ParticleType.Animal)
                                                     {
-                                                        Random rnd3 = new Random(Global.SoupInstance.timeSteps + x + y * Global.SoupInstance.env_SizeX + Target.Index);
+                                                        Random rnd3 = new Random(Global.global_Soup.timeSteps + x + y * Global.global_Soup.env_SizeX + Target.Index);
                                                         if (Target.Age >= 0)
                                                         {
                                                             double TargetSpeed = Vector2D.Size(Target.Velocity) * 9d + 0.1d;
@@ -239,9 +239,9 @@ namespace Paramecium.Forms
                         {
                             for (int y = y1; y < y2; y++)
                             {
-                                if (x >= 0 && x < Global.SoupInstance.env_SizeX && y >= 0 && y < Global.SoupInstance.env_SizeY)
+                                if (x >= 0 && x < Global.global_Soup.env_SizeX && y >= 0 && y < Global.global_Soup.env_SizeY)
                                 {
-                                    if (Global.SoupInstance.GridMapByte[x + y * Global.SoupInstance.env_SizeX] == 0x01)
+                                    if (Global.global_Soup.GridMapByte[x + y * Global.global_Soup.env_SizeX] == 0x01)
                                     {
                                         double WallPosX = x + 0.5d;
                                         double WallPosY = y + 0.5d;
@@ -261,11 +261,11 @@ namespace Paramecium.Forms
 
                     SolidBrush brush = new SolidBrush(Color.FromArgb(0, 0, 0));
 
-                    FillRectangle(canvas_g, brush, -16, -16, 16, Global.SoupInstance.env_SizeY + 32);
-                    FillRectangle(canvas_g, brush, -16, -16, Global.SoupInstance.env_SizeX + 32, 16);
-                    FillRectangle(canvas_g, brush, -16, Global.SoupInstance.env_SizeY, Global.SoupInstance.env_SizeX + 32, 16);
-                    FillRectangle(canvas_g, brush, Global.SoupInstance.env_SizeX, -16, 16, Global.SoupInstance.env_SizeY + 32);
-                    DrawRectangle(canvas_g, Pens.Red, 0, 0, Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY);
+                    FillRectangle(canvas_g, brush, -16, -16, 16, Global.global_Soup.env_SizeY + 32);
+                    FillRectangle(canvas_g, brush, -16, -16, Global.global_Soup.env_SizeX + 32, 16);
+                    FillRectangle(canvas_g, brush, -16, Global.global_Soup.env_SizeY, Global.global_Soup.env_SizeX + 32, 16);
+                    FillRectangle(canvas_g, brush, Global.global_Soup.env_SizeX, -16, 16, Global.global_Soup.env_SizeY + 32);
+                    DrawRectangle(canvas_g, Pens.Red, 0, 0, Global.global_Soup.env_SizeX, Global.global_Soup.env_SizeY);
                     canvas_g.Dispose();
 
                     SimulationView.Image = canvas;
@@ -279,7 +279,7 @@ namespace Paramecium.Forms
 
                 if ((DateTime.Now - BottomStatLastRefreshTime).TotalMilliseconds >= 50)
                 {
-                    switch (Global.SoupInstance.SoupState)
+                    switch (Global.global_Soup.SoupState)
                     {
                         case SoupStatus.Stop:
                             StatSoupStatus.Text = "Status : Stop";
@@ -295,15 +295,15 @@ namespace Paramecium.Forms
                             break;
                     }
 
-                    StatTimeStep.Text = $"Time Step : {Global.SoupInstance.timeSteps} (T{Global.SoupInstance.sim_ParallelLimit})";
-                    StatPopulation.Text = $"Population : {Global.SoupInstance.PopulationPlant}/{Global.SoupInstance.PopulationAnimal}/{Global.SoupInstance.PopulationTotal}";
-                    StatBiomassAmount.Text = $"BiomassAmount : {Global.SoupInstance.BiomassAmount}";
+                    StatTimeStep.Text = $"Time Step : {Global.global_Soup.timeSteps} (T{Global.global_Soup.sim_ParallelLimit})";
+                    StatPopulation.Text = $"Population : {Global.global_Soup.PopulationPlant}/{Global.global_Soup.PopulationAnimal}/{Global.global_Soup.PopulationTotal}";
+                    StatBiomassAmount.Text = $"BiomassAmount : {Global.global_Soup.BiomassAmount}";
                     BottomStat.Refresh();
                 }
                 if ((DateTime.Now - tpsOriginTime).TotalMilliseconds >= 1000)
                 {
-                    StatTps.Text = $"TPS : {Global.SoupInstance.timeSteps - tpsOrigin}";
-                    tpsOrigin = Global.SoupInstance.timeSteps;
+                    StatTps.Text = $"TPS : {Global.global_Soup.timeSteps - tpsOrigin}";
+                    tpsOrigin = Global.global_Soup.timeSteps;
                     tpsOriginTime = DateTime.Now;
                     StatFps.Text = $"FPS : {frameCount}";
                     frameCount = 0;
@@ -398,15 +398,15 @@ namespace Paramecium.Forms
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                Global.SoupInstance.SetSoupState(SoupStatus.Stop);
+                Global.global_Soup.SetSoupState(SoupStatus.Stop);
 
                 string jsonString;
 
                 using (StreamReader sr = new StreamReader(ofd.FileName))
                 {
                     jsonString = sr.ReadToEnd();
-                    Global.SoupInstance = JsonSerializer.Deserialize<Soup>(jsonString);
-                    Global.SoupInstance.SoupRun();
+                    Global.global_Soup = JsonSerializer.Deserialize<Soup>(jsonString);
+                    Global.global_Soup.SoupRun();
                 }
 
                 FilePath = ofd.FileName;
@@ -415,9 +415,9 @@ namespace Paramecium.Forms
 
         private void TopMenu_File_Save_Click(object sender, EventArgs e)
         {
-            Global.SoupInstance.SetSoupState(SoupStatus.Pause);
+            Global.global_Soup.SetSoupState(SoupStatus.Pause);
 
-            string jsonString = JsonSerializer.Serialize(Global.SoupInstance);
+            string jsonString = JsonSerializer.Serialize(Global.global_Soup);
 
             using (StreamWriter sw = new StreamWriter(FilePath, false))
             {
@@ -437,9 +437,9 @@ namespace Paramecium.Forms
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                Global.SoupInstance.SetSoupState(SoupStatus.Pause);
+                Global.global_Soup.SetSoupState(SoupStatus.Pause);
 
-                string jsonString = JsonSerializer.Serialize(Global.SoupInstance);
+                string jsonString = JsonSerializer.Serialize(Global.global_Soup);
 
                 using (StreamWriter sw = new StreamWriter(sfd.FileName, false))
                 {
@@ -498,7 +498,7 @@ namespace Paramecium.Forms
 
         private void TopMenu_Simulation_NewSimulation_Click(object sender, EventArgs e)
         {
-            Global.SoupInstance.SetSoupState(SoupStatus.Pause);
+            Global.global_Soup.SetSoupState(SoupStatus.Pause);
 
             FormNewSimulation FormNewSimulation = new FormNewSimulation();
             FormNewSimulation.ShowDialog();
@@ -555,20 +555,20 @@ namespace Paramecium.Forms
             switch (e.KeyCode)
             {
                 case Keys.Space:
-                    if (Global.SoupInstance.SoupState == SoupStatus.Pause) Global.SoupInstance.SetSoupState(SoupStatus.Running);
-                    else Global.SoupInstance.SetSoupState(SoupStatus.Pause);
+                    if (Global.global_Soup.SoupState == SoupStatus.Pause) Global.global_Soup.SetSoupState(SoupStatus.Running);
+                    else Global.global_Soup.SetSoupState(SoupStatus.Pause);
                     break;
                 case Keys.OemPeriod:
-                    Global.SoupInstance.sim_ParallelLimit++;
+                    Global.global_Soup.sim_ParallelLimit++;
                     break;
                 case Keys.Oemcomma:
-                    if (Global.SoupInstance.sim_ParallelLimit > 1)
+                    if (Global.global_Soup.sim_ParallelLimit > 1)
                     {
-                        Global.SoupInstance.sim_ParallelLimit--;
+                        Global.global_Soup.sim_ParallelLimit--;
                     }
                     break;
                 case Keys.OemQuestion:
-                    Global.SoupInstance.SetSoupState(SoupStatus.StepRun);
+                    Global.global_Soup.SetSoupState(SoupStatus.StepRun);
                     break;
             }
         }

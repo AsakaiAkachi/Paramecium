@@ -117,9 +117,9 @@
             Int2D result = new Int2D((int)value.X, (int)value.Y);
 
             if (result.X < 0) result.X = 0;
-            if (result.X >= Global.SoupInstance.env_SizeX) result.X = Global.SoupInstance.env_SizeX - 1;
+            if (result.X >= Global.global_Soup.env_SizeX) result.X = Global.global_Soup.env_SizeX - 1;
             if (result.Y < 0) result.Y = 0;
-            if (result.Y >= Global.SoupInstance.env_SizeY) result.Y = Global.SoupInstance.env_SizeY - 1;
+            if (result.Y >= Global.global_Soup.env_SizeY) result.Y = Global.global_Soup.env_SizeY - 1;
 
             return result;
         }

@@ -5,12 +5,12 @@ namespace Paramecium
 {
     public static class Global
     {
-        public static Soup SoupInstance;
+        public static Soup global_Soup;
 
         static Global()
         {
-            SoupInstance = new Soup();
-            SoupInstance.Initialize();
+            global_Soup = new Soup();
+            global_Soup.Initialize();
         }
     }
 }

@@ -7,7 +7,6 @@
         public TileType Type { get; set; }
 
         public List<int> LocalParticles { get; set; }
-        public int LocalParticleCount { get; set; }
 
         public double Biomass { get; set; }
 
@@ -17,7 +16,6 @@
             Y = y;
             Type = type;
             LocalParticles = new List<int>();
-            LocalParticleCount = 0;
 
             Biomass = 0d;
         }

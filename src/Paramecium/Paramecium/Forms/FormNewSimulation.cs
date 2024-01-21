@@ -20,13 +20,13 @@ namespace Paramecium.Forms
 
         private void ButtonOK_Click(object sender, EventArgs e)
         {
-            Global.SoupInstance.SetSoupState(SoupStatus.Stop);
-            Global.SoupInstance = new Soup(
+            Global.global_Soup.SetSoupState(SoupStatus.Stop);
+            Global.global_Soup = new Soup(
                 (int)SoupSizeX.Value, (int)SoupSizeY.Value, (double)WallPerlinNoiseX.Value, (double)WallPerlinNoiseY.Value, (double)WallPerlinNoiseZ.Value, WallPerlinNoisePositionRandomize.Checked,
                 (double)WallPerlinNoiseScale.Value, (int)WallPerlinNoiseOctave.Value, (double)WallThickness.Value, (int)ParticleCountLimit.Value, (double)TotalBiomassAmount.Value, (int)InitialAnimalCount.Value
             );
-            Global.SoupInstance.Initialize();
-            Global.SoupInstance.SoupRun();
+            Global.global_Soup.Initialize();
+            Global.global_Soup.SoupRun();
             this.Close();
         }
 
