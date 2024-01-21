@@ -55,7 +55,7 @@ namespace Paramecium.Simulation
             Type = type;
             IsAlive = true;
             Random rnd = new Random();
-            Position = new Vector2D(rnd, 0, 0, global_Soup.SizeX, global_Soup.SizeY);
+            Position = new Vector2D(rnd, 0, 0, Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY);
             GridPosition = Vector2D.ToGridPosition(Position);
             Velocity = new Vector2D();
 
@@ -83,7 +83,7 @@ namespace Paramecium.Simulation
             Type = ParticleType.Plant;
             IsAlive = true;
             Random rnd = new Random();
-            Position = new Vector2D(rnd, 0, 0, global_Soup.SizeX, global_Soup.SizeY);
+            Position = new Vector2D(rnd, 0, 0, Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY);
             GridPosition = Vector2D.ToGridPosition(Position);
             Velocity = new Vector2D();
 
@@ -127,9 +127,9 @@ namespace Paramecium.Simulation
 
         public void OnInitialize()
         {
-            Index = Global.global_Soup.UnassignedParticleIds[Global.global_Soup.UnassignedParticleIds.Count - 1];
-            Global.global_Soup.UnassignedParticleIds.RemoveAt(Global.global_Soup.UnassignedParticleIds.Count - 1);
-            Global.global_Soup.GridMap[GridPosition.X + GridPosition.Y * Global.global_Soup.env_SizeX].LocalParticles.Add(Index);
+            Index = Global.SoupInstance.UnassignedParticleIds[Global.SoupInstance.UnassignedParticleIds.Count - 1];
+            Global.SoupInstance.UnassignedParticleIds.RemoveAt(Global.SoupInstance.UnassignedParticleIds.Count - 1);
+            Global.SoupInstance.GridMap[GridPosition.X + GridPosition.Y * Global.SoupInstance.env_SizeX].LocalParticles.Add(Index);
 
             Id = new Random().Next(100000000, 1000000000);
         }
@@ -143,8 +143,8 @@ namespace Paramecium.Simulation
         }
         public void MiddleUpdate()
         {
-            int local_env_SizeX = global_Soup.SizeX;
-            int local_env_SizeY = global_Soup.SizeY;
+            int local_env_SizeX = Global.SoupInstance.env_SizeX;
+            int local_env_SizeY = Global.SoupInstance.env_SizeY;
 
             switch (Type)
             {
@@ -173,7 +173,7 @@ namespace Paramecium.Simulation
                         else { }
 
                         if (GridPosition.X + xOffsetNext < 0 || GridPosition.X + xOffsetNext >= local_env_SizeX || GridPosition.Y + yOffsetNext < 0 || GridPosition.Y + yOffsetNext >= local_env_SizeY) { }
-                        else if (Global.global_Soup.GridMap[(GridPosition.X + xOffsetNext) + (GridPosition.Y + yOffsetNext) * local_env_SizeX].Type == TileType.Wall) { }
+                        else if (Global.SoupInstance.GridMap[(GridPosition.X + xOffsetNext) + (GridPosition.Y + yOffsetNext) * local_env_SizeX].Type == TileType.Wall) { }
                         else if (xOffsetNext >= -3 && xOffsetNext <= 3 && yOffsetNext >= -3 && yOffsetNext <= 3)
                         {
                             xOffset = xOffsetNext;
@@ -181,7 +181,7 @@ namespace Paramecium.Simulation
                         }
                     }
 
-                    Grid TargetGrid = Global.global_Soup.GridMap[(GridPosition.X + xOffset) + (GridPosition.Y + yOffset) * local_env_SizeX];
+                    Grid TargetGrid = Global.SoupInstance.GridMap[(GridPosition.X + xOffset) + (GridPosition.Y + yOffset) * local_env_SizeX];
                     Satiety += Math.Min(Math.Max(TargetGrid.Biomass * 0.1d, 0.1d), Math.Min(1.0, TargetGrid.Biomass));
                     TargetGrid.Biomass -= Math.Min(Math.Max(TargetGrid.Biomass * 0.1d, 0.1d), Math.Min(1.0, TargetGrid.Biomass));
 
@@ -216,15 +216,15 @@ namespace Paramecium.Simulation
 
                         if (TargetIndex != -1 && TargetId != -1)
                         {
-                            if (Global.global_Soup.Particles[TargetIndex] is not null)
+                            if (Global.SoupInstance.Particles[TargetIndex] is not null)
                             {
-                                if (Global.global_Soup.Particles[TargetIndex].IsAlive)
+                                if (Global.SoupInstance.Particles[TargetIndex].IsAlive)
                                 {
-                                    if (Global.global_Soup.Particles[TargetIndex].Id == TargetId)
+                                    if (Global.SoupInstance.Particles[TargetIndex].Id == TargetId)
                                     {
-                                        if (Vector2D.Size(Global.global_Soup.Particles[TargetIndex].Position - Position) < RaycastRange)
+                                        if (Vector2D.Size(Global.SoupInstance.Particles[TargetIndex].Position - Position) < RaycastRange)
                                         {
-                                            Target = Global.global_Soup.Particles[TargetIndex];
+                                            Target = Global.SoupInstance.Particles[TargetIndex];
                                         }
                                         else
                                         {
@@ -274,7 +274,7 @@ namespace Paramecium.Simulation
                                     Int2D TargetGrid1 = Vector2D.ToGridPosition(Position + RaycastVector * j + RaycastScannerVector * -1d);
                                     Int2D TargetGrid2 = Vector2D.ToGridPosition(Position + RaycastVector * j + RaycastScannerVector);
 
-                                    if (Global.global_Soup.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].Type == TileType.Wall)
+                                    if (Global.SoupInstance.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].Type == TileType.Wall)
                                     {
                                         Target = null;
                                         TargetIndex = -1;
@@ -283,17 +283,17 @@ namespace Paramecium.Simulation
                                     }
                                     else
                                     {
-                                        int LocalParticlesCount = Global.global_Soup.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].LocalParticles.Count;
+                                        int LocalParticlesCount = Global.SoupInstance.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].LocalParticles.Count;
                                         if (LocalParticlesCount > 0)
                                         {
-                                            List<int> LocalParticles = Global.global_Soup.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].LocalParticles;
+                                            List<int> LocalParticles = Global.SoupInstance.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].LocalParticles;
                                             for (int k = 0; k < LocalParticlesCount; k++)
                                             {
                                                 if (LocalParticles[k] != Index)
                                                 {
-                                                    Particle TargetParticle = Global.global_Soup.Particles[LocalParticles[k]];
+                                                    Particle TargetParticle = Global.SoupInstance.Particles[LocalParticles[k]];
 
-                                                    if (Global.global_Soup.Particles[LocalParticles[k]] == Target)
+                                                    if (Global.SoupInstance.Particles[LocalParticles[k]] == Target)
                                                     {
                                                         breakFlag = true;
                                                     }
@@ -303,7 +303,7 @@ namespace Paramecium.Simulation
 
                                         if (breakFlag) break;
 
-                                        if (Global.global_Soup.GridMap[TargetGrid1.X + TargetGrid1.Y * local_env_SizeX].Type == TileType.Wall)
+                                        if (Global.SoupInstance.GridMap[TargetGrid1.X + TargetGrid1.Y * local_env_SizeX].Type == TileType.Wall)
                                         {
                                             if (!breakFlag)
                                             {
@@ -313,7 +313,7 @@ namespace Paramecium.Simulation
                                             }
                                             break;
                                         }
-                                        if (Global.global_Soup.GridMap[TargetGrid2.X + TargetGrid2.Y * local_env_SizeX].Type == TileType.Wall)
+                                        if (Global.SoupInstance.GridMap[TargetGrid2.X + TargetGrid2.Y * local_env_SizeX].Type == TileType.Wall)
                                         {
                                             if (!breakFlag)
                                             {
@@ -350,22 +350,22 @@ namespace Paramecium.Simulation
                                         Int2D TargetGrid1 = Vector2D.ToGridPosition(Position + RaycastVector * j + RaycastScannerVector * -1d);
                                         Int2D TargetGrid2 = Vector2D.ToGridPosition(Position + RaycastVector * j + RaycastScannerVector);
 
-                                        if (Global.global_Soup.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].Type == TileType.Wall)
+                                        if (Global.SoupInstance.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].Type == TileType.Wall)
                                         {
                                             RaycastResultWall += 1d * ((RaycastIteration - j) / (double)RaycastIteration);
                                             break;
                                         }
                                         else
                                         {
-                                            int LocalParticlesCount = Global.global_Soup.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].LocalParticles.Count;
+                                            int LocalParticlesCount = Global.SoupInstance.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].LocalParticles.Count;
                                             if (LocalParticlesCount > 0)
                                             {
-                                                List<int> LocalParticles = Global.global_Soup.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].LocalParticles;
+                                                List<int> LocalParticles = Global.SoupInstance.GridMap[TargetGrid0.X + TargetGrid0.Y * local_env_SizeX].LocalParticles;
                                                 for (int k = 0; k < LocalParticlesCount; k++)
                                                 {
                                                     if (LocalParticles[k] != Index)
                                                     {
-                                                        Particle TargetParticle = Global.global_Soup.Particles[LocalParticles[k]];
+                                                        Particle TargetParticle = Global.SoupInstance.Particles[LocalParticles[k]];
 
                                                         if (TargetParticle.Type == ParticleType.Plant)
                                                         {
@@ -398,11 +398,11 @@ namespace Paramecium.Simulation
 
                                             if (breakFlag) break;
 
-                                            if (Global.global_Soup.GridMap[TargetGrid1.X + TargetGrid1.Y * local_env_SizeX].Type == TileType.Wall)
+                                            if (Global.SoupInstance.GridMap[TargetGrid1.X + TargetGrid1.Y * local_env_SizeX].Type == TileType.Wall)
                                             {
                                                 break;
                                             }
-                                            if (Global.global_Soup.GridMap[TargetGrid2.X + TargetGrid2.Y * local_env_SizeX].Type == TileType.Wall)
+                                            if (Global.SoupInstance.GridMap[TargetGrid2.X + TargetGrid2.Y * local_env_SizeX].Type == TileType.Wall)
                                             {
                                                 break;
                                             }
@@ -436,7 +436,7 @@ namespace Paramecium.Simulation
                             Velocity += Vector2D.FromAngle(Angle) * 0.005d;
                         }
 
-                        Global.global_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * local_env_SizeX].Fertility += Math.Min(0.075d * Vector2D.Size(Velocity), Satiety);
+                        Global.SoupInstance.GridMap[(GridPosition.X) + (GridPosition.Y) * local_env_SizeX].Fertility += Math.Min(0.075d * Vector2D.Size(Velocity), Satiety);
                         Satiety -= Math.Min(0.075d * Vector2D.Size(Velocity), Satiety);
                     }
                     break;
@@ -447,7 +447,7 @@ namespace Paramecium.Simulation
             {
                 for (int y = Math.Max((int)Math.Floor(Position.Y - CellSize), 0); y <= Math.Min((int)Math.Ceiling(Position.Y + CellSize), local_env_SizeY - 1); y++)
                 {
-                    if (Global.global_Soup.GridMap[x + y * Global.global_Soup.env_SizeX].Type == TileType.Wall)
+                    if (Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].Type == TileType.Wall)
                     {
                         Vector2D WallPosition1 = new Vector2D(x + 0.25, y + 0.25);
                         Vector2D WallPosition2 = new Vector2D(x + 0.75, y + 0.25);
@@ -487,15 +487,15 @@ namespace Paramecium.Simulation
                         }
                     }
 
-                    int LocalParticlesCount = Global.global_Soup.GridMap[x + y * local_env_SizeX].LocalParticles.Count;
+                    int LocalParticlesCount = Global.SoupInstance.GridMap[x + y * local_env_SizeX].LocalParticles.Count;
                     if (LocalParticlesCount >= 1)
                     {
-                        List<int> TargetIds = Global.global_Soup.GridMap[x + y * local_env_SizeX].LocalParticles;
+                        List<int> TargetIds = Global.SoupInstance.GridMap[x + y * local_env_SizeX].LocalParticles;
                         for (int i = 0; i < LocalParticlesCount; i++)
                         {
                             if (TargetIds[i] != Index)
                             {
-                                Particle Target = Global.global_Soup.Particles[TargetIds[i]];
+                                Particle Target = Global.SoupInstance.Particles[TargetIds[i]];
                                 Vector2D collidedParticlePosition = Target.Position;
                                 double Distance = Vector2D.Distance(Position, collidedParticlePosition);
                                 if (Distance < Radius + Target.Radius)
@@ -535,10 +535,10 @@ namespace Paramecium.Simulation
                     while (Satiety > 4)
                     {
                         double SatietySwap = rnd.NextDouble() * Math.Min(6, Satiety);
-                        Global.global_Soup.ParticlesBuffer[threadId].Add(new Particle(this, SatietySwap));
+                        Global.SoupInstance.ParticlesBuffer[threadId].Add(new Particle(this, SatietySwap));
                         Satiety -= SatietySwap;
                     }
-                    Global.global_Soup.ParticlesBuffer[threadId].Add(new Particle(this, Satiety));
+                    Global.SoupInstance.ParticlesBuffer[threadId].Add(new Particle(this, Satiety));
                     Satiety = 0;
 
                     IsAlive = false;
@@ -554,11 +554,11 @@ namespace Paramecium.Simulation
                     {
                         Random rnd = new Random();
 
-                        Global.global_Soup.ParticlesBuffer[threadId].Add(new Particle(this, 64));
+                        Global.SoupInstance.ParticlesBuffer[threadId].Add(new Particle(this, 64));
                         Satiety -= 64;
                     }
 
-                    Global.global_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * Global.global_Soup.env_SizeX].Fertility += Math.Min(0.025d, Satiety);
+                    Global.SoupInstance.GridMap[(GridPosition.X) + (GridPosition.Y) * Global.SoupInstance.env_SizeX].Fertility += Math.Min(0.025d, Satiety);
                     Satiety -= Math.Min(0.025d, Satiety);
 
                     if (Satiety <= 0) IsAlive = false;
@@ -579,9 +579,9 @@ namespace Paramecium.Simulation
             }
 
             Position += Velocity;
-            if (Position.X > Global.global_Soup.env_SizeX)
+            if (Position.X > Global.SoupInstance.env_SizeX)
             {
-                Position.X = Global.global_Soup.env_SizeX;
+                Position.X = Global.SoupInstance.env_SizeX;
                 Velocity.X *= -1d;
             }
             if (Position.X < 0)
@@ -589,9 +589,9 @@ namespace Paramecium.Simulation
                 Position.X = 0;
                 Velocity.X *= -1d;
             }
-            if (Position.Y > Global.global_Soup.env_SizeY)
+            if (Position.Y > Global.SoupInstance.env_SizeY)
             {
-                Position.Y = Global.global_Soup.env_SizeY;
+                Position.Y = Global.SoupInstance.env_SizeY;
                 Velocity.Y *= -1d;
             }
             if (Position.Y < 0)
@@ -608,7 +608,7 @@ namespace Paramecium.Simulation
         {
             Int2D NextGridPosition = Vector2D.ToGridPosition(Position);
 
-            if (Global.global_Soup.GridMap[NextGridPosition.X + NextGridPosition.Y * Global.global_Soup.env_SizeX].Type == TileType.Wall)
+            if (Global.SoupInstance.GridMap[NextGridPosition.X + NextGridPosition.Y * Global.SoupInstance.env_SizeX].Type == TileType.Wall)
             {
                 IsAlive = false;
             }
@@ -617,17 +617,17 @@ namespace Paramecium.Simulation
             {
                 if (GridPosition != NextGridPosition)
                 {
-                    Global.global_Soup.GridMap[GridPosition.X + GridPosition.Y * Global.global_Soup.env_SizeX].LocalParticles.Remove(Index);
+                    Global.SoupInstance.GridMap[GridPosition.X + GridPosition.Y * Global.SoupInstance.env_SizeX].LocalParticles.Remove(Index);
                     GridPosition = NextGridPosition;
-                    Global.global_Soup.GridMap[GridPosition.X + GridPosition.Y * Global.global_Soup.env_SizeX].LocalParticles.Add(Index);
+                    Global.SoupInstance.GridMap[GridPosition.X + GridPosition.Y * Global.SoupInstance.env_SizeX].LocalParticles.Add(Index);
                 }
             }
 
             if (!IsAlive)
             {
-                Global.global_Soup.GridMap[GridPosition.X + GridPosition.Y * Global.global_Soup.env_SizeX].Fertility += Satiety;
-                Global.global_Soup.GridMap[GridPosition.X + GridPosition.Y * Global.global_Soup.env_SizeX].LocalParticles.Remove(Index);
-                Global.global_Soup.UnassignedParticleIds.Add(Index);
+                Global.SoupInstance.GridMap[GridPosition.X + GridPosition.Y * Global.SoupInstance.env_SizeX].Fertility += Satiety;
+                Global.SoupInstance.GridMap[GridPosition.X + GridPosition.Y * Global.SoupInstance.env_SizeX].LocalParticles.Remove(Index);
+                Global.SoupInstance.UnassignedParticleIds.Add(Index);
                 return;
             }
         }
