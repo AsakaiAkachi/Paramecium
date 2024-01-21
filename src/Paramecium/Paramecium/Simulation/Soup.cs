@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Numerics;
 using System.Security.Cryptography.Xml;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,106 +11,133 @@ namespace Paramecium.Simulation
 {
     public class Soup
     {
-        public int SizeX { get; set; } = 256;
+        public int env_SizeX { get; set; }
+        public int env_SizeY { get; set; }
 
-        public int SizeY { get; set; } = 256;
+        public double env_WallPerlinNoiseX { get; set; }
+        public double env_WallPerlinNoiseY { get; set; }
+        public double env_WallPerlinNoiseZ { get; set; }
+        public double env_WallPerlinNoiseScale { get; set; }
+        public int env_WallPerlinNoiseOctave { get; set; }
+        public double env_WallThickness { get; set; }
 
-        public double BiomassTotalAmount { get; set; } = 131072d;
+        public int env_ParticleCountLimit { get; set; }
+        public double env_TotalBiomassAmount { get; set; }
+        public double BiomassAmount;
 
-        public double PlantRadiusBase { get; set; } = 0.25d;
+        public int sim_InitialAnimalCount { get; set; }
 
-        public double PlantDivisionBiomassAmount { get; set; } = 16d;
+        public int sim_ThreadCountWidth { get; set; }
+        public int sim_ParallelLimit { get; set; }
 
-        public double PlantBiomassCollectionSpeed { get; set; } = 0.1d;
+        public int timeSteps { get; set; }
 
-        public int PlantBiomassCollectionRange { get; set; } = 6;
+        public Grid[] GridMap { get; set; }
+        public byte[] GridMapByte { get; set; }
 
-        public double AnimalRadiusBase { get; set; } = 0.25d;
+        public byte[] GridMapBg { get; set; }
+        public byte[] GridMapBgParticle { get; set; }
+        public Particle[] Particles { get; set; }
+        public List<Particle>[] ParticlesBuffer { get; set; }
+        public List<int> UnassignedParticleIds { get; set; }
 
-        public double AnimalDivisionBiomassAmountBase { get; set; } = 128d;
+        public int PopulationPlant { get; set; }
+        public int PopulationAnimal { get; set; }
+        public int PopulationTotal { get; set; }
 
-        public double AnimalAccelerationForceBase { get; set; } = 0.01d;
-
-        public double AnimalBiomassDecreaseRateBase { get; set; } = 0.0025d;
-
-        public double AnimalBiomassDecreaseRateMovingFactor { get; set; } = 0.0075d;
-        public double ParticleDrag { get; set; } = 0.1d;
-
-
-        public double WallPerlinNoiseX { get; set; } = 0d;
-
-        public double WallPerlinNoiseY { get; set; } = 0d;
-
-        public double WallPerlinNoiseZ { get; set; } = 0d;
-
-        public double WallPerlinNoiseScale { get; set; } = 0.03d;
-
-        public int WallPerlinNoiseOctave { get; set; } = 4;
-
-        public double WallThickness { get; set; } = 0.01d;
-
-
-        public long TimeStep { get; set; } = 0;
-
-        [JsonIgnore]
-        public SoupStatus SoupStatus = SoupStatus.Stop;
-
-        [JsonIgnore]
-        public Grid[,] Grids = new Grid[256, 256];
-
-        [JsonPropertyName("Grids")]
-        public Grid[] Grids_external
-        {
-            get
-            {
-                Grid[] result = new Grid[SizeX * SizeY];
-                for (int x = 0; x < SizeX; x++)
-                {
-                    for (int y = 0; y < SizeY; y++)
-                    {
-                        result[x + y * SizeX] = Grids[x, y];
-                    }
-                }
-                return result;
-            }
-            set
-            {
-                Grid[,] result = new Grid[SizeX, SizeY];
-                for (int i = 0; i < value.Length; i++)
-                {
-                    result[i % SizeX, i / SizeX] = value[i];
-                }
-            }
-        }
-        public Particle Particles { get; set; }
-
-        [JsonIgnore]
-        public List<int>[] ParticleProcessingQueue;
-
-        [JsonIgnore]
-        public List<int>[] ParticleBuffer;
-
+        public SoupState SoupState;
+        public bool SoupIsProcessing;
 
         public Soup() { }
-
-        public void Initialize()
+        public Soup(int env_SizeX, int env_SizeY, double env_WallPerlinNoiseX, double env_WallPerlinNoiseY, double env_WallPerlinNoiseZ, bool WallPerlinNoisePositionRandomize, double env_WallPerlinNoiseScale, int env_WallPerlinNoiseOctave, double env_WallThickness, int env_ParticleCountLimit, double env_TotalBiomassAmount, int sim_InitialAnimalCount)
         {
+            this.env_SizeX = env_SizeX;
+            this.env_SizeY = env_SizeY;
+            GridMap = new Grid[env_SizeX * env_SizeY];
+
+            GridMapByte = new byte[env_SizeX * env_SizeY];
+            GridMapBg = new byte[env_SizeX * env_SizeY];
+            GridMapBgParticle = new byte[env_SizeX * env_SizeY];
+
+            Random rnd = new Random();
+
+            if (WallPerlinNoisePositionRandomize) this.env_WallPerlinNoiseX = rnd.NextDouble() * 256d;
+            else this.env_WallPerlinNoiseX = env_WallPerlinNoiseX;
+            if (WallPerlinNoisePositionRandomize) this.env_WallPerlinNoiseY = rnd.NextDouble() * 256d;
+            else this.env_WallPerlinNoiseY = env_WallPerlinNoiseY;
+            if (WallPerlinNoisePositionRandomize) this.env_WallPerlinNoiseZ = rnd.NextDouble() * 256d;
+            else this.env_WallPerlinNoiseZ = env_WallPerlinNoiseZ;
+            this.env_WallPerlinNoiseScale = env_WallPerlinNoiseScale;
+            this.env_WallPerlinNoiseOctave = env_WallPerlinNoiseOctave;
+            this.env_WallThickness = env_WallThickness;
+
+            this.env_ParticleCountLimit = env_ParticleCountLimit;
+            this.env_TotalBiomassAmount = env_TotalBiomassAmount;
+
+            this.sim_InitialAnimalCount = sim_InitialAnimalCount;
+
+            sim_ThreadCountWidth = 16;
+            sim_ParallelLimit = 1;
+
             Perlin perlin = new Perlin();
-            for (int x = 0; x < SizeX; x++)
+            for (int x = 0; x < env_SizeX; x++)
             {
-                for (int y = 0; y < SizeY; y++)
+                for (int y = 0; y < env_SizeY; y++)
                 {
-                    TileType TileType;
+                    TileType tileType;
                     if (
                         Math.Abs(perlin.OctavePerlin(
-                            WallPerlinNoiseX + x * WallPerlinNoiseScale,
-                            WallPerlinNoiseY + y * WallPerlinNoiseScale,
-                            WallPerlinNoiseZ,
-                            WallPerlinNoiseOctave, 0.5
-                        ) - 0.5) <= WallThickness
-                    ) TileType = TileType.Wall;
-                    else TileType = TileType.None;
-                    Grids[x, y] = new Grid(x, y, TileType);
+                            this.env_WallPerlinNoiseX + x * env_WallPerlinNoiseScale,
+                            this.env_WallPerlinNoiseY + y * env_WallPerlinNoiseScale,
+                            this.env_WallPerlinNoiseZ, 
+                            env_WallPerlinNoiseOctave, 0.5
+                        ) - 0.5) <= env_WallThickness
+                    ) tileType = TileType.Wall;
+                    else tileType = TileType.None;
+                    GridMap[x + y * env_SizeX] = new Grid(x, y, tileType);
+                    GridMapByte[x + y * env_SizeX] = (byte)tileType;
+                    GridMapBg[x + y * env_SizeX] = (byte)tileType;
+                    GridMapBgParticle[x + y * env_SizeX] = (byte)tileType;
+                }
+            }
+
+            Particles = new Particle[env_ParticleCountLimit];
+            ParticlesBuffer = new List<Particle>[sim_ThreadCountWidth];
+            for (int i = 0; i < ParticlesBuffer.Length; i++)
+            {
+                ParticlesBuffer[i] = new List<Particle>();
+            }
+            UnassignedParticleIds = new List<int>();
+            for (int i = env_ParticleCountLimit - 1; i >= 0; i--)
+            {
+                UnassignedParticleIds.Add(i);
+            }
+
+            SoupState = SoupState.Stop;
+            SoupIsProcessing = false;
+        }
+
+        public void SoupSetup()
+        {
+            for (int i = 0; i < sim_InitialAnimalCount; i++)
+            {
+                ParticlesBuffer[0].Add(new Particle(ParticleType.Animal));
+            }
+
+            Random rnd = new Random();
+
+            double GeneratedBiomass = 0;
+
+            while(GeneratedBiomass < env_TotalBiomassAmount)
+            {
+                double NewPlantBiomassAmount = Math.Min(rnd.NextDouble() * 15.999, env_TotalBiomassAmount - GeneratedBiomass);
+                Vector2D NewPlantPosition = (new Vector2D(rnd, 0, 0, env_SizeX, env_SizeY));
+                Int2D NewPlantGridPosition = Vector2D.ToGridPosition(NewPlantPosition);
+
+                if (GridMap[NewPlantGridPosition.X + NewPlantGridPosition.Y * env_SizeX].Type == TileType.None)
+                {
+                    ParticlesBuffer[0].Add(new Particle(NewPlantPosition, NewPlantBiomassAmount));
+                    GeneratedBiomass += NewPlantBiomassAmount;
                 }
             }
         }
@@ -128,7 +154,7 @@ namespace Paramecium.Simulation
             PopulationAnimalArray = new int[sim_ThreadCountWidth];
             PopulationTotalArray = new int[sim_ThreadCountWidth];
 
-            SoupStatus = SoupStatus.Pause;
+            SoupState = SoupState.Pause;
 
             Task.Run(() =>
             {
@@ -214,9 +240,9 @@ namespace Paramecium.Simulation
                     **/
                 }
 
-                while (SoupState != SoupStatus.Stop)
+                while (SoupState != SoupState.Stop)
                 {
-                    if (SoupState == SoupStatus.Running || SoupState == SoupStatus.StepRun)
+                    if (SoupState == SoupState.Running || SoupState == SoupState.StepRun)
                     {
                         SoupIsProcessing = true;
                         for (int i = 0; i < ParticlesBuffer.Length; i++)
@@ -320,9 +346,9 @@ namespace Paramecium.Simulation
 
                         timeSteps++;
 
-                        if (SoupState == SoupStatus.StepRun)
+                        if (SoupState == SoupState.StepRun)
                         {
-                            SoupState = SoupStatus.Pause;
+                            SoupState = SoupState.Pause;
                         }
                     }
                     else SoupIsProcessing = false;
@@ -418,31 +444,31 @@ namespace Paramecium.Simulation
             });
         }
 
-        public void SetSoupState(SoupStatus soupState)
+        public void SetSoupState(SoupState soupState)
         {
             switch (soupState)
             {
-                case SoupStatus.Stop:
-                    SoupState = SoupStatus.Stop;
+                case SoupState.Stop:
+                    SoupState = SoupState.Stop;
                     while (SoupIsProcessing) { }
                     break;
-                case SoupStatus.Pause:
-                    SoupState = SoupStatus.Pause;
+                case SoupState.Pause:
+                    SoupState = SoupState.Pause;
                     while (SoupIsProcessing) { }
                     break;
-                case SoupStatus.Running:
-                    SoupState = SoupStatus.Running;
+                case SoupState.Running:
+                    SoupState = SoupState.Running;
                     while (!SoupIsProcessing) { }
                     break;
-                case SoupStatus.StepRun:
-                    SoupState = SoupStatus.StepRun;
+                case SoupState.StepRun:
+                    SoupState = SoupState.StepRun;
                     while (!SoupIsProcessing) { }
                     break;
             }
         }
     }
 
-    public enum SoupStatus
+    public enum SoupState
     {
         Stop,
         Pause,

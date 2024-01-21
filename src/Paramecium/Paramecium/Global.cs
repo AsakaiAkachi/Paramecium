@@ -9,8 +9,8 @@ namespace Paramecium
 
         static Global()
         {
-            SoupInstance = new Soup();
-            SoupInstance.Initialize();
+            SoupInstance = new Soup(512, 256, 0d, 0d, 0d, true, 0.03d, 4, 0.01d, 655360, 262144d, 8);
+            SoupInstance.SoupSetup();
         }
     }
 }
