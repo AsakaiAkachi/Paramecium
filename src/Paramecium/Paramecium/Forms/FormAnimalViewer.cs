@@ -27,11 +27,11 @@ namespace Paramecium.Forms
 
         public void Update()
         {
-            if (Variables.SoupInstance.Particles[TargetIndex] is not null)
+            if (Global.SoupInstance.Particles[TargetIndex] is not null)
             {
-                if (Variables.SoupInstance.Particles[TargetIndex].Id == TargetId && Variables.SoupInstance.Particles[TargetIndex].Type == ParticleType.Animal)
+                if (Global.SoupInstance.Particles[TargetIndex].Id == TargetId && Global.SoupInstance.Particles[TargetIndex].Type == ParticleType.Animal)
                 {
-                    Particle Target = Variables.SoupInstance.Particles[TargetIndex];
+                    Particle Target = Global.SoupInstance.Particles[TargetIndex];
 
                     LabelItemPosition.Visible = true;
                     LabelItemVelocity.Visible = true;

@@ -36,10 +36,12 @@ namespace Paramecium.Forms
         {
             InitializeComponent();
 
+            MouseWheel += SimulationView_MouseWheel;
+
             zoomFactor = 0;
             zoomFactorActual = 1d;
-            cameraX = Variables.SoupInstance.env_SizeX / 2d;
-            cameraY = Variables.SoupInstance.env_SizeY / 2d;
+            cameraX = Global.SoupInstance.env_SizeX / 2d;
+            cameraY = Global.SoupInstance.env_SizeY / 2d;
 
             canvas = new Bitmap(1, 1);
 
@@ -51,7 +53,7 @@ namespace Paramecium.Forms
 
         private async void FormMain_Shown(object sender, EventArgs e)
         {
-            Variables.SoupInstance.SoupRun();
+            Global.SoupInstance.SoupRun();
 
             FilePath = $@"{Path.GetDirectoryName(Application.ExecutablePath)}\New Soup.soup";
 
@@ -63,7 +65,7 @@ namespace Paramecium.Forms
                     Bitmap canvasOld = canvas;
                     canvas = new Bitmap(SimulationView.Width, SimulationView.Height);
 
-                    Bitmap bgCanvas = new Bitmap(Variables.SoupInstance.env_SizeX, Variables.SoupInstance.env_SizeY, PixelFormat.Format8bppIndexed);
+                    Bitmap bgCanvas = new Bitmap(Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY, PixelFormat.Format8bppIndexed);
                     SolidBrush brush1 = new SolidBrush(Color.FromArgb(255, 0, 0, 0));
                     brush1.Dispose();
 
@@ -79,22 +81,22 @@ namespace Paramecium.Forms
                     bgCanvas.Palette = pal;
 
                     BitmapData bmpdata = bgCanvas.LockBits(
-                        new Rectangle(0, 0, Variables.SoupInstance.env_SizeX, Variables.SoupInstance.env_SizeY),
+                        new Rectangle(0, 0, Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY),
                         ImageLockMode.WriteOnly,
                         PixelFormat.Format8bppIndexed
                     );
 
-                    if (zoomFactor >= 3)
+                    if (zoomFactor >= 4)
                     {
-                        Marshal.Copy(Variables.SoupInstance.GridMapBg, 0, bmpdata.Scan0, Variables.SoupInstance.GridMapBg.Length);
+                        Marshal.Copy(Global.SoupInstance.GridMapBg, 0, bmpdata.Scan0, Global.SoupInstance.GridMapBg.Length);
                     }
                     else
                     {
-                        Marshal.Copy(Variables.SoupInstance.GridMapBgParticle, 0, bmpdata.Scan0, Variables.SoupInstance.GridMapBgParticle.Length);
+                        Marshal.Copy(Global.SoupInstance.GridMapBgParticle, 0, bmpdata.Scan0, Global.SoupInstance.GridMapBgParticle.Length);
                     }
                     bgCanvas.UnlockBits(bmpdata);
 
-                    Bitmap bgCanvas2 = new Bitmap(Variables.SoupInstance.env_SizeX + 1, Variables.SoupInstance.env_SizeY + 1);
+                    Bitmap bgCanvas2 = new Bitmap(Global.SoupInstance.env_SizeX + 1, Global.SoupInstance.env_SizeY + 1);
 
                     Graphics bgCanvas2_g = Graphics.FromImage(bgCanvas2);
                     bgCanvas2_g.DrawImage(bgCanvas, 1, 1, bgCanvas.Width, bgCanvas.Height);
@@ -110,7 +112,7 @@ namespace Paramecium.Forms
                         (float)(bgCanvas2.Height * zoomFactorActual)
                     );
 
-                    if (zoomFactor >= 3)
+                    if (zoomFactor >= 4)
                     {
                         /**
                         float x1 = WorldPosXToCanvasPosX(CanvasPosXToWorldPosX(0d));
@@ -134,15 +136,15 @@ namespace Paramecium.Forms
                         {
                             for (int y = y1; y < y2; y++)
                             {
-                                if (x >= 0 && x < Variables.SoupInstance.env_SizeX && y >= 0 && y < Variables.SoupInstance.env_SizeY)
+                                if (x >= 0 && x < Global.SoupInstance.env_SizeX && y >= 0 && y < Global.SoupInstance.env_SizeY)
                                 {
                                     try
                                     {
-                                        if (Variables.SoupInstance.TileMap[x + y * Variables.SoupInstance.env_SizeX].LocalParticles.Count > 0)
+                                        if (Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles.Count > 0)
                                         {
-                                            for (int i = 0; i < Variables.SoupInstance.TileMap[x + y * Variables.SoupInstance.env_SizeX].LocalParticles.Count; i++)
+                                            for (int i = 0; i < Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles.Count; i++)
                                             {
-                                                Particle Target = Variables.SoupInstance.Particles[Variables.SoupInstance.TileMap[x + y * Variables.SoupInstance.env_SizeX].LocalParticles[i]];
+                                                Particle Target = Global.SoupInstance.Particles[Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles[i]];
 
                                                 if (Target is not null)
                                                 {
@@ -164,7 +166,7 @@ namespace Paramecium.Forms
 
                                                     if (Target.Type == ParticleType.Animal)
                                                     {
-                                                        Random rnd3 = new Random(Variables.SoupInstance.timeSteps + x + y * Variables.SoupInstance.env_SizeX + Target.Index);
+                                                        Random rnd3 = new Random(Global.SoupInstance.timeSteps + x + y * Global.SoupInstance.env_SizeX + Target.Index);
                                                         if (Target.Age >= 0)
                                                         {
                                                             double TargetSpeed = Vector2D.Size(Target.Velocity) * 9d + 0.1d;
@@ -173,25 +175,25 @@ namespace Paramecium.Forms
                                                                 DrawLine(
                                                                     canvas_g,
                                                                     Pens.White,
-                                                                    Target.Position.X - (Vector2D.FromAngle(Target.Angle) * Target.Genes.gene_Size).X,
-                                                                    Target.Position.Y - (Vector2D.FromAngle(Target.Angle) * Target.Genes.gene_Size).Y,
-                                                                    Target.Position.X - (Vector2D.FromAngle(Target.Angle) * Target.Genes.gene_Size).X - (Vector2D.FromAngle(Target.Angle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * Target.Genes.gene_Size * 1.5d).X,
-                                                                    Target.Position.Y - (Vector2D.FromAngle(Target.Angle) * Target.Genes.gene_Size).Y - (Vector2D.FromAngle(Target.Angle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * Target.Genes.gene_Size * 1.5d).Y
+                                                                    Target.Position.X - (Vector2D.FromAngle(Target.Angle) * Target.Radius).X,
+                                                                    Target.Position.Y - (Vector2D.FromAngle(Target.Angle) * Target.Radius).Y,
+                                                                    Target.Position.X - (Vector2D.FromAngle(Target.Angle) * Target.Radius).X - (Vector2D.FromAngle(Target.Angle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * Target.Radius * 1.5d).X,
+                                                                    Target.Position.Y - (Vector2D.FromAngle(Target.Angle) * Target.Radius).Y - (Vector2D.FromAngle(Target.Angle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * Target.Radius * 1.5d).Y
                                                                 );
                                                                 SolidBrush bBlack = new SolidBrush(Color.FromArgb(0, 0, 0));
                                                                 FillCircle(
                                                                     canvas_g,
                                                                     bBlack,
-                                                                    Target.Position.X + (Vector2D.FromAngle(Target.Angle - 30) * 0.7d * Target.Genes.gene_Size).X,
-                                                                    Target.Position.Y + (Vector2D.FromAngle(Target.Angle - 30) * 0.7d * Target.Genes.gene_Size).Y,
-                                                                    0.1d * Target.Genes.gene_Size
+                                                                    Target.Position.X + (Vector2D.FromAngle(Target.Angle - 30) * 0.7d * Target.Radius).X,
+                                                                    Target.Position.Y + (Vector2D.FromAngle(Target.Angle - 30) * 0.7d * Target.Radius).Y,
+                                                                    0.1d * Target.Radius
                                                                 );
                                                                 FillCircle(
                                                                     canvas_g,
                                                                     bBlack,
-                                                                    Target.Position.X + (Vector2D.FromAngle(Target.Angle + 30) * 0.7d * Target.Genes.gene_Size).X,
-                                                                    Target.Position.Y + (Vector2D.FromAngle(Target.Angle + 30) * 0.7d * Target.Genes.gene_Size).Y,
-                                                                    0.1d * Target.Genes.gene_Size
+                                                                    Target.Position.X + (Vector2D.FromAngle(Target.Angle + 30) * 0.7d * Target.Radius).X,
+                                                                    Target.Position.Y + (Vector2D.FromAngle(Target.Angle + 30) * 0.7d * Target.Radius).Y,
+                                                                    0.1d * Target.Radius
                                                                 );
                                                                 bBlack.Dispose();
                                                             }
@@ -237,9 +239,9 @@ namespace Paramecium.Forms
                         {
                             for (int y = y1; y < y2; y++)
                             {
-                                if (x >= 0 && x < Variables.SoupInstance.env_SizeX && y >= 0 && y < Variables.SoupInstance.env_SizeY)
+                                if (x >= 0 && x < Global.SoupInstance.env_SizeX && y >= 0 && y < Global.SoupInstance.env_SizeY)
                                 {
-                                    if (Variables.SoupInstance.TileMapByte[x + y * Variables.SoupInstance.env_SizeX] == 0x01)
+                                    if (Global.SoupInstance.GridMapByte[x + y * Global.SoupInstance.env_SizeX] == 0x01)
                                     {
                                         double WallPosX = x + 0.5d;
                                         double WallPosY = y + 0.5d;
@@ -259,11 +261,11 @@ namespace Paramecium.Forms
 
                     SolidBrush brush = new SolidBrush(Color.FromArgb(0, 0, 0));
 
-                    FillRectangle(canvas_g, brush, -16, -16, 16, Variables.SoupInstance.env_SizeY + 32);
-                    FillRectangle(canvas_g, brush, -16, -16, Variables.SoupInstance.env_SizeX + 32, 16);
-                    FillRectangle(canvas_g, brush, -16, Variables.SoupInstance.env_SizeY, Variables.SoupInstance.env_SizeX + 32, 16);
-                    FillRectangle(canvas_g, brush, Variables.SoupInstance.env_SizeX, -16, 16, Variables.SoupInstance.env_SizeY + 32);
-                    DrawRectangle(canvas_g, Pens.Red, 0, 0, Variables.SoupInstance.env_SizeX, Variables.SoupInstance.env_SizeY);
+                    FillRectangle(canvas_g, brush, -16, -16, 16, Global.SoupInstance.env_SizeY + 32);
+                    FillRectangle(canvas_g, brush, -16, -16, Global.SoupInstance.env_SizeX + 32, 16);
+                    FillRectangle(canvas_g, brush, -16, Global.SoupInstance.env_SizeY, Global.SoupInstance.env_SizeX + 32, 16);
+                    FillRectangle(canvas_g, brush, Global.SoupInstance.env_SizeX, -16, 16, Global.SoupInstance.env_SizeY + 32);
+                    DrawRectangle(canvas_g, Pens.Red, 0, 0, Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY);
                     canvas_g.Dispose();
 
                     SimulationView.Image = canvas;
@@ -277,17 +279,31 @@ namespace Paramecium.Forms
 
                 if ((DateTime.Now - BottomStatLastRefreshTime).TotalMilliseconds >= 50)
                 {
-                    if (Variables.SoupInstance.IsRunning == false) StatSoupStatus.Text = "Status : Pause";
-                    else if (Variables.SoupInstance.IsRunning == true) StatSoupStatus.Text = "Status : Running";
-                    StatTimeStep.Text = $"Time Step : {Variables.SoupInstance.timeSteps} (T{Variables.SoupInstance.sim_ParallelLimit})";
-                    StatPopulation.Text = $"Population : {Variables.SoupInstance.PopulationPlant}/{Variables.SoupInstance.PopulationAnimal}/{Variables.SoupInstance.PopulationTotal}";
-                    StatBiomassAmount.Text = $"BiomassAmount : {Variables.SoupInstance.BiomassAmount}";
+                    switch (Global.SoupInstance.SoupState)
+                    {
+                        case SoupState.Stop:
+                            StatSoupStatus.Text = "Status : Stop";
+                            break;
+                        case SoupState.Pause:
+                            StatSoupStatus.Text = "Status : Pause";
+                            break;
+                        case SoupState.Running:
+                            StatSoupStatus.Text = "Status : Running";
+                            break;
+                        case SoupState.StepRun:
+                            StatSoupStatus.Text = "Status : Step Run";
+                            break;
+                    }
+
+                    StatTimeStep.Text = $"Time Step : {Global.SoupInstance.timeSteps} (T{Global.SoupInstance.sim_ParallelLimit})";
+                    StatPopulation.Text = $"Population : {Global.SoupInstance.PopulationPlant}/{Global.SoupInstance.PopulationAnimal}/{Global.SoupInstance.PopulationTotal}";
+                    StatBiomassAmount.Text = $"BiomassAmount : {Global.SoupInstance.BiomassAmount}";
                     BottomStat.Refresh();
                 }
                 if ((DateTime.Now - tpsOriginTime).TotalMilliseconds >= 1000)
                 {
-                    StatTps.Text = $"TPS : {Variables.SoupInstance.timeSteps - tpsOrigin}";
-                    tpsOrigin = Variables.SoupInstance.timeSteps;
+                    StatTps.Text = $"TPS : {Global.SoupInstance.timeSteps - tpsOrigin}";
+                    tpsOrigin = Global.SoupInstance.timeSteps;
                     tpsOriginTime = DateTime.Now;
                     StatFps.Text = $"FPS : {frameCount}";
                     frameCount = 0;
@@ -382,16 +398,15 @@ namespace Paramecium.Forms
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                Variables.SoupInstance.SoupStop = true;
-                TimeWait.Wait(100);
+                Global.SoupInstance.SetSoupState(SoupState.Stop);
 
                 string jsonString;
 
                 using (StreamReader sr = new StreamReader(ofd.FileName))
                 {
                     jsonString = sr.ReadToEnd();
-                    Variables.SoupInstance = JsonSerializer.Deserialize<Soup>(jsonString);
-                    Variables.SoupInstance.SoupRun();
+                    Global.SoupInstance = JsonSerializer.Deserialize<Soup>(jsonString);
+                    Global.SoupInstance.SoupRun();
                 }
 
                 FilePath = ofd.FileName;
@@ -400,10 +415,9 @@ namespace Paramecium.Forms
 
         private void TopMenu_File_Save_Click(object sender, EventArgs e)
         {
-            Variables.SoupInstance.IsRunning = false;
-            TimeWait.Wait(100);
+            Global.SoupInstance.SetSoupState(SoupState.Pause);
 
-            string jsonString = JsonSerializer.Serialize(Variables.SoupInstance);
+            string jsonString = JsonSerializer.Serialize(Global.SoupInstance);
 
             using (StreamWriter sw = new StreamWriter(FilePath, false))
             {
@@ -423,10 +437,9 @@ namespace Paramecium.Forms
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                Variables.SoupInstance.IsRunning = false;
-                TimeWait.Wait(100);
+                Global.SoupInstance.SetSoupState(SoupState.Pause);
 
-                string jsonString = JsonSerializer.Serialize(Variables.SoupInstance);
+                string jsonString = JsonSerializer.Serialize(Global.SoupInstance);
 
                 using (StreamWriter sw = new StreamWriter(sfd.FileName, false))
                 {
@@ -485,8 +498,7 @@ namespace Paramecium.Forms
 
         private void TopMenu_Simulation_NewSimulation_Click(object sender, EventArgs e)
         {
-            Variables.SoupInstance.IsRunning = false;
-            TimeWait.Wait(100);
+            Global.SoupInstance.SetSoupState(SoupState.Pause);
 
             FormNewSimulation FormNewSimulation = new FormNewSimulation();
             FormNewSimulation.ShowDialog();
@@ -504,7 +516,7 @@ namespace Paramecium.Forms
                         if (zoomFactor < 8) zoomFactor++;
                         break;
                     case (MouseButtons.Right):
-                        if (zoomFactor > -4) zoomFactor--;
+                        if (zoomFactor > 0) zoomFactor--;
                         break;
                 }
                 zoomFactorActual = Math.Pow(2, zoomFactor);
@@ -532,23 +544,31 @@ namespace Paramecium.Forms
                 prevY = e.Y;
             }
         }
+        private void SimulationView_MouseWheel(object? sender, MouseEventArgs e)
+        {
+            zoomFactor = Math.Min(Math.Max(zoomFactor + e.Delta / 100, 0), 8);
+            zoomFactorActual = Math.Pow(2, zoomFactor);
+        }
 
         private void FormMain_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
             {
                 case Keys.Space:
-                    if (!Variables.SoupInstance.IsRunning) Variables.SoupInstance.IsRunning = true;
-                    else Variables.SoupInstance.IsRunning = false;
+                    if (Global.SoupInstance.SoupState == SoupState.Pause) Global.SoupInstance.SetSoupState(SoupState.Running);
+                    else Global.SoupInstance.SetSoupState(SoupState.Pause);
                     break;
                 case Keys.OemPeriod:
-                    Variables.SoupInstance.sim_ParallelLimit++;
+                    Global.SoupInstance.sim_ParallelLimit++;
                     break;
                 case Keys.Oemcomma:
-                    if (Variables.SoupInstance.sim_ParallelLimit > 1)
+                    if (Global.SoupInstance.sim_ParallelLimit > 1)
                     {
-                        Variables.SoupInstance.sim_ParallelLimit--;
+                        Global.SoupInstance.sim_ParallelLimit--;
                     }
+                    break;
+                case Keys.OemQuestion:
+                    Global.SoupInstance.SetSoupState(SoupState.StepRun);
                     break;
             }
         }

@@ -1,4 +1,4 @@
-Paramecium/Paramecium/bin/*
-Paramecium/Paramecium/obj/*
-Paramecium/.vs/*
-src/*
+Paramecium/*
+src/Paramecium/.vs/*
+src/Paramecium/Paramecium/bin/*
+src/Paramecium/Paramecium/obj/*

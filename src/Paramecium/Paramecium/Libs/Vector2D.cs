@@ -18,7 +18,7 @@
         public Vector2D(Random random, double xMin, double yMin, double xMax, double yMax)
         {
             X = random.NextDouble() * (xMax - xMin) + xMin;
-            Y = random.NextDouble() * (yMax - xMin) + yMin;
+            Y = random.NextDouble() * (yMax - yMin) + yMin;
         }
 
         public static Vector2D operator +(Vector2D left, Vector2D right)
@@ -117,9 +117,9 @@
             Int2D result = new Int2D((int)value.X, (int)value.Y);
 
             if (result.X < 0) result.X = 0;
-            if (result.X >= Variables.SoupInstance.env_SizeX) result.X = Variables.SoupInstance.env_SizeX - 1;
+            if (result.X >= Global.SoupInstance.env_SizeX) result.X = Global.SoupInstance.env_SizeX - 1;
             if (result.Y < 0) result.Y = 0;
-            if (result.Y >= Variables.SoupInstance.env_SizeY) result.Y = Variables.SoupInstance.env_SizeY - 1;
+            if (result.Y >= Global.SoupInstance.env_SizeY) result.Y = Global.SoupInstance.env_SizeY - 1;
 
             return result;
         }

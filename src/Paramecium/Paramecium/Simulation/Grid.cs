@@ -28,6 +28,6 @@
     public enum TileType
     {
         None,
-        Wall,
+        Wall
     }
 }
