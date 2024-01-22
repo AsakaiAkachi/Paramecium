@@ -3,6 +3,7 @@ using System;
 using System.CodeDom;
 using System.Drawing;
 using System.Runtime;
+using System.Security.Policy;
 using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
@@ -27,10 +28,14 @@ namespace Paramecium.Simulation
 
         public double Satiety { get; set; }
 
+        public double Mass { get; set; }
+
         public bool InCollision { get; set; }
 
-        public int RaceId { get; set; }
         public Gene Genes { get; set; }
+
+        public double Health { get; set; }
+        public int TimeSinceLastDamage { get; set; }
 
         public int Generation { get; set; }
         public int Age { get; set; }
@@ -38,7 +43,7 @@ namespace Paramecium.Simulation
         public int TargetIndex { get; set; } = -1;
         public int TargetId { get; set; } = -1;
 
-        const double CellSize = 0.5;
+        public double RandomWalkTargetAngle { get; set; }
 
         public Particle()
         {
@@ -66,18 +71,19 @@ namespace Paramecium.Simulation
             {
                 case ParticleType.Plant:
                     Satiety = rnd.NextDouble() * 8d + 4d;
-                    Radius = Math.Max(Math.Sqrt(Satiety) / 8d * CellSize, 0.025d);
+                    Radius = 0.5d * Math.Max(Math.Sqrt(Satiety) / g_Soup.PlantSizeMultiplier * g_Soup.CellSizeMultiplier, 0.01d);
                     Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
                     break;
                 case ParticleType.Animal:
                     Genes = new Gene(rnd);
                     Angle = rnd.NextDouble() * 360d;
-                    Radius = 0.5 * CellSize;
+                    Radius = 0.5 * g_Soup.CellSizeMultiplier;
                     Satiety = 64d;
                     Color = new ColorInt3(Genes.GeneColorRed, Genes.GeneColorGreen, Genes.GeneColorBlue);
-                    RaceId = rnd.Next(0, 2147483647);
+                    Health = Genes.GeneHealth * 10d;
                     Generation = 1;
                     Age = 300;
+                    Mass = Math.Pow(Radius, 2);
                     break;
             }
         }
@@ -91,7 +97,7 @@ namespace Paramecium.Simulation
             Velocity = new Vector2D();
 
             Satiety = satiety;
-            Radius = Math.Max(Math.Sqrt(Satiety) / 8d * CellSize, 0.025d);
+            Radius = 0.5d * Math.Max(Math.Sqrt(Satiety) / g_Soup.PlantSizeMultiplier * g_Soup.CellSizeMultiplier, 0.01d);
             Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
         }
         public Particle(Particle parent, double satiety)
@@ -108,9 +114,9 @@ namespace Paramecium.Simulation
 
             if (parent.Type == ParticleType.Plant)
             {
-                Position = parent.Position + Vector2D.FromAngle(rnd.NextDouble() * 360d) * 0.1d;
-                Velocity = new Vector2D(rnd, -0.1d, -0.1d, 0.1d, 0.1d);
-                Radius = Math.Max(Math.Sqrt(Satiety) / 8d * CellSize, 0.025d);
+                Position = parent.Position + Vector2D.FromAngle(rnd.NextDouble() * 360d) * 0.2d * g_Soup.CellSizeMultiplier;
+                //Velocity = Vector2D.FromAngle(rnd.NextDouble() * 360d) * rnd.NextDouble() * 0.1d;
+                Radius = 0.5d * Math.Max(Math.Sqrt(Satiety) / g_Soup.PlantSizeMultiplier * g_Soup.CellSizeMultiplier, 0.01d);
                 Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
                 Age = -50;
             }
@@ -119,11 +125,12 @@ namespace Paramecium.Simulation
                 Genes = new Gene(parent.Genes);
                 Angle = parent.Angle + 180;
                 Position = parent.Position + Vector2D.FromAngle(Angle) * parent.Radius * 0.75d;
-                Radius = 0.25 * CellSize;
-                RaceId = parent.RaceId;
+                Radius = 0.25 * g_Soup.CellSizeMultiplier;
                 Color = new ColorInt3(255, 127, 255);
+                Health = Genes.GeneHealth * 10d;
                 Generation = parent.Generation + 1;
                 Age = -300;
+                Mass = Math.Pow(Radius, 2);
             }
             GridPosition = Vector2D.ToGridPosition(Position);
         }
@@ -145,6 +152,16 @@ namespace Paramecium.Simulation
             g_Soup.GridMap[GridPosition.X + GridPosition.Y * g_Soup.SizeX].LocalParticles.Add(Index);
 
             Id = new Random().Next(100000000, 1000000000);
+
+            RandomWalkTargetAngle = new Random().NextDouble() * 360d;
+
+            if (Type == ParticleType.Plant)
+            {
+                Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
+                Radius = Math.Max(Math.Sqrt(Satiety) / 8d * g_Soup.CellSizeMultiplier, 0.025d);
+
+                Mass = Math.Pow(Radius, 2);
+            }
         }
 
         public void EarlyUpdate()
@@ -166,7 +183,7 @@ namespace Paramecium.Simulation
                     int xOffset = 0;
                     int yOffset = 0;
 
-                    for (int i = 0; i < 6; i++)
+                    for (int i = 0; i < 10; i++)
                     {
                         int xOffsetNext = xOffset;
                         int yOffsetNext = yOffset;
@@ -187,7 +204,7 @@ namespace Paramecium.Simulation
 
                         if (GridPosition.X + xOffsetNext < 0 || GridPosition.X + xOffsetNext >= local_env_SizeX || GridPosition.Y + yOffsetNext < 0 || GridPosition.Y + yOffsetNext >= local_env_SizeY) { }
                         else if (Global.g_Soup.GridMap[(GridPosition.X + xOffsetNext) + (GridPosition.Y + yOffsetNext) * local_env_SizeX].Type == TileType.Wall) { }
-                        else if (xOffsetNext >= -3 && xOffsetNext <= 3 && yOffsetNext >= -3 && yOffsetNext <= 3)
+                        else if (xOffsetNext >= -5 && xOffsetNext <= 5 && yOffsetNext >= -5 && yOffsetNext <= 5)
                         {
                             xOffset = xOffsetNext;
                             yOffset = yOffsetNext;
@@ -195,8 +212,18 @@ namespace Paramecium.Simulation
                     }
 
                     Grid TargetGrid = Global.g_Soup.GridMap[(GridPosition.X + xOffset) + (GridPosition.Y + yOffset) * local_env_SizeX];
-                    Satiety += Math.Min(0.16d, TargetGrid.Fertility);
-                    TargetGrid.Fertility -= Math.Min(0.16d, TargetGrid.Fertility);
+                    if (TargetGrid.Fertility >= 0)
+                    {
+                        Satiety += Math.Min(0.16d, TargetGrid.Fertility);
+                        TargetGrid.Fertility -= Math.Min(0.16d, TargetGrid.Fertility);
+
+                        Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
+                        Radius = 0.5d * Math.Max(Math.Sqrt(Satiety) / g_Soup.PlantSizeMultiplier * g_Soup.CellSizeMultiplier, 0.01d);
+
+                        Mass = Math.Pow(Radius, 2);
+                    }
+
+
 
                     /**
                     if (!InCollision)
@@ -225,7 +252,7 @@ namespace Paramecium.Simulation
                         double RaycastResultPlant = 0d;
 
                         Particle? Target = null;
-                        double TargetDistance = RaycastRange / CellSize;
+                        double TargetDistance = RaycastRange;
 
                         if (TargetIndex != -1 && TargetId != -1)
                         {
@@ -342,10 +369,10 @@ namespace Paramecium.Simulation
                         }
                         else
                         {
-                            for (int i = -10; i <= 10; i++)
+                            for (int i = -15; i <= 15; i++)
                             {
                                 Vector2D RaycastVector = Vector2D.FromAngle(Angle + (i * 6)) * (RaycastRange / RaycastIteration);
-                                Vector2D RaycastScannerVector = Vector2D.FromAngle(Angle + (i * 6) + 90) * (RaycastRange / RaycastIteration * 1.414213);
+                                Vector2D RaycastScannerVector = Vector2D.Rotate(RaycastVector, 90) * 1.414213;
 
                                 for (int j = 1; j <= RaycastIteration; j++)
                                 {
@@ -382,16 +409,16 @@ namespace Paramecium.Simulation
 
                                                         bool IsValidTarget = false;
 
-                                                        double TargetDistanceTemp = Vector2D.Size(TargetParticle.Position - Position) / (Math.Max(TargetParticle.Radius, 0.001d) / CellSize);
+                                                        double TargetDistanceTemp = Vector2D.Size(TargetParticle.Position - Position) / (Math.Max(TargetParticle.Radius * 2d, 0.001d) / g_Soup.CellSizeMultiplier);
                                                         if (TargetParticle.Type == ParticleType.Plant)
                                                         {
-                                                            TargetDistanceTemp /= Math.Max(1d - (Genes.GeneDiet + 1d) / 2d, 0.001d);
+                                                            TargetDistanceTemp /= Math.Max(1d - (Genes.GeneDiet + 1d) / 2d * 1.5, 0.001d);
                                                             IsValidTarget = true;
                                                         }
                                                         else if (TargetParticle.Type == ParticleType.Animal)
                                                         {
                                                             TargetDistanceTemp /= Math.Max((Genes.GeneDiet + 1d) / 2d, 0.001d);
-                                                            if (Math.Sqrt(Math.Pow(Color.Red - TargetParticle.Color.Red, 2) + Math.Pow(Color.Green - TargetParticle.Color.Green, 2) + Math.Pow(Color.Blue - TargetParticle.Color.Blue, 2)) > 16d && TargetParticle.Age >= 0) IsValidTarget = true;
+                                                            if (Math.Sqrt(Math.Pow(Color.Red - TargetParticle.Color.Red, 2) + Math.Pow(Color.Green - TargetParticle.Color.Green, 2) + Math.Pow(Color.Blue - TargetParticle.Color.Blue, 2)) > 16d && TargetParticle.Age >= 1) IsValidTarget = true;
                                                         }
 
                                                         if (TargetDistanceTemp < TargetDistance && IsValidTarget)
@@ -437,13 +464,22 @@ namespace Paramecium.Simulation
 
                         if (Target is not null)
                         {
-                            Angle += Math.Min(Math.Max(Vector2D.ToAngle(Target.Position - Position) - Angle, -12), 12);
+                            double TargetAngle = Vector2D.ToAngle(Target.Position - Position);
+                            if (TargetAngle > 180d + Angle) TargetAngle -= 360d;
+                            if (TargetAngle < -180d + Angle) TargetAngle += 360d;
+                            Angle += Math.Min(Math.Max(TargetAngle - Angle, -12), 12);
+
                             //Velocity += Vector2D.Normalization(Target.Position - Position) * (0.5d + Vector2D.Size(Target.Position - Position) / RaycastRange * 0.5d) * 0.01d;
-                            Velocity += Vector2D.FromAngle(Angle) * 0.01d * (0.5d + Vector2D.Size(Target.Position - Position) / RaycastRange * 0.5d);
+                            if (Target.Type == ParticleType.Plant) Velocity += Vector2D.FromAngle(Angle) * 0.01d * (0.2d + Vector2D.Size(Target.Position - Position) / RaycastRange * 0.8d);
+                            else if (Target.Type == ParticleType.Animal) Velocity += Vector2D.FromAngle(Angle) * 0.01d * 0.5d;
                         }
                         else
                         {
-                            Angle += Math.Sin(((Age % 628) + (Index % 628)) * 0.01d) * 3d;
+                            if (new Random().NextDouble() < 0.005d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
+                            if (RandomWalkTargetAngle > 180d + Angle) RandomWalkTargetAngle -= 360d;
+                            if (RandomWalkTargetAngle < -180d + Angle) RandomWalkTargetAngle += 360d;
+
+                            Angle += Math.Min(Math.Max(RandomWalkTargetAngle - Angle, -12), 12);
                             Velocity += Vector2D.FromAngle(Angle) * 0.005d;
                         }
 
@@ -454,9 +490,9 @@ namespace Paramecium.Simulation
             }
 
             InCollision = false;
-            for (int x = Math.Max((int)Math.Floor(Position.X - CellSize), 0); x <= Math.Min((int)Math.Ceiling(Position.X + CellSize), local_env_SizeX - 1); x++)
+            for (int x = Math.Max((int)Math.Floor(Position.X - g_Soup.CellSizeMultiplier), 0); x <= Math.Min((int)Math.Ceiling(Position.X + g_Soup.CellSizeMultiplier), local_env_SizeX - 1); x++)
             {
-                for (int y = Math.Max((int)Math.Floor(Position.Y - CellSize), 0); y <= Math.Min((int)Math.Ceiling(Position.Y + CellSize), local_env_SizeY - 1); y++)
+                for (int y = Math.Max((int)Math.Floor(Position.Y - g_Soup.CellSizeMultiplier), 0); y <= Math.Min((int)Math.Ceiling(Position.Y + g_Soup.CellSizeMultiplier), local_env_SizeY - 1); y++)
                 {
                     if (Global.g_Soup.GridMap[x + y * Global.g_Soup.SizeX].Type == TileType.Wall)
                     {
@@ -475,27 +511,48 @@ namespace Paramecium.Simulation
                         {
                             Velocity += Vector2D.Normalization(Position - WallPosition1) * ((Radius + 0.353553 - WallDistance1) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             InCollision = true;
+                            if (Type == ParticleType.Animal)
+                            {
+                                if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
+                            }
                         }
                         if (WallDistance2 < 0.353553 + Radius)
                         {
                             Velocity += Vector2D.Normalization(Position - WallPosition2) * ((Radius + 0.353553 - WallDistance2) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             InCollision = true;
+                            if (Type == ParticleType.Animal)
+                            {
+                                if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
+                            }
                         }
                         if (WallDistance3 < 0.353553 + Radius)
                         {
                             Velocity += Vector2D.Normalization(Position - WallPosition3) * ((Radius + 0.353553 - WallDistance3) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             InCollision = true;
+                            if (Type == ParticleType.Animal)
+                            {
+                                if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
+                            }
                         }
                         if (WallDistance4 < 0.353553 + Radius)
                         {
                             Velocity += Vector2D.Normalization(Position - WallPosition4) * ((Radius + 0.353553 - WallDistance4) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             InCollision = true;
+                            if (Type == ParticleType.Animal)
+                            {
+                                if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
+                            }
                         }
                         if (WallDistance5 < 0.5 + Radius)
                         {
                             Velocity += Vector2D.Normalization(Position - WallPosition5) * ((Radius + 0.5 - WallDistance5) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             InCollision = true;
+                            if (Type == ParticleType.Animal)
+                            {
+                                if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
+                            }
                         }
+
                     }
 
                     int LocalParticlesCount = Global.g_Soup.GridMap[x + y * local_env_SizeX].LocalParticles.Count;
@@ -511,7 +568,7 @@ namespace Paramecium.Simulation
                                 double Distance = Vector2D.Distance(Position, collidedParticlePosition);
                                 if (Distance < Radius + Target.Radius)
                                 {
-                                    Velocity += Vector2D.Normalization(Position - Target.Position) * ((Radius + Target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + Target.Velocity), 0.01d);
+                                    Velocity += Vector2D.Normalization(Position - Target.Position) * ((Radius + Target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + Target.Velocity), 0.01d) * Math.Min(Target.Mass / Mass, 1d);
                                     InCollision = true;
                                     Target.InCollision = true;
 
@@ -519,26 +576,44 @@ namespace Paramecium.Simulation
                                     {
                                         if (Target.Index == TargetIndex)
                                         {
-
                                             if (Target.Type == ParticleType.Plant)
                                             {
-                                                Satiety += Math.Min(1d, Target.Satiety) * (1d - (Genes.GeneDiet + 1d) / 2d);
-                                                g_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * g_Soup.SizeX].Fertility += Math.Min(1d, Target.Satiety) * ((Genes.GeneDiet + 1d) / 2d);
+                                                Satiety += Math.Min(Math.Max(1d - (Genes.GeneDiet + 1d) / 2d * 1.5, 0d) * Genes.GeneStrength, Target.Satiety);
+                                                g_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * g_Soup.SizeX].Fertility += Math.Min(Math.Min((Genes.GeneDiet + 1d) / 2d * 1.5, 1d) * Genes.GeneStrength, Target.Satiety);
+                                                Target.Satiety -= Math.Min(1d * Genes.GeneStrength, Target.Satiety);
+                                                Target.Radius = 0.5d * Math.Max(Math.Sqrt(Target.Satiety) / g_Soup.PlantSizeMultiplier * g_Soup.CellSizeMultiplier, 0.01d);
+                                                Target.Mass = Math.Pow(Target.Radius, 2);
                                             }
                                             else if (Target.Type == ParticleType.Animal)
                                             {
-                                                Satiety += Math.Min(1d, Target.Satiety) * ((Genes.GeneDiet + 1d) / 2d);
-                                                g_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * g_Soup.SizeX].Fertility += Math.Min(1d, Target.Satiety) * (1d - (Genes.GeneDiet + 1d) / 2d);
+                                                Target.TargetIndex = Index;
+                                                Target.TargetId = Id;
+
+                                                Target.Velocity += Vector2D.Normalization(Target.Position - Position) * 0.01d;
+
+                                                Target.Health -= Math.Max((Genes.GeneStrength - Target.Genes.GeneHardness) * Math.Min(Genes.GeneAgility / Math.Max(Target.Genes.GeneAgility, 0.01d), 1d), 0.1d);
+                                                Target.TimeSinceLastDamage = 100;
+
+                                                if (Target.Health <= 0d)
+                                                {
+                                                    Satiety += Target.Satiety * ((Genes.GeneDiet + 1d) / 2d);
+                                                    g_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * g_Soup.SizeX].Fertility += Target.Satiety * (1d - (Genes.GeneDiet + 1d) / 2d);
+                                                    Target.Satiety = 0;
+                                                }
+
+                                                //Satiety += Math.Min(0.1d, Target.Satiety) * ((Genes.GeneDiet + 1d) / 2d);
+                                                //g_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * g_Soup.SizeX].Fertility += Math.Min(0.1d, Target.Satiety) * (1d - (Genes.GeneDiet + 1d) / 2d);
                                             }
-                                            Target.Satiety -= Math.Min(1d, Target.Satiety);
 
                                             if (Target.Satiety <= 0)
                                             {
                                                 Target.IsAlive = false;
 
+                                                RandomWalkTargetAngle = Angle;
+
                                                 //if (new Random().NextDouble() < 0.1d)
                                                 //{
-                                                //    g_Soup.ParticlesBuffer[threadId].Add(new Particle(Position + (Vector2D.FromAngle(Angle + 180) * CellSize * 0.45d), 0));
+                                                //    g_Soup.ParticlesBuffer[threadId].Add(new Particle(Position + (Vector2D.FromAngle(Angle + 180) * g_Soup.CellSizeMultiplier * 0.45d), 0));
                                                 //}
                                             }
                                         }
@@ -554,21 +629,16 @@ namespace Paramecium.Simulation
         {
             if (Type == ParticleType.Plant)
             {
-                Color = new ColorInt3(0, 63 + (int)(192 / 16 * Satiety), 0);
-                Radius = Math.Max(Math.Sqrt(Satiety) / 8d * CellSize, 0.025d);
-
-                if (Satiety >= 16)
+                if (Satiety >= g_Soup.PlantForkBiomass)
                 {
                     Random rnd = new Random();
 
-                    while (Satiety > 4)
+                    while (Satiety > 0)
                     {
-                        double SatietySwap = rnd.NextDouble() * Math.Min(6, Satiety);
+                        double SatietySwap = Math.Min(rnd.NextDouble() * g_Soup.PlantForkBiomass / 4, Satiety);
                         Global.g_Soup.ParticlesBuffer[threadId].Add(new Particle(this, SatietySwap));
                         Satiety -= SatietySwap;
                     }
-                    Global.g_Soup.ParticlesBuffer[threadId].Add(new Particle(this, Satiety));
-                    Satiety = 0;
 
                     IsAlive = false;
 
@@ -579,25 +649,39 @@ namespace Paramecium.Simulation
             {
                 if (Age > 0)
                 {
-                    if (Age <= 300) Radius = 0.25 * CellSize + 0.25 * CellSize * (Math.Min(300, Age) / 300d);
+                    if (Age <= 300)
+                    {
+                        Radius = 0.25 * g_Soup.CellSizeMultiplier + 0.25 * g_Soup.CellSizeMultiplier * (Math.Min(300, Age) / 300d);
+                        Mass = Math.Pow(Radius, 2);
+                    }
 
-                    if (Satiety >= 128)
+                    if (Satiety >= Genes.ForkCost * 2d)
                     {
                         Random rnd = new Random();
 
-                        Global.g_Soup.ParticlesBuffer[threadId].Add(new Particle(this, 64));
-                        Satiety -= 64;
+                        Global.g_Soup.ParticlesBuffer[threadId].Add(new Particle(this, Genes.ForkCost));
+                        Satiety -= Genes.ForkCost;
                     }
 
-                    Global.g_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * Global.g_Soup.SizeX].Fertility += Math.Min(0.025d, Satiety) + Math.Min(0.075d * Vector2D.Size(Velocity), Satiety);
-                    Satiety -= Math.Min(0.025d, Satiety) + Math.Min(0.075d * Vector2D.Size(Velocity), Satiety); ;
+                    if (TimeSinceLastDamage > 0) TimeSinceLastDamage--;
+                    else if (TimeSinceLastDamage == 0 && Health < Genes.GeneHealth * 10d)
+                    {
+                        Satiety -= 0.1d;
+                        Health = Math.Min(Health + 0.1d, Genes.GeneHealth * 10d);
+                    }
+                    else if (TimeSinceLastDamage == 0 && Health >= Genes.GeneHealth * 10d) TimeSinceLastDamage = -1;
+
+                    if (Health > Genes.GeneHealth * 10d) Health = Genes.GeneHealth * 10d;
+
+                    Global.g_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * Global.g_Soup.SizeX].Fertility += Math.Min(0.05d, Satiety) + Math.Min(0.15d * Vector2D.Size(Velocity), Satiety);
+                    Satiety -= Math.Min(0.05d, Satiety) + Math.Min(0.15d * Vector2D.Size(Velocity), Satiety);
 
                     if (Satiety <= 0) IsAlive = false;
                 }
 
                 if (Age == 0)
                 {
-                    //Radius = 0.5 * CellSize;
+                    //Radius = 0.5 * g_Soup.CellSizeMultiplier;
                     Color = new ColorInt3(Genes.GeneColorRed, Genes.GeneColorGreen, Genes.GeneColorBlue);
                 }
             }
@@ -666,10 +750,19 @@ namespace Paramecium.Simulation
 
     public class Gene
     {
+        public long RaceId { get; set; }
+
         public int GeneColorRed { get; set; }
         public int GeneColorGreen { get; set; }
         public int GeneColorBlue { get; set; }
         public double GeneDiet { get; set; }
+        public double GeneHealth { get; set; }
+        public double GeneStrength { get; set; }
+        public double GeneHardness { get; set; }
+        public double GeneAgility { get; set; }
+        public double ActionGeneUnassignedPoint { get; set; }
+
+        public double ForkCost { get; set; }
 
         public Gene()
         {
@@ -680,27 +773,64 @@ namespace Paramecium.Simulation
         {
             Random rnd = new Random();
 
+            RaceId = rnd.NextInt64(0, 2176782336);
+
             GeneColorRed = rnd.Next(0, 256);
             GeneColorGreen = rnd.Next(0, 256);
             GeneColorBlue = rnd.Next(0, 256);
             GeneDiet = -1d;
+            GeneHealth = 1d;
+            GeneStrength = 1d;
+            GeneHardness = 0d;
+            GeneAgility = 0d;
+            ActionGeneUnassignedPoint = 2d;
+            ForkCost = 60d;
         }
 
         public Gene(Gene parentGenes)
         {
             Random rnd = new Random();
 
+            RaceId = parentGenes.RaceId;
+
             GeneColorRed = parentGenes.GeneColorRed;
             GeneColorGreen = parentGenes.GeneColorGreen;
             GeneColorBlue = parentGenes.GeneColorBlue;
-            GeneDiet = Math.Min(Math.Max(GeneDiet + (rnd.NextDouble() * 0.2d - 0.1d), -1d), 1d);
 
-            if (rnd.NextDouble() < 0.02d)
+            GeneDiet = Math.Min(Math.Max(parentGenes.GeneDiet + (rnd.NextDouble() * 0.2d - 0.1d), -1d), 1d);
+
+            GeneHealth = Math.Min(Math.Max(parentGenes.GeneHealth + (rnd.NextDouble() * 0.2d - 0.1d), 0d), 4d);
+            GeneStrength = Math.Min(Math.Max(parentGenes.GeneStrength + (rnd.NextDouble() * 0.2d - 0.1d), 0d), 4d);
+            GeneHardness = Math.Min(Math.Max(parentGenes.GeneHardness + (rnd.NextDouble() * 0.2d - 0.1d), 0d), 4d);
+            GeneAgility = Math.Min(Math.Max(parentGenes.GeneAgility + (rnd.NextDouble() * 0.2d - 0.1d), 0d), 4d);
+            ActionGeneUnassignedPoint = Math.Min(Math.Max(parentGenes.ActionGeneUnassignedPoint + (rnd.NextDouble() * 0.2d - 0.1d), 0d), 4d);
+            double ActionGenesValueSum = GeneHealth + GeneStrength + GeneHardness + GeneAgility + ActionGeneUnassignedPoint;
+            GeneHealth /= ActionGenesValueSum / 4d;
+            GeneStrength /= ActionGenesValueSum / 4d;
+            GeneHardness /= ActionGenesValueSum / 4d;
+            GeneAgility /= ActionGenesValueSum / 4d;
+            ActionGeneUnassignedPoint /= ActionGenesValueSum / 4d;
+
+            if (rnd.NextDouble() < 0.04d)
             {
+                RaceId = rnd.NextInt64(0, 2176782336);
+
                 GeneColorRed = rnd.Next(0, 256);
                 GeneColorGreen = rnd.Next(0, 256);
                 GeneColorBlue = rnd.Next(0, 256);
                 GeneDiet = rnd.NextDouble() * 2d - 1d;
+
+                GeneHealth = rnd.NextDouble() * 4d;
+                GeneStrength = rnd.NextDouble() * 4d;
+                GeneHardness = rnd.NextDouble() * 4d;
+                GeneAgility = rnd.NextDouble() * 4d;
+                ActionGeneUnassignedPoint = rnd.NextDouble() * 4d;
+                double ActionGenesValueSumMutation = GeneHealth + GeneStrength + GeneHardness + GeneAgility + ActionGeneUnassignedPoint;
+                GeneHealth /= ActionGenesValueSumMutation / 4d;
+                GeneStrength /= ActionGenesValueSumMutation / 4d;
+                GeneHardness /= ActionGenesValueSumMutation / 4d;
+                GeneAgility /= ActionGenesValueSumMutation / 4d;
+                ActionGeneUnassignedPoint /= ActionGenesValueSumMutation / 4d;
             }
             else
             {
@@ -708,61 +838,18 @@ namespace Paramecium.Simulation
                 switch (MutatingColor)
                 {
                     case 0:
-                        GeneColorRed = Math.Min(Math.Max(GeneColorRed + rnd.Next(-1, 1 + 1), 0), 255);
+                        GeneColorRed = Math.Min(Math.Max(parentGenes.GeneColorRed + rnd.Next(-4, 4 + 1), 0), 255);
                         break;
                     case 1:
-                        GeneColorGreen = Math.Min(Math.Max(GeneColorGreen + rnd.Next(-1, 1 + 1), 0), 255);
+                        GeneColorGreen = Math.Min(Math.Max(parentGenes.GeneColorGreen + rnd.Next(-4, 4 + 1), 0), 255);
                         break;
                     case 2:
-                        GeneColorBlue = Math.Min(Math.Max(GeneColorBlue + rnd.Next(-1, 1 + 1), 0), 255);
+                        GeneColorBlue = Math.Min(Math.Max(parentGenes.GeneColorBlue + rnd.Next(-4, 4 + 1), 0), 255);
                         break;
                 }
             }
-        }
 
-        public static double TryMutation(double targetGene)
-        {
-            Random rnd = new Random();
-
-            if (rnd.NextDouble() < 0.1d)
-            {
-                if (rnd.NextDouble() < 0.1d)
-                {
-                    return rnd.NextDouble() * 2d;
-                }
-                else
-                {
-                    return Math.Max(Math.Min(targetGene + (rnd.NextDouble() * 0.2d - 0.1d), 2d), 0d);
-                }
-            }
-            else return targetGene;
-        }
-        public static double TryMutationSize(double targetGene)
-        {
-            Random rnd = new Random();
-
-            if (rnd.NextDouble() < 0.1d)
-            {
-                if (rnd.NextDouble() < 0.1d)
-                {
-                    return rnd.NextDouble() * 1.25d + 0.25d;
-                }
-                else
-                {
-                    return Math.Max(Math.Min(targetGene + (rnd.NextDouble() * 0.2d - 0.1d), 1.5d), 0.25d);
-                }
-            }
-            else return targetGene;
-        }
-        public static ColorInt3 TryMutationColor(ColorInt3 targetGene)
-        {
-            Random rnd = new Random();
-
-            if (rnd.NextDouble() < 0.01d)
-            {
-                return new ColorInt3(rnd);
-            }
-            else return targetGene;
+            ForkCost = 30d + (GeneHealth * 15d) + (GeneStrength * 15d) + (GeneHardness * 15d) + (GeneAgility * 15d);
         }
     }
 

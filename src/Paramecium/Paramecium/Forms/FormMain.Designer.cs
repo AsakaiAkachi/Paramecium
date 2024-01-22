@@ -48,7 +48,6 @@
             TopMenu_Simulation = new ToolStripMenuItem();
             TopMenu_Simulation_NewSimulation = new ToolStripMenuItem();
             SimulationView = new PictureBox();
-            StatBiomassAmount = new ToolStripStatusLabel();
             BottomStat.SuspendLayout();
             TopMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SimulationView).BeginInit();
@@ -56,7 +55,7 @@
             // 
             // BottomStat
             // 
-            BottomStat.Items.AddRange(new ToolStripItem[] { StatSoupStatus, StatTimeStep, StatPopulation, StatTps, StatFps, StatMemory, StatBiomassAmount });
+            BottomStat.Items.AddRange(new ToolStripItem[] { StatSoupStatus, StatTimeStep, StatPopulation, StatTps, StatFps, StatMemory });
             BottomStat.Location = new Point(0, 622);
             BottomStat.Name = "BottomStat";
             BottomStat.Size = new Size(900, 24);
@@ -201,12 +200,6 @@
             SimulationView.MouseMove += SimulationView_MouseMove;
             SimulationView.MouseUp += SimulationView_MouseUp;
             // 
-            // StatBiomassAmount
-            // 
-            StatBiomassAmount.Name = "StatBiomassAmount";
-            StatBiomassAmount.Size = new Size(108, 19);
-            StatBiomassAmount.Text = "BiomassAmount : 0";
-            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -251,6 +244,5 @@
         private ToolStripStatusLabel StatSoupStatus;
         private ToolStripMenuItem TopMenu_Simulation;
         private ToolStripMenuItem TopMenu_Simulation_NewSimulation;
-        private ToolStripStatusLabel StatBiomassAmount;
     }
 }
