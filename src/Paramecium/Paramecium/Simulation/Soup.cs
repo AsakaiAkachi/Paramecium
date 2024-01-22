@@ -384,8 +384,8 @@ namespace Paramecium.Simulation
                             BiomassAmountArray[i] += GridMap[x + y * SizeX].Fertility;
                             if (GridMap[x + y * SizeX].Type != TileType.Wall)
                             {
-                                //GridMapBg[x + y * env_SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * env_SizeX].Fertility * 8d / (env_TotalBiomassAmount / (env_SizeX * env_SizeY))), 0), 32) + 16);
-                                GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility * 8d), 0), 32) + 16);
+                                GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility * 8d / (TotalBiomassAmount / (SizeX * SizeY))), 0), 32) + 16);
+                                //GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility * 8d), 0), 32) + 16);
                                 GridMapBgParticle[x + y * SizeX] = GridMapBg[x + y * SizeX];
                             }
                             else
