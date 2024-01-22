@@ -7,6 +7,8 @@ using System.Text.Json.Serialization;
 using static System.Windows.Forms.Design.AxImporter;
 using System;
 using System.Security.Cryptography;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using System.ComponentModel.Design;
 
 namespace Paramecium.Forms
 {
@@ -25,6 +27,16 @@ namespace Paramecium.Forms
         private double cameraX;
         private double cameraY;
 
+        private int SelectedCellIndex = -1;
+        private int SelectedCellId = -1;
+        private bool Clicked = false;
+        private double ClickedPosX = 0d;
+        private double ClickedPosY = 0d;
+        private double MousePosX = 0d;
+        private double MousePosY = 0d;
+        private bool Tracking = false;
+        private int DisplayMode = 0;
+
         private Bitmap canvas;
 
         DateTime BottomStatLastRefreshTime;
@@ -40,8 +52,8 @@ namespace Paramecium.Forms
 
             zoomFactor = 0;
             zoomFactorActual = 1d;
-            cameraX = Global.SoupInstance.env_SizeX / 2d;
-            cameraY = Global.SoupInstance.env_SizeY / 2d;
+            cameraX = Global.g_Soup.SizeX / 2d;
+            cameraY = Global.g_Soup.SizeY / 2d;
 
             canvas = new Bitmap(1, 1);
 
@@ -53,11 +65,14 @@ namespace Paramecium.Forms
 
         private async void FormMain_Shown(object sender, EventArgs e)
         {
-            Global.SoupInstance.SoupRun();
+            Global.g_Soup.SoupRun();
 
             FilePath = $@"{Path.GetDirectoryName(Application.ExecutablePath)}\New Soup.soup";
 
             Random rnd2 = new Random();
+
+            string RaceIdChars = "0123456789abcdefghijklmnopqrstuvwxyz";
+
             while (true)
             {
                 if (SimulationView.Width > 0 && SimulationView.Height > 0)
@@ -65,7 +80,33 @@ namespace Paramecium.Forms
                     Bitmap canvasOld = canvas;
                     canvas = new Bitmap(SimulationView.Width, SimulationView.Height);
 
-                    Bitmap bgCanvas = new Bitmap(Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY, PixelFormat.Format8bppIndexed);
+                    if (SelectedCellIndex != -1 && SelectedCellId != -1)
+                    {
+                        if (g_Soup.Particles[SelectedCellIndex] is null)
+                        {
+                            SelectedCellIndex = -1;
+                            SelectedCellId = -1;
+                        }
+                        else if (g_Soup.Particles[SelectedCellIndex].Id != SelectedCellId || !g_Soup.Particles[SelectedCellIndex].IsAlive)
+                        {
+                            SelectedCellIndex = -1;
+                            SelectedCellId = -1;
+                        }
+                    }
+
+                    if (Tracking)
+                    {
+                        if (SelectedCellIndex != -1 && SelectedCellId != -1)
+                        {
+                            if (g_Soup.Particles[SelectedCellIndex] is not null && g_Soup.Particles[SelectedCellIndex].Id == SelectedCellId)
+                            {
+                                cameraX += (g_Soup.Particles[SelectedCellIndex].Position.X - cameraX) * 0.1d;
+                                cameraY += (g_Soup.Particles[SelectedCellIndex].Position.Y - cameraY) * 0.1d;
+                            }
+                        }
+                    }
+
+                    Bitmap bgCanvas = new Bitmap(Global.g_Soup.SizeX, Global.g_Soup.SizeY, PixelFormat.Format8bppIndexed);
                     SolidBrush brush1 = new SolidBrush(Color.FromArgb(255, 0, 0, 0));
                     brush1.Dispose();
 
@@ -81,22 +122,22 @@ namespace Paramecium.Forms
                     bgCanvas.Palette = pal;
 
                     BitmapData bmpdata = bgCanvas.LockBits(
-                        new Rectangle(0, 0, Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY),
+                        new Rectangle(0, 0, Global.g_Soup.SizeX, Global.g_Soup.SizeY),
                         ImageLockMode.WriteOnly,
                         PixelFormat.Format8bppIndexed
                     );
 
                     if (zoomFactor >= 4)
                     {
-                        Marshal.Copy(Global.SoupInstance.GridMapBg, 0, bmpdata.Scan0, Global.SoupInstance.GridMapBg.Length);
+                        Marshal.Copy(Global.g_Soup.GridMapBg, 0, bmpdata.Scan0, Global.g_Soup.GridMapBg.Length);
                     }
                     else
                     {
-                        Marshal.Copy(Global.SoupInstance.GridMapBgParticle, 0, bmpdata.Scan0, Global.SoupInstance.GridMapBgParticle.Length);
+                        Marshal.Copy(Global.g_Soup.GridMapBgParticle, 0, bmpdata.Scan0, Global.g_Soup.GridMapBgParticle.Length);
                     }
                     bgCanvas.UnlockBits(bmpdata);
 
-                    Bitmap bgCanvas2 = new Bitmap(Global.SoupInstance.env_SizeX + 1, Global.SoupInstance.env_SizeY + 1);
+                    Bitmap bgCanvas2 = new Bitmap(Global.g_Soup.SizeX + 1, Global.g_Soup.SizeY + 1);
 
                     Graphics bgCanvas2_g = Graphics.FromImage(bgCanvas2);
                     bgCanvas2_g.DrawImage(bgCanvas, 1, 1, bgCanvas.Width, bgCanvas.Height);
@@ -112,6 +153,11 @@ namespace Paramecium.Forms
                         (float)(bgCanvas2.Height * zoomFactorActual)
                     );
 
+                    int x1 = (int)Math.Floor(CanvasPosXToWorldPosX(0d));
+                    int y1 = (int)Math.Floor(CanvasPosYToWorldPosY(0d));
+                    int x2 = (int)Math.Ceiling(CanvasPosXToWorldPosX(canvas.Width));
+                    int y2 = (int)Math.Ceiling(CanvasPosYToWorldPosY(canvas.Height));
+
                     if (zoomFactor >= 4)
                     {
                         /**
@@ -122,11 +168,6 @@ namespace Paramecium.Forms
                         canvas_g.DrawRectangle(Pens.Red, x1, y1, x2 - 1, y2 - 1);
                         **/
 
-                        int x1 = (int)Math.Floor(CanvasPosXToWorldPosX(0d));
-                        int y1 = (int)Math.Floor(CanvasPosYToWorldPosY(0d));
-                        int x2 = (int)Math.Ceiling(CanvasPosXToWorldPosX(canvas.Width));
-                        int y2 = (int)Math.Ceiling(CanvasPosYToWorldPosY(canvas.Height));
-
                         SolidBrush brush2 = new SolidBrush(Color.FromArgb(127, 127, 127));
                         SolidBrush brush3 = new SolidBrush(Color.FromArgb(127, 127, 127));
                         SolidBrush brush4 = new SolidBrush(Color.FromArgb(0, 255, 0));
@@ -136,19 +177,38 @@ namespace Paramecium.Forms
                         {
                             for (int y = y1; y < y2; y++)
                             {
-                                if (x >= 0 && x < Global.SoupInstance.env_SizeX && y >= 0 && y < Global.SoupInstance.env_SizeY)
+                                if (x >= 0 && x < Global.g_Soup.SizeX && y >= 0 && y < Global.g_Soup.SizeY)
                                 {
                                     try
                                     {
-                                        if (Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles.Count > 0)
+                                        if (Global.g_Soup.GridMap[x + y * Global.g_Soup.SizeX].LocalParticles.Count > 0)
                                         {
-                                            for (int i = 0; i < Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles.Count; i++)
+                                            for (int i = 0; i < Global.g_Soup.GridMap[x + y * Global.g_Soup.SizeX].LocalParticles.Count; i++)
                                             {
-                                                Particle Target = Global.SoupInstance.Particles[Global.SoupInstance.GridMap[x + y * Global.SoupInstance.env_SizeX].LocalParticles[i]];
+                                                Particle Target = Global.g_Soup.Particles[Global.g_Soup.GridMap[x + y * Global.g_Soup.SizeX].LocalParticles[i]];
 
                                                 if (Target is not null)
                                                 {
                                                     SolidBrush b_plant = new SolidBrush(Target.Color);
+
+                                                    switch(DisplayMode)
+                                                    {
+                                                        case 0:
+                                                            break;
+                                                        case 1:
+                                                            b_plant.Dispose();
+                                                            if (Target.Type == ParticleType.Plant)
+                                                            {
+                                                                b_plant = new SolidBrush(Color.FromArgb(0, 0, 0));
+                                                            }
+                                                            else if (Target.Type == ParticleType.Animal)
+                                                            {
+                                                                b_plant = new SolidBrush(Color.FromArgb((int)(((Target.Genes.GeneDiet + 1d) / 2d) * 255d), 255 - (int)(((Target.Genes.GeneDiet + 1d) / 2d) * 255d), 0));
+                                                            }
+                                                            break;
+                                                    }
+
+
                                                     FillCircle(
                                                         canvas_g,
                                                         b_plant,
@@ -166,7 +226,7 @@ namespace Paramecium.Forms
 
                                                     if (Target.Type == ParticleType.Animal)
                                                     {
-                                                        Random rnd3 = new Random(Global.SoupInstance.timeSteps + x + y * Global.SoupInstance.env_SizeX + Target.Index);
+                                                        Random rnd3 = new Random(Global.g_Soup.ElapsedTimeStep + x + y * Global.g_Soup.SizeX + Target.Index);
                                                         if (Target.Age >= 0)
                                                         {
                                                             double TargetSpeed = Vector2D.Size(Target.Velocity) * 9d + 0.1d;
@@ -227,21 +287,31 @@ namespace Paramecium.Forms
                                                     **/
 
                                                     b_plant.Dispose();
+
+                                                    if (Clicked)
+                                                    {
+                                                        if (Vector2D.Size(Target.Position - new Vector2D(ClickedPosX, ClickedPosY)) < Target.Radius)
+                                                        {
+                                                            SelectedCellIndex = Target.Index;
+                                                            SelectedCellId = Target.Id;
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                    catch (Exception ex) { }
+                                    catch { }
                                 }
                             }
                         }
+
                         for (int x = x1; x < x2; x++)
                         {
                             for (int y = y1; y < y2; y++)
                             {
-                                if (x >= 0 && x < Global.SoupInstance.env_SizeX && y >= 0 && y < Global.SoupInstance.env_SizeY)
+                                if (x >= 0 && x < Global.g_Soup.SizeX && y >= 0 && y < Global.g_Soup.SizeY)
                                 {
-                                    if (Global.SoupInstance.GridMapByte[x + y * Global.SoupInstance.env_SizeX] == 0x01)
+                                    if (Global.g_Soup.GridMapByte[x + y * Global.g_Soup.SizeX] == 0x01)
                                     {
                                         double WallPosX = x + 0.5d;
                                         double WallPosY = y + 0.5d;
@@ -254,6 +324,81 @@ namespace Paramecium.Forms
                             }
                         }
 
+                        if (SelectedCellIndex != -1 && SelectedCellId != -1)
+                        {
+                            if (g_Soup.Particles[SelectedCellIndex] is not null && g_Soup.Particles[SelectedCellIndex].Id == SelectedCellId)
+                            {
+                                for (int x = x1; x < x2; x++)
+                                {
+                                    for (int y = y1; y < y2; y++)
+                                    {
+                                        if (x >= 0 && x < Global.g_Soup.SizeX && y >= 0 && y < Global.g_Soup.SizeY)
+                                        {
+                                            try
+                                            {
+                                                for (int i = 0; i < Global.g_Soup.GridMap[x + y * Global.g_Soup.SizeX].LocalParticles.Count; i++)
+                                                {
+                                                    Particle Target = Global.g_Soup.Particles[Global.g_Soup.GridMap[x + y * Global.g_Soup.SizeX].LocalParticles[i]];
+
+                                                    if (Target is not null)
+                                                    {
+                                                        if (Target.Index == SelectedCellIndex && Target.Id == SelectedCellId)
+                                                        {
+                                                            DrawCircle(
+                                                                canvas_g,
+                                                                Pens.Yellow,
+                                                                Target.Position.X,
+                                                                Target.Position.Y,
+                                                                Target.Radius + 0.5d
+                                                            );
+                                                            if (Target.TargetIndex != -1)
+                                                            {
+                                                                DrawLine(
+                                                                    canvas_g,
+                                                                    Pens.Yellow,
+                                                                    Target.Position.X,
+                                                                    Target.Position.Y,
+                                                                    g_Soup.Particles[Target.TargetIndex].Position.X,
+                                                                    g_Soup.Particles[Target.TargetIndex].Position.Y
+                                                                );
+                                                                DrawCircle(
+                                                                    canvas_g,
+                                                                    Pens.Yellow,
+                                                                    g_Soup.Particles[Target.TargetIndex].Position.X,
+                                                                    g_Soup.Particles[Target.TargetIndex].Position.Y,
+                                                                    g_Soup.Particles[Target.TargetIndex].Radius * 0.5d
+                                                                );
+                                                            }
+                                                        }
+                                                        else if (SelectedCellIndex != -1 && SelectedCellId != -1)
+                                                        {
+                                                            if (g_Soup.Particles[SelectedCellIndex].Id == SelectedCellId && Target.Type == ParticleType.Animal)
+                                                            {
+                                                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                                                {
+                                                                    if (Math.Sqrt(Math.Pow(g_Soup.Particles[SelectedCellIndex].Genes.GeneColorRed - Target.Genes.GeneColorRed, 2) + Math.Pow(g_Soup.Particles[SelectedCellIndex].Genes.GeneColorGreen - Target.Genes.GeneColorGreen, 2) + Math.Pow(g_Soup.Particles[SelectedCellIndex].Genes.GeneColorBlue - Target.Genes.GeneColorBlue, 2)) <= 16d)
+                                                                    {
+                                                                        DrawCircle(
+                                                                            canvas_g,
+                                                                            Pens.LightGreen,
+                                                                            Target.Position.X,
+                                                                            Target.Position.Y,
+                                                                            Target.Radius + 0.5d
+                                                                        );
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            catch { }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         brush2.Dispose();
                         brush3.Dispose();
                         brush4.Dispose();
@@ -261,11 +406,185 @@ namespace Paramecium.Forms
 
                     SolidBrush brush = new SolidBrush(Color.FromArgb(0, 0, 0));
 
-                    FillRectangle(canvas_g, brush, -16, -16, 16, Global.SoupInstance.env_SizeY + 32);
-                    FillRectangle(canvas_g, brush, -16, -16, Global.SoupInstance.env_SizeX + 32, 16);
-                    FillRectangle(canvas_g, brush, -16, Global.SoupInstance.env_SizeY, Global.SoupInstance.env_SizeX + 32, 16);
-                    FillRectangle(canvas_g, brush, Global.SoupInstance.env_SizeX, -16, 16, Global.SoupInstance.env_SizeY + 32);
-                    DrawRectangle(canvas_g, Pens.Red, 0, 0, Global.SoupInstance.env_SizeX, Global.SoupInstance.env_SizeY);
+                    FillRectangle(canvas_g, brush, -16, -16, 16, Global.g_Soup.SizeY + 32);
+                    FillRectangle(canvas_g, brush, -16, -16, Global.g_Soup.SizeX + 32, 16);
+                    FillRectangle(canvas_g, brush, -16, Global.g_Soup.SizeY, Global.g_Soup.SizeX + 32, 16);
+                    FillRectangle(canvas_g, brush, Global.g_Soup.SizeX, -16, 16, Global.g_Soup.SizeY + 32);
+                    DrawRectangle(canvas_g, Pens.Red, 0, 0, Global.g_Soup.SizeX, Global.g_Soup.SizeY);
+
+                    Font fnt = new Font("MS UI Gothic", 12);
+                    SolidBrush brushBack = new SolidBrush(Color.FromArgb(127, 127, 127, 127));
+                    SolidBrush brushBar = new SolidBrush(Color.FromArgb(255, 191, 191, 191));
+                    SolidBrush brushRed = new SolidBrush(Color.FromArgb(223, 0, 0));
+                    SolidBrush brushGreen = new SolidBrush(Color.FromArgb(0, 223, 0));
+
+                    if (SelectedCellIndex != -1 && SelectedCellId != -1)
+                    {
+                        try
+                        {
+                            if (g_Soup.Particles[SelectedCellIndex] is not null && g_Soup.Particles[SelectedCellIndex].Id == SelectedCellId)
+                            {
+                                int OffsetY = 0;
+
+                                {
+                                    string Text = $"Cell #{g_Soup.Particles[SelectedCellIndex].Id}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"種族 : {RaceIdChars[(int)(g_Soup.Particles[SelectedCellIndex].Genes.RaceId / 60466176) % 36]}{RaceIdChars[(int)(g_Soup.Particles[SelectedCellIndex].Genes.RaceId / 1679616) % 36]}{RaceIdChars[(int)(g_Soup.Particles[SelectedCellIndex].Genes.RaceId / 46656) % 36]}{RaceIdChars[(int)(g_Soup.Particles[SelectedCellIndex].Genes.RaceId / 1296) % 36]}{RaceIdChars[(int)(g_Soup.Particles[SelectedCellIndex].Genes.RaceId / 36) % 36]}{RaceIdChars[(int)(g_Soup.Particles[SelectedCellIndex].Genes.RaceId % 36)]}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"世代 : {g_Soup.Particles[SelectedCellIndex].Generation}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"年齢 : {g_Soup.Particles[SelectedCellIndex].Age}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                {
+                                    string Text = $"位置 : ({g_Soup.Particles[SelectedCellIndex].Position.X:0.000}, {g_Soup.Particles[SelectedCellIndex].Position.Y:0.000})";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                {
+                                    string Text = $"速度 : ({g_Soup.Particles[SelectedCellIndex].Velocity.X:0.000}, {g_Soup.Particles[SelectedCellIndex].Velocity.Y:0.000}) / {Vector2D.Size(g_Soup.Particles[SelectedCellIndex].Velocity):0.000}u/t";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    canvas_g.FillRectangle(brushBar, 0, OffsetY, (int)(256 * (Vector2D.Size(g_Soup.Particles[SelectedCellIndex].Velocity) / 0.1d)), TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    SolidBrush brushColor = new SolidBrush(Color.FromArgb(255, g_Soup.Particles[SelectedCellIndex].Genes.GeneColorRed, g_Soup.Particles[SelectedCellIndex].Genes.GeneColorGreen, g_Soup.Particles[SelectedCellIndex].Genes.GeneColorBlue));
+                                    string Text = $"色 : ({g_Soup.Particles[SelectedCellIndex].Genes.GeneColorRed}, {g_Soup.Particles[SelectedCellIndex].Genes.GeneColorGreen}, {g_Soup.Particles[SelectedCellIndex].Genes.GeneColorBlue})";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushColor, 0, OffsetY, 256, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"食性 : {g_Soup.Particles[SelectedCellIndex].Genes.GeneDiet:0.000}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushRed, 0, OffsetY, 256, TextSize.Height);
+                                    canvas_g.FillRectangle(brushGreen, 0, OffsetY, (int)(256 * (1d - (g_Soup.Particles[SelectedCellIndex].Genes.GeneDiet + 1d) / 2d)), TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Plant)
+                                {
+                                    string Text = $"バイオマス : {g_Soup.Particles[SelectedCellIndex].Satiety:0.000} / {g_Soup.PlantForkBiomass}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    canvas_g.FillRectangle(brushBar, 0, OffsetY, (int)(256 * (g_Soup.Particles[SelectedCellIndex].Satiety / g_Soup.PlantForkBiomass)), TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"バイオマス : {g_Soup.Particles[SelectedCellIndex].Satiety:0.000} / {g_Soup.Particles[SelectedCellIndex].Genes.ForkCost * 2:0.000}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    canvas_g.FillRectangle(brushBar, 0, OffsetY, (int)(256 * (g_Soup.Particles[SelectedCellIndex].Satiety / (g_Soup.Particles[SelectedCellIndex].Genes.ForkCost * 2d))), TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"体力 : {g_Soup.Particles[SelectedCellIndex].Health:0.000} / {g_Soup.Particles[SelectedCellIndex].Genes.GeneHealth * 10d:0.000}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    canvas_g.FillRectangle(brushBar, 0, OffsetY, (int)(256 * (g_Soup.Particles[SelectedCellIndex].Health / (g_Soup.Particles[SelectedCellIndex].Genes.GeneHealth * 10d))), TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"攻撃力 : {g_Soup.Particles[SelectedCellIndex].Genes.GeneStrength:0.000}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    canvas_g.FillRectangle(brushBar, 0, OffsetY, (int)(256 * (g_Soup.Particles[SelectedCellIndex].Genes.GeneStrength / 4d)), TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"防御力 : {g_Soup.Particles[SelectedCellIndex].Genes.GeneHardness:0.000}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    canvas_g.FillRectangle(brushBar, 0, OffsetY, (int)(256 * (g_Soup.Particles[SelectedCellIndex].Genes.GeneHardness / 4d)), TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.Particles[SelectedCellIndex].Type == ParticleType.Animal)
+                                {
+                                    string Text = $"機敏性 : {g_Soup.Particles[SelectedCellIndex].Genes.GeneAgility:0.000}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                                    canvas_g.FillRectangle(brushBar, 0, OffsetY, (int)(256 * (g_Soup.Particles[SelectedCellIndex].Genes.GeneAgility / 4d)), TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        int OffsetY = 0;
+
+                        Int2D MouseGridPos = Vector2D.ToGridPosition(new Vector2D(MousePosX, MousePosY));
+
+                        {
+                            string Text = $"Grid #{MouseGridPos.X + MouseGridPos.Y * g_Soup.SizeX}";
+                            Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                            canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                            TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                            OffsetY += TextSize.Height;
+                        }
+                        {
+                            string Text = $"位置 : ({MouseGridPos.X}, {MouseGridPos.Y})";
+                            Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                            canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                            TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                            OffsetY += TextSize.Height;
+                        }
+                        {
+                            string Text = $"バイオマス : {g_Soup.GridMap[MouseGridPos.X + MouseGridPos.Y * g_Soup.SizeX].Fertility:0.000}";
+                            Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                            canvas_g.FillRectangle(brushBack, 0, OffsetY, 256, TextSize.Height);
+                            TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                            OffsetY += TextSize.Height;
+                        }
+                    }
+
+                    fnt.Dispose();
+                    brush.Dispose();
+                    brushBack.Dispose();
+                    brushBar.Dispose();
+                    brushRed.Dispose();
+                    brushGreen.Dispose();
+
+
                     canvas_g.Dispose();
 
                     SimulationView.Image = canvas;
@@ -274,12 +593,14 @@ namespace Paramecium.Forms
                     bgCanvas.Dispose();
                     bgCanvas2.Dispose();
 
+                    Clicked = false;
+
                     frameCount++;
                 }
 
                 if ((DateTime.Now - BottomStatLastRefreshTime).TotalMilliseconds >= 50)
                 {
-                    switch (Global.SoupInstance.SoupState)
+                    switch (Global.g_Soup.SoupState)
                     {
                         case SoupState.Stop:
                             StatSoupStatus.Text = "Status : Stop";
@@ -295,15 +616,15 @@ namespace Paramecium.Forms
                             break;
                     }
 
-                    StatTimeStep.Text = $"Time Step : {Global.SoupInstance.timeSteps} (T{Global.SoupInstance.sim_ParallelLimit})";
-                    StatPopulation.Text = $"Population : {Global.SoupInstance.PopulationPlant}/{Global.SoupInstance.PopulationAnimal}/{Global.SoupInstance.PopulationTotal}";
-                    StatBiomassAmount.Text = $"BiomassAmount : {Global.SoupInstance.BiomassAmount}";
+                    StatTimeStep.Text = $"Time Step : {Global.g_Soup.ElapsedTimeStep} (T{Global.g_Soup.sim_ParallelLimit})";
+                    StatPopulation.Text = $"Population : {Global.g_Soup.PopulationPlant}/{Global.g_Soup.PopulationAnimal}/{Global.g_Soup.PopulationTotal}";
+                    //StatBiomassAmount.Text = $"BiomassAmount : {Global.g_Soup.BiomassAmount:0.000}";
                     BottomStat.Refresh();
                 }
                 if ((DateTime.Now - tpsOriginTime).TotalMilliseconds >= 1000)
                 {
-                    StatTps.Text = $"TPS : {Global.SoupInstance.timeSteps - tpsOrigin}";
-                    tpsOrigin = Global.SoupInstance.timeSteps;
+                    StatTps.Text = $"TPS : {Global.g_Soup.ElapsedTimeStep - tpsOrigin}";
+                    tpsOrigin = Global.g_Soup.ElapsedTimeStep;
                     tpsOriginTime = DateTime.Now;
                     StatFps.Text = $"FPS : {frameCount}";
                     frameCount = 0;
@@ -329,6 +650,7 @@ namespace Paramecium.Forms
 
             return result;
         }
+
         private float WorldPosYToCanvasPosY(double worldPosY)
         {
             double result = canvas.Height / 2d - (cameraY - worldPosY) * zoomFactorActual;
@@ -398,15 +720,15 @@ namespace Paramecium.Forms
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                Global.SoupInstance.SetSoupState(SoupState.Stop);
+                Global.g_Soup.SetSoupState(SoupState.Stop);
 
                 string jsonString;
 
                 using (StreamReader sr = new StreamReader(ofd.FileName))
                 {
                     jsonString = sr.ReadToEnd();
-                    Global.SoupInstance = JsonSerializer.Deserialize<Soup>(jsonString);
-                    Global.SoupInstance.SoupRun();
+                    Global.g_Soup = JsonSerializer.Deserialize<Soup>(jsonString);
+                    Global.g_Soup.SoupRun();
                 }
 
                 FilePath = ofd.FileName;
@@ -415,9 +737,9 @@ namespace Paramecium.Forms
 
         private void TopMenu_File_Save_Click(object sender, EventArgs e)
         {
-            Global.SoupInstance.SetSoupState(SoupState.Pause);
+            Global.g_Soup.SetSoupState(SoupState.Pause);
 
-            string jsonString = JsonSerializer.Serialize(Global.SoupInstance);
+            string jsonString = JsonSerializer.Serialize(Global.g_Soup);
 
             using (StreamWriter sw = new StreamWriter(FilePath, false))
             {
@@ -437,9 +759,9 @@ namespace Paramecium.Forms
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                Global.SoupInstance.SetSoupState(SoupState.Pause);
+                Global.g_Soup.SetSoupState(SoupState.Pause);
 
-                string jsonString = JsonSerializer.Serialize(Global.SoupInstance);
+                string jsonString = JsonSerializer.Serialize(Global.g_Soup);
 
                 using (StreamWriter sw = new StreamWriter(sfd.FileName, false))
                 {
@@ -498,7 +820,7 @@ namespace Paramecium.Forms
 
         private void TopMenu_Simulation_NewSimulation_Click(object sender, EventArgs e)
         {
-            Global.SoupInstance.SetSoupState(SoupState.Pause);
+            Global.g_Soup.SetSoupState(SoupState.Pause);
 
             FormNewSimulation FormNewSimulation = new FormNewSimulation();
             FormNewSimulation.ShowDialog();
@@ -508,24 +830,48 @@ namespace Paramecium.Forms
         int prevX, prevY;
         private void SimulationView_MouseDown(object sender, MouseEventArgs e)
         {
-            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+            switch (e.Button)
             {
-                switch (e.Button)
-                {
-                    case (MouseButtons.Left):
-                        if (zoomFactor < 8) zoomFactor++;
-                        break;
-                    case (MouseButtons.Right):
-                        if (zoomFactor > 0) zoomFactor--;
-                        break;
-                }
-                zoomFactorActual = Math.Pow(2, zoomFactor);
-            }
-            else if (e.Button == MouseButtons.Right)
-            {
-                drag = true;
-                prevX = e.X;
-                prevY = e.Y;
+                case MouseButtons.Left:
+                    switch (Control.ModifierKeys)
+                    {
+                        case Keys.Shift:
+                            break;
+                        case Keys.Control:
+                            if (zoomFactor < 8) zoomFactor++;
+                            zoomFactorActual = Math.Pow(2, zoomFactor);
+                            break;
+                        case Keys.Alt:
+                            break;
+                        default:
+                            Clicked = true;
+                            SelectedCellIndex = -1;
+                            SelectedCellId = -1;
+                            ClickedPosX = CanvasPosXToWorldPosX(e.X);
+                            ClickedPosY = CanvasPosYToWorldPosY(e.Y);
+                            Console.WriteLine($"{ClickedPosX}, {ClickedPosY}");
+                            break;
+                    }
+                    break;
+                case MouseButtons.Right:
+                    switch (Control.ModifierKeys)
+                    {
+                        case Keys.Shift:
+                            break;
+                        case Keys.Control:
+                            if (zoomFactor > 0) zoomFactor--;
+                            zoomFactorActual = Math.Pow(2, zoomFactor);
+                            break;
+                        case Keys.Alt:
+                            break;
+                        default:
+                            drag = true;
+                            prevX = e.X;
+                            prevY = e.Y;
+                            Tracking = false;
+                            break;
+                    }
+                    break;
             }
         }
 
@@ -543,6 +889,8 @@ namespace Paramecium.Forms
                 prevX = e.X;
                 prevY = e.Y;
             }
+            MousePosX = CanvasPosXToWorldPosX(e.X);
+            MousePosY = CanvasPosYToWorldPosY(e.Y);
         }
         private void SimulationView_MouseWheel(object? sender, MouseEventArgs e)
         {
@@ -555,20 +903,30 @@ namespace Paramecium.Forms
             switch (e.KeyCode)
             {
                 case Keys.Space:
-                    if (Global.SoupInstance.SoupState == SoupState.Pause) Global.SoupInstance.SetSoupState(SoupState.Running);
-                    else Global.SoupInstance.SetSoupState(SoupState.Pause);
+                    if (Global.g_Soup.SoupState == SoupState.Pause) Global.g_Soup.SetSoupState(SoupState.Running);
+                    else Global.g_Soup.SetSoupState(SoupState.Pause);
                     break;
                 case Keys.OemPeriod:
-                    Global.SoupInstance.sim_ParallelLimit++;
+                    Global.g_Soup.sim_ParallelLimit++;
                     break;
                 case Keys.Oemcomma:
-                    if (Global.SoupInstance.sim_ParallelLimit > 1)
+                    if (Global.g_Soup.sim_ParallelLimit > 1)
                     {
-                        Global.SoupInstance.sim_ParallelLimit--;
+                        Global.g_Soup.sim_ParallelLimit--;
                     }
                     break;
                 case Keys.OemQuestion:
-                    Global.SoupInstance.SetSoupState(SoupState.StepRun);
+                    Global.g_Soup.SetSoupState(SoupState.StepRun);
+                    break;
+                case Keys.R:
+                    if (!Tracking) Tracking = true;
+                    else Tracking = false;
+                    break;
+                case Keys.D1:
+                    DisplayMode = 0;
+                    break;
+                case Keys.D2:
+                    DisplayMode = 1;
                     break;
             }
         }

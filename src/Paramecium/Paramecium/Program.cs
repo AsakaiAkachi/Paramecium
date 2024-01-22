@@ -1,6 +1,7 @@
 using Paramecium.Forms;
 using Paramecium.Libs;
 using System.Runtime.InteropServices;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Paramecium
 {
@@ -15,7 +16,7 @@ namespace Paramecium
         [STAThread]
         static void Main()
         {
-            //AllocConsole();
+            AllocConsole();
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
 
             ApplicationConfiguration.Initialize();
