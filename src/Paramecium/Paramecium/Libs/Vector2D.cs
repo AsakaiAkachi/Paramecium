@@ -5,6 +5,8 @@
         public double X { get; set; }
         public double Y { get; set; }
 
+        public static Vector2D Zero = new Vector2D(0, 0);
+
         public Vector2D()
         {
             X = 0;
