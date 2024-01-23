@@ -30,6 +30,7 @@ namespace Paramecium.Forms
         bool MainLoopBreak = false;
         private async void FormEventViewer_Shown(object sender, EventArgs e)
         {
+            /**
             while (true)
             {
                 if (MainLoopBreak) break;
@@ -38,6 +39,7 @@ namespace Paramecium.Forms
 
                 await Task.Delay(1);
             }
+            **/
         }
     }
 }

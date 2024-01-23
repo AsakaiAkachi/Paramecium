@@ -14,9 +14,9 @@ namespace Paramecium.Simulation
         public int SizeX { get; set; } = 512;
         public int SizeY { get; set; } = 256;
 
-        public double WallPerlinNoiseX { get; set; } = new Random().NextDouble() * 256d;
-        public double WallPerlinNoiseY { get; set; } = new Random().NextDouble() * 256d;
-        public double WallPerlinNoiseZ { get; set; } = new Random().NextDouble() * 256d;
+        public double WallPerlinNoiseX { get; set; } = 79.14649528369992;// = new Random().NextDouble() * 256d;
+        public double WallPerlinNoiseY { get; set; } = 97.49842312725215;// = new Random().NextDouble() * 256d;
+        public double WallPerlinNoiseZ { get; set; } = 244.70658351525472;// = new Random().NextDouble() * 256d;
         public double WallPerlinNoiseScale { get; set; } = 0.03d;
         public int WallPerlinNoiseOctave { get; set; } = 4;
         public double WallThickness { get; set; } = 0.01d;
@@ -28,12 +28,19 @@ namespace Paramecium.Simulation
         public double PlantForkBiomass { get; set; } = 15d;
         public double AnimalForkBiomass { get; set; } = 60d;
 
+        public int PlantBiomassCollectionRange { get; set; } = 3;
+
         public int InitialAnimalCount { get; set; } = 32;
+        public int HatchingTime { get; set; } = 3000;
+        //public int AgingBeginsAge { get; set; } = 6000;
+        //public int AgingAbilityDeclineBaseTime { get; set; } = 1500;
 
         public double PlantSizeMultiplier { get; set; } = 3.872983d;
 
-        public int sim_ThreadCountWidth { get; set; }
-        public int sim_ParallelLimit { get; set; }
+        public int RegionCountWidth { get; set; }
+        public int RegionCountHeight { get; set; }
+        public int RegionCount { get; set; }
+        public int ParallelismLimit { get; set; }
 
         public int ElapsedTimeStep { get; set; }
 
@@ -84,8 +91,10 @@ namespace Paramecium.Simulation
             GridMapBg = new byte[SizeX * SizeY];
             GridMapBgParticle = new byte[SizeX * SizeY];
 
-            sim_ThreadCountWidth = SizeX / 16;
-            sim_ParallelLimit = 1;
+            RegionCountWidth = (int)Math.Ceiling(SizeX / 32d);
+            RegionCountHeight = (int)Math.Ceiling(SizeY / 32d);
+            RegionCount = RegionCountWidth * RegionCountHeight;
+            ParallelismLimit = 1;
 
             Perlin perlin = new Perlin();
             for (int x = 0; x < SizeX; x++)
@@ -110,7 +119,7 @@ namespace Paramecium.Simulation
             }
 
             Particles = new Particle[4];
-            ParticlesBuffer = new List<Particle>[sim_ThreadCountWidth];
+            ParticlesBuffer = new List<Particle>[RegionCount];
             for (int i = 0; i < ParticlesBuffer.Length; i++)
             {
                 ParticlesBuffer[i] = new List<Particle>();
@@ -134,19 +143,30 @@ namespace Paramecium.Simulation
 
             Random rnd = new Random();
 
-            double GeneratedBiomass = 0;
-
-            while(GeneratedBiomass < TotalBiomassAmount)
+            while(BiomassAmount < TotalBiomassAmount - (AnimalForkBiomass * InitialAnimalCount))
             {
-                double NewPlantBiomassAmount = Math.Min(rnd.NextDouble() * PlantForkBiomass, TotalBiomassAmount - GeneratedBiomass);
+                double NewPlantBiomassAmount = Math.Min(rnd.NextDouble() * (PlantForkBiomass * 0.8d + 0.1d), TotalBiomassAmount - (AnimalForkBiomass * InitialAnimalCount) - BiomassAmount);
                 Vector2D NewPlantPosition = (new Vector2D(rnd, 0, 0, SizeX, SizeY));
                 Int2D NewPlantGridPosition = Vector2D.ToGridPosition(NewPlantPosition);
 
                 if (GridMap[NewPlantGridPosition.X + NewPlantGridPosition.Y * SizeX].Type == TileType.None)
                 {
                     ParticlesBuffer[0].Add(new Particle(NewPlantPosition, NewPlantBiomassAmount));
-                    GeneratedBiomass += NewPlantBiomassAmount;
                     BiomassAmount += NewPlantBiomassAmount;
+                }
+            }
+        }
+
+        public void SoupLoaded()
+        {
+            for (int i = 0; i < Particles.Length; i++)
+            {
+                if (Particles[i] is not null)
+                {
+                    if (Particles[i].IsAlive)
+                    {
+                        Particles[i].OnLoaded();
+                    }
                 }
             }
         }
@@ -158,10 +178,10 @@ namespace Paramecium.Simulation
 
         public void SoupRun()
         {
-            BiomassAmountArray = new double[sim_ThreadCountWidth];
-            PopulationPlantArray = new int[sim_ThreadCountWidth];
-            PopulationAnimalArray = new int[sim_ThreadCountWidth];
-            PopulationTotalArray = new int[sim_ThreadCountWidth];
+            BiomassAmountArray = new double[RegionCount];
+            PopulationPlantArray = new int[RegionCount];
+            PopulationAnimalArray = new int[RegionCount];
+            PopulationTotalArray = new int[RegionCount];
 
             SoupState = SoupState.Pause;
 
@@ -175,8 +195,7 @@ namespace Paramecium.Simulation
                     }
                     ParticlesBuffer[0].Clear();
 
-                    Update(4, 0);
-                    Update(4, 1);
+                    Update(4);
 
                     BiomassAmount = 0;
                     PopulationPlant = 0;
@@ -264,20 +283,11 @@ namespace Paramecium.Simulation
                             ParticlesBuffer[i].Clear();
                         }
 
-                        Update(0, 0);
-                        Update(0, 1);
-
-                        Update(1, 0);
-                        Update(1, 1);
-
-                        Update(2, 0);
-                        Update(2, 1);
-
-                        Update(3, 0);
-                        Update(3, 1);
-
-                        Update(4, 0);
-                        Update(4, 1);
+                        Update(0);
+                        Update(1);
+                        Update(2);
+                        Update(3);
+                        Update(4);
 
                         /**
                         int PopulationPlantNext = 0;
@@ -365,94 +375,116 @@ namespace Paramecium.Simulation
             });
         }
 
-        public void Update(int phase, int path)
+        public void Update(int phase)
         {
             ParallelOptions parallelOptions = new ParallelOptions();
-            parallelOptions.MaxDegreeOfParallelism = sim_ParallelLimit;
+            parallelOptions.MaxDegreeOfParallelism = ParallelismLimit;
 
-            int RegionSizeWidth = SizeX / sim_ThreadCountWidth;
-            int ChunkSizeWidth = RegionSizeWidth / 2;
+            //int RegionSizeWidth = SizeX / RegionCountWidth;
+            //int ChunkSizeWidth = RegionSizeWidth / 2;
+            int RegionSizeWidth = 32;
+            int RegionSizeHeight = 32;
+            int ChunkSizeWidth = 16;
+            int ChunkSizeHeight = 16;
 
-            Parallel.For(0, sim_ThreadCountWidth, parallelOptions, i =>
+            for (int path = 0; path < 4; path++)
             {
-                int xStart = RegionSizeWidth * (i % sim_ThreadCountWidth);
-
-                if (path == 1) xStart += ChunkSizeWidth;
-
-                if (phase == 4 && path == 0)
+                Parallel.For(0, RegionCount, parallelOptions, i =>
                 {
-                    BiomassAmountArray[i] = 0;
-                    PopulationPlantArray[i] = 0;
-                    PopulationAnimalArray[i] = 0;
-                    PopulationTotalArray[i] = 0;
-                }
+                    int xStart = RegionSizeWidth * (i % RegionCountWidth);
+                    int yStart = RegionSizeHeight * (i / RegionCountWidth);
 
-                for (int x = xStart; x < xStart + ChunkSizeWidth; x++)
-                {
-                    for (int y = 0; y < SizeY; y++)
+                    if (path == 1 || path == 3) xStart += ChunkSizeWidth;
+                    if (path == 2 || path == 3) yStart += ChunkSizeHeight;
+
+                    if (phase == 4 && path == 0)
                     {
-                        if (phase == 4)
-                        {
-                            GridMap[x + y * SizeX].Fertility /= (BiomassAmount / TotalBiomassAmount);
-                            BiomassAmountArray[i] += GridMap[x + y * SizeX].Fertility;
-                            if (GridMap[x + y * SizeX].Type != TileType.Wall)
-                            {
-                                GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility * 8d / (TotalBiomassAmount / (SizeX * SizeY))), 0), 32) + 16);
-                                GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility * 8d), 0), 32) + 16);
-                                GridMapBgParticle[x + y * SizeX] = GridMapBg[x + y * SizeX];
-                            }
-                            else
-                            {
-                                GridMap[x + y * SizeX].Fertility = 0;
-                                GridMapBg[x + y * SizeX] = 0x01;
-                                GridMapBgParticle[x + y * SizeX] = 0x01;
-                            }
-                        }
+                        BiomassAmountArray[i] = 0;
+                        PopulationPlantArray[i] = 0;
+                        PopulationAnimalArray[i] = 0;
+                        PopulationTotalArray[i] = 0;
+                    }
 
-                        for (int j = GridMap[x + y * SizeX].LocalParticles.Count - 1; j >= 0; j--)
+                    for (int x = xStart; x < xStart + ChunkSizeWidth; x++)
+                    {
+                        for (int y = yStart; y < yStart + ChunkSizeHeight; y++)
                         {
-                            switch (phase)
+                            if (phase == 4)
                             {
-                                case 0:
-                                    Particles[GridMap[x + y * SizeX].LocalParticles[j]].EarlyUpdate();
-                                    break;
-                                case 1:
-                                    Particles[GridMap[x + y * SizeX].LocalParticles[j]].MiddleUpdate(i);
-                                    break;
-                                case 2:
-                                    Particles[GridMap[x + y * SizeX].LocalParticles[j]].LateUpdate(i);
-                                    break;
-                                case 3:
-                                    Particles[GridMap[x + y * SizeX].LocalParticles[j]].OnStepFinish();
-                                    break;
-                                case 4:
-                                    if (GridMap[x + y * SizeX].Type != TileType.Wall)
+                                if (GridMap[x + y * SizeX].Type == TileType.Wall)
+                                {
+                                    GridMap[x + y * SizeX].Fertility = 0;
+                                    GridMapBg[x + y * SizeX] = 0x01;
+                                    GridMapBgParticle[x + y * SizeX] = 0x01;
+                                }
+                                else if (GridMap[x + y * SizeX].Fertility > 0d)
+                                {
+                                    GridMap[x + y * SizeX].Fertility /= (BiomassAmount / TotalBiomassAmount);
+                                    BiomassAmountArray[i] += GridMap[x + y * SizeX].Fertility;
+                                    GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility * 8d / (TotalBiomassAmount / (SizeX * SizeY))), 0), 32) + 16);
+                                    GridMapBgParticle[x + y * SizeX] = GridMapBg[x + y * SizeX];
+                                }
+                                else
+                                {
+                                    GridMapBg[x + y * SizeX] = 0x10;
+                                    GridMapBgParticle[x + y * SizeX] = 0x10;
+                                }
+                            }
+
+                            if (GridMap[x + y * SizeX].LocalParticleCount > 0)
+                            {
+                                for (int j = 0; j < GridMap[x + y * SizeX].LocalParticleCount; j++)
+                                {
+                                    switch (phase)
                                     {
-                                        Particles[GridMap[x + y * SizeX].LocalParticles[j]].Satiety /= (BiomassAmount / TotalBiomassAmount);
-                                        if (Particles[GridMap[x + y * SizeX].LocalParticles[j]].Type == ParticleType.Plant)
-                                        {
-                                            BiomassAmountArray[i] += Particles[GridMap[x + y * SizeX].LocalParticles[j]].Satiety;
-                                            if (GridMapBgParticle[x + y * SizeX] != 0x03)
+                                        case 0:
+                                            Particles[GridMap[x + y * SizeX].LocalParticles[j]].EarlyUpdate();
+                                            break;
+                                        case 1:
+                                            Particles[GridMap[x + y * SizeX].LocalParticles[j]].MiddleUpdate(i);
+                                            break;
+                                        case 2:
+                                            Particles[GridMap[x + y * SizeX].LocalParticles[j]].LateUpdate(i);
+                                            break;
+                                        case 3:
+                                            Particles[GridMap[x + y * SizeX].LocalParticles[j]].OnStepFinish(i);
+                                            break;
+                                        case 4:
+                                            if (GridMap[x + y * SizeX].Type != TileType.Wall)
                                             {
-                                                GridMapBgParticle[x + y * SizeX] = 0x02;
+                                                Particles[GridMap[x + y * SizeX].LocalParticles[j]].Satiety /= (BiomassAmount / TotalBiomassAmount);
+                                                if (GridMap[x + y * SizeX].LocalPlantCount > 0)
+                                                {
+                                                    if (Particles[GridMap[x + y * SizeX].LocalParticles[j]].Type == ParticleType.Plant)
+                                                    {
+                                                        BiomassAmountArray[i] += Particles[GridMap[x + y * SizeX].LocalParticles[j]].Satiety;
+                                                        if (GridMapBgParticle[x + y * SizeX] != 0x03)
+                                                        {
+                                                            GridMapBgParticle[x + y * SizeX] = 0x02;
+                                                        }
+                                                        PopulationPlantArray[i]++;
+                                                        PopulationTotalArray[i]++;
+                                                    }
+                                                }
+                                                if (GridMap[x + y * SizeX].LocalAnimalCount > 0)
+                                                {
+                                                    if (Particles[GridMap[x + y * SizeX].LocalParticles[j]].Type == ParticleType.Animal)
+                                                    {
+                                                        BiomassAmountArray[i] += Particles[GridMap[x + y * SizeX].LocalParticles[j]].Satiety;
+                                                        GridMapBgParticle[x + y * SizeX] = 0x03;
+                                                        PopulationAnimalArray[i]++;
+                                                        PopulationTotalArray[i]++;
+                                                    }
+                                                }
                                             }
-                                            PopulationPlantArray[i]++;
-                                            PopulationTotalArray[i]++;
-                                        }
-                                        if (Particles[GridMap[x + y * SizeX].LocalParticles[j]].Type == ParticleType.Animal)
-                                        {
-                                            BiomassAmountArray[i] += Particles[GridMap[x + y * SizeX].LocalParticles[j]].Satiety;
-                                            GridMapBgParticle[x + y * SizeX] = 0x03;
-                                            PopulationAnimalArray[i]++;
-                                            PopulationTotalArray[i]++;
-                                        }
+                                            break;
                                     }
-                                    break;
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
         public void SetSoupState(SoupState soupState)
