@@ -53,7 +53,7 @@ namespace Paramecium.Forms
                     LabelVelocity.Text = $": ({Target.Velocity.X}, {Target.Velocity.Y})";
                     LabelAngle.Text = $": {Target.Angle}°";
                     LabelColor.Text = $": {Target.Color.Red}, {Target.Color.Green}, {Target.Color.Blue}";
-                    LabelSatiety.Text = $": {Target.Satiety}";
+                    LabelSatiety.Text = $": {Target.Biomass}";
                     LabelGeneration.Text = $": {Target.Generation}";
                     LabelAge.Text = $": {Target.Age}";
                 }

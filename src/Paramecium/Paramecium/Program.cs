@@ -1,7 +1,7 @@
 using Paramecium.Forms;
 using Paramecium.Libs;
+using System.IO;
 using System.Runtime.InteropServices;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Paramecium
 {
@@ -19,8 +19,24 @@ namespace Paramecium
             AllocConsole();
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
 
+            if (!Directory.Exists($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves"))
+            {
+                Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves");
+            }
+            if (!Directory.Exists($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves"))
+            {
+                Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves");
+            }
+
             ApplicationConfiguration.Initialize();
-            Application.Run(new FormMain());
+            try
+            {
+                Application.Run(g_FormMain);
+            }
+            catch (Exception ex)
+            {
+                ConsoleLog(LogLevel.Failure, ex.ToString());
+            }
         }
     }
 }

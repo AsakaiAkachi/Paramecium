@@ -22,6 +22,11 @@
             X = random.NextDouble() * (xMax - xMin) + xMin;
             Y = random.NextDouble() * (yMax - yMin) + yMin;
         }
+        public Vector2D(Vector2D value)
+        {
+            X = value.X;
+            Y = value.Y;
+        }
 
         public static Vector2D operator +(Vector2D left, Vector2D right)
         {

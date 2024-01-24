@@ -48,6 +48,7 @@
             TopMenu_Simulation = new ToolStripMenuItem();
             TopMenu_Simulation_NewSimulation = new ToolStripMenuItem();
             SimulationView = new PictureBox();
+            オートセーブの設定ToolStripMenuItem = new ToolStripMenuItem();
             BottomStat.SuspendLayout();
             TopMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SimulationView).BeginInit();
@@ -175,7 +176,7 @@
             // 
             // TopMenu_Simulation
             // 
-            TopMenu_Simulation.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Simulation_NewSimulation });
+            TopMenu_Simulation.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Simulation_NewSimulation, オートセーブの設定ToolStripMenuItem });
             TopMenu_Simulation.Name = "TopMenu_Simulation";
             TopMenu_Simulation.Size = new Size(87, 20);
             TopMenu_Simulation.Text = "シミュレーション";
@@ -183,7 +184,7 @@
             // TopMenu_Simulation_NewSimulation
             // 
             TopMenu_Simulation_NewSimulation.Name = "TopMenu_Simulation_NewSimulation";
-            TopMenu_Simulation_NewSimulation.Size = new Size(131, 22);
+            TopMenu_Simulation_NewSimulation.Size = new Size(180, 22);
             TopMenu_Simulation_NewSimulation.Text = "新規作成...";
             TopMenu_Simulation_NewSimulation.Click += TopMenu_Simulation_NewSimulation_Click;
             // 
@@ -199,6 +200,12 @@
             SimulationView.MouseDown += SimulationView_MouseDown;
             SimulationView.MouseMove += SimulationView_MouseMove;
             SimulationView.MouseUp += SimulationView_MouseUp;
+            // 
+            // オートセーブの設定ToolStripMenuItem
+            // 
+            オートセーブの設定ToolStripMenuItem.Name = "オートセーブの設定ToolStripMenuItem";
+            オートセーブの設定ToolStripMenuItem.Size = new Size(180, 22);
+            オートセーブの設定ToolStripMenuItem.Text = "オートセーブの設定...";
             // 
             // FormMain
             // 
@@ -244,5 +251,6 @@
         private ToolStripStatusLabel StatSoupStatus;
         private ToolStripMenuItem TopMenu_Simulation;
         private ToolStripMenuItem TopMenu_Simulation_NewSimulation;
+        private ToolStripMenuItem オートセーブの設定ToolStripMenuItem;
     }
 }

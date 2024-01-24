@@ -24,6 +24,12 @@
             Green = random.Next(0, 256);
             Blue = random.Next(0, 256);
         }
+        public ColorInt3(ColorInt3 value)
+        {
+            Red = value.Red;
+            Green = value.Green;
+            Blue = value.Blue;
+        }
 
 
         public static implicit operator Color(ColorInt3 value)
