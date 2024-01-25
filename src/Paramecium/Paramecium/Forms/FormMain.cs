@@ -1213,6 +1213,7 @@ namespace Paramecium.Forms
                         g_FormMain.zoomFactorActual = 1;
                         g_FormMain.cameraX = g_Soup.SizeX / 2d;
                         g_FormMain.cameraY = g_Soup.SizeY / 2d;
+                        Tracking = false;
                     }
                     break;
                 case Keys.F:
