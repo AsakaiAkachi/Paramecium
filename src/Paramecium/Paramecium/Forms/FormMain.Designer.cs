@@ -47,8 +47,8 @@
             TopMenu_Window_DebugConsole = new ToolStripMenuItem();
             TopMenu_Simulation = new ToolStripMenuItem();
             TopMenu_Simulation_NewSimulation = new ToolStripMenuItem();
-            SimulationView = new PictureBox();
             オートセーブの設定ToolStripMenuItem = new ToolStripMenuItem();
+            SimulationView = new PictureBox();
             BottomStat.SuspendLayout();
             TopMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SimulationView).BeginInit();
@@ -73,8 +73,8 @@
             // 
             StatTimeStep.BorderSides = ToolStripStatusLabelBorderSides.Left;
             StatTimeStep.Name = "StatTimeStep";
-            StatTimeStep.Size = new Size(77, 19);
-            StatTimeStep.Text = "Time Step : 0";
+            StatTimeStep.Size = new Size(100, 19);
+            StatTimeStep.Text = "Time Step : 0 (T0)";
             // 
             // StatPopulation
             // 
@@ -184,9 +184,15 @@
             // TopMenu_Simulation_NewSimulation
             // 
             TopMenu_Simulation_NewSimulation.Name = "TopMenu_Simulation_NewSimulation";
-            TopMenu_Simulation_NewSimulation.Size = new Size(180, 22);
+            TopMenu_Simulation_NewSimulation.Size = new Size(169, 22);
             TopMenu_Simulation_NewSimulation.Text = "新規作成...";
             TopMenu_Simulation_NewSimulation.Click += TopMenu_Simulation_NewSimulation_Click;
+            // 
+            // オートセーブの設定ToolStripMenuItem
+            // 
+            オートセーブの設定ToolStripMenuItem.Name = "オートセーブの設定ToolStripMenuItem";
+            オートセーブの設定ToolStripMenuItem.Size = new Size(169, 22);
+            オートセーブの設定ToolStripMenuItem.Text = "オートセーブの設定...";
             // 
             // SimulationView
             // 
@@ -200,12 +206,6 @@
             SimulationView.MouseDown += SimulationView_MouseDown;
             SimulationView.MouseMove += SimulationView_MouseMove;
             SimulationView.MouseUp += SimulationView_MouseUp;
-            // 
-            // オートセーブの設定ToolStripMenuItem
-            // 
-            オートセーブの設定ToolStripMenuItem.Name = "オートセーブの設定ToolStripMenuItem";
-            オートセーブの設定ToolStripMenuItem.Size = new Size(180, 22);
-            オートセーブの設定ToolStripMenuItem.Text = "オートセーブの設定...";
             // 
             // FormMain
             // 

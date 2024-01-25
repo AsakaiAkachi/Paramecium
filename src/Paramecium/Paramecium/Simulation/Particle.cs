@@ -104,7 +104,7 @@ namespace Paramecium.Simulation
                     Color = new ColorInt3(Genes.GeneColorRed, Genes.GeneColorGreen, Genes.GeneColorBlue);
                     Health = Genes.GeneHealth * 10d;
                     Generation = 1;
-                    Age = 300;
+                    Age = g_Soup.HatchingTime;
                     Mass = Math.Pow(Radius, 2);
                     break;
             }
@@ -157,7 +157,7 @@ namespace Paramecium.Simulation
                 Color = new ColorInt3(255, 127, 255);
                 Health = Genes.GeneHealth * 10d;
                 Generation = parent.Generation + 1;
-                Age = -300;
+                Age = g_Soup.HatchingTime * -1;
                 Mass = Math.Pow(Radius, 2);
             }
             GridPosition = Vector2D.ToGridPosition(Position);
@@ -224,6 +224,11 @@ namespace Paramecium.Simulation
                     Velocity *= 0.9d;
                 }
 
+                if (InCollision)
+                {
+                    CollisionDisabled = false;
+                }
+
                 switch (Type)
                 {
                     // 植物がタイルからバイオマスを吸収する処理
@@ -279,6 +284,7 @@ namespace Paramecium.Simulation
                                 // 質量を再計算
                                 Mass = Math.Pow(Radius, 2);
 
+                                CollisionDisabled = false;
                                 NextGridBiomassCheck = -20;
                             }
                             else NextGridBiomassCheck++;
@@ -668,6 +674,7 @@ namespace Paramecium.Simulation
                                             {
                                                 Velocity += Vector2D.Normalization(Position - Target.Position) * ((Radius + Target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + Target.Velocity), 0.01d) * Math.Min(Target.Mass / Mass, 1d);
                                                 InCollision = true;
+                                                Target.CollisionDisabled = false;
                                                 Target.InCollision = true;
 
                                                 if (Type == ParticleType.Animal) // 自身が動物の場合
@@ -691,16 +698,15 @@ namespace Paramecium.Simulation
                                                             Target.TargetIndex = Index;
                                                             Target.TargetId = Id;
 
-                                                            Target.Velocity += Vector2D.Normalization(Target.Position - Position) * 0.02d;
+                                                            //Target.Velocity += Vector2D.Normalization(Target.Position - Position) * 0.02d;
                                                             Target.TimeSinceLastDamage = 100;
 
                                                             //Target.Health -= Math.Max((Genes.GeneStrength / AgingFactor) * 0.25d * Math.Min((Genes.GeneStrength / AgingFactor) / Math.Max(Target.Genes.GeneHardness, 0.01d), 1d) * Math.Min((Genes.GeneAgility / AgingFactor) / Math.Max((Target.Genes.GeneAgility / Target.AgingFactor), 0.01d), 1d), 0.1d) * (new Random().NextDouble() * 2d);
 
 
-                                                            if (new Random().NextDouble() < Math.Max(Genes.GeneAgility - Target.Genes.GeneAgility, 0.1d)) // 自機敏性-相手機敏性
+                                                            if (new Random().NextDouble() < 0.1d * Math.Pow(2d, Genes.GeneAgility - Target.Genes.GeneAgility))
                                                             {
-                                                                // 自攻撃力×(自攻撃力-相手防御力)×乱数(0～2)
-                                                                Target.Health -= Genes.GeneStrength * Math.Max(Genes.GeneStrength - Target.Genes.GeneHardness, 0.1d) * (new Random().NextDouble() * 2d);
+                                                                Target.Health -= Math.Max(Genes.GeneStrength * (AnimalPriority * 0.5d + 0.5d) * (Genes.GeneStrength - Target.Genes.GeneHardness) * (new Random().NextDouble() * 2d), 0.1d);
                                                             }
 
                                                             if (Target.Health <= 0d)
@@ -708,6 +714,7 @@ namespace Paramecium.Simulation
                                                                 Biomass += (Target.Biomass + Target.BiomassStockpiled) * AnimalPriority;
                                                                 g_Soup.GridMap[(GridPosition.X) + (GridPosition.Y) * local_SizeX].Fertility += (Target.Biomass + Target.BiomassStockpiled) * (1d - AnimalPriority);
                                                                 Target.Biomass = 0;
+                                                                Target.Health = 0;
                                                             }
 
                                                             //Satiety += Math.Min(0.1d, Target.Satiety) * ((Genes.GeneDiet + 1d) / 2d);
@@ -766,9 +773,9 @@ namespace Paramecium.Simulation
                 {
                     if (Age > 0)
                     {
-                        if (Age <= 300) // ふ化後の大きさが徐々に大きくなっていく際の処理
+                        if (Age <= g_Soup.HatchingTime) // ふ化後の大きさが徐々に大きくなっていく際の処理
                         {
-                            Radius = 0.25 * g_Soup.CellSizeMultiplier + 0.25 * g_Soup.CellSizeMultiplier * (Math.Min(300, Age) / 300d);
+                            Radius = 0.25 * g_Soup.CellSizeMultiplier + 0.25 * g_Soup.CellSizeMultiplier * (Math.Min(g_Soup.HatchingTime, Age) / (double)g_Soup.HatchingTime);
                             Mass = Math.Pow(Radius, 2);
                         }
 
@@ -1007,7 +1014,7 @@ namespace Paramecium.Simulation
             GeneAgility /= ActionGenesValueSum / 4d;
             ActionGeneUnassignedPoint /= ActionGenesValueSum / 4d;
 
-            if (rnd.NextDouble() < 0.1d)
+            if (rnd.NextDouble() < g_Soup.MutationRate)
             {
                 RaceId = rnd.NextInt64(0, 2176782336);
 
@@ -1046,8 +1053,8 @@ namespace Paramecium.Simulation
             }
 
             //ForkCost = 30d + (GeneHealth * 15d) + (GeneStrength * 15d) + (GeneHardness * 15d) + (GeneAgility * 15d);
-            //ForkCost = g_Soup.AnimalForkBiomass;
-            ForkCost = 45d + (GeneHealth * 15d) + (GeneStrength * 20d) + (GeneHardness * 20d) + (GeneAgility * 20d);
+            ForkCost = g_Soup.AnimalForkBiomass;
+            //ForkCost = 45d + (GeneHealth * 15d) + (GeneStrength * 20d) + (GeneHardness * 20d) + (GeneAgility * 20d);
         }
     }
 

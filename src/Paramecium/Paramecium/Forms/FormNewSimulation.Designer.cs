@@ -33,13 +33,15 @@
             SoupParameterView = new DataGridView();
             ColumnSoupParameter = new DataGridViewTextBoxColumn();
             ColumnValue = new DataGridViewTextBoxColumn();
+            label1 = new Label();
+            label2 = new Label();
             ((System.ComponentModel.ISupportInitialize)SoupParameterView).BeginInit();
             SuspendLayout();
             // 
             // ButtonOK
             // 
             ButtonOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            ButtonOK.Location = new Point(12, 423);
+            ButtonOK.Location = new Point(12, 443);
             ButtonOK.Name = "ButtonOK";
             ButtonOK.Size = new Size(90, 30);
             ButtonOK.TabIndex = 32;
@@ -50,7 +52,7 @@
             // ButtonCancel
             // 
             ButtonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            ButtonCancel.Location = new Point(108, 423);
+            ButtonCancel.Location = new Point(108, 443);
             ButtonCancel.Name = "ButtonCancel";
             ButtonCancel.Size = new Size(90, 30);
             ButtonCancel.TabIndex = 33;
@@ -62,14 +64,18 @@
             // 
             SoupParameterView.AllowUserToAddRows = false;
             SoupParameterView.AllowUserToDeleteRows = false;
-            SoupParameterView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            SoupParameterView.AllowUserToResizeColumns = false;
+            SoupParameterView.AllowUserToResizeRows = false;
             SoupParameterView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             SoupParameterView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            SoupParameterView.ColumnHeadersVisible = false;
             SoupParameterView.Columns.AddRange(new DataGridViewColumn[] { ColumnSoupParameter, ColumnValue });
-            SoupParameterView.Location = new Point(12, 12);
+            SoupParameterView.Location = new Point(8, 33);
+            SoupParameterView.MultiSelect = false;
             SoupParameterView.Name = "SoupParameterView";
             SoupParameterView.RowHeadersVisible = false;
-            SoupParameterView.Size = new Size(500, 400);
+            SoupParameterView.SelectionMode = DataGridViewSelectionMode.CellSelect;
+            SoupParameterView.Size = new Size(500, 378);
             SoupParameterView.TabIndex = 34;
             // 
             // ColumnSoupParameter
@@ -83,11 +89,31 @@
             ColumnValue.HeaderText = "値";
             ColumnValue.Name = "ColumnValue";
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(8, 9);
+            label1.Name = "label1";
+            label1.Size = new Size(94, 15);
+            label1.TabIndex = 35;
+            label1.Text = "スープのパラメーター";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(8, 420);
+            label2.Name = "label2";
+            label2.Size = new Size(342, 15);
+            label2.TabIndex = 36;
+            label2.Text = "上の表にパラメーターを入力した後、「スープを作成」ボタンを押してください";
+            // 
             // FormNewSimulation
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(524, 465);
+            ClientSize = new Size(518, 485);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(SoupParameterView);
             Controls.Add(ButtonCancel);
             Controls.Add(ButtonOK);
@@ -100,6 +126,7 @@
             Text = "スープを新規作成";
             ((System.ComponentModel.ISupportInitialize)SoupParameterView).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -108,5 +135,7 @@
         private DataGridView SoupParameterView;
         private DataGridViewTextBoxColumn ColumnSoupParameter;
         private DataGridViewTextBoxColumn ColumnValue;
+        private Label label1;
+        private Label label2;
     }
 }

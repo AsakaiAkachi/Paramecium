@@ -10,6 +10,8 @@ namespace Paramecium
         public static FormMain g_FormMain;
         public static FormNewSimulation g_FormNewSimulation;
 
+        public static SolidBrush SolidBrushPlaceholder = new SolidBrush(Color.FromArgb(255, 0, 255));
+
         static Global()
         {
             /**

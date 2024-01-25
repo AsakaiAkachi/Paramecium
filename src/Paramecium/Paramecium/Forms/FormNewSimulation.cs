@@ -17,21 +17,22 @@ namespace Paramecium.Forms
         {
             InitializeComponent();
 
-            SoupParameterView.Rows.Add("SizeX", 128);
-            SoupParameterView.Rows.Add("SizeY", 128);
-            SoupParameterView.Rows.Add("WallPerlinNoiseX", 79.14649528369992);
-            SoupParameterView.Rows.Add("WallPerlinNoiseY", 97.49842312725215);
-            SoupParameterView.Rows.Add("WallPerlinNoiseZ", 244.70658351525472);
-            SoupParameterView.Rows.Add("WallPerlinNoiseScale", 0.1);
-            SoupParameterView.Rows.Add("WallPerlinNoiseOctave", 4);
-            SoupParameterView.Rows.Add("WallThickness", 0.025);
-            SoupParameterView.Rows.Add("TotalBiomassAmount", 65536);
-            SoupParameterView.Rows.Add("CellSizeMultiplier", 0.5);
-            SoupParameterView.Rows.Add("PlantForkBiomass", 15);
-            SoupParameterView.Rows.Add("AnimalForkBiomass", 60);
-            SoupParameterView.Rows.Add("PlantBiomassCollectionRange", 3);
-            SoupParameterView.Rows.Add("InitialAnimalCount", 1);
-            SoupParameterView.Rows.Add("HatchingTime", 3000);
+            SoupParameterView.Rows.Add("Size X", 128);
+            SoupParameterView.Rows.Add("Size Y", 128);
+            SoupParameterView.Rows.Add("Wall Perlin Noise X", 79.14649528369992);
+            SoupParameterView.Rows.Add("Wall Perlin Noise Y", 97.49842312725215);
+            SoupParameterView.Rows.Add("Wall Perlin Noise Z", 244.70658351525472);
+            SoupParameterView.Rows.Add("Wall Perlin Noise Scale", 0.1);
+            SoupParameterView.Rows.Add("Wall Perlin Noise Octave", 4);
+            SoupParameterView.Rows.Add("Wall Thickness", 0.025);
+            SoupParameterView.Rows.Add("Total BiomassAmount", 65536);
+            SoupParameterView.Rows.Add("Cell Size Multiplier", 0.5);
+            SoupParameterView.Rows.Add("Plant Fork Biomass", 15);
+            SoupParameterView.Rows.Add("Animal Fork Biomass", 60);
+            SoupParameterView.Rows.Add("Plant Biomass Collection Range", 3);
+            SoupParameterView.Rows.Add("Initial Animal Count", 1);
+            SoupParameterView.Rows.Add("Hatching Time", 300);
+            SoupParameterView.Rows.Add("Mutation Rate", 0.1);
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
@@ -47,7 +48,8 @@ namespace Paramecium.Forms
                     double.Parse(SoupParameterView[1, 5].Value.ToString()), int.Parse(SoupParameterView[1, 6].Value.ToString()), double.Parse(SoupParameterView[1, 7].Value.ToString()),
                     double.Parse(SoupParameterView[1, 8].Value.ToString()),
                     double.Parse(SoupParameterView[1, 9].Value.ToString()), double.Parse(SoupParameterView[1, 10].Value.ToString()), double.Parse(SoupParameterView[1, 11].Value.ToString()), int.Parse(SoupParameterView[1, 12].Value.ToString()),
-                    int.Parse(SoupParameterView[1, 13].Value.ToString()), int.Parse(SoupParameterView[1, 14].Value.ToString())
+                    int.Parse(SoupParameterView[1, 13].Value.ToString()), int.Parse(SoupParameterView[1, 14].Value.ToString()),
+                    double.Parse(SoupParameterView[1, 15].Value.ToString())
                 );
 
                 g_Soup = newSoup;
