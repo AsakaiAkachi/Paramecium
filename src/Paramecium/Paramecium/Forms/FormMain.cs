@@ -3,14 +3,7 @@ using Paramecium.Libs;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using static System.Windows.Forms.Design.AxImporter;
-using System;
-using System.Security.Cryptography;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-using System.ComponentModel.Design;
-using System.Drawing;
-using System.Net.Cache;
 
 namespace Paramecium.Forms
 {
@@ -222,6 +215,45 @@ namespace Paramecium.Forms
                                                             {
                                                                 TargetColor = new SolidBrush(Color.FromArgb((int)(((Target.Genes.GeneDiet + 1d) / 2d) * 255d), 255 - (int)(((Target.Genes.GeneDiet + 1d) / 2d) * 255d), 0));
                                                             }
+                                                            break;
+                                                        case 2:
+                                                            if (Target.CollisionDisabled == false)
+                                                            {
+                                                                TargetColor = new SolidBrush(Color.FromArgb(255, 255, 0));
+                                                            }
+                                                            else
+                                                            {
+                                                                TargetColor = new SolidBrush(Color.FromArgb(0, 0, 0));
+                                                            }
+                                                            break;
+                                                        case 3:
+                                                            if (Target.Type == ParticleType.Plant)
+                                                            {
+                                                                if (Target.NextGridBiomassCheck < 0)
+                                                                {
+                                                                    TargetColor = new SolidBrush(Color.FromArgb(255, 255, 0));
+                                                                }
+                                                                else if (Target.NextGridBiomassCheck == 0)
+                                                                {
+                                                                    TargetColor = new SolidBrush(Color.FromArgb(255, 255, 255));
+                                                                }
+                                                                else
+                                                                {
+                                                                    TargetColor = new SolidBrush(Color.FromArgb(0, 0, 0));
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                TargetColor = BrushCellColorGray;
+                                                            }
+                                                            break;
+                                                        default:
+                                                            DisplayMode = 0;
+                                                            if (Target.Type == ParticleType.Animal && Target.Age < 0)
+                                                            {
+                                                                TargetColor = new SolidBrush(Color.FromArgb(255, 127, 255));
+                                                            }
+                                                            else TargetColor = new SolidBrush(Target.Color);
                                                             break;
                                                     }
 
@@ -691,10 +723,20 @@ namespace Paramecium.Forms
                             }
                         }
 
-                        if (fullScreen)
                         {
                             int OffsetY = 0;
 
+                            /**
+                            {
+                                string Text = $"Biomass : {g_Soup.BiomassAmount:0.000} ({(g_Soup.BiomassAmount / g_Soup.TotalBiomassAmount - 1d) * 100d:0.000}%)";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
+                                canvas_g.FillRectangle(BrushOverlayGauge, 128, canvas.Height - TextSize.Height - OffsetY, (int)(128 * (g_Soup.BiomassAmount / g_Soup.TotalBiomassAmount - 1d) * 100d), TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            **/
+                            if (fullScreen)
                             {
                                 string Text = $"Population : {g_Soup.PopulationPlant}/{g_Soup.PopulationAnimal}/{g_Soup.PopulationTotal}";
                                 Size TextSize = TextRenderer.MeasureText(Text, fnt);
@@ -702,6 +744,7 @@ namespace Paramecium.Forms
                                 TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
                                 OffsetY += TextSize.Height;
                             }
+                            if (fullScreen)
                             {
                                 string Text = $"Time Step : {g_Soup.ElapsedTimeStep} (T{g_Soup.ParallelismLimit})";
                                 Size TextSize = TextRenderer.MeasureText(Text, fnt);
@@ -1251,6 +1294,30 @@ namespace Paramecium.Forms
                     break;
                 case Keys.D2:
                     DisplayMode = 1;
+                    break;
+                case Keys.D3:
+                    DisplayMode = 2;
+                    break;
+                case Keys.D4:
+                    DisplayMode = 3;
+                    break;
+                case Keys.D5:
+                    DisplayMode = 4;
+                    break;
+                case Keys.D6:
+                    DisplayMode = 5;
+                    break;
+                case Keys.D7:
+                    DisplayMode = 6;
+                    break;
+                case Keys.D8:
+                    DisplayMode = 7;
+                    break;
+                case Keys.D9:
+                    DisplayMode = 8;
+                    break;
+                case Keys.D0:
+                    DisplayMode = 9;
                     break;
             }
         }

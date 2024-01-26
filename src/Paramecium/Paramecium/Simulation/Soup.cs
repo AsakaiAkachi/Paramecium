@@ -41,6 +41,8 @@ namespace Paramecium.Simulation
 
         public double PlantSizeMultiplier { get; set; } = 3.872983d;
 
+        public double BiomassAmountMultiplier { get; set; } = 1.0d;
+
         public int RegionCountWidth { get; set; }
         public int RegionCountHeight { get; set; }
         public int RegionCount { get; set; }
@@ -285,6 +287,8 @@ namespace Paramecium.Simulation
                             ParticlesBuffer[i].Clear();
                         }
 
+                        BiomassAmountMultiplier = TotalBiomassAmount / BiomassAmount;
+
                         Update(0);
                         Update(1);
                         Update(2);
@@ -466,7 +470,6 @@ namespace Paramecium.Simulation
                 }
                 else if (GridMap[x + y * SizeX].Fertility > 0d)
                 {
-                    GridMap[x + y * SizeX].Fertility /= (BiomassAmount / TotalBiomassAmount);
                     BiomassAmountArray[thread] += GridMap[x + y * SizeX].Fertility;
                     GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility / (TotalBiomassAmount / (SizeX * SizeY)) * 32d), 0), 32) + 16);
                     GridMapBgParticle[x + y * SizeX] = GridMapBg[x + y * SizeX];
@@ -482,24 +485,25 @@ namespace Paramecium.Simulation
             {
                 for (int j = 0; j < GridMap[x + y * SizeX].LocalParticleCount; j++)
                 {
+                    Particle Target = Particles[GridMap[x + y * SizeX].LocalParticles[j]];
+
                     switch (phase)
                     {
                         case 0:
-                            Particles[GridMap[x + y * SizeX].LocalParticles[j]].EarlyUpdate();
+                            Target.EarlyUpdate();
                             break;
                         case 1:
-                            Particles[GridMap[x + y * SizeX].LocalParticles[j]].MiddleUpdate(thread);
+                            Target.MiddleUpdate(thread);
                             break;
                         case 2:
-                            Particles[GridMap[x + y * SizeX].LocalParticles[j]].LateUpdate(thread);
+                            Target.LateUpdate(thread);
                             break;
                         case 3:
-                            Particles[GridMap[x + y * SizeX].LocalParticles[j]].OnStepFinish(thread);
+                            Target.OnStepFinish(thread);
                             break;
                         case 4:
                             if (GridMap[x + y * SizeX].Type != TileType.Wall)
                             {
-                                Particles[GridMap[x + y * SizeX].LocalParticles[j]].Biomass /= (BiomassAmount / TotalBiomassAmount);
                                 if (GridMap[x + y * SizeX].LocalPlantCount > 0)
                                 {
                                     if (Particles[GridMap[x + y * SizeX].LocalParticles[j]].Type == ParticleType.Plant)
@@ -517,7 +521,7 @@ namespace Paramecium.Simulation
                                 {
                                     if (Particles[GridMap[x + y * SizeX].LocalParticles[j]].Type == ParticleType.Animal)
                                     {
-                                        BiomassAmountArray[thread] += Particles[GridMap[x + y * SizeX].LocalParticles[j]].Biomass;
+                                        BiomassAmountArray[thread] += Particles[GridMap[x + y * SizeX].LocalParticles[j]].Biomass + Particles[GridMap[x + y * SizeX].LocalParticles[j]].BiomassStockpiled;
                                         GridMapBgParticle[x + y * SizeX] = 0x03;
                                         PopulationAnimalArray[thread]++;
                                         PopulationTotalArray[thread]++;
