@@ -866,8 +866,10 @@ namespace Paramecium.Simulation
                     Position += Velocity;
                     if (Position.X > local_SizeX)
                     {
-                        Position.X = local_SizeX;
-                        Velocity.X *= -1d;
+                        //Position.X = local_SizeX;
+                        //Velocity.X *= -1d;
+                        Position = new Vector2D(local_SizeX, Position.Y);
+                        Velocity = new Vector2D(Velocity.X * -1d, Velocity.Y);
                         if (Type == ParticleType.Animal)
                         {
                             if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
@@ -875,8 +877,10 @@ namespace Paramecium.Simulation
                     }
                     if (Position.X < 0)
                     {
-                        Position.X = 0;
-                        Velocity.X *= -1d;
+                        //Position.X = 0;
+                        //Velocity.X *= -1d;
+                        Position = new Vector2D(0, Position.Y);
+                        Velocity = new Vector2D(Velocity.X * -1d, Velocity.Y);
                         if (Type == ParticleType.Animal)
                         {
                             if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
@@ -884,8 +888,10 @@ namespace Paramecium.Simulation
                     }
                     if (Position.Y > local_SizeY)
                     {
-                        Position.Y = local_SizeY;
-                        Velocity.Y *= -1d;
+                        //Position.Y = local_SizeY;
+                        //Velocity.Y *= -1d;
+                        Position = new Vector2D(Position.X, local_SizeY);
+                        Velocity = new Vector2D(Velocity.X, Velocity.Y * -1d);
                         if (Type == ParticleType.Animal)
                         {
                             if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;
@@ -893,8 +899,10 @@ namespace Paramecium.Simulation
                     }
                     if (Position.Y < 0)
                     {
-                        Position.Y = 0;
-                        Velocity.Y *= -1d;
+                        //Position.Y = 0;
+                        //Velocity.Y *= -1d;
+                        Position = new Vector2D(Position.X, 0);
+                        Velocity = new Vector2D(Velocity.X, Velocity.Y * -1d);
                         if (Type == ParticleType.Animal)
                         {
                             if (new Random().NextDouble() < 0.1d) RandomWalkTargetAngle = new Random().NextDouble() * 360d;

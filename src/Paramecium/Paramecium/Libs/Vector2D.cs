@@ -1,6 +1,6 @@
 ﻿namespace Paramecium.Libs
 {
-    public class Vector2D
+    public struct Vector2D
     {
         public double X { get; set; }
         public double Y { get; set; }
@@ -47,10 +47,10 @@
 
         public static bool operator ==(Vector2D left, Vector2D right)
         {
-            if (object.ReferenceEquals(left, right))
-            {
-                return true;
-            }
+            //if (object.ReferenceEquals(left, right))
+            //{
+            //    return true;
+            //}
             if (((object)left == null) || ((object)right == null))
             {
                 return false;

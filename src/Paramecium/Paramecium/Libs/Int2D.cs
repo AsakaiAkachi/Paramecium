@@ -1,6 +1,6 @@
 ﻿namespace Paramecium.Libs
 {
-    public class Int2D
+    public struct Int2D
     {
         public int X { get; set; }
         public int Y { get; set; }
@@ -32,10 +32,10 @@
 
         public static bool operator ==(Int2D left, Int2D right)
         {
-            if (object.ReferenceEquals(left, right))
-            {
-                return true;
-            }
+            //if (object.ReferenceEquals(left, right))
+            //{
+            //    return true;
+            //}
             if (((object)left == null) || ((object)right == null))
             {
                 return false;

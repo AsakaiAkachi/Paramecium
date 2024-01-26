@@ -18,6 +18,7 @@ namespace Paramecium
         {
             AllocConsole();
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+            Console.Title = "Paramecium";
 
             if (!Directory.Exists($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves"))
             {

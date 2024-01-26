@@ -1,6 +1,6 @@
 ﻿namespace Paramecium.Libs
 {
-    public class ColorInt3
+    public struct ColorInt3
     {
         public int Red { get; set; }
         public int Green { get; set; }
