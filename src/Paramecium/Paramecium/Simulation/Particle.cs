@@ -502,7 +502,7 @@ namespace Paramecium.Simulation
                                                             else if (TargetParticle.Type == ParticleType.Animal)
                                                             {
                                                                 TargetDistanceTemp /= Math.Max(AnimalPriority, 0.001d);
-                                                                if (Math.Sqrt(Math.Pow(Color.Red - TargetParticle.Color.Red, 2) + Math.Pow(Color.Green - TargetParticle.Color.Green, 2) + Math.Pow(Color.Blue - TargetParticle.Color.Blue, 2)) > 16d && TargetParticle.Age >= 1) IsValidTarget = true;
+                                                                if (Genes.RaceId != TargetParticle.Genes.RaceId && TargetParticle.Age >= 1) IsValidTarget = true;
                                                             }
 
                                                             // 補正後のターゲットまでの距離がすでにターゲット候補になっている生物より近い場合はターゲット候補を変更する

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             BottomStat = new StatusStrip();
             StatSoupStatus = new ToolStripStatusLabel();
             StatTimeStep = new ToolStripStatusLabel();
@@ -215,6 +216,7 @@
             Controls.Add(SimulationView);
             Controls.Add(BottomStat);
             Controls.Add(TopMenu);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = TopMenu;
             Name = "FormMain";
             Text = "Paramecium";

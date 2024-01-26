@@ -415,6 +415,7 @@ namespace Paramecium.Forms
                                                                                     Target.Radius + 0.5d
                                                                                 );
                                                                             }
+                                                                            /**
                                                                             else if (Math.Sqrt(Math.Pow(g_Soup.Particles[SelectedCellIndex].Genes.GeneColorRed - Target.Genes.GeneColorRed, 2) + Math.Pow(g_Soup.Particles[SelectedCellIndex].Genes.GeneColorGreen - Target.Genes.GeneColorGreen, 2) + Math.Pow(g_Soup.Particles[SelectedCellIndex].Genes.GeneColorBlue - Target.Genes.GeneColorBlue, 2)) <= 16d)
                                                                             {
                                                                                 DrawCircle(
@@ -425,6 +426,7 @@ namespace Paramecium.Forms
                                                                                     Target.Radius + 0.5d
                                                                                 );
                                                                             }
+                                                                            **/
                                                                         }
                                                                     }
                                                                 }
