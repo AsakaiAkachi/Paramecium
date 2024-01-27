@@ -1,13 +1,4 @@
-﻿using Paramecium.Libraries;
-using System;
-using System.CodeDom;
-using System.Drawing;
-using System.Runtime;
-using System.Security.Policy;
-using System.Threading;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-
-namespace Paramecium.Simulation
+﻿namespace Paramecium.Simulation
 {
     public class Particle
     {
@@ -231,6 +222,9 @@ namespace Paramecium.Simulation
 
         public void EarlyUpdate()
         {
+
+            //Velocity += new Vector2D(0, 0.001d);
+
             // 速度に抗力を適用する
             if (Type == ParticleType.Animal || (Type == ParticleType.Plant && Age >= 0))
             {
@@ -1093,6 +1087,8 @@ namespace Paramecium.Simulation
                 GeneHardness /= ActionGenesValueSumMutation / 4d;
                 GeneAgility /= ActionGenesValueSumMutation / 4d;
                 ActionGeneUnassignedPoint /= ActionGenesValueSumMutation / 4d;
+
+                EventLog.PushEventLog($"新種「{LongToBase36(RaceId, 6)}」が誕生しました (食性：{GeneDiet:0.000})");
             }
             else
             {

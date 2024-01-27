@@ -1,6 +1,7 @@
 ﻿global using static Paramecium.Global;
-using Paramecium.Forms;
-using Paramecium.Simulation;
+global using Paramecium.Forms;
+global using Paramecium.Simulation;
+global using Paramecium.Libraries;
 
 namespace Paramecium
 {

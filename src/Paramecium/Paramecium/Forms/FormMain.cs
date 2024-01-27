@@ -1,9 +1,6 @@
-﻿using Paramecium.Simulation;
-using Paramecium.Libraries;
-using System.Drawing.Imaging;
+﻿using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Paramecium.Forms
 {
@@ -779,6 +776,18 @@ namespace Paramecium.Forms
                                 TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
                                 OffsetY += TextSize.Height;
                             }
+
+                            OffsetY += 16;
+
+                            List<EventLog> LoadedEventLog = EventLog.LoadEventLog();
+                            for (int i = LoadedEventLog.Count - 1; i >= 0; i--)
+                            {
+                                string Text = $"{LoadedEventLog[i].EventLogText}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
                         }
 
                         fnt.Dispose();
@@ -975,6 +984,8 @@ namespace Paramecium.Forms
                         g_FormMain.cameraX = g_Soup.SizeX / 2d;
                         g_FormMain.cameraY = g_Soup.SizeY / 2d;
                     }
+
+                    EventLog.PushEventLog($"スープファイル「{Path.GetFileName(FilePath)}」を読み込みました");
                 }
                 catch
                 {
@@ -995,6 +1006,8 @@ namespace Paramecium.Forms
                 {
                     sw.Write(jsonString);
                 }
+
+                EventLog.PushEventLog($"現在のスープを「{Path.GetFileName(FilePath)}」に上書き保存しました");
             }
         }
 
@@ -1020,6 +1033,8 @@ namespace Paramecium.Forms
                 }
 
                 FilePath = sfd.FileName;
+
+                EventLog.PushEventLog($"現在のスープが「{Path.GetFileName(FilePath)}」として保存されました");
             }
         }
 
@@ -1255,8 +1270,16 @@ namespace Paramecium.Forms
                 case Keys.Space:
                     if (g_Soup is not null)
                     {
-                        if (g_Soup.SoupState == SoupState.Pause) g_Soup.SetSoupState(SoupState.Running);
-                        else g_Soup.SetSoupState(SoupState.Pause);
+                        if (g_Soup.SoupState == SoupState.Pause)
+                        {
+                            g_Soup.SetSoupState(SoupState.Running);
+                            EventLog.PushEventLog("シミュレーションを再開しました");
+                        }
+                        else
+                        {
+                            g_Soup.SetSoupState(SoupState.Pause);
+                            EventLog.PushEventLog("シミュレーションを一時停止しました");
+                        }
                     }
                     break;
                 case Keys.OemPeriod:
