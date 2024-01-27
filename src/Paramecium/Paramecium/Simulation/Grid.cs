@@ -12,6 +12,7 @@
         public int LocalAnimalCount { get; set; }
 
         public double Fertility { get; set; }
+        public bool NeighborhoodGridBiomass { get; set; }
 
         public Grid(int x, int y, TileType type)
         {
@@ -24,6 +25,8 @@
             LocalAnimalCount = 0;
 
             Fertility = 0d;
+
+            NeighborhoodGridBiomass = false;
         }
     }
 

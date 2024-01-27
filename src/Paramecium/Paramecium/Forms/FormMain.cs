@@ -1,5 +1,5 @@
 ﻿using Paramecium.Simulation;
-using Paramecium.Libs;
+using Paramecium.Libraries;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -204,6 +204,10 @@ namespace Paramecium.Forms
                                                             {
                                                                 TargetColor = new SolidBrush(Color.FromArgb(255, 127, 255));
                                                             }
+                                                            else if (Target.Type == ParticleType.Plant)
+                                                            {
+                                                                TargetColor = new SolidBrush(Color.FromArgb(0, Math.Min(63 + (int)(192 / g_Soup.PlantForkBiomass * Target.Biomass), 255), 0));
+                                                            }
                                                             else TargetColor = new SolidBrush(Target.Color);
                                                             break;
                                                         case 1:
@@ -217,6 +221,16 @@ namespace Paramecium.Forms
                                                             }
                                                             break;
                                                         case 2:
+                                                            if (Target.Type == ParticleType.Plant)
+                                                            {
+                                                                TargetColor = BrushCellColorGray;
+                                                            }
+                                                            else if (Target.Type == ParticleType.Animal)
+                                                            {
+                                                                TargetColor = new SolidBrush(Color.FromArgb((int)Math.Min(255d / 4d * Target.Genes.GeneStrength, 255), (int)Math.Min(255d / 4d * Target.Genes.GeneAgility, 255), (int)Math.Min(255d / 4d * Target.Genes.GeneHardness, 255)));
+                                                            }
+                                                            break;
+                                                        case 5:
                                                             if (Target.CollisionDisabled == false)
                                                             {
                                                                 TargetColor = new SolidBrush(Color.FromArgb(255, 255, 0));
@@ -226,7 +240,7 @@ namespace Paramecium.Forms
                                                                 TargetColor = new SolidBrush(Color.FromArgb(0, 0, 0));
                                                             }
                                                             break;
-                                                        case 3:
+                                                        case 6:
                                                             if (Target.Type == ParticleType.Plant)
                                                             {
                                                                 if (Target.NextGridBiomassCheck < 0)
@@ -738,7 +752,7 @@ namespace Paramecium.Forms
                             **/
                             if (fullScreen)
                             {
-                                string Text = $"Population : {g_Soup.PopulationPlant}/{g_Soup.PopulationAnimal}/{g_Soup.PopulationTotal}";
+                                string Text = $"個体数 : {g_Soup.PopulationPlant}/{g_Soup.PopulationAnimal}/{g_Soup.PopulationTotal}";
                                 Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                 canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
                                 TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
@@ -746,7 +760,20 @@ namespace Paramecium.Forms
                             }
                             if (fullScreen)
                             {
-                                string Text = $"Time Step : {g_Soup.ElapsedTimeStep} (T{g_Soup.ParallelismLimit})";
+                                string Text = $"経過タイムステップ数 : {g_Soup.ElapsedTimeStep} (T{g_Soup.ParallelismLimit})";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = "描画モード : ";
+                                if (DisplayMode == 0) Text += "通常";
+                                else if (DisplayMode == 1) Text += "食性";
+                                else if (DisplayMode == 2) Text += "パラメーター";
+                                else if (DisplayMode == 5) Text += "[デバッグ] 当たり判定";
+                                else if (DisplayMode == 6) Text += "[デバッグ] バイオマス収集";
+                                else Text += "通常";
                                 Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                 canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
                                 TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);

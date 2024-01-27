@@ -1,4 +1,4 @@
-﻿namespace Paramecium.Libs
+﻿namespace Paramecium.Libraries
 {
     public struct ColorInt3
     {

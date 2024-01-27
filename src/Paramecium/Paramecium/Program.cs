@@ -1,5 +1,5 @@
 using Paramecium.Forms;
-using Paramecium.Libs;
+using Paramecium.Libraries;
 using System.IO;
 using System.Runtime.InteropServices;
 

@@ -1,4 +1,4 @@
-﻿using Paramecium.Libs;
+﻿using Paramecium.Libraries;
 using System.Drawing;
 using System.IO.Pipes;
 using System.Linq;
