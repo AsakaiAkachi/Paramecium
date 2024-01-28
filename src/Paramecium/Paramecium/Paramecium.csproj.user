@@ -4,9 +4,6 @@
     <_LastSelectedProfileId>C:\Users\takku\Documents\GitHub\Paramecium\src\Paramecium\Paramecium\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="Forms\FormAnimalViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Update="Forms\FormEventViewer.cs">
       <SubType>Form</SubType>
     </Compile>

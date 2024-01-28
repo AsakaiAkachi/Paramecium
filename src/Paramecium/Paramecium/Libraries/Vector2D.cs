@@ -119,7 +119,7 @@
             return result;
         }
 
-        public static Int2D ToGridPosition(Vector2D value)
+        public static Int2D ToIntegerizedPosition(Vector2D value)
         {
             Int2D result = new Int2D((int)value.X, (int)value.Y);
 

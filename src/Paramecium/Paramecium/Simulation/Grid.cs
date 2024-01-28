@@ -6,8 +6,8 @@
         public int Y { get; set; }
         public TileType Type { get; set; }
 
-        public List<int> LocalParticles { get; set; }
-        public int LocalParticleCount { get; set; }
+        public List<int> LocalPlants { get; set; }
+        public List<int> LocalAnimals { get; set; }
         public int LocalPlantCount { get; set; }
         public int LocalAnimalCount { get; set; }
 
@@ -19,8 +19,8 @@
             X = x;
             Y = y;
             Type = type;
-            LocalParticles = new List<int>();
-            LocalParticleCount = 0;
+            LocalPlants = new List<int>();
+            LocalAnimals = new List<int>();
             LocalPlantCount = 0;
             LocalAnimalCount = 0;
 

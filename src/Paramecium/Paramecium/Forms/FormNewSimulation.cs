@@ -17,22 +17,22 @@ namespace Paramecium.Forms
         {
             InitializeComponent();
 
-            SoupParameterView.Rows.Add("Size X", 128);
-            SoupParameterView.Rows.Add("Size Y", 128);
-            SoupParameterView.Rows.Add("Wall Perlin Noise X", 79.14649528369992);
-            SoupParameterView.Rows.Add("Wall Perlin Noise Y", 97.49842312725215);
-            SoupParameterView.Rows.Add("Wall Perlin Noise Z", 244.70658351525472);
-            SoupParameterView.Rows.Add("Wall Perlin Noise Scale", 0.1);
+            SoupParameterView.Rows.Add("Size X", 256);
+            SoupParameterView.Rows.Add("Size Y", 160);
+            SoupParameterView.Rows.Add("Wall Perlin Noise X", new Random().NextDouble() * 256d);
+            SoupParameterView.Rows.Add("Wall Perlin Noise Y", new Random().NextDouble() * 256d);
+            SoupParameterView.Rows.Add("Wall Perlin Noise Z", new Random().NextDouble() * 256d);
+            SoupParameterView.Rows.Add("Wall Perlin Noise Scale", 0.03);
             SoupParameterView.Rows.Add("Wall Perlin Noise Octave", 4);
-            SoupParameterView.Rows.Add("Wall Thickness", 0.025);
-            SoupParameterView.Rows.Add("Total BiomassAmount", 65536);
+            SoupParameterView.Rows.Add("Wall Thickness", 0.0085);
+            SoupParameterView.Rows.Add("Total BiomassAmount", 163840);
             SoupParameterView.Rows.Add("Cell Size Multiplier", 0.5);
             SoupParameterView.Rows.Add("Plant Fork Biomass", 15);
-            SoupParameterView.Rows.Add("Animal Fork Biomass", 60);
+            SoupParameterView.Rows.Add("Animal Fork Biomass", 50);
             SoupParameterView.Rows.Add("Plant Biomass Collection Range", 3);
-            SoupParameterView.Rows.Add("Initial Animal Count", 1);
+            SoupParameterView.Rows.Add("Initial Animal Count", 1000);
             SoupParameterView.Rows.Add("Hatching Time", 300);
-            SoupParameterView.Rows.Add("Mutation Rate", 0.1);
+            SoupParameterView.Rows.Add("Mutation Rate", 0.015625);
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
