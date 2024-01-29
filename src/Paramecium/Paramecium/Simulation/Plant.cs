@@ -302,34 +302,30 @@ namespace Paramecium.Simulation
 
         public void OnStepFinalize()
         {
-            try
+            if (IsValid)
             {
-                if (IsValid)
+                if (Velocity != Vector2D.Zero)
                 {
-                    if (Velocity != Vector2D.Zero)
-                    {
-                        Int2D NextIntegerizedPosition = Vector2D.ToIntegerizedPosition(Position);
+                    Int2D NextIntegerizedPosition = Vector2D.ToIntegerizedPosition(Position);
 
-                        if (IntegerizedPosition != NextIntegerizedPosition)
-                        {
-                            g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Remove(Index);
-                            g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount--;
-                            IntegerizedPosition = NextIntegerizedPosition;
-                            g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Add(Index);
-                            g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount++;
-                        }
+                    if (IntegerizedPosition != NextIntegerizedPosition)
+                    {
+                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Remove(Index);
+                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount--;
+                        IntegerizedPosition = NextIntegerizedPosition;
+                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Add(Index);
+                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount++;
                     }
                 }
-                else
-                {
-                    g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Element * g_Soup.BiomassAmountMultiplier;
-                    g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Remove(Index);
-                    g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount--;
-                    lock (g_Soup.PlantUnassignedIndexesLockObject) g_Soup.PlantUnassignedIndexes.Add(Index);
-                    g_Soup.Plants[Index] = null;
-                }
             }
-            catch (Exception ex) { ConsoleLog(LogLevel.Failure, ex.ToString()); }
+            else
+            {
+                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Element * g_Soup.BiomassAmountMultiplier;
+                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Remove(Index);
+                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount--;
+                lock (g_Soup.PlantUnassignedIndexesLockObject) g_Soup.PlantUnassignedIndexes.Add(Index);
+                g_Soup.Plants[Index] = null;
+            }
         }
     }
 }

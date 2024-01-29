@@ -33,6 +33,8 @@
             StatSoupStatus = new ToolStripStatusLabel();
             StatTimeStep = new ToolStripStatusLabel();
             StatPopulation = new ToolStripStatusLabel();
+            StatLatestGeneration = new ToolStripStatusLabel();
+            StatTotalBornDie = new ToolStripStatusLabel();
             StatTps = new ToolStripStatusLabel();
             StatFps = new ToolStripStatusLabel();
             StatMemory = new ToolStripStatusLabel();
@@ -57,7 +59,7 @@
             // 
             // BottomStat
             // 
-            BottomStat.Items.AddRange(new ToolStripItem[] { StatSoupStatus, StatTimeStep, StatPopulation, StatTps, StatFps, StatMemory });
+            BottomStat.Items.AddRange(new ToolStripItem[] { StatSoupStatus, StatTimeStep, StatPopulation, StatLatestGeneration, StatTotalBornDie, StatTps, StatFps, StatMemory });
             BottomStat.Location = new Point(0, 622);
             BottomStat.Name = "BottomStat";
             BottomStat.Size = new Size(900, 24);
@@ -83,6 +85,20 @@
             StatPopulation.Name = "StatPopulation";
             StatPopulation.Size = new Size(106, 19);
             StatPopulation.Text = "Population : 0/0/0";
+            // 
+            // StatLatestGeneration
+            // 
+            StatLatestGeneration.BorderSides = ToolStripStatusLabelBorderSides.Left;
+            StatLatestGeneration.Name = "StatLatestGeneration";
+            StatLatestGeneration.Size = new Size(118, 19);
+            StatLatestGeneration.Text = "Latest Generation : 0";
+            // 
+            // StatTotalBornDie
+            // 
+            StatTotalBornDie.BorderSides = ToolStripStatusLabelBorderSides.Left;
+            StatTotalBornDie.Name = "StatTotalBornDie";
+            StatTotalBornDie.Size = new Size(112, 19);
+            StatTotalBornDie.Text = "Total Born/Die : 0/0";
             // 
             // StatTps
             // 
@@ -185,14 +201,14 @@
             // TopMenu_Simulation_NewSimulation
             // 
             TopMenu_Simulation_NewSimulation.Name = "TopMenu_Simulation_NewSimulation";
-            TopMenu_Simulation_NewSimulation.Size = new Size(169, 22);
+            TopMenu_Simulation_NewSimulation.Size = new Size(180, 22);
             TopMenu_Simulation_NewSimulation.Text = "新規作成...";
             TopMenu_Simulation_NewSimulation.Click += TopMenu_Simulation_NewSimulation_Click;
             // 
             // オートセーブの設定ToolStripMenuItem
             // 
             オートセーブの設定ToolStripMenuItem.Name = "オートセーブの設定ToolStripMenuItem";
-            オートセーブの設定ToolStripMenuItem.Size = new Size(169, 22);
+            オートセーブの設定ToolStripMenuItem.Size = new Size(180, 22);
             オートセーブの設定ToolStripMenuItem.Text = "オートセーブの設定...";
             // 
             // SimulationView
@@ -254,5 +270,7 @@
         private ToolStripMenuItem TopMenu_Simulation;
         private ToolStripMenuItem TopMenu_Simulation_NewSimulation;
         private ToolStripMenuItem オートセーブの設定ToolStripMenuItem;
+        private ToolStripStatusLabel StatTotalBornDie;
+        private ToolStripStatusLabel StatLatestGeneration;
     }
 }

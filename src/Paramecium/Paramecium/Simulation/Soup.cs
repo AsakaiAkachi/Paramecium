@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting;
 using System.Security.Cryptography.Xml;
 using System.Text.Json;
 using System.Threading;
@@ -39,6 +40,9 @@ namespace Paramecium.Simulation
         public int HatchingTime { get; set; } = 300;
         public double MutationRate { get; set; } = 0.1d;
 
+        public double AnimalElementLosePerStepInPassive { get; set; } = 0.025d;
+        public double AnimalElementLosePerStepInAccelerating { get; set; } = 0.075d;
+
         public double PlantSizeMultiplier { get; set; } = 3.872983d;
 
         public double BiomassAmountMultiplier { get; set; } = 1.0d;
@@ -48,7 +52,13 @@ namespace Paramecium.Simulation
         public int RegionCount { get; set; }
         public int ParallelismLimit { get; set; }
 
-        public int ElapsedTimeStep { get; set; }
+        public long ElapsedTimeStep { get; set; }
+        public long TotalBornCount { get; set; }
+        public long TotalDieCount { get; set; }
+        public object TotalDieCountLockObject = new object();
+
+        public int LatestGeneration { get; set; } = 1;
+        public object LatestGenerationLockObject = new object();
 
         public Grid[] GridMap { get; set; }
         public byte[] GridMapByte { get; set; }
@@ -60,6 +70,7 @@ namespace Paramecium.Simulation
         public List<Plant>[] PlantBuffer { get; set; }
         public List<int> PlantUnassignedIndexes { get; set; }
         public object PlantUnassignedIndexesLockObject = new object();
+
         public Animal[] Animals { get; set; }
         public List<Animal>[] AnimalBuffer { get; set; }
         public List<int> AnimalUnassignedIndexes { get; set; }
@@ -70,7 +81,7 @@ namespace Paramecium.Simulation
         public int PopulationTotal { get; set; }
 
         public SoupState SoupState;
-        public bool SoupIsProcessing;
+        public object SoupStateLockObject = new object();
 
         public Soup() { }
         public Soup(
@@ -80,7 +91,8 @@ namespace Paramecium.Simulation
             double totalBiomassAmount,
             double cellSizeMultiplier, double plantForkBiomass, double animalForkBiomass, int plantBiomassCollectionRange,
             int initialAnimalCount, int hatchingTime, 
-            double mutationRate
+            double mutationRate,
+            double animalElementLosePerStepInPassive, double animalElementLosePerStepInAccelerating
         )
         {
             SizeX = sizeX; SizeY = sizeY;
@@ -99,6 +111,9 @@ namespace Paramecium.Simulation
             GridMapBgParticle = new byte[SizeX * SizeY];
 
             MutationRate = mutationRate;
+
+            AnimalElementLosePerStepInPassive = animalElementLosePerStepInPassive;
+            AnimalElementLosePerStepInAccelerating = animalElementLosePerStepInAccelerating;
 
             RegionCountWidth = (int)Math.Ceiling(SizeX / 32d);
             RegionCountHeight = (int)Math.Ceiling(SizeY / 32d);
@@ -169,7 +184,6 @@ namespace Paramecium.Simulation
             }
 
             SoupState = SoupState.Stop;
-            SoupIsProcessing = false;
         }
 
         public void SoupSetup()
@@ -248,6 +262,7 @@ namespace Paramecium.Simulation
                         //AnimalBuffer[0][j].Age = 0;
                         AnimalBuffer[0][j].OnInitialize();
                         Animals[AnimalBuffer[0][j].Index] = AnimalBuffer[0][j];
+                        TotalBornCount++;
                     }
                     AnimalBuffer[0].Clear();
 
@@ -326,12 +341,10 @@ namespace Paramecium.Simulation
 
                 while (SoupState != SoupState.Stop)
                 {
-                    if (SoupState == SoupState.Running || SoupState == SoupState.StepRun)
+                    lock (SoupStateLockObject)
                     {
-                        try
+                        if (SoupState == SoupState.Running || SoupState == SoupState.StepRun)
                         {
-                            SoupIsProcessing = true;
-
                             for (int i = 0; i < PlantBuffer.Length; i++)
                             {
                                 for (int j = 0; j < PlantBuffer[i].Count; j++)
@@ -347,6 +360,7 @@ namespace Paramecium.Simulation
                                 {
                                     AnimalBuffer[i][j].OnInitialize();
                                     Animals[AnimalBuffer[i][j].Index] = AnimalBuffer[i][j];
+                                    TotalBornCount++;
                                 }
                                 AnimalBuffer[i].Clear();
                             }
@@ -358,51 +372,6 @@ namespace Paramecium.Simulation
                             Update(2);
                             Update(3);
                             Update(4);
-
-                            /**
-                            int PopulationPlantNext = 0;
-                            int PopulationAnimalNext = 0;
-
-                            double BiomassAmountNext = 0;
-
-                            for (int x = 0; x < env_SizeX; x++)
-                            {
-                                for (int y = 0; y < env_SizeY; y++)
-                                {
-                                    BiomassAmountNext += TileMap[x + y * env_SizeX].Fertility;
-
-                                    if (TileMap[x + y * env_SizeX].Type != TileType.Wall)
-                                    {
-                                        GridMapBg[x + y * env_SizeX] = (byte)((int)(Math.Min(TileMap[x + y * env_SizeX].Fertility, 4d) * 8d) + 16);
-
-                                        if (TileMap[x + y * env_SizeX].LocalParticles.Count == 0) GridMapBgParticle[x + y * env_SizeX] = (byte)((int)(Math.Min(TileMap[x + y * env_SizeX].Fertility, 4d) * 8d) + 16);
-                                        else
-                                        {
-                                            for (int j = 0; j < TileMap[x + y * env_SizeX].LocalParticles.Count; j++)
-                                            {
-                                                if (Particles[TileMap[x + y * env_SizeX].LocalParticles[j]].Type == ParticleType.Plant)
-                                                {
-                                                    GridMapBgParticle[x + y * env_SizeX] = 0x02;
-                                                    PopulationPlantNext++;
-                                                }
-                                                else if (Particles[TileMap[x + y * env_SizeX].LocalParticles[j]].Type == ParticleType.Animal)
-                                                {
-                                                    GridMapBgParticle[x + y * env_SizeX] = 0x03;
-                                                    PopulationAnimalNext++;
-                                                }
-                                                BiomassAmountNext += Particles[TileMap[x + y * env_SizeX].LocalParticles[j]].Satiety;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            BiomassAmount = BiomassAmountNext;
-
-                            PopulationPlant = PopulationPlantNext;
-                            PopulationAnimal = PopulationAnimalNext;
-                            PopulationTotal = PopulationPlantNext + PopulationAnimalNext;
-                            **/
 
                             CurrentBiomassAmount = 0;
                             PopulationPlant = 0;
@@ -432,13 +401,7 @@ namespace Paramecium.Simulation
                                 SoupState = SoupState.Pause;
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            ConsoleLog(LogLevel.Failure, ex.ToString());
-                            SoupIsProcessing = false;
-                        }
                     }
-                    else SoupIsProcessing = false;
                 }
             });
         }
@@ -530,30 +493,26 @@ namespace Paramecium.Simulation
             {
                 if (phase == 4)
                 {
-                    try
+                    if (GridMap[x + y * SizeX].Type == TileType.Wall)
                     {
-                        if (GridMap[x + y * SizeX].Type == TileType.Wall)
-                        {
-                            GridMap[x + y * SizeX].Fertility = 0;
-                            GridMapBg[x + y * SizeX] = 0x01;
-                            GridMapBgParticle[x + y * SizeX] = 0x01;
-                        }
-                        else if (GridMap[x + y * SizeX].Fertility > 0d)
-                        {
-                            BiomassAmountArray[thread] += GridMap[x + y * SizeX].Fertility;
-                            GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility / (TotalBiomassAmount / (SizeX * SizeY)) * 32d), 0), 32) + 16);
-                            GridMapBgParticle[x + y * SizeX] = GridMapBg[x + y * SizeX];
-                        }
-                        else
-                        {
-                            GridMapBg[x + y * SizeX] = 0x10;
-                            GridMapBgParticle[x + y * SizeX] = 0x10;
-                        }
-
-                        GridMap[x + y * SizeX].LocalPlantCount = GridMap[x + y * SizeX].LocalPlants.Count;
-                        GridMap[x + y * SizeX].LocalAnimalCount = GridMap[x + y * SizeX].LocalAnimals.Count;
+                        GridMap[x + y * SizeX].Fertility = 0;
+                        GridMapBg[x + y * SizeX] = 0x01;
+                        GridMapBgParticle[x + y * SizeX] = 0x01;
                     }
-                    catch (Exception ex) { ConsoleLog(LogLevel.Failure, ex.ToString()); }
+                    else if (GridMap[x + y * SizeX].Fertility > 0d)
+                    {
+                        BiomassAmountArray[thread] += GridMap[x + y * SizeX].Fertility;
+                        GridMapBg[x + y * SizeX] = (byte)((int)Math.Min(Math.Max(Math.Round(GridMap[x + y * SizeX].Fertility / (TotalBiomassAmount / (SizeX * SizeY)) * 32d), 0), 32) + 16);
+                        GridMapBgParticle[x + y * SizeX] = GridMapBg[x + y * SizeX];
+                    }
+                    else
+                    {
+                        GridMapBg[x + y * SizeX] = 0x10;
+                        GridMapBgParticle[x + y * SizeX] = 0x10;
+                    }
+
+                    GridMap[x + y * SizeX].LocalPlantCount = GridMap[x + y * SizeX].LocalPlants.Count;
+                    GridMap[x + y * SizeX].LocalAnimalCount = GridMap[x + y * SizeX].LocalAnimals.Count;
                 }
 
                 if (GridMap[x + y * SizeX].LocalPlantCount > 0)
@@ -632,24 +591,19 @@ namespace Paramecium.Simulation
             switch (soupState)
             {
                 case SoupState.Stop:
-                    SoupState = SoupState.Stop;
-                    while (SoupIsProcessing) { }
+                    lock(SoupStateLockObject) SoupState = SoupState.Stop;
                     break;
                 case SoupState.Pause:
-                    SoupState = SoupState.Pause;
-                    while (SoupIsProcessing) { }
+                    lock (SoupStateLockObject) SoupState = SoupState.Pause;
                     break;
                 case SoupState.ResourceLock:
-                    SoupState = SoupState.ResourceLock;
-                    while (SoupIsProcessing) { }
+                    lock (SoupStateLockObject) SoupState = SoupState.ResourceLock;
                     break;
                 case SoupState.Running:
-                    SoupState = SoupState.Running;
-                    while (!SoupIsProcessing) { }
+                    lock (SoupStateLockObject) SoupState = SoupState.Running;
                     break;
                 case SoupState.StepRun:
-                    SoupState = SoupState.StepRun;
-                    while (!SoupIsProcessing) { }
+                    lock (SoupStateLockObject) SoupState = SoupState.StepRun;
                     break;
             }
         }
