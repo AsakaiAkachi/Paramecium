@@ -297,12 +297,13 @@ namespace Paramecium.Forms
                                                         Target.Radius
                                                     );
 
-                                                    if (zoomFactor >= 6)
+                                                    if (zoomFactor >= 5)
                                                     {
                                                         Random rnd3 = new Random(g_Soup.ElapsedTimeStep + x + y * g_Soup.SizeX + Target.Index);
                                                         if (Target.Age >= 0)
                                                         {
-                                                            double TargetSpeed = Vector2D.Size(Target.Velocity) * 9d + 0.1d;
+                                                            double TargetAcc = Math.Min(Math.Max(Target.BrainOutputAcceleration, -10d), 10d) * 0.1d;
+                                                            double TargetRot = Math.Min(Math.Max(Target.BrainOutputRotation, -10), 10) * -1.5d;
                                                             for (int j = 0; j < 3; j++)
                                                             {
                                                                 DrawLine(
@@ -310,26 +311,26 @@ namespace Paramecium.Forms
                                                                     Pens.White,
                                                                     TargetPosX - (Vector2D.FromAngle(TargetAngle) * TargetRadius).X,
                                                                     TargetPosY - (Vector2D.FromAngle(TargetAngle) * TargetRadius).Y,
-                                                                    TargetPosX - (Vector2D.FromAngle(TargetAngle) * TargetRadius).X - (Vector2D.FromAngle(TargetAngle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * TargetRadius * 1.5d).X,
-                                                                    TargetPosY - (Vector2D.FromAngle(TargetAngle) * TargetRadius).Y - (Vector2D.FromAngle(TargetAngle + (rnd3.NextDouble() * (60d * TargetSpeed) - (30d * TargetSpeed))) * TargetRadius * 1.5d).Y
+                                                                    TargetPosX - (Vector2D.FromAngle(TargetAngle) * TargetRadius).X - (Vector2D.FromAngle(TargetAngle + (rnd3.NextDouble() * (60d * TargetAcc) - (30d * TargetAcc)) + TargetRot) * TargetRadius * 1.5d).X,
+                                                                    TargetPosY - (Vector2D.FromAngle(TargetAngle) * TargetRadius).Y - (Vector2D.FromAngle(TargetAngle + (rnd3.NextDouble() * (60d * TargetAcc) - (30d * TargetAcc)) + TargetRot) * TargetRadius * 1.5d).Y
                                                                 );
-                                                                SolidBrush bBlack = new SolidBrush(Color.FromArgb(0, 0, 0));
-                                                                FillCircle(
-                                                                    canvas_g,
-                                                                    bBlack,
-                                                                    TargetPosX + (Vector2D.FromAngle(TargetAngle - 30) * 0.7d * TargetRadius).X,
-                                                                    TargetPosY + (Vector2D.FromAngle(TargetAngle - 30) * 0.7d * TargetRadius).Y,
-                                                                    0.1d * Target.Radius
-                                                                );
-                                                                FillCircle(
-                                                                    canvas_g,
-                                                                    bBlack,
-                                                                    TargetPosX + (Vector2D.FromAngle(TargetAngle + 30) * 0.7d * TargetRadius).X,
-                                                                    TargetPosY + (Vector2D.FromAngle(TargetAngle + 30) * 0.7d * TargetRadius).Y,
-                                                                    0.1d * Target.Radius
-                                                                );
-                                                                bBlack.Dispose();
                                                             }
+                                                            SolidBrush bBlack = new SolidBrush(Color.FromArgb(0, 0, 0));
+                                                            FillCircle(
+                                                                canvas_g,
+                                                                bBlack,
+                                                                TargetPosX + (Vector2D.FromAngle(TargetAngle - 30) * 0.7d * TargetRadius).X,
+                                                                TargetPosY + (Vector2D.FromAngle(TargetAngle - 30) * 0.7d * TargetRadius).Y,
+                                                                0.1d * Target.Radius
+                                                            );
+                                                            FillCircle(
+                                                                canvas_g,
+                                                                bBlack,
+                                                                TargetPosX + (Vector2D.FromAngle(TargetAngle + 30) * 0.7d * TargetRadius).X,
+                                                                TargetPosY + (Vector2D.FromAngle(TargetAngle + 30) * 0.7d * TargetRadius).Y,
+                                                                0.1d * Target.Radius
+                                                            );
+                                                            bBlack.Dispose();
                                                         }
                                                     }
 
@@ -467,7 +468,138 @@ namespace Paramecium.Forms
                         SolidBrush b_OverlayBackground = new SolidBrush(Color.FromArgb(127, 127, 127, 127));
                         Font fnt_small = new Font("MS UI Gothic", 8);
                         Font fnt = new Font("MS UI Gothic", 12);
-                        if (SelectedCellType == SelectedCellType.Animal)
+
+                        {
+                            int OffsetY = 0;
+
+                            OffsetY += 16;
+
+                            List<EventLog> LoadedEventLog = EventLog.LoadEventLog();
+                            for (int i = LoadedEventLog.Count - 1; i >= 0; i--)
+                            {
+                                string Text = $"{LoadedEventLog[i].EventLogText}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+
+                            /*
+                            {
+                                string Text = $"BiomassAmountMultiplier : {g_Soup.BiomassAmountMultiplier:0.000}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"CurrentBiomassAmount : {g_Soup.CurrentBiomassAmount:0.000}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"Plants.Length : {g_Soup.Plants.Length}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"PlantUnassignedIndexes.Count : {g_Soup.PlantUnassignedIndexes.Count}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"Animals.Length : {g_Soup.Animals.Length}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"AnimalUnassignedIndexes.Count : {g_Soup.AnimalUnassignedIndexes.Count}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            */
+                        }
+
+                        if (SelectedCellType == SelectedCellType.None)
+                        {
+                            Int2D MouseIntegerizedPosition = Vector2D.ToIntegerizedPosition(new Vector2D(MousePosX, MousePosY));
+
+                            int OffsetY = 0;
+
+                            Grid Target = g_Soup.GridMap[MouseIntegerizedPosition.X + MouseIntegerizedPosition.Y * g_Soup.SizeX];
+
+                            {
+                                string Text = $"Grid #{MouseIntegerizedPosition.X + MouseIntegerizedPosition.Y * g_Soup.SizeX}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"タイプ : ";
+                                if (Target.Type == TileType.None) Text += "通常";
+                                else if (Target.Type == TileType.Wall) Text += "壁";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"位置 : ({MouseIntegerizedPosition.X}, {MouseIntegerizedPosition.Y})";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"バイオマス : {Target.Fertility:0.000}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (Target.Fertility / (g_Soup.TotalBiomassAmount / (g_Soup.SizeX * g_Soup.SizeY)))), TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                        }
+                        else if (SelectedCellType == SelectedCellType.Plant)
+                        {
+                            Plant target = g_Soup.Plants[SelectedCellIndex];
+
+                            int OffsetY = 0;
+
+                            {
+                                string Text = $"Cell #{LongToBase36(target.Id, 12)}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"タイプ : 植物";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                            {
+                                string Text = $"エレメント : {target.Element:0.000} / {g_Soup.PlantForkBiomass:0.000}";
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.Element / g_Soup.PlantForkBiomass)), TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
+                        }
+                        else if (SelectedCellType == SelectedCellType.Animal)
                         {
                             Animal target = g_Soup.Animals[SelectedCellIndex];
 
@@ -555,7 +687,7 @@ namespace Paramecium.Forms
                                 string Text = $"エレメント : {target.Element:0.000} / {g_Soup.AnimalForkBiomass:0.000}";
                                 Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                 canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
-                                canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.Element / (g_Soup.AnimalForkBiomass))), TextSize.Height);
+                                canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.Element / g_Soup.AnimalForkBiomass)), TextSize.Height);
                                 TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                 OffsetY += TextSize.Height;
                             }
@@ -563,7 +695,7 @@ namespace Paramecium.Forms
                                 string Text = $"繁殖進捗 : {target.OffspringProgress:0.000} / {g_Soup.AnimalForkBiomass:0.000}";
                                 Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                 canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
-                                canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.OffspringProgress / (g_Soup.AnimalForkBiomass))), TextSize.Height);
+                                canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.OffspringProgress / g_Soup.AnimalForkBiomass)), TextSize.Height);
                                 TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                 OffsetY += TextSize.Height;
                             }
@@ -641,34 +773,34 @@ namespace Paramecium.Forms
                             b_BrainInputViewBlue.Dispose();
 
                             SolidBrush BrainOutputAcceleration = new SolidBrush(Color.FromArgb(
-                                (int)Math.Min(Math.Max((target.BrainOutputAcceleration) * 64d * -1d, 0), 255),
-                                (int)Math.Min(Math.Max((target.BrainOutputAcceleration) * 64d, 0), 255),
+                                (int)Math.Min(Math.Max((target.BrainOutputAcceleration) * -25.5d, 0), 255),
+                                (int)Math.Min(Math.Max((target.BrainOutputAcceleration) * 25.5d, 0), 255),
                                 0
                             ));
                             SolidBrush BrainOutputRotation = new SolidBrush(Color.FromArgb(
-                                (int)Math.Min(Math.Max((target.BrainOutputRotation) * 64d * -1d, 0), 255),
-                                (int)Math.Min(Math.Max((target.BrainOutputRotation) * 64d, 0), 255),
+                                (int)Math.Min(Math.Max((target.BrainOutputRotation) * -25.5d, 0), 255),
+                                (int)Math.Min(Math.Max((target.BrainOutputRotation) * 25.5d, 0), 255),
                                 0
                             ));
                             SolidBrush BrainOutputAttack = new SolidBrush(Color.FromArgb(
-                                (int)Math.Min(Math.Max((target.BrainOutputAttack) * 64d * -1d, 0), 255),
-                                (int)Math.Min(Math.Max((target.BrainOutputAttack) * 64d, 0), 255),
+                                (int)Math.Min(Math.Max((target.BrainOutputAttack) * -25.5d, 0), 255),
+                                (int)Math.Min(Math.Max((target.BrainOutputAttack) * 25.5d, 0), 255),
                                 0
                             ));
 
                             canvas_g.FillEllipse(BrainOutputAcceleration, 225 + 256, 180, 15, 15);
                             canvas_g.DrawEllipse(Pens.White, 225 + 256, 180, 15, 15);
-                            TextRenderer.DrawText(canvas_g, $"ACC", fnt_small, new Point(245 + 256, 180), Color.White);
+                            TextRenderer.DrawText(canvas_g, $"Acceleration", fnt_small, new Point(245 + 256, 180), Color.White);
                             TextRenderer.DrawText(canvas_g, $"{target.BrainOutputAcceleration:0.000}", fnt_small, new Point(245 + 256, 190), Color.White);
 
                             canvas_g.FillEllipse(BrainOutputRotation, 225 + 256, 200, 15, 15);
                             canvas_g.DrawEllipse(Pens.White, 225 + 256, 200, 15, 15);
-                            TextRenderer.DrawText(canvas_g, $"ROT", fnt_small, new Point(245 + 256, 200), Color.White);
+                            TextRenderer.DrawText(canvas_g, $"Rotation", fnt_small, new Point(245 + 256, 200), Color.White);
                             TextRenderer.DrawText(canvas_g, $"{target.BrainOutputRotation:0.000}", fnt_small, new Point(245 + 256, 210), Color.White);
 
                             canvas_g.FillEllipse(BrainOutputAttack, 225 + 256, 220, 15, 15);
                             canvas_g.DrawEllipse(Pens.White, 225 + 256, 220, 15, 15);
-                            TextRenderer.DrawText(canvas_g, $"ATK", fnt_small, new Point(245 + 256, 220), Color.White);
+                            TextRenderer.DrawText(canvas_g, $"Attack", fnt_small, new Point(245 + 256, 220), Color.White);
                             TextRenderer.DrawText(canvas_g, $"{target.BrainOutputAttack:0.000}", fnt_small, new Point(245 + 256, 230), Color.White);
 
                             BrainOutputAcceleration.Dispose();
@@ -833,7 +965,7 @@ namespace Paramecium.Forms
             graphics.DrawLine(pen, StartX, StartY, EndX, EndY);
         }
 
-        private void TopMenu_File_Open_Click(object sender, EventArgs e)
+        private async void TopMenu_File_Open_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
 
@@ -852,13 +984,19 @@ namespace Paramecium.Forms
                 {
                     string jsonString;
 
-                    using (StreamReader sr = new StreamReader(ofd.FileName))
-                    {
-                        jsonString = sr.ReadToEnd();
-                        g_Soup = JsonSerializer.Deserialize<Soup>(jsonString);
-                        g_Soup.SoupLoaded();
-                        g_Soup.SoupRun();
-                    }
+                    EventLog.PushEventLog($"スープを読み込んでいます...");
+                    await Task.Delay(100);
+
+                    StreamReader sr = new StreamReader(ofd.FileName);
+
+                    jsonString = sr.ReadToEnd();
+                    g_Soup = JsonSerializer.Deserialize<Soup>(jsonString);
+                    g_Soup.SoupLoaded();
+                    g_Soup.SoupRun();
+
+                    jsonString = String.Empty;
+
+                    sr.Dispose();
 
                     FilePath = ofd.FileName;
 
@@ -870,6 +1008,8 @@ namespace Paramecium.Forms
                         g_FormMain.cameraY = g_Soup.SizeY / 2d;
                     }
 
+                    GC.Collect();
+
                     EventLog.PushEventLog($"スープファイル「{Path.GetFileName(FilePath)}」を読み込みました");
                 }
                 catch
@@ -879,24 +1019,32 @@ namespace Paramecium.Forms
             }
         }
 
-        private void TopMenu_File_Save_Click(object sender, EventArgs e)
+        private async void TopMenu_File_Save_Click(object sender, EventArgs e)
         {
             if (g_Soup is not null)
             {
                 g_Soup.SetSoupState(SoupState.Pause);
 
+                EventLog.PushEventLog($"スープを保存しています...");
+                await Task.Delay(100);
+
                 string jsonString = JsonSerializer.Serialize(g_Soup);
 
-                using (StreamWriter sw = new StreamWriter(FilePath, false))
-                {
-                    sw.Write(jsonString);
-                }
+                StreamWriter sw = new StreamWriter(FilePath, false);
+
+                sw.Write(jsonString);
+
+                sw.Dispose();
+
+                jsonString = String.Empty;
+
+                GC.Collect();
 
                 EventLog.PushEventLog($"現在のスープを「{Path.GetFileName(FilePath)}」に上書き保存しました");
             }
         }
 
-        private void TopMenu_File_SaveAs_Click(object sender, EventArgs e)
+        private async void TopMenu_File_SaveAs_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
 
@@ -910,14 +1058,22 @@ namespace Paramecium.Forms
             {
                 if (g_Soup is not null) g_Soup.SetSoupState(SoupState.Pause);
 
+                EventLog.PushEventLog($"スープを保存しています...");
+                await Task.Delay(100);
+
                 string jsonString = JsonSerializer.Serialize(g_Soup);
 
-                using (StreamWriter sw = new StreamWriter(sfd.FileName, false))
-                {
-                    sw.Write(jsonString);
-                }
+                StreamWriter sw = new StreamWriter(sfd.FileName, false);
+
+                sw.Write(jsonString);
+
+                sw.Dispose();
+
+                jsonString = String.Empty;
 
                 FilePath = sfd.FileName;
+
+                GC.Collect();
 
                 EventLog.PushEventLog($"現在のスープが「{Path.GetFileName(FilePath)}」として保存されました");
             }
@@ -1062,12 +1218,15 @@ namespace Paramecium.Forms
                                                 {
                                                     Plant Target = g_Soup.Plants[SelectedCellIndex];
 
-                                                    g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalPlants.Remove(Target.Index);
-                                                    g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalPlantCount--;
-                                                    Target.Position = new Vector2D(CanvasPosXToWorldPosX(e.X), CanvasPosYToWorldPosY(e.Y));
-                                                    Target.IntegerizedPosition = Vector2D.ToIntegerizedPosition(Target.Position);
-                                                    g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalPlants.Add(Target.Index);
-                                                    g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalPlantCount++;
+                                                    if (Target.IsValid)
+                                                    {
+                                                        g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalPlants.Remove(Target.Index);
+                                                        g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalPlantCount--;
+                                                        Target.Position = new Vector2D(CanvasPosXToWorldPosX(e.X), CanvasPosYToWorldPosY(e.Y));
+                                                        Target.IntegerizedPosition = Vector2D.ToIntegerizedPosition(Target.Position);
+                                                        g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalPlants.Add(Target.Index);
+                                                        g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalPlantCount++;
+                                                    }
                                                 }
                                             }
                                             if (SelectedCellType == SelectedCellType.Animal)
@@ -1076,12 +1235,15 @@ namespace Paramecium.Forms
                                                 {
                                                     Animal Target = g_Soup.Animals[SelectedCellIndex];
 
-                                                    g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalAnimals.Remove(Target.Index);
-                                                    g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalAnimalCount--;
-                                                    Target.Position = new Vector2D(CanvasPosXToWorldPosX(e.X), CanvasPosYToWorldPosY(e.Y));
-                                                    Target.IntegerizedPosition = Vector2D.ToIntegerizedPosition(Target.Position);
-                                                    g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalAnimals.Add(Target.Index);
-                                                    g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalAnimalCount++;
+                                                    if (Target.IsValid)
+                                                    {
+                                                        g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalAnimals.Remove(Target.Index);
+                                                        g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalAnimalCount--;
+                                                        Target.Position = new Vector2D(CanvasPosXToWorldPosX(e.X), CanvasPosYToWorldPosY(e.Y));
+                                                        Target.IntegerizedPosition = Vector2D.ToIntegerizedPosition(Target.Position);
+                                                        g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalAnimals.Add(Target.Index);
+                                                        g_Soup.GridMap[Target.IntegerizedPosition.X + Target.IntegerizedPosition.Y * g_Soup.SizeX].LocalAnimalCount++;
+                                                    }
                                                 }
                                             }
                                         }

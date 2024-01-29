@@ -89,11 +89,24 @@ namespace Paramecium.Simulation
             Radius = 0.125d;
             Mass = Math.Pow(Radius, 2);
 
-            RaceId = parent.RaceId;
+            if (random.NextDouble() < 0.01d)
+            {
+                RaceId = random.NextInt64(0, 2176782336);
 
-            GeneColorRed = parent.GeneColorRed;
-            GeneColorGreen = parent.GeneColorGreen;
-            GeneColorBlue = parent.GeneColorBlue;
+                GeneColorRed = random.Next(0, 255 + 1);
+                GeneColorGreen = random.Next(0, 255 + 1);
+                GeneColorBlue = random.Next(0, 255 + 1);
+
+                EventLog.PushEventLog($"新種族「{LongToBase36(RaceId, 6)}」が誕生しました。(位置 : ({Position.X:0.000}, {Position.Y:0.000}))");
+            }
+            else
+            {
+                RaceId = parent.RaceId;
+
+                GeneColorRed = parent.GeneColorRed;
+                GeneColorGreen = parent.GeneColorGreen;
+                GeneColorBlue = parent.GeneColorBlue;
+            }
 
             Age = g_Soup.HatchingTime * -1;
             Generation = parent.Generation + 1;
@@ -136,6 +149,15 @@ namespace Paramecium.Simulation
 
         public void EarlyUpdate()
         {
+            if (double.IsInfinity(Angle)) ConsoleLog(LogLevel.Warning, "Angle is positive or negative infinity!");
+            if (double.IsInfinity(Element)) ConsoleLog(LogLevel.Warning, "Element is positive or negative infinity!");
+            if (double.IsInfinity(OffspringProgress)) ConsoleLog(LogLevel.Warning, "OffspringProgress is positive or negative infinity!");
+            if (double.IsInfinity(Radius)) ConsoleLog(LogLevel.Warning, "Radius is positive or negative infinity!");
+            if (double.IsInfinity(Mass)) ConsoleLog(LogLevel.Warning, "Mass is positive or negative infinity!");
+            if (double.IsInfinity(BrainOutputAcceleration)) ConsoleLog(LogLevel.Warning, "BrainOutputAcceleration is positive or negative infinity!");
+            if (double.IsInfinity(BrainOutputRotation)) ConsoleLog(LogLevel.Warning, "BrainOutputRotation is positive or negative infinity!");
+            if (double.IsInfinity(BrainOutputAttack)) ConsoleLog(LogLevel.Warning, "BrainOutputAttack is positive or negative infinity!");
+
             Velocity *= 0.9d;
 
             if (Age >= 0)
@@ -376,11 +398,11 @@ namespace Paramecium.Simulation
                         }
                     }
                 }
-                Angle += Math.Min(Math.Max(BrainOutputRotation * 1.8, -18d), 18d);
-                Velocity += Vector2D.FromAngle(Angle) * Math.Min(Math.Max(BrainOutputAcceleration * 0.001d, -0.01d), 0.01d);
+                Angle += Math.Min(Math.Max(BrainOutputRotation, -10), 10) * 1.8d;
+                Velocity += Vector2D.FromAngle(Angle) * Math.Min(Math.Max(BrainOutputAcceleration, -10d), 10d) * 0.001d;
 
-                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Math.Min(Math.Min(Math.Abs(BrainOutputAcceleration), 10d) * 0.004d, Element) * g_Soup.BiomassAmountMultiplier;
-                Element -= Math.Min(Math.Min(Math.Abs(BrainOutputAcceleration), 10d) * 0.004d, Element);
+                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Math.Min(Math.Min(Math.Abs(BrainOutputAcceleration), 10d) / 10d * 0.0375d, Element) * g_Soup.BiomassAmountMultiplier;
+                Element -= Math.Min(Math.Min(Math.Abs(BrainOutputAcceleration), 10d) / 10d * 0.0375d, Element);
             }
         }
 
@@ -441,8 +463,8 @@ namespace Paramecium.Simulation
 
                                     if (BrainOutputAttack > 0)
                                     {
-                                        Element += Math.Min(1d, target.Element) * g_Soup.BiomassAmountMultiplier;
-                                        target.Element -= Math.Min(1d, target.Element);
+                                        Element += Math.Min(1.5d, target.Element) * g_Soup.BiomassAmountMultiplier;
+                                        target.Element -= Math.Min(1.5d, target.Element);
                                     }
                                 }
                             }
@@ -464,8 +486,13 @@ namespace Paramecium.Simulation
 
                                     if (BrainOutputAttack > 0 && BrainOutputAttack > target.BrainOutputAttack && target.Age >= 0)
                                     {
-                                        Element += Math.Min(1d, target.Element) * g_Soup.BiomassAmountMultiplier;
-                                        target.Element -= Math.Min(1d, target.Element);
+                                        Element += Math.Min(5d, target.Element) * g_Soup.BiomassAmountMultiplier;
+                                        target.Element -= Math.Min(5d, target.Element);
+                                        if (target.Element <= 0)
+                                        {
+                                            Element += target.OffspringProgress * g_Soup.BiomassAmountMultiplier;
+                                            target.OffspringProgress = 0;
+                                        }
                                     }
                                 }
                             }
@@ -477,7 +504,11 @@ namespace Paramecium.Simulation
 
         public void LateUpdate(int threadId)
         {
-            Element -= Math.Min(0.001d, Element);
+            if (Age >= 0)
+            {
+                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Math.Min(0.0125d, Element) * g_Soup.BiomassAmountMultiplier;
+                Element -= Math.Min(0.0125d, Element);
+            }
 
             if (Element <= 0)
             {
@@ -558,7 +589,8 @@ namespace Paramecium.Simulation
                     g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += (Element + OffspringProgress) * g_Soup.BiomassAmountMultiplier;
                     g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimals.Remove(Index);
                     g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimalCount--;
-                    lock (g_Soup.PlantUnassignedIndexesLockObject) g_Soup.PlantUnassignedIndexes.Add(Index);
+                    lock (g_Soup.AnimalUnassignedIndexesLockObject) g_Soup.AnimalUnassignedIndexes.Add(Index);
+                    g_Soup.Animals[Index] = null;
                 }
             }
             catch (Exception ex) { ConsoleLog(LogLevel.Failure, ex.ToString()); }

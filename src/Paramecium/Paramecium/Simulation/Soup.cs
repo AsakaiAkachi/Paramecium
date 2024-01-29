@@ -351,7 +351,7 @@ namespace Paramecium.Simulation
                                 AnimalBuffer[i].Clear();
                             }
 
-                            BiomassAmountMultiplier = TotalBiomassAmount / CurrentBiomassAmount;
+                            BiomassAmountMultiplier = 1d + (TotalBiomassAmount / CurrentBiomassAmount - 1d) * 10d;
 
                             Update(0);
                             Update(1);

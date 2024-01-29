@@ -73,6 +73,10 @@ namespace Paramecium.Simulation
 
         public void EarlyUpdate()
         {
+            if (double.IsInfinity(Element)) ConsoleLog(LogLevel.Warning, "Element is positive or negative infinity!");
+            if (double.IsInfinity(Radius)) ConsoleLog(LogLevel.Warning, "Radius is positive or negative infinity!");
+            if (double.IsInfinity(Mass)) ConsoleLog(LogLevel.Warning, "Mass is positive or negative infinity!");
+
             if (Age >= 0) Velocity *= 0.9d;
 
             int PlantBiomassCollectionRange = g_Soup.PlantBiomassCollectionRange;
@@ -322,6 +326,7 @@ namespace Paramecium.Simulation
                     g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Remove(Index);
                     g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount--;
                     lock (g_Soup.PlantUnassignedIndexesLockObject) g_Soup.PlantUnassignedIndexes.Add(Index);
+                    g_Soup.Plants[Index] = null;
                 }
             }
             catch (Exception ex) { ConsoleLog(LogLevel.Failure, ex.ToString()); }
