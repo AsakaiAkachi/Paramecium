@@ -28,7 +28,7 @@ namespace Paramecium.Forms
             SoupParameterView.Rows.Add("Wall Perlin Noise Z", new Random().NextDouble() * 256d); SoupParameterViewRows.Add("WallPerlinNoiseZ", i); i++;
             SoupParameterView.Rows.Add("Wall Perlin Noise Scale", 0.03); SoupParameterViewRows.Add("WallPerlinNoiseScale", i); i++;
             SoupParameterView.Rows.Add("Wall Perlin Noise Octave", 4); SoupParameterViewRows.Add("WallPerlinNoiseOctave", i); i++;
-            SoupParameterView.Rows.Add("Wall Thickness", 0.0085); SoupParameterViewRows.Add("WallPerlinNoiseThickness", i); i++;
+            SoupParameterView.Rows.Add("Wall Thickness", 0.01); SoupParameterViewRows.Add("WallPerlinNoiseThickness", i); i++;
             SoupParameterView.Rows.Add("Total BiomassAmount", 163840); SoupParameterViewRows.Add("TotalBiomassAmount", i); i++;
             SoupParameterView.Rows.Add("Cell Size Multiplier", 0.5); SoupParameterViewRows.Add("CellSizeMultiplier", i); i++;
             SoupParameterView.Rows.Add("Plant Fork Biomass", 10); SoupParameterViewRows.Add("PlantForkBiomass", i); i++;

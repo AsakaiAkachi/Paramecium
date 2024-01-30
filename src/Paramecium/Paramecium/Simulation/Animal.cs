@@ -24,6 +24,7 @@ namespace Paramecium.Simulation
         public int Generation { get; set; }
         public int OffspringCount { get; set; }
         //public double CumulativeMutationRate { get; set; }
+        public List<long> ParentGenealogicalTree { get; set; } = new List<long>();
 
         public long RaceId { get; set; }
         public int RaceIndex { get; set; }
@@ -68,12 +69,12 @@ namespace Paramecium.Simulation
             Generation = 1;
             //CumulativeMutationRate = 0;
 
-            Brain = new double[(33 * 15 * 4 * 3) + (9 * 5 * 4 * 3)]; // 33 rays x 15 scan x 4 type x 3 output + 9 rays x 5 scan x 4 type x 3 output
+            Brain = new double[(29 * 10 * 4 * 3) + (9 * 4 * 4 * 3)];
             for (int i = 0; i < Brain.Length; i++)
             {
                 Brain[i] = random.NextDouble() * 2d - 1d;
             }
-            BrainInput = new int[(33 * 15) + (9 * 5)];
+            BrainInput = new int[(29 * 10) + (9 * 4)];
         }
         public Animal(Random random, Animal parent)
         {
@@ -93,8 +94,14 @@ namespace Paramecium.Simulation
             Age = g_Soup.HatchingTime * -1;
             Generation = parent.Generation + 1;
             //CumulativeMutationRate = parent.CumulativeMutationRate;
+            ParentGenealogicalTree = new List<long>(parent.ParentGenealogicalTree);
+            ParentGenealogicalTree.Insert(0, parent.Id);
+            if (ParentGenealogicalTree.Count > 100)
+            {
+                ParentGenealogicalTree.RemoveAt(ParentGenealogicalTree.Count - 1);
+            }
 
-            Brain = new double[(33 * 15 * 4 * 3) + (9 * 5 * 4 * 3)];
+            Brain = new double[(29 * 10 * 4 * 3) + (9 * 4 * 4 * 3)];
             for (int i = 0; i < Brain.Length; i++)
             {
                 if (random.NextDouble() < g_Soup.MutationRate)
@@ -104,7 +111,7 @@ namespace Paramecium.Simulation
                 }
                 else Brain[i] = parent.Brain[i];
             }
-            BrainInput = new int[(33 * 15) + (9 * 5)];
+            BrainInput = new int[(29 * 10) + (9 * 4)];
 
             //if (CumulativeMutationRate >= g_Soup.MutationRate * 10d)
             if (random.NextDouble() < g_Soup.MutationRate)
@@ -171,18 +178,18 @@ namespace Paramecium.Simulation
                 BrainOutputRotation = 0;
                 BrainOutputAttack = 0;
 
-                for (int i = -16; i <= 16; i++)
+                for (int i = -14; i <= 14; i++)
                 {
-                    Vector2D rayVector = Vector2D.FromAngle(Angle + i * 5.625) * 0.666;
-                    Vector2D rayWallVector = Vector2D.FromAngle(Angle + i * 5.625 + 90) * 0.666 * 0.25d * 1.414213;
+                    Vector2D rayVector = Vector2D.FromAngle(Angle + i * 6.4285714286);
+                    Vector2D rayWallVector = Vector2D.FromAngle(Angle + i * 6.4285714286 + 90) * 0.25d * 1.414213;
 
                     bool j_break = false;
 
-                    for (int j = 0; j < 15; j++)
+                    for (int j = 0; j <= 9; j++)
                     {
                         if (j_break)
                         {
-                            BrainInput[(i + 16) * 15 + j] = 0;
+                            BrainInput[(i + 14) * 10 + j] = 0;
                         }
                         else
                         {
@@ -193,22 +200,22 @@ namespace Paramecium.Simulation
                                     Vector2D TargetPosition = Position + rayVector * j;
                                     if (TargetPosition.X < 0 || TargetPosition.X > l_SoupSizeX || TargetPosition.Y < 0 || TargetPosition.Y > l_SoupSizeY)
                                     {
-                                        BrainInput[(i + 16) * 15 + j] = 1;
-                                        BrainOutputAcceleration += Brain[(i + 16) * 180 + j * 12];
-                                        BrainOutputRotation += Brain[(i + 16) * 180 + j * 12 + 1];
-                                        BrainOutputAttack += Brain[(i + 16) * 180 + j * 12 + 2];
+                                        BrainInput[(i + 14) * 10 + j] = 1;
+                                        BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12];
+                                        BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 1];
+                                        BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 2];
                                         j_break = true;
                                         break;
                                     }
 
                                     Int2D TargetGrid = Vector2D.ToIntegerizedPosition(TargetPosition);
-                                    BrainInput[(i + 16) * 15 + j] = 0;
+                                    BrainInput[(i + 14) * 10 + j] = 0;
                                     if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].Type == TileType.Wall)
                                     {
-                                        BrainInput[(i + 16) * 15 + j] = 1;
-                                        BrainOutputAcceleration += Brain[(i + 16) * 180 + j * 12];
-                                        BrainOutputRotation += Brain[(i + 16) * 180 + j * 12 + 1];
-                                        BrainOutputAttack += Brain[(i + 16) * 180 + j * 12 + 2];
+                                        BrainInput[(i + 14) * 10 + j] = 1;
+                                        BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12];
+                                        BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 1];
+                                        BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 2];
                                         j_break = true;
                                         break;
                                     }
@@ -216,10 +223,10 @@ namespace Paramecium.Simulation
                                     {
                                         if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlantCount > 0)
                                         {
-                                            BrainInput[(i + 16) * 15 + j] = 2;
-                                            BrainOutputAcceleration += Brain[(i + 16) * 180 + j * 12 + 1 * 3];
-                                            BrainOutputRotation += Brain[(i + 16) * 180 + j * 12 + 1 * 3 + 1];
-                                            BrainOutputAttack += Brain[(i + 16) * 180 + j * 12 + 1 * 3 + 2];
+                                            BrainInput[(i + 14) * 10 + j] = 2;
+                                            BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 1 * 3];
+                                            BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 1 * 3 + 1];
+                                            BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 1 * 3 + 2];
                                         }
                                         if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimalCount > 0)
                                         {
@@ -230,17 +237,17 @@ namespace Paramecium.Simulation
                                                 {
                                                     if (target.RaceId == RaceId)
                                                     {
-                                                        BrainInput[(i + 16) * 15 + j] = 3;
-                                                        BrainOutputAcceleration += Brain[(i + 16) * 180 + j * 12 + 2 * 3];
-                                                        BrainOutputRotation += Brain[(i + 16) * 180 + j * 12 + 2 * 3 + 1];
-                                                        BrainOutputAttack += Brain[(i + 16) * 180 + j * 12 + 2 * 3 + 2];
+                                                        BrainInput[(i + 14) * 10 + j] = 3;
+                                                        BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 2 * 3];
+                                                        BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 2 * 3 + 1];
+                                                        BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 2 * 3 + 2];
                                                     }
                                                     else
                                                     {
-                                                        BrainInput[(i + 16) * 15 + j] = 4;
-                                                        BrainOutputAcceleration += Brain[(i + 16) * 180 + j * 12 + 3 * 3];
-                                                        BrainOutputRotation += Brain[(i + 16) * 180 + j * 12 + 3 * 3 + 1];
-                                                        BrainOutputAttack += Brain[(i + 16) * 180 + j * 12 + 3 * 3 + 2];
+                                                        BrainInput[(i + 14) * 10 + j] = 4;
+                                                        BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 3 * 3];
+                                                        BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 3 * 3 + 1];
+                                                        BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 3 * 3 + 2];
                                                     }
                                                 }
                                             }
@@ -252,32 +259,32 @@ namespace Paramecium.Simulation
                                     Int2D TargetGridWall0 = Vector2D.ToIntegerizedPosition(Position + rayVector * j + (rayVector * k * 0.25));
                                     if (g_Soup.GridMap[TargetGridWall0.X + TargetGridWall0.Y * l_SoupSizeX].Type == TileType.Wall)
                                     {
-                                        BrainInput[(i + 16) * 15 + j] = 1;
-                                        BrainOutputAcceleration += Brain[(i + 16) * 180 + j * 12];
-                                        BrainOutputRotation += Brain[(i + 16) * 180 + j * 12 + 1];
-                                        BrainOutputAttack += Brain[(i + 16) * 180 + j * 12 + 2];
+                                        BrainInput[(i + 14) * 10 + j] = 1;
+                                        BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12];
+                                        BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 1];
+                                        BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 2];
                                         j_break = true;
                                         break;
                                     }
-                                    if (j < 14)
+                                    if (j < 9)
                                     {
                                         Int2D TargetGridWall1 = Vector2D.ToIntegerizedPosition(Position + rayVector * j + (rayVector * k * 0.25) + rayWallVector * -1);
                                         if (g_Soup.GridMap[TargetGridWall1.X + TargetGridWall1.Y * l_SoupSizeX].Type == TileType.Wall)
                                         {
-                                            BrainInput[(i + 16) * 15 + (j + 1)] = 1;
-                                            BrainOutputAcceleration += Brain[(i + 16) * 180 + (j + 1) * 12 + 2 * 3];
-                                            BrainOutputRotation += Brain[(i + 16) * 180 + (j + 1) * 12 + 2 * 3 + 1];
-                                            BrainOutputAttack += Brain[(i + 16) * 180 + (j + 1) * 12 + 2 * 3 + 2];
+                                            BrainInput[(i + 14) * 10 + j] = 1;
+                                            BrainOutputAcceleration += Brain[(i + 14) * 120 + (j + 1) * 12];
+                                            BrainOutputRotation += Brain[(i + 14) * 120 + (j + 1) * 12 + 1];
+                                            BrainOutputAttack += Brain[(i + 14) * 120 + (j + 1) * 12 + 2];
                                             j_break = true;
                                             break;
                                         }
                                         Int2D TargetGridWall2 = Vector2D.ToIntegerizedPosition(Position + rayVector * j + (rayVector * k * 0.25) + rayWallVector);
                                         if (g_Soup.GridMap[TargetGridWall2.X + TargetGridWall2.Y * l_SoupSizeX].Type == TileType.Wall)
                                         {
-                                            BrainInput[(i + 16) * 15 + (j + 1)] = 1;
-                                            BrainOutputAcceleration += Brain[(i + 16) * 180 + (j + 1) * 12 + 2 * 3];
-                                            BrainOutputRotation += Brain[(i + 16) * 180 + (j + 1) * 12 + 2 * 3 + 1];
-                                            BrainOutputAttack += Brain[(i + 16) * 180 + (j + 1) * 12 + 2 * 3 + 2];
+                                            BrainInput[(i + 14) * 10 + j] = 1;
+                                            BrainOutputAcceleration += Brain[(i + 14) * 120 + (j + 1) * 12];
+                                            BrainOutputRotation += Brain[(i + 14) * 120 + (j + 1) * 12 + 1];
+                                            BrainOutputAttack += Brain[(i + 14) * 120 + (j + 1) * 12 + 2];
                                             j_break = true;
                                             break;
                                         }
@@ -289,16 +296,16 @@ namespace Paramecium.Simulation
                 }
                 for (int i = -4; i <= 4; i++)
                 {
-                    Vector2D rayVector = Vector2D.FromAngle(Angle + i * 19.375 + 180) * 0.666;
-                    Vector2D rayWallVector = Vector2D.FromAngle(Angle + i * 19.375 + 180) * 0.666 * 0.25d * 1.414213;
+                    Vector2D rayVector = Vector2D.FromAngle(Angle + i * 22.5 + 180);
+                    Vector2D rayWallVector = Vector2D.FromAngle(Angle + i * 22.5 + 180 + 90) * 0.25d * 1.414213;
 
                     bool j_break = false;
 
-                    for (int j = 0; j < 5; j++)
+                    for (int j = 0; j <= 3; j++)
                     {
                         if (j_break)
                         {
-                            BrainInput[495 + (i + 4) * 5 + j] = 0;
+                            BrainInput[290 + (i + 4) * 4 + j] = 0;
                         }
                         else
                         {
@@ -309,22 +316,22 @@ namespace Paramecium.Simulation
                                     Vector2D TargetPosition = Position + rayVector * j;
                                     if (TargetPosition.X < 0 || TargetPosition.X > l_SoupSizeX || TargetPosition.Y < 0 || TargetPosition.Y > l_SoupSizeY)
                                     {
-                                        BrainInput[495 + (i + 4) * 5 + j] = 1;
-                                        BrainOutputAcceleration += Brain[5940 + (i + 4) * 48 + j * 12];
-                                        BrainOutputRotation += Brain[5940 + (i + 4) * 48 + j * 12 + 1];
-                                        BrainOutputAttack += Brain[5940 + (i + 4) * 48 + j * 12 + 2];
+                                        BrainInput[290 + (i + 4) * 4 + j] = 1;
+                                        BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12];
+                                        BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 1];
+                                        BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 2];
                                         j_break = true;
                                         break;
                                     }
 
                                     Int2D TargetGrid = Vector2D.ToIntegerizedPosition(TargetPosition);
-                                    BrainInput[495 + (i + 4) * 5 + j] = 0;
+                                    BrainInput[290 + (i + 4) * 4 + j] = 0;
                                     if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].Type == TileType.Wall)
                                     {
-                                        BrainInput[495 + (i + 4) * 5 + j] = 1;
-                                        BrainOutputAcceleration += Brain[5940 + (i + 4) * 48 + j * 12];
-                                        BrainOutputRotation += Brain[5940 + (i + 4) * 48 + j * 12 + 1];
-                                        BrainOutputAttack += Brain[5940 + (i + 4) * 48 + j * 12 + 2];
+                                        BrainInput[290 + (i + 4) * 4 + j] = 1;
+                                        BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12];
+                                        BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 1];
+                                        BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 2];
                                         j_break = true;
                                         break;
                                     }
@@ -332,10 +339,10 @@ namespace Paramecium.Simulation
                                     {
                                         if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlantCount > 0)
                                         {
-                                            BrainInput[495 + (i + 4) * 5 + j] = 2;
-                                            BrainOutputAcceleration += Brain[5940 + (i + 4) * 48 + j * 12 + 1 * 3];
-                                            BrainOutputRotation += Brain[5940 + (i + 4) * 48 + j * 12 + 1 * 3 + 1];
-                                            BrainOutputAttack += Brain[5940 + (i + 4) * 48 + j * 12 + 1 * 3 + 2];
+                                            BrainInput[290 + (i + 4) * 4 + j] = 2;
+                                            BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 1 * 3];
+                                            BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 1 * 3 + 1];
+                                            BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 1 * 3 + 2];
                                         }
                                         if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimalCount > 0)
                                         {
@@ -346,17 +353,17 @@ namespace Paramecium.Simulation
                                                 {
                                                     if (target.RaceId == RaceId)
                                                     {
-                                                        BrainInput[495 + (i + 4) * 5 + j] = 3;
-                                                        BrainOutputAcceleration += Brain[5940 + (i + 4) * 48 + j * 12 + 2 * 3];
-                                                        BrainOutputRotation += Brain[5940 + (i + 4) * 48 + j * 12 + 2 * 3 + 1];
-                                                        BrainOutputAttack += Brain[5940 + (i + 4) * 48 + j * 12 + 2 * 3 + 2];
+                                                        BrainInput[290 + (i + 4) * 4 + j] = 3;
+                                                        BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 2 * 3];
+                                                        BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 2 * 3 + 1];
+                                                        BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 2 * 3 + 2];
                                                     }
                                                     else
                                                     {
-                                                        BrainInput[495 + (i + 4) * 5 + j] = 4;
-                                                        BrainOutputAcceleration += Brain[5940 + (i + 4) * 48 + j * 12 + 3 * 3];
-                                                        BrainOutputRotation += Brain[5940 + (i + 4) * 48 + j * 12 + 3 * 3 + 1];
-                                                        BrainOutputAttack += Brain[5940 + (i + 4) * 48 + j * 12 + 3 * 3 + 2];
+                                                        BrainInput[290 + (i + 4) * 4 + j] = 4;
+                                                        BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3];
+                                                        BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3 + 1];
+                                                        BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3 + 2];
                                                     }
                                                 }
                                             }
@@ -368,32 +375,32 @@ namespace Paramecium.Simulation
                                     Int2D TargetGridWall0 = Vector2D.ToIntegerizedPosition(Position + rayVector * j + (rayVector * k * 0.25));
                                     if (g_Soup.GridMap[TargetGridWall0.X + TargetGridWall0.Y * l_SoupSizeX].Type == TileType.Wall)
                                     {
-                                        BrainInput[495 + (i + 4) * 5 + j] = 1;
-                                        BrainOutputAcceleration += Brain[5940 + (i + 4) * 48 + j * 12];
-                                        BrainOutputRotation += Brain[5940 + (i + 4) * 48 + j * 12 + 1];
-                                        BrainOutputAttack += Brain[5940 + (i + 4) * 48 + j * 12 + 2];
+                                        BrainInput[290 + (i + 4) * 4 + j] = 1;
+                                        BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12];
+                                        BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 1];
+                                        BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 2];
                                         j_break = true;
                                         break;
                                     }
-                                    if (j < 4)
+                                    if (j < 3)
                                     {
                                         Int2D TargetGridWall1 = Vector2D.ToIntegerizedPosition(Position + rayVector * j + (rayVector * k * 0.25) + rayWallVector * -1);
                                         if (g_Soup.GridMap[TargetGridWall1.X + TargetGridWall1.Y * l_SoupSizeX].Type == TileType.Wall)
                                         {
-                                            BrainInput[495 + (i + 4) * 5 + (j + 1)] = 1;
-                                            BrainOutputAcceleration += Brain[5940 + (i + 4) * 48 + (j + 1) * 12 + 2 * 3];
-                                            BrainOutputRotation += Brain[5940 + (i + 4) * 48 + (j + 1) * 12 + 2 * 3 + 1];
-                                            BrainOutputAttack += Brain[5940 + (i + 4) * 48 + (j + 1) * 12 + 2 * 3 + 2];
+                                            BrainInput[290 + (i + 4) * 4 + j] = 1;
+                                            BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + (j + 1) * 12];
+                                            BrainOutputRotation += Brain[3480 + (i + 4) * 36 + (j + 1) * 12 + 1];
+                                            BrainOutputAttack += Brain[3480 + (i + 4) * 36 + (j + 1) * 12 + 2];
                                             j_break = true;
                                             break;
                                         }
                                         Int2D TargetGridWall2 = Vector2D.ToIntegerizedPosition(Position + rayVector * j + (rayVector * k * 0.25) + rayWallVector);
                                         if (g_Soup.GridMap[TargetGridWall2.X + TargetGridWall2.Y * l_SoupSizeX].Type == TileType.Wall)
                                         {
-                                            BrainInput[495 + (i + 4) * 5 + (j + 1)] = 1;
-                                            BrainOutputAcceleration += Brain[5940 + (i + 4) * 48 + (j + 1) * 12 + 2 * 3];
-                                            BrainOutputRotation += Brain[5940 + (i + 4) * 48 + (j + 1) * 12 + 2 * 3 + 1];
-                                            BrainOutputAttack += Brain[5940 + (i + 4) * 48 + (j + 1) * 12 + 2 * 3 + 2];
+                                            BrainInput[290 + (i + 4) * 4 + j] = 1;
+                                            BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + (j + 1) * 12];
+                                            BrainOutputRotation += Brain[3480 + (i + 4) * 36 + (j + 1) * 12 + 1];
+                                            BrainOutputAttack += Brain[3480 + (i + 4) * 36 + (j + 1) * 12 + 2];
                                             j_break = true;
                                             break;
                                         }
