@@ -16,9 +16,9 @@ namespace Paramecium.Simulation
         public double Angle { get; set; }
 
         public double Element { get; set; }
-        public double OffspringProgress { get; set; }
         public double Radius { get; set; }
         public double Mass { get; set; }
+        public int RegenerationCooldown { get; set; }
 
         public int Age { get; set; }
         public int Generation { get; set; }
@@ -55,7 +55,6 @@ namespace Paramecium.Simulation
             Angle = angle;
 
             Element = element;
-            OffspringProgress = 0;
             Radius = 0.25d;
             Mass = Math.Pow(Radius, 2);
 
@@ -88,7 +87,6 @@ namespace Paramecium.Simulation
             Angle = parent.Angle + 180;
 
             Element = g_Soup.AnimalForkBiomass;
-            OffspringProgress = 0;
             Radius = 0.125d;
             Mass = Math.Pow(Radius, 2);
 
@@ -470,8 +468,8 @@ namespace Paramecium.Simulation
 
                                     if (BrainOutputAttack > 0)
                                     {
-                                        Element += Math.Min(1.5d, target.Element) * g_Soup.BiomassAmountMultiplier;
-                                        target.Element -= Math.Min(1.5d, target.Element);
+                                        Element += Math.Min(1d, target.Element) * g_Soup.BiomassAmountMultiplier;
+                                        target.Element -= Math.Min(1d, target.Element);
                                     }
                                 }
                             }
@@ -493,13 +491,8 @@ namespace Paramecium.Simulation
 
                                     if (BrainOutputAttack > 0 && BrainOutputAttack > target.BrainOutputAttack && target.Age >= 0)
                                     {
-                                        Element += Math.Min(5d, target.Element) * g_Soup.BiomassAmountMultiplier;
-                                        target.Element -= Math.Min(5d, target.Element);
-                                        if (target.Element <= 0)
-                                        {
-                                            Element += target.OffspringProgress * g_Soup.BiomassAmountMultiplier;
-                                            target.OffspringProgress = 0;
-                                        }
+                                        Element += Math.Min(Math.Min(BrainOutputAttack - target.BrainOutputAttack, 5d), target.Element) * g_Soup.BiomassAmountMultiplier;
+                                        target.Element -= Math.Min(Math.Min(BrainOutputAttack - target.BrainOutputAttack, 5d), target.Element);
                                     }
                                 }
                             }
@@ -523,15 +516,10 @@ namespace Paramecium.Simulation
                 return;
             }
 
-            if (Element >= g_Soup.AnimalForkBiomass)
-            {
-                OffspringProgress += (Element - g_Soup.AnimalForkBiomass) * g_Soup.BiomassAmountMultiplier;
-                Element -= Element - g_Soup.AnimalForkBiomass;
-            }
-            if (OffspringProgress >= g_Soup.AnimalForkBiomass)
+            if (Element >= g_Soup.AnimalForkBiomass * 2d)
             {
                 g_Soup.AnimalBuffer[threadId].Add(new Animal(new Random(), this));
-                OffspringProgress -= g_Soup.AnimalForkBiomass;
+                Element -= g_Soup.AnimalForkBiomass;
                 OffspringCount++;
             }
 
@@ -591,7 +579,7 @@ namespace Paramecium.Simulation
             }
             else
             {
-                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += (Element + OffspringProgress) * g_Soup.BiomassAmountMultiplier;
+                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Element * g_Soup.BiomassAmountMultiplier;
                 g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimals.Remove(Index);
                 g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimalCount--;
                 lock (g_Soup.AnimalUnassignedIndexesLockObject) g_Soup.AnimalUnassignedIndexes.Add(Index);

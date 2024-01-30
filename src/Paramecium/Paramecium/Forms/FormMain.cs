@@ -216,18 +216,10 @@ namespace Paramecium.Forms
                                                 double TargetPosY = Target.Position.Y;
                                                 double TargetRadius = Target.Radius;
 
-                                                if (DisplayMode == 5)
+                                                if (DisplayMode == 1)
                                                 {
                                                     TargetColor.Dispose();
-                                                    if (Target.CollisionIsDisabled == false) TargetColor = new SolidBrush(Color.FromArgb(255, 255, 0));
-                                                    else TargetColor = new SolidBrush(Color.FromArgb(0, 0, 0));
-                                                }
-                                                if (DisplayMode == 6)
-                                                {
-                                                    TargetColor.Dispose();
-                                                    if (Target.ElementCollectionIsDisabled < 0) TargetColor = new SolidBrush(Color.FromArgb(255, 255, 0));
-                                                    else if (Target.ElementCollectionIsDisabled == 0) TargetColor = new SolidBrush(Color.FromArgb(255, 255, 255));
-                                                    else TargetColor = new SolidBrush(Color.FromArgb(0, 0, 0));
+                                                    TargetColor = new SolidBrush(Color.FromArgb(127, 127, 127));
                                                 }
 
                                                 FillCircle(
@@ -280,13 +272,37 @@ namespace Paramecium.Forms
                                                     TargetColor = new SolidBrush(Color.FromArgb(255, 127, 255));
                                                 }
 
-                                                /*
                                                 if (DisplayMode == 1)
                                                 {
                                                     TargetColor.Dispose();
-                                                    TargetColor = new SolidBrush(Color.FromArgb((int)Math.Min(255d * Target.CumulativeMutationRate / (g_Soup.MutationRate * 10d), 255d), 0, 0));
+                                                    if (SelectedCellType == SelectedCellType.Animal)
+                                                    {
+                                                        Animal SecondTarget = g_Soup.Animals[SelectedCellIndex];
+
+                                                        if (SecondTarget is not null)
+                                                        {
+                                                            double GeneDifferences = 0;
+
+                                                            for (int j = 0; j < Target.Brain.Length; j++)
+                                                            {
+                                                                if (Target.Brain[i] != SecondTarget.Brain[i])
+                                                                {
+                                                                    GeneDifferences += Math.Min(Math.Abs(Target.Brain[i] - SecondTarget.Brain[i]), 1.0d) / Target.Brain.Length;
+                                                                }
+                                                            }
+
+                                                            if (GeneDifferences < 0.5)
+                                                            {
+                                                                TargetColor = new SolidBrush(Color.FromArgb(0, (int)(255 * (1d - GeneDifferences * 2d)), (int)(255 * (GeneDifferences * 2d))));
+                                                            }
+                                                            else
+                                                            {
+                                                                TargetColor = new SolidBrush(Color.FromArgb(0, 0, (int)(255 * (1d - (GeneDifferences - 0.5d) * 2d))));
+                                                            }
+                                                        }
+                                                    }
+                                                    else TargetColor = new SolidBrush(Color.FromArgb(0, 0, 0));
                                                 }
-                                                */
 
                                                 FillCircle(
                                                     canvas_g,
@@ -477,8 +493,62 @@ namespace Paramecium.Forms
                         {
                             int OffsetY = 0;
 
-                            OffsetY += 16;
+                            if (fullScreen)
+                            {
+                                {
+                                    string Text = $"Total Born/Die : {g_Soup.TotalBornCount}/{g_Soup.TotalDieCount}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                {
+                                    string Text = $"Latest Generation : {g_Soup.LatestGeneration}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                {
+                                    string Text = $"Population (P/A/T) : {g_Soup.PopulationPlant}/{g_Soup.PopulationAnimal}/{g_Soup.PopulationTotal}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                {
+                                    string Text = $"Time Step : {g_Soup.ElapsedTimeStep} (T{g_Soup.ParallelismLimit})";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                {
+                                    string Text = $"Status : {g_Soup.SoupState}";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                            }
+                            {
+                                string Text = $"表示モード : ";
+                                switch (DisplayMode)
+                                {
+                                    case 1:
+                                        Text += "遺伝子類似性";
+                                        break;
+                                    default:
+                                        Text += "通常";
+                                        break;
+                                }
+                                Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                OffsetY += TextSize.Height;
+                            }
 
+                            OffsetY += 16;
                             List<EventLog> LoadedEventLog = EventLog.LoadEventLog();
                             for (int i = LoadedEventLog.Count - 1; i >= 0; i--)
                             {
@@ -704,18 +774,10 @@ namespace Paramecium.Forms
                                     brushColor.Dispose();
                                 }
                                 {
-                                    string Text = $"エレメント : {target.Element:0.000} / {g_Soup.AnimalForkBiomass:0.000}";
+                                    string Text = $"エレメント : {target.Element:0.000} / {g_Soup.AnimalForkBiomass * 2d:0.000}";
                                     Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                     canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
-                                    canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.Element / g_Soup.AnimalForkBiomass)), TextSize.Height);
-                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
-                                    OffsetY += TextSize.Height;
-                                }
-                                {
-                                    string Text = $"繁殖進捗 : {target.OffspringProgress:0.000} / {g_Soup.AnimalForkBiomass:0.000}";
-                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
-                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
-                                    canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.OffspringProgress / g_Soup.AnimalForkBiomass)), TextSize.Height);
+                                    canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.Element / (g_Soup.AnimalForkBiomass * 2d))), TextSize.Height);
                                     TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                     OffsetY += TextSize.Height;
                                 }
@@ -870,7 +932,7 @@ namespace Paramecium.Forms
                                 break;
                         }
                         StatTimeStep.Text = $"Time Step : {g_Soup.ElapsedTimeStep} (T{g_Soup.ParallelismLimit})";
-                        StatPopulation.Text = $"Population : {g_Soup.PopulationPlant}/{g_Soup.PopulationAnimal}/{g_Soup.PopulationTotal}";
+                        StatPopulation.Text = $"Population (P/A/T) : {g_Soup.PopulationPlant}/{g_Soup.PopulationAnimal}/{g_Soup.PopulationTotal}";
                         StatLatestGeneration.Text = $"Latest Generation : {g_Soup.LatestGeneration}";
                         StatTotalBornDie.Text = $"Total Born/Die : {g_Soup.TotalBornCount}/{g_Soup.TotalDieCount}";
                     }

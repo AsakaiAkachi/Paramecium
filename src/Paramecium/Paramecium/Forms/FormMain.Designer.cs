@@ -83,8 +83,8 @@
             // 
             StatPopulation.BorderSides = ToolStripStatusLabelBorderSides.Left;
             StatPopulation.Name = "StatPopulation";
-            StatPopulation.Size = new Size(106, 19);
-            StatPopulation.Text = "Population : 0/0/0";
+            StatPopulation.Size = new Size(148, 19);
+            StatPopulation.Text = "Population (P/A/T) : 0/0/0";
             // 
             // StatLatestGeneration
             // 
@@ -118,8 +118,8 @@
             // 
             StatMemory.BorderSides = ToolStripStatusLabelBorderSides.Left;
             StatMemory.Name = "StatMemory";
-            StatMemory.Size = new Size(101, 19);
-            StatMemory.Text = "Memory : 0 bytes";
+            StatMemory.Size = new Size(112, 19);
+            StatMemory.Text = "Memory : 0 Mbytes";
             // 
             // TopMenu
             // 
@@ -201,14 +201,14 @@
             // TopMenu_Simulation_NewSimulation
             // 
             TopMenu_Simulation_NewSimulation.Name = "TopMenu_Simulation_NewSimulation";
-            TopMenu_Simulation_NewSimulation.Size = new Size(180, 22);
+            TopMenu_Simulation_NewSimulation.Size = new Size(169, 22);
             TopMenu_Simulation_NewSimulation.Text = "新規作成...";
             TopMenu_Simulation_NewSimulation.Click += TopMenu_Simulation_NewSimulation_Click;
             // 
             // オートセーブの設定ToolStripMenuItem
             // 
             オートセーブの設定ToolStripMenuItem.Name = "オートセーブの設定ToolStripMenuItem";
-            オートセーブの設定ToolStripMenuItem.Size = new Size(180, 22);
+            オートセーブの設定ToolStripMenuItem.Size = new Size(169, 22);
             オートセーブの設定ToolStripMenuItem.Text = "オートセーブの設定...";
             // 
             // SimulationView

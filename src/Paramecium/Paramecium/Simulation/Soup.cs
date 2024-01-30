@@ -570,7 +570,7 @@ namespace Paramecium.Simulation
                                 Target.OnStepFinalize();
                                 break;
                             case 4:
-                                BiomassAmountArray[thread] += Target.Element + Target.OffspringProgress;
+                                BiomassAmountArray[thread] += Target.Element;
                                 PopulationTotalArray[thread]++;
                                 PopulationAnimalArray[thread]++;
                                 break;
