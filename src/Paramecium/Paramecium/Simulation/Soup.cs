@@ -16,8 +16,6 @@ namespace Paramecium.Simulation
 {
     public class Soup
     {
-        public int Seed { get; set; }
-
         public int SizeX { get; set; } = 512;
         public int SizeY { get; set; } = 256;
 
@@ -41,7 +39,7 @@ namespace Paramecium.Simulation
         public int HatchingTime { get; set; } = 300;
         public double MutationRate { get; set; } = 0.1d;
 
-        public double AnimalElementLosePerStepInPassive { get; set; } = 0.025d;
+        public double AnimalElementLosePerStepInPassive { get; set; } = 0.025;
         public double AnimalElementLosePerStepInAccelerating { get; set; } = 0.075d;
 
         public double PlantSizeMultiplier { get; set; } = 3.872983d;
@@ -189,24 +187,24 @@ namespace Paramecium.Simulation
 
         public void SoupSetup()
         {
-            Random rnd = new Random();
+            Random random = new Random();
 
             while (CurrentBiomassAmount < TotalBiomassAmount - (AnimalForkBiomass * InitialAnimalCount))
             {
-                double NewPlantBiomassAmount = Math.Min(rnd.NextDouble() * (PlantForkBiomass * 0.8d + 0.1d), TotalBiomassAmount - (AnimalForkBiomass * InitialAnimalCount) - CurrentBiomassAmount);
-                Vector2D NewPlantPosition = (new Vector2D(rnd, 0, 0, SizeX, SizeY));
+                double NewPlantBiomassAmount = Math.Min(random.NextDouble() * (PlantForkBiomass * 0.8d + 0.1d), TotalBiomassAmount - (AnimalForkBiomass * InitialAnimalCount) - CurrentBiomassAmount);
+                Vector2D NewPlantPosition = (new Vector2D(random, 0, 0, SizeX, SizeY));
                 Int2D NewPlantGridPosition = Vector2D.ToIntegerizedPosition(NewPlantPosition);
 
                 if (GridMap[NewPlantGridPosition.X + NewPlantGridPosition.Y * SizeX].Type == TileType.None)
                 {
-                    PlantBuffer[0].Add(new Plant(rnd, NewPlantPosition, Vector2D.Zero, NewPlantBiomassAmount));
+                    PlantBuffer[0].Add(new Plant(random, NewPlantPosition, Vector2D.Zero, NewPlantBiomassAmount));
                     CurrentBiomassAmount += NewPlantBiomassAmount;
                 }
             }
 
             for (int i = 0; i < InitialAnimalCount; i++)
             {
-                AnimalBuffer[0].Add(new Animal(rnd, new Vector2D(rnd, 0, 0, SizeX, SizeY), Vector2D.Zero, rnd.NextDouble() * 360d, AnimalForkBiomass));
+                AnimalBuffer[0].Add(new Animal(random, new Vector2D(random, 0, 0, SizeX, SizeY), Vector2D.Zero, random.NextDouble() * 360d, AnimalForkBiomass));
             }
         }
 
@@ -423,8 +421,8 @@ namespace Paramecium.Simulation
 
                 for (int path = 0; path < 4; path++)
                 {
-                    Random rnd = new Random();
-                    int pathRoute = rnd.Next(0, 3 + 1);
+                    Random random = new Random();
+                    int pathRoute = random.Next(0, 3 + 1);
 
                     Parallel.For(0, RegionCount, parallelOptions, i =>
                     {

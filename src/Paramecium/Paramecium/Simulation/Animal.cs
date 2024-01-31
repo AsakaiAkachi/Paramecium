@@ -1,6 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Paramecium.Simulation
 {
@@ -133,6 +135,12 @@ namespace Paramecium.Simulation
                 GeneColorRed = parent.GeneColorRed;
                 GeneColorGreen = parent.GeneColorGreen;
                 GeneColorBlue = parent.GeneColorBlue;
+
+                //int ColorMutation = random.Next(0, 2 + 1);
+
+                //if (ColorMutation == 0) GeneColorRed = Math.Min(Math.Max(parent.GeneColorRed + random.Next(-4, 4 + 1), 0), 255);
+                //else if (ColorMutation == 1) GeneColorGreen = Math.Min(Math.Max(parent.GeneColorGreen + random.Next(-4, 4 + 1), 0), 255);
+                //else if (ColorMutation == 2) GeneColorBlue = Math.Min(Math.Max(parent.GeneColorBlue + random.Next(-4, 4 + 1), 0), 255);
             }
         }
 
@@ -219,7 +227,7 @@ namespace Paramecium.Simulation
                                         j_break = true;
                                         break;
                                     }
-                                    else
+                                    else if (j > 1)
                                     {
                                         if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlantCount > 0)
                                         {
@@ -248,6 +256,55 @@ namespace Paramecium.Simulation
                                                         BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 3 * 3];
                                                         BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 3 * 3 + 1];
                                                         BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 3 * 3 + 2];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlantCount > 0)
+                                        {
+                                            for (int l = 0; l < g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlantCount; l++)
+                                            {
+                                                Plant target = g_Soup.Plants[g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlants[l]];
+
+                                                double TargetRelativeAngle = Vector2D.ToAngle(target.Position - Position) - (Angle + i * 6.4285714286);
+                                                if (TargetRelativeAngle < 0) TargetRelativeAngle += 360;
+                                                if (TargetRelativeAngle >= 360 - 45 / (j + 1) || TargetRelativeAngle <= 45 / (j + 1))
+                                                {
+                                                    BrainInput[(i + 14) * 10 + j] = 2;
+                                                    BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 1 * 3];
+                                                    BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 1 * 3 + 1];
+                                                    BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 1 * 3 + 2];
+                                                }
+                                            }
+                                        }
+                                        if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimalCount > 0)
+                                        {
+                                            for (int l = 0; l < g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimalCount; l++)
+                                            {
+                                                Animal target = g_Soup.Animals[g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimals[l]];
+                                                if (target.Id != Id)
+                                                {
+                                                    double TargetRelativeAngle = Vector2D.ToAngle(target.Position - Position) - (Angle + i * 6.4285714286);
+                                                    if (TargetRelativeAngle < 0) TargetRelativeAngle += 360;
+                                                    if (TargetRelativeAngle >= 360 - 45 / (j + 1) || TargetRelativeAngle <= 45 / (j + 1))
+                                                    {
+                                                        if (target.RaceId == RaceId)
+                                                        {
+                                                            BrainInput[(i + 14) * 10 + j] = 3;
+                                                            BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 2 * 3];
+                                                            BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 2 * 3 + 1];
+                                                            BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 2 * 3 + 2];
+                                                        }
+                                                        else
+                                                        {
+                                                            BrainInput[(i + 14) * 10 + j] = 4;
+                                                            BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 3 * 3];
+                                                            BrainOutputRotation += Brain[(i + 14) * 120 + j * 12 + 3 * 3 + 1];
+                                                            BrainOutputAttack += Brain[(i + 14) * 120 + j * 12 + 3 * 3 + 2];
+                                                        }
                                                     }
                                                 }
                                             }
@@ -335,7 +392,7 @@ namespace Paramecium.Simulation
                                         j_break = true;
                                         break;
                                     }
-                                    else
+                                    else if (j > 1)
                                     {
                                         if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlantCount > 0)
                                         {
@@ -364,6 +421,55 @@ namespace Paramecium.Simulation
                                                         BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3];
                                                         BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3 + 1];
                                                         BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3 + 2];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlantCount > 0)
+                                        {
+                                            for (int l = 0; l < g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlantCount; l++)
+                                            {
+                                                Plant target = g_Soup.Plants[g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalPlants[l]];
+
+                                                double TargetRelativeAngle = Vector2D.ToAngle(target.Position - Position) - (Angle + i * 22.5 + 180);
+                                                if (TargetRelativeAngle < 0) TargetRelativeAngle += 360;
+                                                if (TargetRelativeAngle >= 360 - 45 / (j + 1) || TargetRelativeAngle <= 45 / (j + 1))
+                                                {
+                                                    BrainInput[290 + (i + 4) * 4 + j] = 2;
+                                                    BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 1 * 3];
+                                                    BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 1 * 3 + 1];
+                                                    BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 1 * 3 + 2];
+                                                }
+                                            }
+                                        }
+                                        if (g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimalCount > 0)
+                                        {
+                                            for (int l = 0; l < g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimalCount; l++)
+                                            {
+                                                Animal target = g_Soup.Animals[g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimals[l]];
+                                                if (target.Id != Id)
+                                                {
+                                                    double TargetRelativeAngle = Vector2D.ToAngle(target.Position - Position) - (Angle + i * 22.5 + 180);
+                                                    if (TargetRelativeAngle < 0) TargetRelativeAngle += 360;
+                                                    if (TargetRelativeAngle >= 360 - 45 / (j + 1) || TargetRelativeAngle <= 45 / (j + 1))
+                                                    {
+                                                        if (target.RaceId == RaceId)
+                                                        {
+                                                            BrainInput[290 + (i + 4) * 4 + j] = 3;
+                                                            BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 2 * 3];
+                                                            BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 2 * 3 + 1];
+                                                            BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 2 * 3 + 2];
+                                                        }
+                                                        else
+                                                        {
+                                                            BrainInput[290 + (i + 4) * 4 + j] = 4;
+                                                            BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3];
+                                                            BrainOutputRotation += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3 + 1];
+                                                            BrainOutputAttack += Brain[3480 + (i + 4) * 36 + j * 12 + 3 * 3 + 2];
+                                                        }
                                                     }
                                                 }
                                             }
@@ -475,8 +581,13 @@ namespace Paramecium.Simulation
 
                                     if (BrainOutputAttack > 0)
                                     {
-                                        Element += Math.Min(1d, target.Element) * g_Soup.BiomassAmountMultiplier;
-                                        target.Element -= Math.Min(1d, target.Element);
+                                        double TargetRelativeAngle = Vector2D.ToAngle(target.Position - Position) - Angle;
+                                        if (TargetRelativeAngle < 0) TargetRelativeAngle += 360;
+                                        if (TargetRelativeAngle >= 360 - 60 || TargetRelativeAngle <= 60)
+                                        {
+                                            Element += Math.Min(1d, target.Element) * g_Soup.BiomassAmountMultiplier;
+                                            target.Element -= Math.Min(1d, target.Element);
+                                        }
                                     }
                                 }
                             }
@@ -496,10 +607,18 @@ namespace Paramecium.Simulation
                                     Velocity += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d) / 2d;
                                     target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
 
-                                    if (BrainOutputAttack > 0 && BrainOutputAttack > target.BrainOutputAttack && target.Age >= 0)
+                                    if (BrainOutputAttack > 0)
                                     {
-                                        Element += Math.Min(Math.Min(BrainOutputAttack - target.BrainOutputAttack, 5d), target.Element) * g_Soup.BiomassAmountMultiplier;
-                                        target.Element -= Math.Min(Math.Min(BrainOutputAttack - target.BrainOutputAttack, 5d), target.Element);
+                                        if (BrainOutputAttack > target.BrainOutputAttack && target.Age >= 0)
+                                        {
+                                            double TargetRelativeAngle = Vector2D.ToAngle(target.Position - Position) - Angle;
+                                            if (TargetRelativeAngle < 0) TargetRelativeAngle += 360;
+                                            if (TargetRelativeAngle >= 360 - 60 || TargetRelativeAngle <= 60)
+                                            {
+                                                Element += Math.Min(Math.Min(BrainOutputAttack - target.BrainOutputAttack, 5d), target.Element) * g_Soup.BiomassAmountMultiplier;
+                                                target.Element -= Math.Min(Math.Min(BrainOutputAttack - target.BrainOutputAttack, 5d), target.Element);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -562,6 +681,9 @@ namespace Paramecium.Simulation
                 Position = new Vector2D(Position.X, 0);
                 Velocity = new Vector2D(Velocity.X, Velocity.Y * -1d);
             }
+
+            if (Angle < 0d) Angle += 360d;
+            if (Angle >= 360d) Angle -= 360d;
 
             Age++;
         }
