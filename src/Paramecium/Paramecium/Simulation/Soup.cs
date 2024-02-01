@@ -16,6 +16,8 @@ namespace Paramecium.Simulation
 {
     public class Soup
     {
+        public int Seed { get; set; } = new Random().Next(-2147483648, 2147483647);
+
         public int SizeX { get; set; } = 512;
         public int SizeY { get; set; } = 256;
 
@@ -41,6 +43,7 @@ namespace Paramecium.Simulation
 
         public double AnimalElementLosePerStepInPassive { get; set; } = 0.025;
         public double AnimalElementLosePerStepInAccelerating { get; set; } = 0.075d;
+        public int AnimalLifeSpan { get; set; } = 30000;
 
         public double PlantSizeMultiplier { get; set; } = 3.872983d;
 
@@ -82,8 +85,11 @@ namespace Paramecium.Simulation
         public SoupState SoupState;
         public object SoupStateLockObject = new object();
 
+        public bool AutoSave { get; set; } = false;
+
         public Soup() { }
         public Soup(
+            int seed,
             int sizeX, int sizeY,
             double wallPerlinNoiseX, double wallPerlinNoiseY, double wallPerlinNoiseZ,
             double wallPerlinNoiseScale, int wallPerlinNoiseOctave, double wallThickness,
@@ -91,9 +97,10 @@ namespace Paramecium.Simulation
             double cellSizeMultiplier, double plantForkBiomass, double animalForkBiomass, int plantBiomassCollectionRange,
             int initialAnimalCount, int hatchingTime, 
             double mutationRate,
-            double animalElementLosePerStepInPassive, double animalElementLosePerStepInAccelerating
+            double animalElementLosePerStepInPassive, double animalElementLosePerStepInAccelerating, int animalLifeSpan
         )
         {
+            Seed = seed;
             SizeX = sizeX; SizeY = sizeY;
             WallPerlinNoiseX = wallPerlinNoiseX; WallPerlinNoiseY = wallPerlinNoiseY; WallPerlinNoiseZ = wallPerlinNoiseZ;
             WallPerlinNoiseScale = wallPerlinNoiseScale; WallPerlinNoiseOctave = wallPerlinNoiseOctave; WallThickness = wallThickness;
@@ -113,6 +120,7 @@ namespace Paramecium.Simulation
 
             AnimalElementLosePerStepInPassive = animalElementLosePerStepInPassive;
             AnimalElementLosePerStepInAccelerating = animalElementLosePerStepInAccelerating;
+            AnimalLifeSpan = animalLifeSpan;
 
             RegionCountWidth = (int)Math.Ceiling(SizeX / 32d);
             RegionCountHeight = (int)Math.Ceiling(SizeY / 32d);
@@ -187,7 +195,7 @@ namespace Paramecium.Simulation
 
         public void SoupSetup()
         {
-            Random random = new Random();
+            Random random = new Random(Seed);
 
             while (CurrentBiomassAmount < TotalBiomassAmount - (AnimalForkBiomass * InitialAnimalCount))
             {
@@ -395,6 +403,25 @@ namespace Paramecium.Simulation
 
                             ElapsedTimeStep++;
 
+                            if (AutoSave && ElapsedTimeStep % 100000 == 0 && ElapsedTimeStep != 0)
+                            {
+                                EventLog.PushEventLog($"Saving soup...");
+
+                                string jsonString = JsonSerializer.Serialize(g_Soup);
+
+                                StreamWriter sw = new StreamWriter($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves\{Path.GetFileNameWithoutExtension(g_FormMain.FilePath)}-autosave{ElapsedTimeStep}.soup", false);
+
+                                sw.Write(jsonString);
+
+                                sw.Dispose();
+
+                                jsonString = string.Empty;
+
+                                GC.Collect();
+
+                                EventLog.PushEventLog($"Soup has been saved.");
+                            }
+
                             if (SoupState == SoupState.StepRun)
                             {
                                 SoupState = SoupState.Pause;
@@ -421,7 +448,7 @@ namespace Paramecium.Simulation
 
                 for (int path = 0; path < 4; path++)
                 {
-                    Random random = new Random();
+                    Random random = new Random((int)((Seed + ElapsedTimeStep * 4 + phase) % 2147483647));
                     int pathRoute = random.Next(0, 3 + 1);
 
                     Parallel.For(0, RegionCount, parallelOptions, i =>

@@ -185,16 +185,27 @@ namespace Paramecium.Forms
                         }
                         else if (autoSelect && (DateTime.Now - lastAutoSelectTime).TotalMilliseconds >= 3000)
                         {
-                            int selectedCellIndex = new Random().Next(0, g_Soup.Animals.Length);
-                            Animal target = g_Soup.Animals[selectedCellIndex];
-                            if (target is not null)
+                            if (g_Soup.PopulationAnimal > 0)
                             {
-                                if (target.IsValid)
+                                while (true)
                                 {
-                                    SelectedCellType = SelectedCellType.Animal;
-                                    SelectedCellIndex = selectedCellIndex;
-                                    SelectedCellId = target.Id;
-                                    lastAutoSelectTime = DateTime.Now;
+                                    int selectedCellIndex = new Random().Next(0, g_Soup.Animals.Length);
+                                    Animal target = g_Soup.Animals[selectedCellIndex];
+
+                                    if (target is not null)
+                                    {
+                                        if (target.IsValid)
+                                        {
+                                            SelectedCellType = SelectedCellType.Animal;
+                                            SelectedCellIndex = selectedCellIndex;
+                                            SelectedCellId = target.Id;
+                                            lastAutoSelectTime = DateTime.Now;
+
+                                            break;
+                                        }
+                                    }
+
+                                    if (g_Soup.PopulationAnimal == 0) break;
                                 }
                             }
                         }
@@ -571,7 +582,7 @@ namespace Paramecium.Forms
                                                                             }
                                                                         }
 
-                                                                        TextRenderer.DrawText(canvas_g, $"一致率 : {(1d - GeneDifferences) * 100d:0.000}%", fnt_CellOverlay, new Point((int)WorldPosXToCanvasPosX(Target.Position.X + Target.Radius) + 4, (int)WorldPosYToCanvasPosY(Target.Position.Y - Target.Radius)), Color.White);
+                                                                        TextRenderer.DrawText(canvas_g, $"Gene Identity : {(1d - GeneDifferences) * 100d:0.000}%", fnt_CellOverlay, new Point((int)WorldPosXToCanvasPosX(Target.Position.X + Target.Radius) + 4, (int)WorldPosYToCanvasPosY(Target.Position.Y - Target.Radius)), Color.White);
                                                                     }
                                                                 }
                                                                 else if (DisplayMode == 2)
@@ -580,30 +591,30 @@ namespace Paramecium.Forms
 
                                                                     if (SecondTarget is not null)
                                                                     {
-                                                                        string Text = $"#{LongToBase36(Target.Id, 12)}\r\n関係性 : ";
+                                                                        string Text = $"#{LongToBase36(Target.Id, 12)}\r\nRelationships : ";
 
                                                                         if (Target.Id == SecondTarget.Id)
                                                                         {
-                                                                            Text += "選択中";
+                                                                            Text += "Selected";
                                                                         }
                                                                         else if (SecondTarget.ParentGenealogicalTree.Contains(Target.Id))
                                                                         {
-                                                                            Text += $"{SecondTarget.ParentGenealogicalTree.IndexOf(Target.Id) + 1}世代前の親";
+                                                                            Text += $"Ancestors {SecondTarget.ParentGenealogicalTree.IndexOf(Target.Id) + 1} Generations Ago";
                                                                         }
                                                                         else if (Target.ParentGenealogicalTree.Contains(SecondTarget.Id))
                                                                         {
-                                                                            Text += $"{Target.ParentGenealogicalTree.IndexOf(SecondTarget.Id) + 1}世代後の子";
+                                                                            Text += $"Descendants After {Target.ParentGenealogicalTree.IndexOf(SecondTarget.Id) + 1} Generations";
                                                                         }
 
                                                                         else if (Target.ParentGenealogicalTree.FindAll(SecondTarget.ParentGenealogicalTree.Contains).Count != 0)
                                                                         {
                                                                             int BranchGeneration = SecondTarget.ParentGenealogicalTree.IndexOf(Target.ParentGenealogicalTree.FindAll(SecondTarget.ParentGenealogicalTree.Contains)[0]) + 1;
 
-                                                                            Text += $"{BranchGeneration}世代前に分岐";
+                                                                            Text += $"Branched Out {BranchGeneration} Generations Ago";
                                                                         }
                                                                         else
                                                                         {
-                                                                            Text += "関係性なし";
+                                                                            Text += "No Relationship";
                                                                         }
 
                                                                         /*
@@ -622,7 +633,7 @@ namespace Paramecium.Forms
                                                         catch (Exception ex)
                                                         {
                                                             ConsoleLog(LogLevel.Warning, ex.ToString());
-                                                            EventLog.PushEventLog($"例外がスローされました :\r\n{ex}");
+                                                            EventLog.PushEventLog($"Exception Thrown :\r\n{ex}");
                                                         }
                                                     }
                                                 }
@@ -693,17 +704,17 @@ namespace Paramecium.Forms
                                     }
                                 }
                                 {
-                                    string Text = $"表示モード : ";
+                                    string Text = $"Display Mode : ";
                                     switch (DisplayMode)
                                     {
                                         case 1:
-                                            Text += "遺伝子類似性";
+                                            Text += "Gene Identity";
                                             break;
                                         case 2:
-                                            Text += "系統樹";
+                                            Text += "Genealogy";
                                             break;
                                         default:
-                                            Text += "通常";
+                                            Text += "Normal";
                                             break;
                                     }
                                     Size TextSize = TextRenderer.MeasureText(Text, fnt);
@@ -713,7 +724,7 @@ namespace Paramecium.Forms
                                 }
                                 if (Tracking)
                                 {
-                                    string Text = "[自動追跡有効]";
+                                    string Text = "[Auto Tracking Enabled]";
                                     Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                     canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
                                     TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
@@ -721,7 +732,15 @@ namespace Paramecium.Forms
                                 }
                                 if (autoSelect)
                                 {
-                                    string Text = "[自動選択有効]";
+                                    string Text = "[Auto Selection Enabled]";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                if (g_Soup.AutoSave)
+                                {
+                                    string Text = "[Auto Save Enabled]";
                                     Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                     canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
                                     TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
@@ -801,23 +820,23 @@ namespace Paramecium.Forms
                                     OffsetY += TextSize.Height;
                                 }
                                 {
-                                    string Text = $"タイプ : ";
-                                    if (Target.Type == TileType.None) Text += "通常";
-                                    else if (Target.Type == TileType.Wall) Text += "壁";
+                                    string Text = $"Type : ";
+                                    if (Target.Type == TileType.None) Text += "Normal";
+                                    else if (Target.Type == TileType.Wall) Text += "Wall";
                                     Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                     canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                     TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                     OffsetY += TextSize.Height;
                                 }
                                 {
-                                    string Text = $"位置 : ({MouseIntegerizedPosition.X}, {MouseIntegerizedPosition.Y})";
+                                    string Text = $"Position : ({MouseIntegerizedPosition.X}, {MouseIntegerizedPosition.Y})";
                                     Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                     canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                     TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                     OffsetY += TextSize.Height;
                                 }
                                 {
-                                    string Text = $"バイオマス : {Target.Fertility:0.000}";
+                                    string Text = $"Element : {Target.Fertility:0.000}";
                                     Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                     canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                     canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (Target.Fertility / (g_Soup.TotalBiomassAmount / (g_Soup.SizeX * g_Soup.SizeY)))), TextSize.Height);
@@ -841,14 +860,14 @@ namespace Paramecium.Forms
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        string Text = $"タイプ : 植物";
+                                        string Text = $"Type : Plant";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        string Text = $"エレメント : {target.Element:0.000} / {g_Soup.PlantForkBiomass:0.000}";
+                                        string Text = $"Element : {target.Element:0.000} / {g_Soup.PlantForkBiomass:0.000}";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.Element / g_Soup.PlantForkBiomass)), TextSize.Height);
@@ -873,41 +892,31 @@ namespace Paramecium.Forms
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        string Text = $"タイプ : ";
-                                        if (target.Age >= 0) Text += "動物";
-                                        else Text += "胞子";
+                                        string Text = $"Type : ";
+                                        if (target.Age >= 0) Text += "Animal";
+                                        else Text += "Spore";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        string Text = $"種族 : #{LongToBase36(target.RaceId, 6)}";
+                                        string Text = $"Race : #{LongToBase36(target.RaceId, 6)}";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        string Text = $"世代 : {target.Generation}";
+                                        string Text = $"Generation : {target.Generation}";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                         OffsetY += TextSize.Height;
                                     }
-                                    /*
-                                    {
-                                        string Text = $"蓄積した変異 : {target.CumulativeMutationRate * 100d:0.000}%";
-                                        Size TextSize = TextRenderer.MeasureText(Text, fnt);
-                                        canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
-                                        canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.CumulativeMutationRate / (g_Soup.MutationRate * 10d))), TextSize.Height);
-                                        TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
-                                        OffsetY += TextSize.Height;
-                                    }
-                                    */
                                     if (target.Age >= 0)
                                     {
-                                        string Text = $"年齢 : {target.Age}";
+                                        string Text = $"Age : {target.Age}";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
@@ -915,7 +924,7 @@ namespace Paramecium.Forms
                                     }
                                     if (target.Age < 0)
                                     {
-                                        string Text = $"ふ化まであと : {target.Age * -1}";
+                                        string Text = $"Age : {target.Age * -1} More Steps to Hatching";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (1d - target.Age * -1 / (double)g_Soup.HatchingTime)), TextSize.Height);
@@ -923,21 +932,21 @@ namespace Paramecium.Forms
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        string Text = $"子孫数 : {target.OffspringCount}";
+                                        string Text = $"Number of Offspring : {target.OffspringCount}";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        string Text = $"位置 : ({target.Position.X:0.000}, {target.Position.Y:0.000})";
+                                        string Text = $"Position : ({target.Position.X:0.000}, {target.Position.Y:0.000})";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        string Text = $"速度 : ({target.Velocity.X:0.000}, {target.Velocity.Y:0.000}) / {Vector2D.Size(target.Velocity):0.000}u/t";
+                                        string Text = $"Velocity : ({target.Velocity.X:0.000}, {target.Velocity.Y:0.000}) / {Vector2D.Size(target.Velocity):0.000}u/t";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (Vector2D.Size(target.Velocity) / 0.1d)), TextSize.Height);
@@ -946,7 +955,7 @@ namespace Paramecium.Forms
                                     }
                                     {
                                         SolidBrush brushColor = new SolidBrush(Color.FromArgb(255, target.GeneColorRed, target.GeneColorGreen, target.GeneColorBlue));
-                                        string Text = $"色 : ({target.GeneColorRed}, {target.GeneColorGreen}, {target.GeneColorBlue})";
+                                        string Text = $"Color : ({target.GeneColorRed}, {target.GeneColorGreen}, {target.GeneColorBlue})";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(brushColor, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
@@ -954,7 +963,7 @@ namespace Paramecium.Forms
                                         brushColor.Dispose();
                                     }
                                     {
-                                        string Text = $"エレメント : {target.Element:0.000} / {g_Soup.AnimalForkBiomass * 2d:0.000}";
+                                        string Text = $"Element : {target.Element:0.000} / {g_Soup.AnimalForkBiomass * 2d:0.000}";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
                                         canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (target.Element / (g_Soup.AnimalForkBiomass * 2d))), TextSize.Height);
@@ -1139,7 +1148,8 @@ namespace Paramecium.Forms
                     BottomStat.Refresh();
                 }
 
-                this.Text = $"{Path.GetFileName(FilePath)} - Paramecium";
+                if (g_Soup is not null) this.Text = $"{Path.GetFileName(FilePath)} - Paramecium 0.4.5";
+                else this.Text = $"Paramecium 0.4.5";
 
                 await Task.Delay(1);
             }
@@ -1238,8 +1248,8 @@ namespace Paramecium.Forms
 
             ofd.FileName = "";
             ofd.InitialDirectory = Path.GetDirectoryName($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\");
-            ofd.Filter = "Paramecium スープファイル(*.soup)|*.soup|すべてのファイル(*.*)|*.*";
-            ofd.Title = "開く";
+            ofd.Filter = "Paramecium Soup File(*.soup)|*.soup|All Files(*.*)|*.*";
+            ofd.Title = "Open";
             ofd.RestoreDirectory = true;
 
             if (ofd.ShowDialog() == DialogResult.OK)
@@ -1251,7 +1261,7 @@ namespace Paramecium.Forms
                 {
                     string jsonString;
 
-                    EventLog.PushEventLog($"スープを読み込んでいます...");
+                    EventLog.PushEventLog($"Loading soup...");
                     await Task.Delay(100);
 
                     StreamReader sr = new StreamReader(ofd.FileName);
@@ -1277,7 +1287,7 @@ namespace Paramecium.Forms
 
                     GC.Collect();
 
-                    EventLog.PushEventLog($"スープファイル「{Path.GetFileName(FilePath)}」を読み込みました");
+                    EventLog.PushEventLog($"Soup file \"{Path.GetFileName(FilePath)}\" has been loaded.");
                 }
                 catch
                 {
@@ -1294,7 +1304,7 @@ namespace Paramecium.Forms
 
                 g_Soup.SetSoupState(SoupState.Pause);
 
-                EventLog.PushEventLog($"スープを保存しています...");
+                EventLog.PushEventLog($"Saving soup...");
                 await Task.Delay(100);
 
                 string jsonString = JsonSerializer.Serialize(g_Soup);
@@ -1309,7 +1319,7 @@ namespace Paramecium.Forms
 
                 GC.Collect();
 
-                EventLog.PushEventLog($"現在のスープを「{Path.GetFileName(FilePath)}」に上書き保存しました");
+                EventLog.PushEventLog($"Soup has been saved.");
 
                 g_Soup.SetSoupState(prevSoupState);
             }
@@ -1321,8 +1331,8 @@ namespace Paramecium.Forms
 
             sfd.FileName = "Untitled.soup";
             sfd.InitialDirectory = Path.GetDirectoryName($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\");
-            sfd.Filter = "Paramecium スープファイル(*.soup)|*.soup|すべてのファイル(*.*)|*.*";
-            sfd.Title = "名前を付けて保存";
+            sfd.Filter = "Paramecium Soup File(*.soup)|*.soup|All Files(*.*)|*.*";
+            sfd.Title = "Save As";
             sfd.RestoreDirectory = true;
 
             if (sfd.ShowDialog() == DialogResult.OK)
@@ -1333,7 +1343,7 @@ namespace Paramecium.Forms
 
                     g_Soup.SetSoupState(SoupState.Pause);
 
-                    EventLog.PushEventLog($"スープを保存しています...");
+                    EventLog.PushEventLog($"Saving soup...");
                     await Task.Delay(100);
 
                     string jsonString = JsonSerializer.Serialize(g_Soup);
@@ -1350,7 +1360,7 @@ namespace Paramecium.Forms
 
                     GC.Collect();
 
-                    EventLog.PushEventLog($"現在のスープが「{Path.GetFileName(FilePath)}」として保存されました");
+                    EventLog.PushEventLog($"Soup has been saved as \"{Path.GetFileName(FilePath)}\"");
 
                     g_Soup.SetSoupState(prevSoupState);
                 }
@@ -1598,12 +1608,12 @@ namespace Paramecium.Forms
                         if (g_Soup.SoupState == SoupState.Pause)
                         {
                             g_Soup.SetSoupState(SoupState.Running);
-                            EventLog.PushEventLog("シミュレーションを再開しました");
+                            EventLog.PushEventLog("Simulation has been resumed");
                         }
                         else
                         {
                             g_Soup.SetSoupState(SoupState.Pause);
-                            EventLog.PushEventLog("シミュレーションを一時停止しました");
+                            EventLog.PushEventLog("Simulation has been paused");
                         }
                     }
                     break;
@@ -1644,7 +1654,7 @@ namespace Paramecium.Forms
                         WindowState = FormWindowState.Normal;
                         FormBorderStyle = FormBorderStyle.None;
                         WindowState = FormWindowState.Maximized;
-                        TopMost = true;
+                        if (!((Control.ModifierKeys) == Keys.Shift)) TopMost = true;
                         TopMenu.Visible = false;
                         BottomStat.Visible = false;
                         SimulationView.Dock = DockStyle.Fill;
@@ -1673,7 +1683,7 @@ namespace Paramecium.Forms
 
                             g_Soup.SetSoupState(SoupState.Pause);
 
-                            EventLog.PushEventLog($"スープを保存しています...");
+                            EventLog.PushEventLog($"Saving soup...");
                             await Task.Delay(100);
 
                             string jsonString = JsonSerializer.Serialize(g_Soup);
@@ -1688,10 +1698,17 @@ namespace Paramecium.Forms
 
                             GC.Collect();
 
-                            EventLog.PushEventLog($"現在のスープを「{Path.GetFileName(FilePath)}」に上書き保存しました");
+                            EventLog.PushEventLog($"Soup has been saved.");
 
                             g_Soup.SetSoupState(prevSoupState);
                         }
+                    }
+                    break;
+                case Keys.A:
+                    if ((Control.ModifierKeys) == Keys.Shift)
+                    {
+                        if (!g_Soup.AutoSave) g_Soup.AutoSave = true;
+                        else g_Soup.AutoSave = false;
                     }
                     break;
                 case Keys.F1:

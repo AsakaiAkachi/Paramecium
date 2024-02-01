@@ -21,6 +21,7 @@ namespace Paramecium.Forms
 
             int i = 0;
 
+            SoupParameterView.Rows.Add("Seed", new Random().Next(-2147483648, 2147483647)); SoupParameterViewRows.Add("Seed", i); i++;
             SoupParameterView.Rows.Add("Size X", 256); SoupParameterViewRows.Add("SizeX", i); i++;
             SoupParameterView.Rows.Add("Size Y", 160); SoupParameterViewRows.Add("SizeY", i); i++;
             SoupParameterView.Rows.Add("Wall Perlin Noise X", new Random().NextDouble() * 256d); SoupParameterViewRows.Add("WallPerlinNoiseX", i); i++;
@@ -37,8 +38,9 @@ namespace Paramecium.Forms
             SoupParameterView.Rows.Add("Initial Animal Count", 1024); SoupParameterViewRows.Add("InitialAnimalCount", i); i++;
             SoupParameterView.Rows.Add("Hatching Time", 300); SoupParameterViewRows.Add("HatchingTime", i); i++;
             SoupParameterView.Rows.Add("Mutation Rate", 0.015625); SoupParameterViewRows.Add("MutationRate", i); i++;
-            SoupParameterView.Rows.Add("Animal Element Lose Per Step (In Passive)", 0.025); SoupParameterViewRows.Add("AnimalElementLosePerStepInPassive", i); i++;
-            SoupParameterView.Rows.Add("Animal Element Lose Per Step (In Accelerating)", 0.075); SoupParameterViewRows.Add("AnimalElementLosePerStepInAccelerating", i); i++;
+            SoupParameterView.Rows.Add("Animal Survival Cost", 0.025); SoupParameterViewRows.Add("AnimalElementLosePerStepInPassive", i); i++;
+            SoupParameterView.Rows.Add("Animal Acc./Dec. cost", 0.075); SoupParameterViewRows.Add("AnimalElementLosePerStepInAccelerating", i); i++;
+            SoupParameterView.Rows.Add("Animal Life Span", 30000); SoupParameterViewRows.Add("AnimalLifeSpan", i); i++;
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
@@ -49,6 +51,7 @@ namespace Paramecium.Forms
                 if (g_Soup is not null) g_Soup.SetSoupState(SoupState.Stop);
 
                 Soup newSoup = new Soup(
+                    int.Parse(SoupParameterView[1, SoupParameterViewRows["Seed"]].Value.ToString()),
                     int.Parse(SoupParameterView[1, SoupParameterViewRows["SizeX"]].Value.ToString()), int.Parse(SoupParameterView[1, SoupParameterViewRows["SizeY"]].Value.ToString()),
                     double.Parse(SoupParameterView[1, SoupParameterViewRows["WallPerlinNoiseX"]].Value.ToString()), double.Parse(SoupParameterView[1, SoupParameterViewRows["WallPerlinNoiseY"]].Value.ToString()), double.Parse(SoupParameterView[1, SoupParameterViewRows["WallPerlinNoiseZ"]].Value.ToString()),
                     double.Parse(SoupParameterView[1, SoupParameterViewRows["WallPerlinNoiseScale"]].Value.ToString()), int.Parse(SoupParameterView[1, SoupParameterViewRows["WallPerlinNoiseOctave"]].Value.ToString()), double.Parse(SoupParameterView[1, SoupParameterViewRows["WallPerlinNoiseThickness"]].Value.ToString()),
@@ -56,7 +59,7 @@ namespace Paramecium.Forms
                     double.Parse(SoupParameterView[1, SoupParameterViewRows["CellSizeMultiplier"]].Value.ToString()), double.Parse(SoupParameterView[1, SoupParameterViewRows["PlantForkBiomass"]].Value.ToString()), double.Parse(SoupParameterView[1, SoupParameterViewRows["AnimalForkBiomass"]].Value.ToString()), int.Parse(SoupParameterView[1, SoupParameterViewRows["PlantBiomassCollectionRange"]].Value.ToString()),
                     int.Parse(SoupParameterView[1, SoupParameterViewRows["InitialAnimalCount"]].Value.ToString()), int.Parse(SoupParameterView[1, SoupParameterViewRows["HatchingTime"]].Value.ToString()),
                     double.Parse(SoupParameterView[1, SoupParameterViewRows["MutationRate"]].Value.ToString()),
-                    double.Parse(SoupParameterView[1, SoupParameterViewRows["AnimalElementLosePerStepInPassive"]].Value.ToString()), double.Parse(SoupParameterView[1, SoupParameterViewRows["AnimalElementLosePerStepInAccelerating"]].Value.ToString())
+                    double.Parse(SoupParameterView[1, SoupParameterViewRows["AnimalElementLosePerStepInPassive"]].Value.ToString()), double.Parse(SoupParameterView[1, SoupParameterViewRows["AnimalElementLosePerStepInAccelerating"]].Value.ToString()), int.Parse(SoupParameterView[1, SoupParameterViewRows["AnimalLifeSpan"]].Value.ToString())
                 );
 
                 g_Soup = newSoup;
@@ -92,7 +95,7 @@ namespace Paramecium.Forms
 
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            this.Hide();
         }
     }
 }

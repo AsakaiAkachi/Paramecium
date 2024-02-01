@@ -21,7 +21,7 @@ namespace Paramecium.Simulation
         public int Age { get; set; }
 
         public bool CollisionIsDisabled { get; set; }
-        public int ElementCollectionIsDisabled { get; set; }
+        public int ElementCollectionIsDisabled { get; set; } = -20;
 
         private int l_SoupSizeX;
         private int l_SoupSizeY;
@@ -83,7 +83,7 @@ namespace Paramecium.Simulation
 
             if (ElementCollectionIsDisabled < 0)
             {
-                Random rnd = new Random();
+                Random rnd = new Random((int)((Id + Age) % 2147483647));
                 int xOffset = 0;
                 int yOffset = 0;
 
@@ -141,7 +141,7 @@ namespace Paramecium.Simulation
                         if (g_Soup.GridMap[x + y * l_SoupSizeX].Fertility > 0)
                         {
                             reactivation = true;
-                            ElementCollectionIsDisabled = -100;
+                            ElementCollectionIsDisabled = -20;
                             break;
                         }
                     }
@@ -244,7 +244,7 @@ namespace Paramecium.Simulation
 
             if (Element >= g_Soup.PlantForkBiomass)
             {
-                Random rnd = new Random();
+                Random rnd = new Random((int)((Id + Age) % 2147483647));
 
                 while (Element > 0)
                 {

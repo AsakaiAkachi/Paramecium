@@ -29,15 +29,6 @@ namespace Paramecium
                 Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves");
             }
 
-            Console.WriteLine(Vector2D.ToAngle(new Vector2D(1, 0)));
-            Console.WriteLine(Vector2D.ToAngle(new Vector2D(1, 1)));
-            Console.WriteLine(Vector2D.ToAngle(new Vector2D(0, 1)));
-            Console.WriteLine(Vector2D.ToAngle(new Vector2D(-1, 1)));
-            Console.WriteLine(Vector2D.ToAngle(new Vector2D(-1, 0)));
-            Console.WriteLine(Vector2D.ToAngle(new Vector2D(-1, -1)));
-            Console.WriteLine(Vector2D.ToAngle(new Vector2D(0, -1)));
-            Console.WriteLine(Vector2D.ToAngle(new Vector2D(1, -1)));
-
             ApplicationConfiguration.Initialize();
             try
             {

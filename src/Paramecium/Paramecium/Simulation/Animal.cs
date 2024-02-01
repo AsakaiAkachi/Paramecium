@@ -587,6 +587,9 @@ namespace Paramecium.Simulation
                                         {
                                             Element += Math.Min(1d, target.Element) * g_Soup.BiomassAmountMultiplier;
                                             target.Element -= Math.Min(1d, target.Element);
+                                            target.ElementCollectionIsDisabled = -20;
+                                            target.Radius = 0.5d * Math.Max(Math.Sqrt(target.Element) / g_Soup.PlantSizeMultiplier * g_Soup.CellSizeMultiplier, 0.01d);
+                                            target.Mass = Math.Pow(Radius, 2);
                                         }
                                     }
                                 }
@@ -644,7 +647,7 @@ namespace Paramecium.Simulation
 
             if (Element >= g_Soup.AnimalForkBiomass * 2d)
             {
-                g_Soup.AnimalBuffer[threadId].Add(new Animal(new Random(), this));
+                g_Soup.AnimalBuffer[threadId].Add(new Animal(new Random((int)((Id + OffspringCount) % 2147483647)), this));
                 Element -= g_Soup.AnimalForkBiomass;
                 OffspringCount++;
             }

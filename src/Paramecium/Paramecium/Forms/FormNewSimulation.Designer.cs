@@ -45,7 +45,7 @@
             ButtonOK.Name = "ButtonOK";
             ButtonOK.Size = new Size(90, 30);
             ButtonOK.TabIndex = 32;
-            ButtonOK.Text = "スープを作成";
+            ButtonOK.Text = "Create Soup";
             ButtonOK.UseVisualStyleBackColor = true;
             ButtonOK.Click += ButtonOK_Click;
             // 
@@ -56,7 +56,7 @@
             ButtonCancel.Name = "ButtonCancel";
             ButtonCancel.Size = new Size(90, 30);
             ButtonCancel.TabIndex = 33;
-            ButtonCancel.Text = "キャンセル";
+            ButtonCancel.Text = "Cancel";
             ButtonCancel.UseVisualStyleBackColor = true;
             ButtonCancel.Click += ButtonCancel_Click;
             // 
@@ -94,18 +94,18 @@
             label1.AutoSize = true;
             label1.Location = new Point(8, 9);
             label1.Name = "label1";
-            label1.Size = new Size(94, 15);
+            label1.Size = new Size(95, 15);
             label1.TabIndex = 35;
-            label1.Text = "スープのパラメーター";
+            label1.Text = "Soup Parameters";
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Location = new Point(8, 420);
             label2.Name = "label2";
-            label2.Size = new Size(342, 15);
+            label2.Size = new Size(426, 15);
             label2.TabIndex = 36;
-            label2.Text = "上の表にパラメーターを入力した後、「スープを作成」ボタンを押してください";
+            label2.Text = "After entering the parameters in the table above, press the \"Create Soup\" button";
             // 
             // FormNewSimulation
             // 
@@ -123,7 +123,7 @@
             Name = "FormNewSimulation";
             ShowIcon = false;
             ShowInTaskbar = false;
-            Text = "スープを新規作成";
+            Text = "Create a New Soup";
             ((System.ComponentModel.ISupportInitialize)SoupParameterView).EndInit();
             ResumeLayout(false);
             PerformLayout();
