@@ -1,16 +1,4 @@
-﻿using Paramecium.Libraries;
-using System.Drawing;
-using System.IO.Pipes;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting;
-using System.Security.Cryptography.Xml;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using System.Text.Json;
 
 namespace Paramecium.Simulation
 {
@@ -563,8 +551,8 @@ namespace Paramecium.Simulation
                                 break;
                             case 4:
                                 BiomassAmountArray[thread] += Target.Element;
-                                PopulationTotalArray[thread]++;
-                                PopulationPlantArray[thread]++;
+                                //PopulationTotalArray[thread]++;
+                                //PopulationPlantArray[thread]++;
                                 break;
                         }
                     }
@@ -572,6 +560,9 @@ namespace Paramecium.Simulation
                     if (phase == 4)
                     {
                         GridMapBgParticle[x + y * SizeX] = 0x02;
+
+                        PopulationTotalArray[thread] += GridMap[x + y * SizeX].LocalPlantCount;
+                        PopulationPlantArray[thread] += GridMap[x + y * SizeX].LocalPlantCount;
                     }
                 }
 
@@ -597,8 +588,6 @@ namespace Paramecium.Simulation
                                 break;
                             case 4:
                                 BiomassAmountArray[thread] += Target.Element;
-                                PopulationTotalArray[thread]++;
-                                PopulationAnimalArray[thread]++;
                                 break;
                         }
                     }
@@ -606,6 +595,9 @@ namespace Paramecium.Simulation
                     if (phase == 4)
                     {
                         GridMapBgParticle[x + y * SizeX] = 0x03;
+
+                        PopulationTotalArray[thread] += GridMap[x + y * SizeX].LocalAnimalCount;
+                        PopulationAnimalArray[thread] += GridMap[x + y * SizeX].LocalAnimalCount;
                     }
                 }
             }

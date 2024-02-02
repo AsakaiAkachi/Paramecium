@@ -46,8 +46,6 @@
             TopMenu_File_Separator1 = new ToolStripSeparator();
             TopMenu_File_Exit = new ToolStripMenuItem();
             TopMenu_Window = new ToolStripMenuItem();
-            TopMenu_Window_EventViewer = new ToolStripMenuItem();
-            TopMenu_Window_DebugConsole = new ToolStripMenuItem();
             TopMenu_Simulation = new ToolStripMenuItem();
             TopMenu_Simulation_NewSimulation = new ToolStripMenuItem();
             SimulationView = new PictureBox();
@@ -172,24 +170,9 @@
             // 
             // TopMenu_Window
             // 
-            TopMenu_Window.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Window_EventViewer, TopMenu_Window_DebugConsole });
             TopMenu_Window.Name = "TopMenu_Window";
             TopMenu_Window.Size = new Size(63, 20);
             TopMenu_Window.Text = "Window";
-            // 
-            // TopMenu_Window_EventViewer
-            // 
-            TopMenu_Window_EventViewer.Name = "TopMenu_Window_EventViewer";
-            TopMenu_Window_EventViewer.Size = new Size(178, 22);
-            TopMenu_Window_EventViewer.Text = "Event Viewer";
-            TopMenu_Window_EventViewer.Click += TopMenu_Window_EventViewer_Click;
-            // 
-            // TopMenu_Window_DebugConsole
-            // 
-            TopMenu_Window_DebugConsole.Name = "TopMenu_Window_DebugConsole";
-            TopMenu_Window_DebugConsole.Size = new Size(178, 22);
-            TopMenu_Window_DebugConsole.Text = "Debugging Console";
-            TopMenu_Window_DebugConsole.Click += TopMenu_Window_DebugConsole_Click;
             // 
             // TopMenu_Simulation
             // 
@@ -246,8 +229,6 @@
         private StatusStrip BottomStat;
         private MenuStrip TopMenu;
         private ToolStripMenuItem TopMenu_Window;
-        private ToolStripMenuItem TopMenu_Window_EventViewer;
-        private ToolStripMenuItem TopMenu_Window_DebugConsole;
         private PictureBox SimulationView;
         private ToolStripStatusLabel StatTps;
         private ToolStripStatusLabel StatFps;

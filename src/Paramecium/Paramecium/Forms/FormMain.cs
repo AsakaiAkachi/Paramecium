@@ -1,8 +1,8 @@
-﻿using System.Drawing.Imaging;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text.Json;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace Paramecium.Forms
 {
@@ -296,7 +296,7 @@ namespace Paramecium.Forms
                                                 }
                                             }
                                         }
-                                        catch(Exception ex) { ConsoleLog(LogLevel.Warning, ex.ToString()); }
+                                        catch (Exception ex) { ConsoleLog(LogLevel.Warning, ex.ToString()); }
                                     }
                                     if (g_Soup.GridMap[x + y * g_Soup.SizeX].LocalAnimalCount > 0)
                                     {
@@ -331,23 +331,33 @@ namespace Paramecium.Forms
 
                                                             if (SecondTarget is not null)
                                                             {
-                                                                double GeneDifferences = 0;
-
+                                                                int DifferentGeneCount = 0;
                                                                 for (int j = 0; j < Target.Brain.Length; j++)
                                                                 {
-                                                                    if (Target.Brain[j] != SecondTarget.Brain[j])
-                                                                    {
-                                                                        GeneDifferences += 1.0d / Target.Brain.Length;
-                                                                    }
+                                                                    if (Target.Brain[j] != SecondTarget.Brain[j]) DifferentGeneCount++;
                                                                 }
 
-                                                                if (GeneDifferences < 0.5)
+                                                                double GeneIdentity = (Target.Brain.Length - DifferentGeneCount) / (double)Target.Brain.Length;
+
+                                                                if (GeneIdentity > 0.75)
                                                                 {
-                                                                    TargetColor = new SolidBrush(Color.FromArgb(0, (int)(255 * (1d - (GeneDifferences * 2d))), (int)(255 * (GeneDifferences * 2d))));
+                                                                    double color = (GeneIdentity - 0.75d) * 4d;
+                                                                    TargetColor = new SolidBrush(Color.FromArgb(0, (int)((255 * color) + (192 * (1d - color)) / 2d), (int)((0 * color) + (64 * (1d - color)) / 2d)));
+                                                                }
+                                                                else if (GeneIdentity > 0.5)
+                                                                {
+                                                                    double color = (GeneIdentity - 0.5d) * 4d;
+                                                                    TargetColor = new SolidBrush(Color.FromArgb(0, (int)((192 * color) + (0 * (1d - color)) / 2d), (int)((64 * color) + (255 * (1d - color)) / 2d)));
+                                                                }
+                                                                else if (GeneIdentity > 0.25)
+                                                                {
+                                                                    double color = (GeneIdentity - 0.25d) * 4d;
+                                                                    TargetColor = new SolidBrush(Color.FromArgb(0, 0, (int)((255 * color) + (64 * (1d - color)) / 2d)));
                                                                 }
                                                                 else
                                                                 {
-                                                                    TargetColor = new SolidBrush(Color.FromArgb(0, 0, (int)(255 * (1d - (GeneDifferences * 2d - 1d)))));
+                                                                    double color = GeneIdentity * 4d;
+                                                                    TargetColor = new SolidBrush(Color.FromArgb(0, 0, (int)((64 * color) + (0 * (1d - color)) / 2d)));
                                                                 }
                                                             }
                                                         }
@@ -553,15 +563,18 @@ namespace Paramecium.Forms
                                                                     Target.Radius + 0.5d
                                                                 );
                                                             }
-                                                            else if (Target.RaceId == g_Soup.Animals[SelectedCellIndex].RaceId)
+                                                            else if (g_Soup.Animals[SelectedCellIndex] is not null)
                                                             {
-                                                                DrawCircle(
-                                                                    canvas_g,
-                                                                    Pens.LightYellow,
-                                                                    TargetPosX,
-                                                                    TargetPosY,
-                                                                    Target.Radius + 0.5d
-                                                                );
+                                                                if (Target.RaceId == g_Soup.Animals[SelectedCellIndex].RaceId)
+                                                                {
+                                                                    DrawCircle(
+                                                                        canvas_g,
+                                                                        Pens.LightYellow,
+                                                                        TargetPosX,
+                                                                        TargetPosY,
+                                                                        Target.Radius + 0.5d
+                                                                    );
+                                                                }
                                                             }
 
                                                             if (zoomFactor >= 6)
@@ -1125,6 +1138,8 @@ namespace Paramecium.Forms
                         StatPopulation.Text = $"Population (P/A/T) : {g_Soup.PopulationPlant}/{g_Soup.PopulationAnimal}/{g_Soup.PopulationTotal}";
                         StatLatestGeneration.Text = $"Latest Generation : {g_Soup.LatestGeneration}";
                         StatTotalBornDie.Text = $"Total Born/Die : {g_Soup.TotalBornCount}/{g_Soup.TotalDieCount}";
+
+                        ParameciumNotifyIcon.Text = $"{Path.GetFileName(FilePath)} - {g_Soup.ElapsedTimeStep} Step / Gen {g_Soup.LatestGeneration}";
                     }
                     else
                     {
@@ -1148,8 +1163,8 @@ namespace Paramecium.Forms
                     BottomStat.Refresh();
                 }
 
-                if (g_Soup is not null) this.Text = $"{Path.GetFileName(FilePath)} - Paramecium 0.4.5";
-                else this.Text = $"Paramecium 0.4.5";
+                if (g_Soup is not null) this.Text = $"{Path.GetFileName(FilePath)} - Paramecium {version}";
+                else this.Text = $"Paramecium {version}";
 
                 await Task.Delay(1);
             }
@@ -1370,47 +1385,6 @@ namespace Paramecium.Forms
         private void TopMenu_File_Exit_Click(object sender, EventArgs e)
         {
             Close();
-        }
-
-        bool EventViewer = false;
-        FormEventViewer? FormEventViewer;
-        private void TopMenu_Window_EventViewer_Click(object sender, EventArgs e)
-        {
-            if (!EventViewer)
-            {
-                FormEventViewer = new FormEventViewer(this);
-                FormEventViewer.Show();
-                EventViewer = true;
-                TopMenu_Window_EventViewer.Checked = true;
-            }
-            else
-            {
-                if (FormEventViewer is not null) FormEventViewer.Close();
-                EventViewer = false;
-                TopMenu_Window_EventViewer.Checked = false;
-            }
-        }
-        public void FormEventViewer_Closed()
-        {
-            EventViewer = false;
-            TopMenu_Window_EventViewer.Checked = false;
-        }
-
-        bool DebugConsole = false;
-        private void TopMenu_Window_DebugConsole_Click(object sender, EventArgs e)
-        {
-            if (!DebugConsole)
-            {
-                AllocConsole();
-                DebugConsole = true;
-                TopMenu_Window_DebugConsole.Checked = true;
-            }
-            else
-            {
-                FreeConsole();
-                DebugConsole = false;
-                TopMenu_Window_DebugConsole.Checked = false;
-            }
         }
 
         private void TopMenu_Simulation_NewSimulation_Click(object sender, EventArgs e)
@@ -1750,6 +1724,11 @@ namespace Paramecium.Forms
                     DisplayMode = 9;
                     break;
             }
+        }
+
+        private void ParameciumNotifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            Activate();
         }
     }
 

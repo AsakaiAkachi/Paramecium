@@ -1,8 +1,4 @@
-﻿using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-using System.Drawing;
-using System.Threading;
-
-namespace Paramecium.Simulation
+﻿namespace Paramecium.Simulation
 {
     public class Plant
     {

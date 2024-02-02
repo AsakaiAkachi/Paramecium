@@ -1,10 +1,4 @@
-﻿using System.Globalization;
-using System.Text.Json.Serialization;
-using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-
-namespace Paramecium.Simulation
+﻿namespace Paramecium.Simulation
 {
     public class Animal
     {
@@ -701,19 +695,28 @@ namespace Paramecium.Simulation
 
                     if (IntegerizedPosition != NextIntegerizedPosition)
                     {
-                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimals.Remove(Index);
-                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimalCount--;
+                        Grid prevGrid = g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX];
+                        prevGrid.LocalAnimals.Remove(Index);
+                        //prevGrid.LocalAnimalCount--;
+                        prevGrid.LocalAnimalCount = prevGrid.LocalAnimals.Count;
+
                         IntegerizedPosition = NextIntegerizedPosition;
-                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimals.Add(Index);
-                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimalCount++;
+
+                        Grid nextGrid = g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX];
+                        nextGrid.LocalAnimals.Add(Index);
+                        //nextGrid.LocalAnimalCount++;
+                        nextGrid.LocalAnimalCount = nextGrid.LocalAnimals.Count;
                     }
                 }
             }
             else
             {
-                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Element * g_Soup.BiomassAmountMultiplier;
-                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimals.Remove(Index);
-                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalAnimalCount--;
+                Grid currentGrid = g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX];
+
+                currentGrid.Fertility += Element * g_Soup.BiomassAmountMultiplier;
+                currentGrid.LocalAnimals.Remove(Index);
+                //currentGrid.LocalAnimalCount--;
+                currentGrid.LocalAnimalCount = currentGrid.LocalAnimals.Count;
                 lock (g_Soup.AnimalUnassignedIndexesLockObject) g_Soup.AnimalUnassignedIndexes.Add(Index);
                 lock (g_Soup.TotalDieCountLockObject) g_Soup.TotalDieCount++;
                 g_Soup.Animals[Index] = null;
