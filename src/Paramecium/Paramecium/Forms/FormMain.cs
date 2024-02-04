@@ -3,6 +3,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text.Json;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Paramecium.Forms
 {
@@ -565,11 +566,13 @@ namespace Paramecium.Forms
                                                             }
                                                             else if (g_Soup.Animals[SelectedCellIndex] is not null)
                                                             {
-                                                                if (Target.RaceId == g_Soup.Animals[SelectedCellIndex].RaceId)
-                                                                {
+                                                                Animal SecondTarget = g_Soup.Animals[SelectedCellIndex];
+
+                                                                //if (Target.RaceId == SecondTarget.RaceId)
+                                                                if (Math.Sqrt(Math.Pow(Target.GeneColorRed - SecondTarget.GeneColorRed, 2) + Math.Pow(Target.GeneColorGreen - SecondTarget.GeneColorGreen, 2) + Math.Pow(Target.GeneColorBlue - SecondTarget.GeneColorBlue, 2)) < g_Soup.AnimalColorCognateRange)                                                                {
                                                                     DrawCircle(
-                                                                        canvas_g,
-                                                                        Pens.LightYellow,
+                                                                    canvas_g,
+                                                                    Pens.LightYellow,
                                                                         TargetPosX,
                                                                         TargetPosY,
                                                                         Target.Radius + 0.5d
@@ -708,6 +711,22 @@ namespace Paramecium.Forms
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
                                         OffsetY += TextSize.Height;
                                     }
+                                    /*
+                                    {
+                                        string Text = $"Total Biomass Amount : {g_Soup.TotalBiomassAmount:0.000}";
+                                        Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                        canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                        TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                        OffsetY += TextSize.Height;
+                                    }
+                                    {
+                                        string Text = $"Biomass Amount Multiplier : x{g_Soup.BiomassAmountMultiplier:0.000}";
+                                        Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                        canvas_g.FillRectangle(BrushOverlayBackground, 0, canvas.Height - TextSize.Height - OffsetY, TextSize.Width, TextSize.Height);
+                                        TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, canvas.Height - TextSize.Height - OffsetY), Color.White);
+                                        OffsetY += TextSize.Height;
+                                    }
+                                    */
                                     {
                                         string Text = $"Status : {g_Soup.SoupState}";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
@@ -856,6 +875,20 @@ namespace Paramecium.Forms
                                     TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                     OffsetY += TextSize.Height;
                                 }
+                                {
+                                    string Text = $"LocalPlantCount : ({Target.LocalPlants.Count} / {Target.LocalPlantCount})";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
+                                {
+                                    string Text = $"LocalAnimalCount : ({Target.LocalAnimals.Count} / {Target.LocalAnimalCount})";
+                                    Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                    canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                    TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                    OffsetY += TextSize.Height;
+                                }
                             }
                             else if (SelectedCellType == SelectedCellType.Plant)
                             {
@@ -876,6 +909,21 @@ namespace Paramecium.Forms
                                         string Text = $"Type : Plant";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                        TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                        OffsetY += TextSize.Height;
+                                    }
+                                    {
+                                        string Text = $"Position : ({target.Position.X:0.000}, {target.Position.Y:0.000})";
+                                        Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                        canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                        TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
+                                        OffsetY += TextSize.Height;
+                                    }
+                                    {
+                                        string Text = $"Velocity : ({target.Velocity.X:0.000}, {target.Velocity.Y:0.000}) / {Vector2D.Size(target.Velocity):0.000}u/t";
+                                        Size TextSize = TextRenderer.MeasureText(Text, fnt);
+                                        canvas_g.FillRectangle(BrushOverlayBackground, 0, OffsetY, 256, TextSize.Height);
+                                        canvas_g.FillRectangle(BrushOverlayGauge, 0, OffsetY, (int)(256 * (Vector2D.Size(target.Velocity) / 0.1d)), TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                         OffsetY += TextSize.Height;
                                     }
@@ -1275,6 +1323,11 @@ namespace Paramecium.Forms
                     string jsonString;
 
                     EventLog.PushEventLog($"Loading soup...");
+
+                    SelectedCellType = SelectedCellType.None;
+                    SelectedCellIndex = -1;
+                    SelectedCellId = -1;
+
                     await Task.Delay(100);
 
                     StreamReader sr = new StreamReader(ofd.FileName);
@@ -1297,6 +1350,8 @@ namespace Paramecium.Forms
                         g_FormMain.cameraX = g_Soup.SizeX / 2d;
                         g_FormMain.cameraY = g_Soup.SizeY / 2d;
                     }
+
+                    g_FormAutosaveSetting.UpdateCurrentAutoSaveIntervalText();
 
                     GC.Collect();
 
@@ -1389,7 +1444,12 @@ namespace Paramecium.Forms
         {
             //if (g_Soup is not null) g_Soup.SetSoupState(SoupState.Pause);
 
-            g_FormNewSimulation.ShowDialog();
+            g_FormCreateNewSoup.ShowDialog();
+        }
+
+        private void TopMenu_Simulation_AutoSaveSettings_Click(object sender, EventArgs e)
+        {
+            g_FormAutosaveSetting.ShowDialog();
         }
 
         bool drag = false;
@@ -1611,11 +1671,52 @@ namespace Paramecium.Forms
                 case Keys.C:
                     if (g_Soup is not null)
                     {
-                        g_FormMain.zoomFactor = 0;
-                        g_FormMain.zoomFactorActual = 1;
-                        g_FormMain.cameraX = g_Soup.SizeX / 2d;
-                        g_FormMain.cameraY = g_Soup.SizeY / 2d;
-                        Tracking = false;
+                        if ((Control.ModifierKeys) == Keys.Control)
+                        {
+                            if (SelectedCellType == SelectedCellType.Animal)
+                            {
+                                Animal Target = g_Soup.Animals[SelectedCellIndex];
+
+                                if (Target is not null)
+                                {
+                                    Clipboard.SetText(JsonSerializer.Serialize(Target));
+                                    EventLog.PushEventLog($"Copied the selected animal to the clipboard.");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            g_FormMain.zoomFactor = 0;
+                            g_FormMain.zoomFactorActual = 1;
+                            g_FormMain.cameraX = g_Soup.SizeX / 2d;
+                            g_FormMain.cameraY = g_Soup.SizeY / 2d;
+                            Tracking = false;
+                        }
+                    }
+                    break;
+                case Keys.V:
+                    if (g_Soup is not null)
+                    {
+                        if ((Control.ModifierKeys) == Keys.Control)
+                        {
+                            string ClipboardText = Clipboard.GetText();
+
+                            SoupState prevSoupState = g_Soup.SoupState;
+                            g_Soup.SetSoupState(SoupState.Pause);
+                            try
+                            {
+                                Animal PastedAnimal = JsonSerializer.Deserialize<Animal>(ClipboardText);
+
+                                g_Soup.AnimalBuffer[0].Add(new Animal(PastedAnimal, new Vector2D(MousePosX, MousePosY)));
+
+                                EventLog.PushEventLog($"Pasted the animal from the clipboard.");
+                            }
+                            catch
+                            {
+                                EventLog.PushEventLog($"Animal paste failed. The clipboard is empty or contains incorrect content.");
+                            }
+                            g_Soup.SetSoupState(prevSoupState);
+                        }
                     }
                     break;
                 case Keys.F:
@@ -1672,13 +1773,6 @@ namespace Paramecium.Forms
 
                             g_Soup.SetSoupState(prevSoupState);
                         }
-                    }
-                    break;
-                case Keys.A:
-                    if ((Control.ModifierKeys) == Keys.Shift)
-                    {
-                        if (!g_Soup.AutoSave) g_Soup.AutoSave = true;
-                        else g_Soup.AutoSave = false;
                     }
                     break;
                 case Keys.K:
@@ -1752,11 +1846,6 @@ namespace Paramecium.Forms
                     DisplayMode = 9;
                     break;
             }
-        }
-
-        private void ParameciumNotifyIcon_DoubleClick(object sender, EventArgs e)
-        {
-            Activate();
         }
     }
 

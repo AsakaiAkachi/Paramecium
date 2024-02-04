@@ -1,4 +1,7 @@
-﻿namespace Paramecium.Simulation
+﻿using System;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+
+namespace Paramecium.Simulation
 {
     public class Animal
     {
@@ -36,8 +39,10 @@
         public double BrainOutputRotation { get; set; }
         public double BrainOutputAttack { get; set; }
 
+        private int l_Seed;
         private int l_SoupSizeX;
         private int l_SoupSizeY;
+        private double l_AnimalColorCognateRange;
 
         public Animal() { }
         public Animal(Random random, Vector2D position, Vector2D velocity, double angle, double element)
@@ -110,7 +115,7 @@
             BrainInput = new int[(29 * 10) + (9 * 4)];
 
             //if (CumulativeMutationRate >= g_Soup.MutationRate * 10d)
-            if (random.NextDouble() < g_Soup.MutationRate)
+            if (false && random.NextDouble() < g_Soup.MutationRate)
             {
                 RaceId = random.NextInt64(0, 2176782336);
 
@@ -126,9 +131,12 @@
             {
                 RaceId = parent.RaceId;
 
-                GeneColorRed = parent.GeneColorRed;
-                GeneColorGreen = parent.GeneColorGreen;
-                GeneColorBlue = parent.GeneColorBlue;
+                //GeneColorRed = parent.GeneColorRed;
+                //GeneColorGreen = parent.GeneColorGreen;
+                //GeneColorBlue = parent.GeneColorBlue;
+                GeneColorRed = Math.Min(Math.Max(parent.GeneColorRed + random.Next(g_Soup.AnimalColorMutationRange * -1, g_Soup.AnimalColorMutationRange + 1), 0), 255);
+                GeneColorGreen = Math.Min(Math.Max(parent.GeneColorGreen + random.Next(g_Soup.AnimalColorMutationRange * -1, g_Soup.AnimalColorMutationRange + 1), 0), 255);
+                GeneColorBlue = Math.Min(Math.Max(parent.GeneColorBlue + random.Next(g_Soup.AnimalColorMutationRange * -1, g_Soup.AnimalColorMutationRange + 1), 0), 255);
 
                 //int ColorMutation = random.Next(0, 2 + 1);
 
@@ -137,11 +145,40 @@
                 //else if (ColorMutation == 2) GeneColorBlue = Math.Min(Math.Max(parent.GeneColorBlue + random.Next(-4, 4 + 1), 0), 255);
             }
         }
+        public Animal(Animal original, Vector2D position)
+        {
+            Index = -1;
+            Id = new Random(g_Soup.Seed).NextInt64(0, 4738381338321616896);
+            IsValid = original.IsValid;
+
+            Position = position;
+            IntegerizedPosition = Vector2D.ToIntegerizedPosition(position);
+            Velocity = new Vector2D();
+            Angle = original.Angle;
+
+            Element = original.Element;
+            Radius = original.Radius;
+            Mass = original.Mass;
+
+            Age = original.Age;
+            Generation = 1;
+            ParentGenealogicalTree = original.ParentGenealogicalTree;
+
+            Brain = original.Brain;
+            BrainInput = original.BrainInput;
+
+            RaceId = original.RaceId;
+            GeneColorRed = original.GeneColorRed;
+            GeneColorGreen = original.GeneColorGreen;
+            GeneColorBlue = original.GeneColorBlue;
+        }
 
         public void OnInitialize()
         {
+            l_Seed = g_Soup.Seed;
             l_SoupSizeX = g_Soup.SizeX;
             l_SoupSizeY = g_Soup.SizeY;
+            l_AnimalColorCognateRange = g_Soup.AnimalColorCognateRange;
 
             if (g_Soup.AnimalUnassignedIndexes.Count == 0)
             {
@@ -166,8 +203,10 @@
 
         public void OnLoaded()
         {
+            l_Seed = g_Soup.Seed;
             l_SoupSizeX = g_Soup.SizeX;
             l_SoupSizeY = g_Soup.SizeY;
+            l_AnimalColorCognateRange = g_Soup.AnimalColorCognateRange;
         }
 
         public void EarlyUpdate()
@@ -237,7 +276,8 @@
                                                 Animal target = g_Soup.Animals[g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimals[l]];
                                                 if (target.Id != Id)
                                                 {
-                                                    if (target.RaceId == RaceId)
+                                                    //if (target.RaceId == RaceId)
+                                                    if (Math.Sqrt(Math.Pow(GeneColorRed - target.GeneColorRed, 2) + Math.Pow(GeneColorGreen - target.GeneColorGreen, 2) + Math.Pow(GeneColorBlue - target.GeneColorBlue, 2)) < l_AnimalColorCognateRange)
                                                     {
                                                         BrainInput[(i + 14) * 10 + j] = 3;
                                                         BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 2 * 3];
@@ -285,7 +325,8 @@
                                                     if (TargetRelativeAngle < 0) TargetRelativeAngle += 360;
                                                     if (TargetRelativeAngle >= 360 - 45 / (j + 1) || TargetRelativeAngle <= 45 / (j + 1))
                                                     {
-                                                        if (target.RaceId == RaceId)
+                                                        //if (target.RaceId == RaceId)
+                                                        if (Math.Sqrt(Math.Pow(GeneColorRed - target.GeneColorRed, 2) + Math.Pow(GeneColorGreen - target.GeneColorGreen, 2) + Math.Pow(GeneColorBlue - target.GeneColorBlue, 2)) < l_AnimalColorCognateRange)
                                                         {
                                                             BrainInput[(i + 14) * 10 + j] = 3;
                                                             BrainOutputAcceleration += Brain[(i + 14) * 120 + j * 12 + 2 * 3];
@@ -402,7 +443,8 @@
                                                 Animal target = g_Soup.Animals[g_Soup.GridMap[TargetGrid.X + TargetGrid.Y * l_SoupSizeX].LocalAnimals[l]];
                                                 if (target.Id != Id)
                                                 {
-                                                    if (target.RaceId == RaceId)
+                                                    //if (target.RaceId == RaceId)
+                                                    if (Math.Sqrt(Math.Pow(GeneColorRed - target.GeneColorRed, 2) + Math.Pow(GeneColorGreen - target.GeneColorGreen, 2) + Math.Pow(GeneColorBlue - target.GeneColorBlue, 2)) < l_AnimalColorCognateRange)
                                                     {
                                                         BrainInput[290 + (i + 4) * 4 + j] = 3;
                                                         BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 2 * 3];
@@ -450,7 +492,8 @@
                                                     if (TargetRelativeAngle < 0) TargetRelativeAngle += 360;
                                                     if (TargetRelativeAngle >= 360 - 45 / (j + 1) || TargetRelativeAngle <= 45 / (j + 1))
                                                     {
-                                                        if (target.RaceId == RaceId)
+                                                        //if (target.RaceId == RaceId)
+                                                        if (Math.Sqrt(Math.Pow(GeneColorRed - target.GeneColorRed, 2) + Math.Pow(GeneColorGreen - target.GeneColorGreen, 2) + Math.Pow(GeneColorBlue - target.GeneColorBlue, 2)) < l_AnimalColorCognateRange)
                                                         {
                                                             BrainInput[290 + (i + 4) * 4 + j] = 3;
                                                             BrainOutputAcceleration += Brain[3480 + (i + 4) * 36 + j * 12 + 2 * 3];
@@ -627,6 +670,24 @@
 
         public void LateUpdate(int threadId)
         {
+            if (double.IsInfinity(Position.X) || double.IsNaN(Position.X))
+            {
+                Position = new Vector2D(0, Position.Y);
+            }
+            if (double.IsInfinity(Position.Y) || double.IsNaN(Position.Y))
+            {
+                Position = new Vector2D(Position.X, 0);
+            }
+
+            if (double.IsInfinity(Velocity.X) || double.IsNaN(Velocity.X))
+            {
+                Velocity = new Vector2D(0, Velocity.Y);
+            }
+            if (double.IsInfinity(Velocity.Y) || double.IsNaN(Velocity.Y))
+            {
+                Velocity = new Vector2D(Velocity.X, 0);
+            }
+
             if (Age >= 0)
             {
                 g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Math.Min(g_Soup.AnimalElementLosePerStepInPassive, Element) * g_Soup.BiomassAmountMultiplier;
@@ -641,7 +702,7 @@
 
             if (Element >= g_Soup.AnimalForkBiomass * 2d)
             {
-                g_Soup.AnimalBuffer[threadId].Add(new Animal(new Random((int)((Id + OffspringCount) % 2147483647)), this));
+                g_Soup.AnimalBuffer[threadId].Add(new Animal(new Random((int)((l_Seed + Id + OffspringCount + Age) % 2147483647)), this));
                 Element -= g_Soup.AnimalForkBiomass;
                 OffspringCount++;
             }
@@ -658,24 +719,24 @@
             }
 
             Position += Velocity;
-            if (Position.X > l_SoupSizeX)
+            if (Position.X > l_SoupSizeX - Radius)
             {
-                Position = new Vector2D(l_SoupSizeX, Position.Y);
+                Position = new Vector2D(l_SoupSizeX - Radius, Position.Y);
                 Velocity = new Vector2D(Velocity.X * -1d, Velocity.Y);
             }
-            if (Position.X < 0)
+            if (Position.X < 0 + Radius)
             {
-                Position = new Vector2D(0, Position.Y);
+                Position = new Vector2D(0 + Radius, Position.Y);
                 Velocity = new Vector2D(Velocity.X * -1d, Velocity.Y);
             }
-            if (Position.Y > l_SoupSizeY)
+            if (Position.Y > l_SoupSizeY - Radius)
             {
-                Position = new Vector2D(Position.X, l_SoupSizeY);
+                Position = new Vector2D(Position.X, l_SoupSizeY - Radius);
                 Velocity = new Vector2D(Velocity.X, Velocity.Y * -1d);
             }
-            if (Position.Y < 0)
+            if (Position.Y < 0 + Radius)
             {
-                Position = new Vector2D(Position.X, 0);
+                Position = new Vector2D(Position.X, 0 + Radius);
                 Velocity = new Vector2D(Velocity.X, Velocity.Y * -1d);
             }
 
@@ -687,22 +748,37 @@
 
         public void OnStepFinalize()
         {
+            Int2D NextIntegerizedPosition = Vector2D.ToIntegerizedPosition(Position);
+            Grid currentGrid = g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX];
+            Grid nextGrid = g_Soup.GridMap[NextIntegerizedPosition.X + NextIntegerizedPosition.Y * l_SoupSizeX];
+
+            if (double.IsInfinity(Velocity.X) || double.IsNaN(Velocity.X) || double.IsInfinity(Velocity.Y) || double.IsNaN(Velocity.Y) ||
+                double.IsInfinity(Position.X) || double.IsNaN(Position.X) || double.IsInfinity(Position.Y) || double.IsNaN(Position.Y))
+            {
+                currentGrid.LocalAnimals.Remove(Index);
+                //currentGrid.LocalAnimalCount--;
+                currentGrid.LocalAnimalCount = currentGrid.LocalAnimals.Count;
+                lock (g_Soup.AnimalUnassignedIndexesLockObject) g_Soup.AnimalUnassignedIndexes.Add(Index);
+                lock (g_Soup.TotalDieCountLockObject) g_Soup.TotalDieCount++;
+                g_Soup.Animals[Index] = null;
+
+                return;
+            }
+
+            if (currentGrid.Type == TileType.Wall || nextGrid.Type == TileType.Wall) IsValid = false;
+
             if (IsValid)
             {
                 if (Velocity != Vector2D.Zero)
                 {
-                    Int2D NextIntegerizedPosition = Vector2D.ToIntegerizedPosition(Position);
-
                     if (IntegerizedPosition != NextIntegerizedPosition)
                     {
-                        Grid prevGrid = g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX];
-                        prevGrid.LocalAnimals.Remove(Index);
+                        currentGrid.LocalAnimals.Remove(Index);
                         //prevGrid.LocalAnimalCount--;
-                        prevGrid.LocalAnimalCount = prevGrid.LocalAnimals.Count;
+                        currentGrid.LocalAnimalCount = currentGrid.LocalAnimals.Count;
 
                         IntegerizedPosition = NextIntegerizedPosition;
 
-                        Grid nextGrid = g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX];
                         nextGrid.LocalAnimals.Add(Index);
                         //nextGrid.LocalAnimalCount++;
                         nextGrid.LocalAnimalCount = nextGrid.LocalAnimals.Count;
@@ -711,8 +787,6 @@
             }
             else
             {
-                Grid currentGrid = g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX];
-
                 currentGrid.Fertility += Element * g_Soup.BiomassAmountMultiplier;
                 currentGrid.LocalAnimals.Remove(Index);
                 //currentGrid.LocalAnimalCount--;

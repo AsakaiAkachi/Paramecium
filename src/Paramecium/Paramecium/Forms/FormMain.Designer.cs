@@ -49,6 +49,7 @@
             TopMenu_Simulation = new ToolStripMenuItem();
             TopMenu_Simulation_NewSimulation = new ToolStripMenuItem();
             SimulationView = new PictureBox();
+            TopMenu_Simulation_AutoSaveSettings = new ToolStripMenuItem();
             BottomStat.SuspendLayout();
             TopMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SimulationView).BeginInit();
@@ -176,7 +177,7 @@
             // 
             // TopMenu_Simulation
             // 
-            TopMenu_Simulation.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Simulation_NewSimulation });
+            TopMenu_Simulation.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Simulation_NewSimulation, TopMenu_Simulation_AutoSaveSettings });
             TopMenu_Simulation.Name = "TopMenu_Simulation";
             TopMenu_Simulation.Size = new Size(46, 20);
             TopMenu_Simulation.Text = "Soup";
@@ -200,6 +201,13 @@
             SimulationView.MouseDown += SimulationView_MouseDown;
             SimulationView.MouseMove += SimulationView_MouseMove;
             SimulationView.MouseUp += SimulationView_MouseUp;
+            // 
+            // TopMenu_Simulation_AutoSaveSettings
+            // 
+            TopMenu_Simulation_AutoSaveSettings.Name = "TopMenu_Simulation_AutoSaveSettings";
+            TopMenu_Simulation_AutoSaveSettings.Size = new Size(182, 22);
+            TopMenu_Simulation_AutoSaveSettings.Text = "Auto Save Settings...";
+            TopMenu_Simulation_AutoSaveSettings.Click += TopMenu_Simulation_AutoSaveSettings_Click;
             // 
             // FormMain
             // 
@@ -246,5 +254,6 @@
         private ToolStripMenuItem TopMenu_Simulation_NewSimulation;
         private ToolStripStatusLabel StatTotalBornDie;
         private ToolStripStatusLabel StatLatestGeneration;
+        private ToolStripMenuItem TopMenu_Simulation_AutoSaveSettings;
     }
 }

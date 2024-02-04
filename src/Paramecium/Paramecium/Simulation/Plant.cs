@@ -19,6 +19,7 @@
         public bool CollisionIsDisabled { get; set; }
         public int ElementCollectionIsDisabled { get; set; } = -20;
 
+        private int l_Seed;
         private int l_SoupSizeX;
         private int l_SoupSizeY;
 
@@ -42,6 +43,7 @@
 
         public void OnInitialize()
         {
+            l_Seed = g_Soup.Seed;
             l_SoupSizeX = g_Soup.SizeX;
             l_SoupSizeY = g_Soup.SizeY;
 
@@ -63,6 +65,7 @@
 
         public void OnLoaded()
         {
+            l_Seed = g_Soup.Seed;
             l_SoupSizeX = g_Soup.SizeX;
             l_SoupSizeY = g_Soup.SizeY;
         }
@@ -79,7 +82,7 @@
 
             if (ElementCollectionIsDisabled < 0)
             {
-                Random rnd = new Random((int)((Id + Age) % 2147483647));
+                Random rnd = new Random((int)((l_Seed + Id + Age) % 2147483647));
                 int xOffset = 0;
                 int yOffset = 0;
 
@@ -240,7 +243,7 @@
 
             if (Element >= g_Soup.PlantForkBiomass)
             {
-                Random rnd = new Random((int)((Id + Age) % 2147483647));
+                Random rnd = new Random((int)((l_Seed + Id + Age) % 2147483647));
 
                 while (Element > 0)
                 {
@@ -253,7 +256,7 @@
 
                 return;
             }
-            else if (Velocity != Vector2D.Zero || g_Soup.ElapsedTimeStep == 0)
+            else if (Velocity != Vector2D.Zero || CollisionIsDisabled == false || g_Soup.ElapsedTimeStep == 0)
             {
                 CollisionIsDisabled = false;
 
@@ -268,24 +271,24 @@
                 }
 
                 Position += Velocity;
-                if (Position.X > l_SoupSizeX)
+                if (Position.X > l_SoupSizeX - Radius)
                 {
-                    Position = new Vector2D(l_SoupSizeX, Position.Y);
+                    Position = new Vector2D(l_SoupSizeX - Radius, Position.Y);
                     Velocity = new Vector2D(Velocity.X * -1d, Velocity.Y);
                 }
-                if (Position.X < 0)
+                if (Position.X < 0 + Radius)
                 {
-                    Position = new Vector2D(0, Position.Y);
+                    Position = new Vector2D(0 + Radius, Position.Y);
                     Velocity = new Vector2D(Velocity.X * -1d, Velocity.Y);
                 }
-                if (Position.Y > l_SoupSizeY)
+                if (Position.Y > l_SoupSizeY - Radius)
                 {
-                    Position = new Vector2D(Position.X, l_SoupSizeY);
+                    Position = new Vector2D(Position.X, l_SoupSizeY - Radius);
                     Velocity = new Vector2D(Velocity.X, Velocity.Y * -1d);
                 }
-                if (Position.Y < 0)
+                if (Position.Y < 0 + Radius)
                 {
-                    Position = new Vector2D(Position.X, 0);
+                    Position = new Vector2D(Position.X, 0 + Radius);
                     Velocity = new Vector2D(Velocity.X, Velocity.Y * -1d);
                 }
 
@@ -298,27 +301,42 @@
 
         public void OnStepFinalize()
         {
+            Int2D NextIntegerizedPosition = Vector2D.ToIntegerizedPosition(Position);
+            Grid currentGrid = g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX];
+            Grid nextGrid = g_Soup.GridMap[NextIntegerizedPosition.X + NextIntegerizedPosition.Y * l_SoupSizeX];
+
+            if (double.IsInfinity(Velocity.X) || double.IsNaN(Velocity.X) || double.IsInfinity(Velocity.Y) || double.IsNaN(Velocity.Y) ||
+                double.IsInfinity(Position.X) || double.IsNaN(Position.X) || double.IsInfinity(Position.Y) || double.IsNaN(Position.Y))
+            {
+                currentGrid.LocalPlants.Remove(Index);
+                currentGrid.LocalPlantCount--;
+                lock (g_Soup.PlantUnassignedIndexesLockObject) g_Soup.PlantUnassignedIndexes.Add(Index);
+                g_Soup.Plants[Index] = null;
+
+                return;
+            }
+
+            if (currentGrid.Type == TileType.Wall || nextGrid.Type == TileType.Wall) IsValid = false;
+
             if (IsValid)
             {
                 if (Velocity != Vector2D.Zero)
                 {
-                    Int2D NextIntegerizedPosition = Vector2D.ToIntegerizedPosition(Position);
-
                     if (IntegerizedPosition != NextIntegerizedPosition)
                     {
-                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Remove(Index);
-                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount--;
+                        currentGrid.LocalPlants.Remove(Index);
+                        currentGrid.LocalPlantCount--;
                         IntegerizedPosition = NextIntegerizedPosition;
-                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Add(Index);
-                        g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount++;
+                        nextGrid.LocalPlants.Add(Index);
+                        nextGrid.LocalPlantCount++;
                     }
                 }
             }
             else
             {
-                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].Fertility += Element * g_Soup.BiomassAmountMultiplier;
-                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlants.Remove(Index);
-                g_Soup.GridMap[IntegerizedPosition.X + IntegerizedPosition.Y * l_SoupSizeX].LocalPlantCount--;
+                currentGrid.Fertility += Element * g_Soup.BiomassAmountMultiplier;
+                currentGrid.LocalPlants.Remove(Index);
+                currentGrid.LocalPlantCount--;
                 lock (g_Soup.PlantUnassignedIndexesLockObject) g_Soup.PlantUnassignedIndexes.Add(Index);
                 g_Soup.Plants[Index] = null;
             }

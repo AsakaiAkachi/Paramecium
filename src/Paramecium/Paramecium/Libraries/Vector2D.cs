@@ -121,12 +121,12 @@
 
         public static Int2D ToIntegerizedPosition(Vector2D value)
         {
-            Int2D result = new Int2D((int)value.X, (int)value.Y);
+            Int2D result = new Int2D((int)Math.Floor(value.X), (int)Math.Floor(value.Y));
 
             if (result.X < 0) result.X = 0;
-            if (result.X >= Global.g_Soup.SizeX) result.X = Global.g_Soup.SizeX - 1;
+            if (result.X >= g_Soup.SizeX) result.X = g_Soup.SizeX - 1;
             if (result.Y < 0) result.Y = 0;
-            if (result.Y >= Global.g_Soup.SizeY) result.Y = Global.g_Soup.SizeY - 1;
+            if (result.Y >= g_Soup.SizeY) result.Y = g_Soup.SizeY - 1;
 
             return result;
         }

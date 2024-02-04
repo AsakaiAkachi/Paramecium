@@ -29,9 +29,11 @@ namespace Paramecium.Simulation
         public int HatchingTime { get; set; } = 300;
         public double MutationRate { get; set; } = 0.1d;
 
+        public int AnimalColorMutationRange { get; set; } = 16;
+        public double AnimalColorCognateRange { get; set; } = 32d;
+
         public double AnimalElementLosePerStepInPassive { get; set; } = 0.025;
         public double AnimalElementLosePerStepInAccelerating { get; set; } = 0.075d;
-        public int AnimalLifeSpan { get; set; } = 30000;
 
         public double PlantSizeMultiplier { get; set; } = 3.872983d;
 
@@ -74,18 +76,19 @@ namespace Paramecium.Simulation
         public object SoupStateLockObject = new object();
 
         public bool AutoSave { get; set; } = false;
+        public int AutoSaveInterval = -1;
 
         public Soup() { }
         public Soup(
             int seed,
             int sizeX, int sizeY,
-            double wallPerlinNoiseX, double wallPerlinNoiseY, double wallPerlinNoiseZ,
+            bool EnableWall, double wallPerlinNoiseX, double wallPerlinNoiseY, double wallPerlinNoiseZ,
             double wallPerlinNoiseScale, int wallPerlinNoiseOctave, double wallThickness,
             double totalBiomassAmount,
             double cellSizeMultiplier, double plantForkBiomass, double animalForkBiomass, int plantBiomassCollectionRange,
             int initialAnimalCount, int hatchingTime, 
             double mutationRate,
-            double animalElementLosePerStepInPassive, double animalElementLosePerStepInAccelerating, int animalLifeSpan
+            double animalElementLosePerStepInPassive, double animalElementLosePerStepInAccelerating
         )
         {
             Seed = seed;
@@ -108,7 +111,6 @@ namespace Paramecium.Simulation
 
             AnimalElementLosePerStepInPassive = animalElementLosePerStepInPassive;
             AnimalElementLosePerStepInAccelerating = animalElementLosePerStepInAccelerating;
-            AnimalLifeSpan = animalLifeSpan;
 
             RegionCountWidth = (int)Math.Ceiling(SizeX / 32d);
             RegionCountHeight = (int)Math.Ceiling(SizeY / 32d);
@@ -121,7 +123,7 @@ namespace Paramecium.Simulation
                 for (int y = 0; y < SizeY; y++)
                 {
                     TileType tileType;
-                    if (WallThickness != 0d)
+                    if (EnableWall)
                     {
                         if (
                             Math.Abs(perlin.OctavePerlin(
@@ -360,7 +362,7 @@ namespace Paramecium.Simulation
                                 AnimalBuffer[i].Clear();
                             }
 
-                            BiomassAmountMultiplier = 1d + (TotalBiomassAmount / CurrentBiomassAmount - 1d) * 10d;
+                            BiomassAmountMultiplier = Math.Min(Math.Max(1d + (TotalBiomassAmount / CurrentBiomassAmount - 1d) * 10d, 0d), 2d);
 
                             Update(0);
                             Update(1);
@@ -391,17 +393,19 @@ namespace Paramecium.Simulation
 
                             ElapsedTimeStep++;
 
-                            if (AutoSave && ElapsedTimeStep % 100000 == 0 && ElapsedTimeStep != 0)
+                            if (AutoSave && ElapsedTimeStep % AutoSaveInterval == 0 && ElapsedTimeStep != 0)
                             {
                                 EventLog.PushEventLog($"Saving soup...");
 
                                 string jsonString = JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions() { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
 
-                                StreamWriter sw = new StreamWriter($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves\{Path.GetFileNameWithoutExtension(g_FormMain.FilePath)}-autosave{ElapsedTimeStep}.soup", false);
+                                StreamWriter sw1 = new StreamWriter($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves\{Path.GetFileNameWithoutExtension(g_FormMain.FilePath)}_autosave{ElapsedTimeStep}.soup", false);
+                                sw1.Write(jsonString);
+                                sw1.Dispose();
 
-                                sw.Write(jsonString);
-
-                                sw.Dispose();
+                                StreamWriter sw2 = new StreamWriter($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves\_LatestAutosave.soup", false);
+                                sw2.Write(jsonString);
+                                sw2.Dispose();
 
                                 jsonString = string.Empty;
 

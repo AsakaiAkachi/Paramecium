@@ -7,11 +7,12 @@ namespace Paramecium
 {
     public static class Global
     {
-        public static string version = "0.4.8";
+        public static string version = "0.4.9";
 
         public static Soup g_Soup;
         public static FormMain g_FormMain;
-        public static FormNewSimulation g_FormNewSimulation;
+        public static FormCreateNewSoup g_FormCreateNewSoup;
+        public static FormAutosaveSetting g_FormAutosaveSetting;
 
         public static SolidBrush SolidBrushPlaceholder = new SolidBrush(Color.FromArgb(255, 0, 255));
 
@@ -29,7 +30,8 @@ namespace Paramecium
             g_Soup.SoupSetup();
             **/
             g_FormMain = new FormMain();
-            g_FormNewSimulation = new FormNewSimulation();
+            g_FormCreateNewSoup = new FormCreateNewSoup();
+            g_FormAutosaveSetting = new FormAutosaveSetting();
         }
 
         public static void ConsoleLog(LogLevel logLevel, string logText)
