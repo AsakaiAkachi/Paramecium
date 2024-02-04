@@ -1138,8 +1138,6 @@ namespace Paramecium.Forms
                         StatPopulation.Text = $"Population (P/A/T) : {g_Soup.PopulationPlant}/{g_Soup.PopulationAnimal}/{g_Soup.PopulationTotal}";
                         StatLatestGeneration.Text = $"Latest Generation : {g_Soup.LatestGeneration}";
                         StatTotalBornDie.Text = $"Total Born/Die : {g_Soup.TotalBornCount}/{g_Soup.TotalDieCount}";
-
-                        ParameciumNotifyIcon.Text = $"{Path.GetFileName(FilePath)} - {g_Soup.ElapsedTimeStep} Step / Gen {g_Soup.LatestGeneration}";
                     }
                     else
                     {
@@ -1282,7 +1280,7 @@ namespace Paramecium.Forms
                     StreamReader sr = new StreamReader(ofd.FileName);
 
                     jsonString = sr.ReadToEnd();
-                    g_Soup = JsonSerializer.Deserialize<Soup>(jsonString);
+                    g_Soup = JsonSerializer.Deserialize<Soup>(jsonString, new JsonSerializerOptions() { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
                     g_Soup.SoupLoaded();
                     g_Soup.SoupRun();
 
@@ -1322,7 +1320,7 @@ namespace Paramecium.Forms
                 EventLog.PushEventLog($"Saving soup...");
                 await Task.Delay(100);
 
-                string jsonString = JsonSerializer.Serialize(g_Soup);
+                string jsonString = JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions() { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
 
                 StreamWriter sw = new StreamWriter(FilePath, false);
 
@@ -1361,7 +1359,7 @@ namespace Paramecium.Forms
                     EventLog.PushEventLog($"Saving soup...");
                     await Task.Delay(100);
 
-                    string jsonString = JsonSerializer.Serialize(g_Soup);
+                    string jsonString = JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions() { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
 
                     StreamWriter sw = new StreamWriter(sfd.FileName, false);
 
@@ -1628,7 +1626,6 @@ namespace Paramecium.Forms
                         WindowState = FormWindowState.Normal;
                         FormBorderStyle = FormBorderStyle.None;
                         WindowState = FormWindowState.Maximized;
-                        if (!((Control.ModifierKeys) == Keys.Shift)) TopMost = true;
                         TopMenu.Visible = false;
                         BottomStat.Visible = false;
                         SimulationView.Dock = DockStyle.Fill;
@@ -1636,7 +1633,6 @@ namespace Paramecium.Forms
                     else
                     {
                         fullScreen = false;
-                        TopMost = false;
                         WindowState = FormWindowState.Normal;
                         FormBorderStyle = FormBorderStyle.Sizable;
                         if (WindowState != premWindowState) WindowState = premWindowState;
@@ -1660,7 +1656,7 @@ namespace Paramecium.Forms
                             EventLog.PushEventLog($"Saving soup...");
                             await Task.Delay(100);
 
-                            string jsonString = JsonSerializer.Serialize(g_Soup);
+                            string jsonString = JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions() { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
 
                             StreamWriter sw = new StreamWriter(FilePath, false);
 
@@ -1683,6 +1679,38 @@ namespace Paramecium.Forms
                     {
                         if (!g_Soup.AutoSave) g_Soup.AutoSave = true;
                         else g_Soup.AutoSave = false;
+                    }
+                    break;
+                case Keys.K:
+                    if (g_Soup.SoupState == SoupState.Pause)
+                    {
+                        if (SelectedCellType != SelectedCellType.None)
+                        {
+                            if (SelectedCellType == SelectedCellType.Plant)
+                            {
+                                Plant Target = g_Soup.Plants[SelectedCellIndex];
+
+                                if (Target is not null)
+                                {
+                                    Target.IsValid = false;
+
+                                    g_Soup.Update(3);
+                                    g_Soup.Update(4);
+                                }
+                            }
+                            else if (SelectedCellType == SelectedCellType.Animal)
+                            {
+                                Animal Target = g_Soup.Animals[SelectedCellIndex];
+
+                                if (Target is not null)
+                                {
+                                    Target.IsValid = false;
+
+                                    g_Soup.Update(3);
+                                    g_Soup.Update(4);
+                                }
+                            }
+                        }
                     }
                     break;
                 case Keys.F1:

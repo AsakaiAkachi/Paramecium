@@ -395,7 +395,7 @@ namespace Paramecium.Simulation
                             {
                                 EventLog.PushEventLog($"Saving soup...");
 
-                                string jsonString = JsonSerializer.Serialize(g_Soup);
+                                string jsonString = JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions() { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
 
                                 StreamWriter sw = new StreamWriter($@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves\{Path.GetFileNameWithoutExtension(g_FormMain.FilePath)}-autosave{ElapsedTimeStep}.soup", false);
 
