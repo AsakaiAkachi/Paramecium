@@ -28,9 +28,9 @@ namespace Paramecium.Simulation
         public long RaceId { get; set; }
         public int RaceIndex { get; set; }
 
-        public int GeneColorRed { get; set; }
-        public int GeneColorGreen { get; set; }
-        public int GeneColorBlue { get; set; }
+        public double GeneColorRed { get; set; }
+        public double GeneColorGreen { get; set; }
+        public double GeneColorBlue { get; set; }
 
         public double[] Brain { get; set; }
 
@@ -62,9 +62,12 @@ namespace Paramecium.Simulation
 
             RaceId = random.NextInt64(0, 2176782336);
 
-            GeneColorRed = random.Next(0, 255 + 1);
-            GeneColorGreen = random.Next(0, 255 + 1);
-            GeneColorBlue = random.Next(0, 255 + 1);
+            //GeneColorRed = random.Next(0, 255 + 1);
+            //GeneColorGreen = random.Next(0, 255 + 1);
+            //GeneColorBlue = random.Next(0, 255 + 1);
+            GeneColorRed = random.NextDouble();
+            GeneColorGreen = random.NextDouble();
+            GeneColorBlue = random.NextDouble();
 
             Age = g_Soup.HatchingTime;
             Generation = 1;
@@ -131,18 +134,15 @@ namespace Paramecium.Simulation
             {
                 RaceId = parent.RaceId;
 
-                //GeneColorRed = parent.GeneColorRed;
-                //GeneColorGreen = parent.GeneColorGreen;
-                //GeneColorBlue = parent.GeneColorBlue;
-                GeneColorRed = Math.Min(Math.Max(parent.GeneColorRed + random.Next(g_Soup.AnimalColorMutationRange * -1, g_Soup.AnimalColorMutationRange + 1), 0), 255);
-                GeneColorGreen = Math.Min(Math.Max(parent.GeneColorGreen + random.Next(g_Soup.AnimalColorMutationRange * -1, g_Soup.AnimalColorMutationRange + 1), 0), 255);
-                GeneColorBlue = Math.Min(Math.Max(parent.GeneColorBlue + random.Next(g_Soup.AnimalColorMutationRange * -1, g_Soup.AnimalColorMutationRange + 1), 0), 255);
+                GeneColorRed = parent.GeneColorRed;
+                GeneColorGreen = parent.GeneColorGreen;
+                GeneColorBlue = parent.GeneColorBlue;
 
-                //int ColorMutation = random.Next(0, 2 + 1);
+                int ColorMutation = random.Next(0, 2 + 1);
 
-                //if (ColorMutation == 0) GeneColorRed = Math.Min(Math.Max(parent.GeneColorRed + random.Next(-4, 4 + 1), 0), 255);
-                //else if (ColorMutation == 1) GeneColorGreen = Math.Min(Math.Max(parent.GeneColorGreen + random.Next(-4, 4 + 1), 0), 255);
-                //else if (ColorMutation == 2) GeneColorBlue = Math.Min(Math.Max(parent.GeneColorBlue + random.Next(-4, 4 + 1), 0), 255);
+                if (ColorMutation == 0) GeneColorRed = Math.Min(Math.Max(parent.GeneColorRed + (random.NextDouble() * g_Soup.AnimalColorMutationRange * 2d - g_Soup.AnimalColorMutationRange), 0d), 1d);
+                else if (ColorMutation == 1) GeneColorGreen = Math.Min(Math.Max(parent.GeneColorGreen + (random.NextDouble() * g_Soup.AnimalColorMutationRange * 2d - g_Soup.AnimalColorMutationRange), 0d), 1d);
+                else if (ColorMutation == 2) GeneColorBlue = Math.Min(Math.Max(parent.GeneColorBlue + (random.NextDouble() * g_Soup.AnimalColorMutationRange * 2d - g_Soup.AnimalColorMutationRange), 0d), 1d);
             }
         }
         public Animal(Animal original, Vector2D position)

@@ -66,7 +66,8 @@ namespace Paramecium.Forms
                         (double)inputNoiseScale.Value, (int)inputNoiseOctave.Value, (double)inputWallThickness.Value,
                         (double)inputTotalElementAmount.Value, (double)inputCellSizeMultiplier.Value, (double)inputPlantForkCost.Value, (double)inputAnimalForkCost.Value, (int)inputPlantElementCollectionRange.Value,
                         (int)inputInitialAnimalCount.Value, (int)inputHatchingTime.Value,
-                        (double)inputMutationRate.Value, (double)inputAnimalSurvivalCost.Value, (double)inputAnimalAccDecCost.Value
+                        (double)inputMutationRate.Value, (double)inputAnimalColorMutationRange.Value, (double)inputAnimalColorCognateRange.Value,
+                        (double)inputAnimalSurvivalCost.Value, (double)inputAnimalAccDecCost.Value
                     );
 
                 g_Soup = newSoup;

@@ -7,7 +7,7 @@ namespace Paramecium
 {
     public static class Global
     {
-        public static string version = "0.4.9";
+        public static string version = "0.4.10";
 
         public static Soup g_Soup;
         public static FormMain g_FormMain;

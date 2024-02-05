@@ -310,7 +310,7 @@ namespace Paramecium.Forms
 
                                                 if (Target is not null)
                                                 {
-                                                    SolidBrush TargetColor = new SolidBrush(Color.FromArgb(Target.GeneColorRed, Target.GeneColorGreen, Target.GeneColorBlue));
+                                                    SolidBrush TargetColor = new SolidBrush(Color.FromArgb((int)(Target.GeneColorRed * 255), (int)(Target.GeneColorGreen * 255), (int)(Target.GeneColorBlue * 255)));
                                                     double TargetPosX = Target.Position.X;
                                                     double TargetPosY = Target.Position.Y;
                                                     double TargetRadius = Target.Radius;
@@ -569,7 +569,8 @@ namespace Paramecium.Forms
                                                                 Animal SecondTarget = g_Soup.Animals[SelectedCellIndex];
 
                                                                 //if (Target.RaceId == SecondTarget.RaceId)
-                                                                if (Math.Sqrt(Math.Pow(Target.GeneColorRed - SecondTarget.GeneColorRed, 2) + Math.Pow(Target.GeneColorGreen - SecondTarget.GeneColorGreen, 2) + Math.Pow(Target.GeneColorBlue - SecondTarget.GeneColorBlue, 2)) < g_Soup.AnimalColorCognateRange)                                                                {
+                                                                if (Math.Sqrt(Math.Pow(Target.GeneColorRed - SecondTarget.GeneColorRed, 2) + Math.Pow(Target.GeneColorGreen - SecondTarget.GeneColorGreen, 2) + Math.Pow(Target.GeneColorBlue - SecondTarget.GeneColorBlue, 2)) < g_Soup.AnimalColorCognateRange)
+                                                                {
                                                                     DrawCircle(
                                                                     canvas_g,
                                                                     Pens.LightYellow,
@@ -875,6 +876,7 @@ namespace Paramecium.Forms
                                     TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                     OffsetY += TextSize.Height;
                                 }
+                                /*
                                 {
                                     string Text = $"LocalPlantCount : ({Target.LocalPlants.Count} / {Target.LocalPlantCount})";
                                     Size TextSize = TextRenderer.MeasureText(Text, fnt);
@@ -889,6 +891,7 @@ namespace Paramecium.Forms
                                     TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);
                                     OffsetY += TextSize.Height;
                                 }
+                                */
                             }
                             else if (SelectedCellType == SelectedCellType.Plant)
                             {
@@ -1015,8 +1018,8 @@ namespace Paramecium.Forms
                                         OffsetY += TextSize.Height;
                                     }
                                     {
-                                        SolidBrush brushColor = new SolidBrush(Color.FromArgb(255, target.GeneColorRed, target.GeneColorGreen, target.GeneColorBlue));
-                                        string Text = $"Color : ({target.GeneColorRed}, {target.GeneColorGreen}, {target.GeneColorBlue})";
+                                        SolidBrush brushColor = new SolidBrush(Color.FromArgb(255, (int)(target.GeneColorRed * 255), (int)(target.GeneColorGreen * 255), (int)(target.GeneColorBlue * 255)));
+                                        string Text = $"Color : ({target.GeneColorRed:0.000}, {target.GeneColorGreen:0.000}, {target.GeneColorBlue:0.000})";
                                         Size TextSize = TextRenderer.MeasureText(Text, fnt);
                                         canvas_g.FillRectangle(brushColor, 0, OffsetY, 256, TextSize.Height);
                                         TextRenderer.DrawText(canvas_g, Text, fnt, new Point(0, OffsetY), Color.White);

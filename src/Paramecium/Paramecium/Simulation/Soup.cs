@@ -29,8 +29,8 @@ namespace Paramecium.Simulation
         public int HatchingTime { get; set; } = 300;
         public double MutationRate { get; set; } = 0.1d;
 
-        public int AnimalColorMutationRange { get; set; } = 16;
-        public double AnimalColorCognateRange { get; set; } = 32d;
+        public double AnimalColorMutationRange { get; set; } = 0.0875d;
+        public double AnimalColorCognateRange { get; set; } = 0.175d;
 
         public double AnimalElementLosePerStepInPassive { get; set; } = 0.025;
         public double AnimalElementLosePerStepInAccelerating { get; set; } = 0.075d;
@@ -87,7 +87,7 @@ namespace Paramecium.Simulation
             double totalBiomassAmount,
             double cellSizeMultiplier, double plantForkBiomass, double animalForkBiomass, int plantBiomassCollectionRange,
             int initialAnimalCount, int hatchingTime, 
-            double mutationRate,
+            double mutationRate, double animalColorMutationRange, double animalColorCognateRange,
             double animalElementLosePerStepInPassive, double animalElementLosePerStepInAccelerating
         )
         {
@@ -108,6 +108,8 @@ namespace Paramecium.Simulation
             GridMapBgParticle = new byte[SizeX * SizeY];
 
             MutationRate = mutationRate;
+            AnimalColorMutationRange = animalColorMutationRange;
+            AnimalColorCognateRange = animalColorCognateRange;
 
             AnimalElementLosePerStepInPassive = animalElementLosePerStepInPassive;
             AnimalElementLosePerStepInAccelerating = animalElementLosePerStepInAccelerating;
