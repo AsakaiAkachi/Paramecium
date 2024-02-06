@@ -23,6 +23,8 @@
         private int l_SoupSizeX;
         private int l_SoupSizeY;
 
+        private Vector2D VelocityAddend { get; set; }
+
         public Plant() { }
         public Plant(Random random, Vector2D position, Vector2D velocity, double element)
         {
@@ -174,23 +176,23 @@
 
                             if (WallDistance1 < 0.353553 + Radius)
                             {
-                                Velocity += Vector2D.Normalization(Position - WallPosition1) * ((Radius + 0.353553 - WallDistance1) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                                VelocityAddend += Vector2D.Normalization(Position - WallPosition1) * ((Radius + 0.353553 - WallDistance1) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             }
                             if (WallDistance2 < 0.353553 + Radius)
                             {
-                                Velocity += Vector2D.Normalization(Position - WallPosition2) * ((Radius + 0.353553 - WallDistance2) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                                VelocityAddend += Vector2D.Normalization(Position - WallPosition2) * ((Radius + 0.353553 - WallDistance2) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             }
                             if (WallDistance3 < 0.353553 + Radius)
                             {
-                                Velocity += Vector2D.Normalization(Position - WallPosition3) * ((Radius + 0.353553 - WallDistance3) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                                VelocityAddend += Vector2D.Normalization(Position - WallPosition3) * ((Radius + 0.353553 - WallDistance3) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             }
                             if (WallDistance4 < 0.353553 + Radius)
                             {
-                                Velocity += Vector2D.Normalization(Position - WallPosition4) * ((Radius + 0.353553 - WallDistance4) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                                VelocityAddend += Vector2D.Normalization(Position - WallPosition4) * ((Radius + 0.353553 - WallDistance4) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             }
                             if (WallDistance5 < 0.5 + Radius)
                             {
-                                Velocity += Vector2D.Normalization(Position - WallPosition5) * ((Radius + 0.5 - WallDistance5) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                                VelocityAddend += Vector2D.Normalization(Position - WallPosition5) * ((Radius + 0.5 - WallDistance5) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                             }
                         }
                         if (g_Soup.GridMap[x + y * l_SoupSizeX].LocalPlantCount > 0 && Age > -40)
@@ -205,8 +207,8 @@
                                     if (Distance < Radius + target.Radius)
                                     {
                                         target.CollisionIsDisabled = false;
-                                        Velocity += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d) / 2d;
-                                        target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
+                                        VelocityAddend += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d);// / 2d;
+                                        //target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
                                     }
                                 }
                             }
@@ -222,8 +224,8 @@
                                     double Distance = Vector2D.Distance(Position, collidedParticlePosition);
                                     if (Distance < Radius + target.Radius)
                                     {
-                                        Velocity += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d) / 2d;
-                                        target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
+                                        VelocityAddend += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d);// / 2d;
+                                        //target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
                                     }
                                 }
                             }
@@ -256,9 +258,15 @@
 
                 return;
             }
-            else if (Velocity != Vector2D.Zero || CollisionIsDisabled == false || g_Soup.ElapsedTimeStep == 0)
+            else if (Velocity != Vector2D.Zero || VelocityAddend != Vector2D.Zero || CollisionIsDisabled == false || g_Soup.ElapsedTimeStep == 0)
             {
                 CollisionIsDisabled = false;
+
+                if (VelocityAddend != Vector2D.Zero)
+                {
+                    Velocity += VelocityAddend;
+                    VelocityAddend = new Vector2D(Vector2D.Zero);
+                }
 
                 if (Vector2D.Size(Velocity) > 0.1d)
                 {

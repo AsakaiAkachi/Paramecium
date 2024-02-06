@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Paramecium.Simulation
@@ -25,8 +26,8 @@ namespace Paramecium.Simulation
         //public double CumulativeMutationRate { get; set; }
         public List<long> ParentGenealogicalTree { get; set; } = new List<long>();
 
-        public long RaceId { get; set; }
-        public int RaceIndex { get; set; }
+        //public long RaceId { get; set; }
+        //public int RaceIndex { get; set; }
 
         public double GeneColorRed { get; set; }
         public double GeneColorGreen { get; set; }
@@ -44,6 +45,8 @@ namespace Paramecium.Simulation
         private int l_SoupSizeY;
         private double l_AnimalColorCognateRange;
 
+        private Vector2D VelocityAddend { get; set; }
+
         public Animal() { }
         public Animal(Random random, Vector2D position, Vector2D velocity, double angle, double element)
         {
@@ -60,7 +63,7 @@ namespace Paramecium.Simulation
             Radius = 0.25d;
             Mass = Math.Pow(Radius, 2);
 
-            RaceId = random.NextInt64(0, 2176782336);
+            //RaceId = random.NextInt64(0, 2176782336);
 
             //GeneColorRed = random.Next(0, 255 + 1);
             //GeneColorGreen = random.Next(0, 255 + 1);
@@ -120,7 +123,7 @@ namespace Paramecium.Simulation
             //if (CumulativeMutationRate >= g_Soup.MutationRate * 10d)
             if (false && random.NextDouble() < g_Soup.MutationRate)
             {
-                RaceId = random.NextInt64(0, 2176782336);
+                //RaceId = random.NextInt64(0, 2176782336);
 
                 GeneColorRed = random.Next(0, 255 + 1);
                 GeneColorGreen = random.Next(0, 255 + 1);
@@ -132,23 +135,35 @@ namespace Paramecium.Simulation
             }
             else
             {
-                RaceId = parent.RaceId;
+                //RaceId = parent.RaceId;
 
-                GeneColorRed = parent.GeneColorRed;
-                GeneColorGreen = parent.GeneColorGreen;
-                GeneColorBlue = parent.GeneColorBlue;
+                double RedMutat = 1, GreenMutat = 1, BlueMutat = 1;
 
+                while(Math.Sqrt(Math.Pow(RedMutat, 2) + Math.Pow(GreenMutat, 2) + Math.Pow(BlueMutat, 2)) > 1d)
+                {
+                    RedMutat = random.NextDouble() * 2d - 1d;
+                    GreenMutat = random.NextDouble() * 2d - 1d;
+                    BlueMutat = random.NextDouble() * 2d - 1d;
+                }
+
+                double MutatScale = (1d / Math.Sqrt(Math.Pow(RedMutat, 2) + Math.Pow(GreenMutat, 2) + Math.Pow(BlueMutat, 2))) * random.NextDouble() * g_Soup.AnimalColorMutationRange;
+                GeneColorRed = Math.Min(Math.Max(parent.GeneColorRed + RedMutat * MutatScale, 0), 1);
+                GeneColorGreen = Math.Min(Math.Max(parent.GeneColorGreen + GreenMutat * MutatScale, 0), 1);
+                GeneColorBlue = Math.Min(Math.Max(parent.GeneColorBlue + BlueMutat * MutatScale, 0), 1);
+
+                /*
                 int ColorMutation = random.Next(0, 2 + 1);
 
                 if (ColorMutation == 0) GeneColorRed = Math.Min(Math.Max(parent.GeneColorRed + (random.NextDouble() * g_Soup.AnimalColorMutationRange * 2d - g_Soup.AnimalColorMutationRange), 0d), 1d);
                 else if (ColorMutation == 1) GeneColorGreen = Math.Min(Math.Max(parent.GeneColorGreen + (random.NextDouble() * g_Soup.AnimalColorMutationRange * 2d - g_Soup.AnimalColorMutationRange), 0d), 1d);
                 else if (ColorMutation == 2) GeneColorBlue = Math.Min(Math.Max(parent.GeneColorBlue + (random.NextDouble() * g_Soup.AnimalColorMutationRange * 2d - g_Soup.AnimalColorMutationRange), 0d), 1d);
+                */
             }
         }
         public Animal(Animal original, Vector2D position)
         {
             Index = -1;
-            Id = new Random(g_Soup.Seed).NextInt64(0, 4738381338321616896);
+            Id = new Random().NextInt64(0, 4738381338321616896);
             IsValid = original.IsValid;
 
             Position = position;
@@ -167,7 +182,7 @@ namespace Paramecium.Simulation
             Brain = original.Brain;
             BrainInput = original.BrainInput;
 
-            RaceId = original.RaceId;
+            //RaceId = original.RaceId;
             GeneColorRed = original.GeneColorRed;
             GeneColorGreen = original.GeneColorGreen;
             GeneColorBlue = original.GeneColorBlue;
@@ -582,23 +597,23 @@ namespace Paramecium.Simulation
 
                         if (WallDistance1 < 0.353553 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition1) * ((Radius + 0.353553 - WallDistance1) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                            VelocityAddend += Vector2D.Normalization(Position - WallPosition1) * ((Radius + 0.353553 - WallDistance1) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                         }
                         if (WallDistance2 < 0.353553 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition2) * ((Radius + 0.353553 - WallDistance2) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                            VelocityAddend += Vector2D.Normalization(Position - WallPosition2) * ((Radius + 0.353553 - WallDistance2) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                         }
                         if (WallDistance3 < 0.353553 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition3) * ((Radius + 0.353553 - WallDistance3) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                            VelocityAddend += Vector2D.Normalization(Position - WallPosition3) * ((Radius + 0.353553 - WallDistance3) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                         }
                         if (WallDistance4 < 0.353553 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition4) * ((Radius + 0.353553 - WallDistance4) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                            VelocityAddend += Vector2D.Normalization(Position - WallPosition4) * ((Radius + 0.353553 - WallDistance4) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                         }
                         if (WallDistance5 < 0.5 + Radius)
                         {
-                            Velocity += Vector2D.Normalization(Position - WallPosition5) * ((Radius + 0.5 - WallDistance5) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
+                            VelocityAddend += Vector2D.Normalization(Position - WallPosition5) * ((Radius + 0.5 - WallDistance5) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity), 0.01d);
                         }
                     }
                     if (g_Soup.GridMap[x + y * l_SoupSizeX].LocalPlantCount > 0)
@@ -612,9 +627,14 @@ namespace Paramecium.Simulation
                                 double Distance = Vector2D.Distance(Position, collidedParticlePosition);
                                 if (Distance < Radius + target.Radius)
                                 {
-                                    target.CollisionIsDisabled = false;
-                                    Velocity += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d) / 2d;
-                                    target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
+                                    VelocityAddend += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d);// / 2d;
+                                    //target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
+
+                                    if (target.CollisionIsDisabled)
+                                    {
+                                        target.CollisionIsDisabled = false;
+                                        target.MiddleUpdate();
+                                    }
 
                                     if (BrainOutputAttack > 0)
                                     {
@@ -644,8 +664,8 @@ namespace Paramecium.Simulation
                                 double Distance = Vector2D.Distance(Position, collidedParticlePosition);
                                 if (Distance < Radius + target.Radius)
                                 {
-                                    Velocity += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d) / 2d;
-                                    target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
+                                    VelocityAddend += Vector2D.Normalization(Position - target.Position) * ((Radius + target.Radius - Distance) / (Radius * 0.5d)) * Math.Max(Vector2D.Size(Velocity + target.Velocity), 0.01d) * Math.Min(target.Mass / Mass, 1d);// / 2d;
+                                    //target.Velocity += Vector2D.Normalization(target.Position - Position) * ((target.Radius + Radius - Distance) / (target.Radius * 0.5d)) * Math.Max(Vector2D.Size(target.Velocity + Velocity), 0.01d) * Math.Min(Mass / target.Mass, 1d) / 2d;
 
                                     if (BrainOutputAttack > 0)
                                     {
@@ -711,6 +731,12 @@ namespace Paramecium.Simulation
             {
                 Radius = 0.25 * g_Soup.CellSizeMultiplier + 0.25 * g_Soup.CellSizeMultiplier * (Math.Min(g_Soup.HatchingTime, Age) / (double)g_Soup.HatchingTime);
                 Mass = Math.Pow(Radius, 2);
+            }
+
+            if (VelocityAddend != Vector2D.Zero)
+            {
+                Velocity += VelocityAddend;
+                VelocityAddend = new Vector2D(Vector2D.Zero);
             }
 
             if (Vector2D.Size(Velocity) > 0.1d)

@@ -76,7 +76,7 @@ namespace Paramecium.Simulation
         public object SoupStateLockObject = new object();
 
         public bool AutoSave { get; set; } = false;
-        public int AutoSaveInterval = -1;
+        public int AutoSaveInterval { get; set; } = -1;
 
         public Soup() { }
         public Soup(
@@ -430,8 +430,7 @@ namespace Paramecium.Simulation
         {
             try
             {
-                ParallelOptions parallelOptions = new ParallelOptions();
-                parallelOptions.MaxDegreeOfParallelism = ParallelismLimit;
+                ParallelOptions parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = ParallelismLimit };
 
                 //int RegionSizeWidth = SizeX / RegionCountWidth;
                 //int ChunkSizeWidth = RegionSizeWidth / 2;

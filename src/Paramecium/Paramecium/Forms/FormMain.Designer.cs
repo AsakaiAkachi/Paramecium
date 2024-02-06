@@ -48,8 +48,8 @@
             TopMenu_Window = new ToolStripMenuItem();
             TopMenu_Simulation = new ToolStripMenuItem();
             TopMenu_Simulation_NewSimulation = new ToolStripMenuItem();
-            SimulationView = new PictureBox();
             TopMenu_Simulation_AutoSaveSettings = new ToolStripMenuItem();
+            SimulationView = new PictureBox();
             BottomStat.SuspendLayout();
             TopMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SimulationView).BeginInit();
@@ -189,6 +189,13 @@
             TopMenu_Simulation_NewSimulation.Text = "Create a New Soup...";
             TopMenu_Simulation_NewSimulation.Click += TopMenu_Simulation_NewSimulation_Click;
             // 
+            // TopMenu_Simulation_AutoSaveSettings
+            // 
+            TopMenu_Simulation_AutoSaveSettings.Name = "TopMenu_Simulation_AutoSaveSettings";
+            TopMenu_Simulation_AutoSaveSettings.Size = new Size(182, 22);
+            TopMenu_Simulation_AutoSaveSettings.Text = "Auto Save Settings...";
+            TopMenu_Simulation_AutoSaveSettings.Click += TopMenu_Simulation_AutoSaveSettings_Click;
+            // 
             // SimulationView
             // 
             SimulationView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -201,13 +208,6 @@
             SimulationView.MouseDown += SimulationView_MouseDown;
             SimulationView.MouseMove += SimulationView_MouseMove;
             SimulationView.MouseUp += SimulationView_MouseUp;
-            // 
-            // TopMenu_Simulation_AutoSaveSettings
-            // 
-            TopMenu_Simulation_AutoSaveSettings.Name = "TopMenu_Simulation_AutoSaveSettings";
-            TopMenu_Simulation_AutoSaveSettings.Size = new Size(182, 22);
-            TopMenu_Simulation_AutoSaveSettings.Text = "Auto Save Settings...";
-            TopMenu_Simulation_AutoSaveSettings.Click += TopMenu_Simulation_AutoSaveSettings_Click;
             // 
             // FormMain
             // 

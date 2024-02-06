@@ -443,7 +443,7 @@
             inputInitialAnimalCount.Size = new Size(150, 23);
             inputInitialAnimalCount.TabIndex = 30;
             inputInitialAnimalCount.TextAlign = HorizontalAlignment.Center;
-            inputInitialAnimalCount.Value = new decimal(new int[] { 1024, 0, 0, 0 });
+            inputInitialAnimalCount.Value = new decimal(new int[] { 1600, 0, 0, 0 });
             // 
             // label15
             // 

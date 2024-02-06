@@ -45,10 +45,12 @@ namespace Paramecium.Forms
             {
                 if (!g_Soup.AutoSave)
                 {
+                    checkboxEnableAutosave.Checked = false;
                     labelCurrentAutoSaveInterval.Text = "Current Auto Save Interval : Auto Save Disabled";
                 }
                 else
                 {
+                    checkboxEnableAutosave.Checked = true;
                     labelCurrentAutoSaveInterval.Text = $"Current Auto Save Interval : {g_Soup.AutoSaveInterval} steps";
                 }
             }
