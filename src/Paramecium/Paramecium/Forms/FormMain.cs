@@ -1635,8 +1635,24 @@ namespace Paramecium.Forms
         }
         private void SimulationView_MouseWheel(object? sender, MouseEventArgs e)
         {
-            zoomFactor = Math.Min(Math.Max(zoomFactor + e.Delta / 100, 0), 8);
+            int MouseWheelDelta = e.Delta;
+
+            if (MouseWheelDelta > 0)
+            {
+                zoomFactor = Math.Min(Math.Max(zoomFactor + 1, 0), 8);
+                //cameraX += (MousePosX - cameraX) / 2d;
+                //cameraY += (MousePosY - cameraY) / 2d;
+            }
+            else if (MouseWheelDelta < 0)
+            {
+                zoomFactor = Math.Min(Math.Max(zoomFactor - 1, 0), 8);
+                //cameraX -= (MousePosX - cameraX);
+                //cameraY -= (MousePosY - cameraY);
+            }
+
             zoomFactorActual = Math.Pow(2, zoomFactor);
+
+            Console.WriteLine(e.Delta);
         }
 
         FormWindowState premWindowState;

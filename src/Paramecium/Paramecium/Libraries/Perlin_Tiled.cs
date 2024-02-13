@@ -1,4 +1,5 @@
-﻿// https://gist.github.com/Flafla2/f0260a861be0ebdeef76#file-perlin_tiled-cs
+﻿// Implementation in C# of Perlin Noise by Adrian Biagioli
+// https://gist.github.com/Flafla2/f0260a861be0ebdeef76
 
 public class Perlin
 {
