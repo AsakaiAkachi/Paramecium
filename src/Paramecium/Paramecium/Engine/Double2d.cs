@@ -1,4 +1,6 @@
-﻿namespace Paramecium.Engine
+﻿using System.Text.Json.Serialization;
+
+namespace Paramecium.Engine
 {
     public struct Double2d
     {
@@ -7,8 +9,11 @@
 
         public static readonly Double2d Zero = new Double2d(0d, 0d);
 
+        [JsonIgnore]
         public double LengthSquared { get => MagnitudeSquared(this); }
+        [JsonIgnore]
         public double Length { get => Magnitude(this); }
+        [JsonIgnore]
         public Double2d Normalized { get => Normalize(this); }
 
         public Double2d()
@@ -134,10 +139,7 @@
         }
         public static double ToAngle(Double2d value)
         {
-            double result = Math.Atan2(value.Y, value.X) / Math.Tau;
-
-            if (result >= 0) return result;
-            else return result + 1;
+            return Math.Atan2(value.Y, value.X) / Math.Tau;
         }
     }
 }

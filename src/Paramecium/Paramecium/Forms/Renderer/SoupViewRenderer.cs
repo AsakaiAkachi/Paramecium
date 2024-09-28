@@ -17,7 +17,7 @@ namespace Paramecium.Forms.Renderer
             if (cameraZoomLevel >= 4)
             {
                 DrawSoupPlant(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor);
-                DrawSoupAnimal(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor);
+                DrawSoupAnimal(targetBitmap, targetGraphics, cameraPosition, cameraZoomLevel, cameraZoomFactor);
                 DrawSoupWall(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor);
             }
             DrawSoupBorder(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor);
@@ -57,7 +57,7 @@ namespace Paramecium.Forms.Renderer
                         if (cameraZoomLevel < 4)
                         {
                             if (targetTile.LocalPlantPopulation > 0) pixelColor = Color.FromArgb(0, 255, 0);
-                            else if (targetTile.LocalAnimalPopulation > 0) pixelColor = Color.FromArgb(255, 255, 255);
+                            if (targetTile.LocalAnimalPopulation > 0) pixelColor = Color.FromArgb(255, 255, 255);
                         }
                     }
                     else if (g_Soup.Tiles[y * g_Soup.SizeX + x].Type == TileType.Wall)
@@ -153,7 +153,7 @@ namespace Paramecium.Forms.Renderer
             }
         }
 
-        public static void DrawSoupAnimal(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
+        public static void DrawSoupAnimal(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor)
         {
             for (int x = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
             {
@@ -173,7 +173,35 @@ namespace Paramecium.Forms.Renderer
                                 {
                                     FillEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius, Color.FromArgb(targetAnimal.ColorRed, targetAnimal.ColorGreen, targetAnimal.ColorBlue));
                                     DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius, Color.FromArgb(255, 255, 255));
-                                    DrawLine(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d, targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.75d, Color.FromArgb(255, 255, 255));
+                                    //DrawLine(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d, targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.75d, Color.FromArgb(255, 255, 255));
+
+                                    if (cameraZoomLevel >= 5)
+                                    {
+                                        Random tailAngleRandom = new Random((int)((targetAnimal.Id % int.MaxValue + g_Soup.ElapsedTimeSteps % int.MaxValue) % int.MaxValue));
+
+                                        for (int j = 0; j < 3; j++)
+                                        {
+                                            DrawLine(
+                                                targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
+                                                targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d,
+                                                targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.05d * targetAnimal.NeuralNetOutputs[8] + double.Max(-1d, double.Min(1d, targetAnimal.NeuralNetOutputs[9])) * 0.15d) * 0.5d,
+                                                Color.FromArgb(255, 255, 255)
+                                            );
+                                        }
+
+                                        FillEllipse(
+                                            targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
+                                            targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.075d) * 0.4d,
+                                            0.05,
+                                            Color.FromArgb(0, 0, 0)
+                                        );
+                                        FillEllipse(
+                                            targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
+                                            targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle - 0.075d) * 0.4d,
+                                            0.05,
+                                            Color.FromArgb(0, 0, 0)
+                                        );
+                                    }
                                 }
                             }
                             catch (Exception ex) { Console.WriteLine(ex.Message); }
@@ -263,7 +291,100 @@ namespace Paramecium.Forms.Renderer
 
     public static class SoupViewOverlayRenderer
     {
+        public static void DrawSoupOverlayView(ref Bitmap targetBitmap, Double2d cameraPosition, int cameraZoomLevel, SelectedObjectType selectedObjectType, int selectedObjectIndex)
+        {
+            Graphics targetGraphics = Graphics.FromImage(targetBitmap);
+            double cameraZoomFactor = double.Pow(2, cameraZoomLevel);
 
+            DrawSelectedObjectFrame(targetBitmap, targetGraphics, cameraPosition, cameraZoomLevel, cameraZoomFactor, selectedObjectType, selectedObjectIndex);
+
+            targetGraphics.Dispose();
+        }
+
+        public static void DrawSelectedObjectFrame(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor, SelectedObjectType selectedObjectType, int selectedObjectIndex)
+        {
+            if (cameraZoomLevel >= 4)
+            {
+                if (selectedObjectType == SelectedObjectType.Plant)
+                {
+                    DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, g_Soup.Plants[selectedObjectIndex].Position, g_Soup.Plants[selectedObjectIndex].Radius + 0.5d, Color.FromArgb(255, 255, 0));
+                }
+                if (selectedObjectType == SelectedObjectType.Animal)
+                {
+                    DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, g_Soup.Animals[selectedObjectIndex].Position, g_Soup.Animals[selectedObjectIndex].Radius + 0.5d, Color.FromArgb(255, 255, 0));
+                }
+            }
+        }
+
+        public static void DrawEllipse(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor, Double2d centerPosition, double radius, Color color)
+        {
+            Pen colorPen = new Pen(color);
+            targetGraphics.DrawEllipse(
+                colorPen, 
+                (float)WorldPosToViewPosX(targetBitmap, cameraPosition, cameraZoomFactor, centerPosition.X - radius), 
+                (float)WorldPosToViewPosY(targetBitmap, cameraPosition, cameraZoomFactor, centerPosition.Y - radius), 
+                (float)(radius * 2d * cameraZoomFactor), 
+                (float)(radius * 2d * cameraZoomFactor)
+            );
+            colorPen.Dispose();
+        }
+        public static void FillEllipse(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor, Double2d centerPosition, double radius, Color color)
+        {
+            SolidBrush colorBrush = new SolidBrush(color);
+            targetGraphics.FillEllipse(
+                colorBrush, 
+                (float)WorldPosToViewPosX(targetBitmap, cameraPosition, cameraZoomFactor, centerPosition.X - radius), 
+                (float)WorldPosToViewPosY(targetBitmap, cameraPosition, cameraZoomFactor, centerPosition.Y - radius), 
+                (float)(radius * 2d * cameraZoomFactor), 
+                (float)(radius * 2d * cameraZoomFactor)
+            );
+            colorBrush.Dispose();
+        }
+
+        public static void DrawRectangle(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor, Double2d startPosition, Double2d endPosition, Color color)
+        {
+            Pen colorPen = new Pen(color);
+            targetGraphics.DrawRectangle(
+                colorPen, 
+                (float)WorldPosToViewPosX(targetBitmap, cameraPosition, cameraZoomFactor, startPosition.X), 
+                (float)WorldPosToViewPosY(targetBitmap, cameraPosition, cameraZoomFactor, startPosition.Y), 
+                (float)((endPosition.X - startPosition.X) * cameraZoomFactor), 
+                (float)((endPosition.Y - startPosition.Y) * cameraZoomFactor)
+            );
+            colorPen.Dispose();
+        }
+        public static void FillRectangle(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor, Double2d startPosition, Double2d endPosition, Color color)
+        {
+            SolidBrush colorBrush = new SolidBrush(color);
+            targetGraphics.FillRectangle(
+                colorBrush, 
+                (float)WorldPosToViewPosX(targetBitmap, cameraPosition, cameraZoomFactor, startPosition.X), 
+                (float)WorldPosToViewPosY(targetBitmap, cameraPosition, cameraZoomFactor, startPosition.Y),
+                (float)((endPosition.X - startPosition.X) * cameraZoomFactor),
+                (float)((endPosition.Y - startPosition.Y) * cameraZoomFactor)
+            );
+            colorBrush.Dispose();
+        }
+
+        public static void DrawLine(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor, Double2d startPosition, Double2d endPosition, Color color)
+        {
+            Pen colorPen = new Pen(color);
+            targetGraphics.DrawLine(
+                colorPen,
+                (float)WorldPosToViewPosX(targetBitmap, cameraPosition, cameraZoomFactor, startPosition.X),
+                (float)WorldPosToViewPosY(targetBitmap, cameraPosition, cameraZoomFactor, startPosition.Y),
+                (float)WorldPosToViewPosX(targetBitmap, cameraPosition, cameraZoomFactor, endPosition.X),
+                (float)WorldPosToViewPosY(targetBitmap, cameraPosition, cameraZoomFactor, endPosition.Y)
+            );
+            colorPen.Dispose();
+        }
+
+        public enum SelectedObjectType
+        {
+            None,
+            Plant,
+            Animal
+        }
     }
 
     public static class WorldPosViewPosConversion
@@ -272,18 +393,34 @@ namespace Paramecium.Forms.Renderer
         {
             return (worldPosX - cameraPosition.X) * cameraZoomFactor + targetBitmap.Width / 2d;
         }
+        public static double WorldPosToViewPosX(int targetWidth, Double2d cameraPosition, double cameraZoomFactor, double worldPosX)
+        {
+            return (worldPosX - cameraPosition.X) * cameraZoomFactor + targetWidth / 2d;
+        }
         public static double WorldPosToViewPosY(in Bitmap targetBitmap, Double2d cameraPosition, double cameraZoomFactor, double worldPosY)
         {
             return (worldPosY - cameraPosition.Y) * cameraZoomFactor + targetBitmap.Height / 2d;
+        }
+        public static double WorldPosToViewPosY(int targetHeight, Double2d cameraPosition, double cameraZoomFactor, double worldPosY)
+        {
+            return (worldPosY - cameraPosition.Y) * cameraZoomFactor + targetHeight / 2d;
         }
 
         public static double ViewPosToWorldPosX(in Bitmap targetBitmap, Double2d cameraPosition, double cameraZoomFactor, int viewPosX)
         {
             return (viewPosX - targetBitmap.Width / 2d) / cameraZoomFactor + cameraPosition.X;
         }
+        public static double ViewPosToWorldPosX(int targetWidth, Double2d cameraPosition, double cameraZoomFactor, int viewPosX)
+        {
+            return (viewPosX - targetWidth / 2d) / cameraZoomFactor + cameraPosition.X;
+        }
         public static double ViewPosToWorldPosY(in Bitmap targetBitmap, Double2d cameraPosition, double cameraZoomFactor, int viewPosY)
         {
             return (viewPosY - targetBitmap.Height / 2d) / cameraZoomFactor + cameraPosition.Y;
+        }
+        public static double ViewPosToWorldPosY(int targetWidth, Double2d cameraPosition, double cameraZoomFactor, int viewPosY)
+        {
+            return (viewPosY - targetWidth / 2d) / cameraZoomFactor + cameraPosition.Y;
         }
     }
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5 indev-2] - 2024-09-28
+
+### Added
+- Animals are now moved by neural networks.
+- Added the ability to select objects and the ability to make the camera follow the selected object.
+- Added the ability to save and load soups.
+- Added program icon.
+
 ## [0.5 indev-1] - 2024-09-27
 
 ### Added

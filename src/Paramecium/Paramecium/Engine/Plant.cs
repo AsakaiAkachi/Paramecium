@@ -18,6 +18,8 @@
 
         public double Element { get; set; }
 
+        public Plant() { }
+
         public Plant(Double2d position, double element)
         {
             Position = position;
@@ -60,9 +62,6 @@
                     targetTile.Element -= targetTile.Element * g_Soup.PlantElementCollectRate;
 
                     if (targetTile.Element < 0) targetTile.Element = 0;
-
-                    Radius = Math.Sqrt(Element / g_Soup.PlantForkCost) / 2d;
-                    Mass = Element;
                 }
             }
             else throw new InvalidOperationException("This animal is not initialized.");
@@ -80,11 +79,11 @@
 
                         if (targetTile.Type == TileType.Wall)
                         {
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.25d), 0.356d);
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.25d), 0.356d);
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.75d), 0.356d);
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.75d), 0.356d);
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.5d, y + 0.5d), 0.5d);
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.25d), 0.356d) * g_Soup.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.25d), 0.356d) * g_Soup.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.75d), 0.356d) * g_Soup.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.75d), 0.356d) * g_Soup.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.5d, y + 0.5d), 0.5d) * g_Soup.RestitutionCoefficient;
                         }
 
                         if (targetTile.LocalPlantPopulation > 0)
@@ -92,7 +91,7 @@
                             for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
                             {
                                 Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
-                                if (targetPlant.Exist && targetPlant.Id != Id) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetPlant.Position, targetPlant.Radius, targetPlant.Mass);
+                                if (targetPlant.Exist && targetPlant.Id != Id) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetPlant.Position, targetPlant.Radius, targetPlant.Mass) * g_Soup.RestitutionCoefficient;
                             }
                         }
 
@@ -101,7 +100,7 @@
                             for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
                             {
                                 Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
-                                if (targetAnimal.Exist) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetAnimal.Position, targetAnimal.Radius, targetAnimal.Mass);
+                                if (targetAnimal.Exist) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetAnimal.Position, targetAnimal.Radius, targetAnimal.Mass) * g_Soup.RestitutionCoefficient;
                             }
                         }
                     }
@@ -163,6 +162,11 @@
 
                     g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
                 }
+
+                Radius = Math.Sqrt(Element / g_Soup.PlantForkCost) / 2d;
+                Mass = Element;
+
+                if (Element <= 0) OnDisable();
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }

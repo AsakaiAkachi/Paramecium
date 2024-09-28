@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Paramecium.Engine
 {
@@ -25,31 +26,36 @@ namespace Paramecium.Engine
         public double WallThickness { get; set; } = 0.008d;
 
         // Element Settings
-        public double TotalElementAmount { get; set; } = 65536d;
-        public double ElementFlowRate { get; set; } = 0.04d;
+        public double TotalElementAmount { get; set; } = 262144d;
+        public double ElementFlowRate { get; set; } = 0.01d;
 
         // Physical Settings
-        public double Drag { get; set; } = 0.01d;
-        public double AngularVelocityDrag { get; set; } = 0.01d;
+        public double Drag { get; set; } = 0.025d;
+        public double AngularVelocityDrag { get; set; } = 0.025d;
         public double MaximumVelocity { get; set; } = 0.1d;
-        public double RestitutionCoefficient { get; set; } = 1d;
+        public double MaximumAngularVelocity { get; set; } = 0.1d;
+        public double RestitutionCoefficient { get; set; } = 0.1d;
 
         // Plant Settings
-        public int InitialPlantPopulation { get; set; } = 256;
-        public double InitialPlantElementAmount { get; set; } = 4d;
+        public int InitialPlantPopulation { get; set; } = 4096;
+        public double InitialPlantElementAmount { get; set; } = 16d;
         public double PlantForkCost { get; set; } = 16d;
         public int PlantForkOffspringCountMin { get; set; } = 4;
         public int PlantForkOffspringCountMax { get; set; } = 8;
-        public double PlantElementCollectRate { get; set; } = 0.04d;
+        public double PlantElementCollectRate { get; set; } = 0.01d;
 
         // Animal Basic Settings
         public int InitialAnimalPopulation { get; set; } = 1024;
-        public double InitialAnimalElementAmount { get; set; } = 32d;
+        public double InitialAnimalElementAmount { get; set; } = 64d;
         public double AnimalForkCost { get; set; } = 64d;
+        public double AnimalElementUpkeep { get; set; } = 0.04d;
+        public double AnimalPlantIngestionRate { get; set; } = 0.2d;
+        public double AnimalAnimalIngestionRate { get; set; } = 0.8d;
+        public int AnimalMaximumAge { get; set; } = 15000;
 
         // Animal Mutation Settings
         public double AnimalMutationRate { get; set; } = 0.2d;
-        public double AnimalNeuralNetWeightMutationRate { get; set; } = 0.01d;
+        public double AnimalBrainNodeMutationRate { get; set; } = 0.05d;
         public double AnimalSpeciesIdMutationRate { get; set; } = 0.1d;
 
 
@@ -63,6 +69,10 @@ namespace Paramecium.Engine
         public long TotalBornCount { get; set; } = 0;
         public long TotalDieCount { get; set; } = 0;
         public long LatestGeneration { get; set; } = 0;
+
+        // Population Information
+        public int PopulationPlant { get; set; }
+        public int PopulationAnimal { get; set; }
 
         // Soup State Management
         public bool Initialized { get; set; } = false;
@@ -131,7 +141,7 @@ namespace Paramecium.Engine
                     }
                 }
 
-                Random random = new Random();
+                Random random = new Random(InitialSeed);
 
                 for (int i = 0; i < InitialPlantPopulation; i++)
                 {
@@ -154,6 +164,8 @@ namespace Paramecium.Engine
                     Animals.Add(new Animal(new Double2d(targetTile.PositionX + random.NextDouble(), targetTile.PositionY + random.NextDouble()), random.NextDouble(), InitialAnimalElementAmount, random));
                     Animals[Animals.Count - 1].Initialize(Animals.Count - 1, random);
                 }
+
+                CurrentSeed = random.Next(int.MinValue, int.MaxValue);
 
                 Initialized = true;
             }
@@ -243,18 +255,16 @@ namespace Paramecium.Engine
                                         targetTile.Element *= GlobalElementAmountMultiplier;
                                     }
                                 });
-                                Parallel.For(0, Plants.Count, parallelOptions, i => { Plants[i].Element *= GlobalElementAmountMultiplier; });
-                                Parallel.For(0, Animals.Count, parallelOptions, i => { Animals[i].Element *= GlobalElementAmountMultiplier; });
+                                Parallel.For(0, Plants.Count, parallelOptions, i => { Plants[i].Element *= GlobalElementAmountMultiplier; Plants[i].Radius = Math.Sqrt(Plants[i].Element / g_Soup.PlantForkCost) / 2d; Plants[i].Mass = Plants[i].Element; });
+                                Parallel.For(0, Animals.Count, parallelOptions, i => { Animals[i].Element *= GlobalElementAmountMultiplier; Animals[i].Mass = 16d + Animals[i].Element; });
 
-                                Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].ApplyDrag(); });
+                                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].CollectElement();
 
                                 Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].UpdateNeuralNet(); });
                                 for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) Animals[i].ApplyNeuralNetOutput();
 
-                                //for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].ApplyDrag();
                                 Parallel.For(0, Plants.Count, parallelOptions, i => { if (Plants[i].Exist) Plants[i].ApplyDrag(); });
-
-                                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].CollectElement();
+                                Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].ApplyDrag(); });
 
                                 Parallel.For(0, Plants.Count, parallelOptions, i => { if (Plants[i].Exist) Plants[i].UpdateCollision(); });
                                 Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].UpdateCollision(); });
@@ -262,10 +272,12 @@ namespace Paramecium.Engine
                                 for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].UpdatePosition();
                                 for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) Animals[i].UpdatePosition();
 
+                                Random random = new Random(CurrentSeed);
+
                                 List<Plant> PlantOffspringBuffer = new List<Plant>();
                                 for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist)
                                     {
-                                        List<Plant>? PlantOffspringLocalBuffer = Plants[i].CreateOffspring(new Random());
+                                        List<Plant>? PlantOffspringLocalBuffer = Plants[i].CreateOffspring(random);
 
                                         if (PlantOffspringLocalBuffer is not null) for (int j = 0; j < PlantOffspringLocalBuffer.Count; j++) PlantOffspringBuffer.Add(PlantOffspringLocalBuffer[j]);
                                     }
@@ -275,15 +287,47 @@ namespace Paramecium.Engine
                                     if (PlantUnusedIndexes.Count > 0)
                                     {
                                         Plants[PlantUnusedIndexes[PlantUnusedIndexes.Count - 1]] = PlantOffspringBuffer[i];
-                                        Plants[PlantUnusedIndexes[PlantUnusedIndexes.Count - 1]].Initialize(PlantUnusedIndexes[PlantUnusedIndexes.Count - 1], new Random());
+                                        Plants[PlantUnusedIndexes[PlantUnusedIndexes.Count - 1]].Initialize(PlantUnusedIndexes[PlantUnusedIndexes.Count - 1], random);
                                         PlantUnusedIndexes.RemoveAt(PlantUnusedIndexes.Count - 1);
                                     }
                                     else
                                     {
                                         Plants.Add(PlantOffspringBuffer[i]);
-                                        Plants[Plants.Count - 1].Initialize(Plants.Count - 1, new Random());
+                                        Plants[Plants.Count - 1].Initialize(Plants.Count - 1, random);
                                     }
                                 }
+
+                                List<Animal> AnimalOffspringBuffer = new List<Animal>();
+                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist)
+                                    {
+                                        Animal? AnimalOffspringLocalBuffer = Animals[i].CreateOffspring(random);
+
+                                        if (AnimalOffspringLocalBuffer is not null) AnimalOffspringBuffer.Add(AnimalOffspringLocalBuffer);
+                                    }
+
+                                for (int i = 0; i < AnimalOffspringBuffer.Count; i++)
+                                {
+                                    if (AnimalUnusedIndexes.Count > 0)
+                                    {
+                                        Animals[AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1]] = AnimalOffspringBuffer[i];
+                                        Animals[AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1]].Initialize(AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1], random);
+                                        AnimalUnusedIndexes.RemoveAt(AnimalUnusedIndexes.Count - 1);
+                                    }
+                                    else
+                                    {
+                                        Animals.Add(AnimalOffspringBuffer[i]);
+                                        Animals[Animals.Count - 1].Initialize(Animals.Count - 1, random);
+                                    }
+                                }
+
+                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) LatestGeneration = long.Max(LatestGeneration, Animals[i].Generation);
+
+                                PopulationPlant = 0;
+                                PopulationAnimal = 0;
+                                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) PopulationPlant++;
+                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) PopulationAnimal++;
+
+                                CurrentSeed = random.Next(int.MinValue, int.MaxValue);
 
                                 ElapsedTimeSteps++;
 
