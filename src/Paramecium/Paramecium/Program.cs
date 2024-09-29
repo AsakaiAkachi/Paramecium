@@ -19,9 +19,13 @@ namespace Paramecium
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
             Console.Title = "Paramecium";
 
-            if (!Directory.Exists($@"{Path.GetDirectoryName(Application.ExecutablePath)}\Simulations"))
+            if (!Directory.Exists($@"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations"))
             {
-                Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\Simulations");
+                Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations");
+            }
+            if (!Directory.Exists($@"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations\autosaves"))
+            {
+                Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations\autosaves");
             }
 
             ApplicationConfiguration.Initialize();

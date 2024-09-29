@@ -48,15 +48,19 @@ namespace Paramecium.Engine
         public int InitialAnimalPopulation { get; set; } = 1024;
         public double InitialAnimalElementAmount { get; set; } = 64d;
         public double AnimalForkCost { get; set; } = 64d;
-        public double AnimalElementUpkeep { get; set; } = 0.04d;
+        public double AnimalElementUpkeep { get; set; } = 0.02d;
         public double AnimalPlantIngestionRate { get; set; } = 0.2d;
         public double AnimalAnimalIngestionRate { get; set; } = 0.8d;
         public int AnimalMaximumAge { get; set; } = 15000;
 
         // Animal Mutation Settings
-        public double AnimalMutationRate { get; set; } = 0.2d;
-        public double AnimalBrainNodeMutationRate { get; set; } = 0.05d;
-        public double AnimalSpeciesIdMutationRate { get; set; } = 0.1d;
+        public double AnimalMutationRate { get; set; } = 0.25d;
+        public int AnimalMaximumMutationCount { get; set; } = 8;
+        public double AnimalSpeciesIdMutationRate { get; set; } = 0.25d;
+
+        // Animal Brain Settings
+        public int AnimalBrainMaximumNodeCount { get; set; } = 64;
+        public int AnimalBrainMaximumConnectionCount { get; set; } = 8;
 
 
 
@@ -69,6 +73,9 @@ namespace Paramecium.Engine
         public long TotalBornCount { get; set; } = 0;
         public long TotalDieCount { get; set; } = 0;
         public long LatestGeneration { get; set; } = 0;
+
+        // Soup File Information
+        public bool Modified { get; set; } = true;
 
         // Population Information
         public int PopulationPlant { get; set; }
@@ -330,6 +337,7 @@ namespace Paramecium.Engine
                                 CurrentSeed = random.Next(int.MinValue, int.MaxValue);
 
                                 ElapsedTimeSteps++;
+                                Modified = true;
 
                                 if (SoupState == SoupState.StepRun) SoupState = SoupState.Pause;
 

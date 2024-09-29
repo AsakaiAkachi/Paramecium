@@ -184,7 +184,7 @@ namespace Paramecium.Forms.Renderer
                                             DrawLine(
                                                 targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
                                                 targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d,
-                                                targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.05d * targetAnimal.NeuralNetOutputs[8] + double.Max(-1d, double.Min(1d, targetAnimal.NeuralNetOutputs[9])) * 0.15d) * 0.5d,
+                                                targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.05d * targetAnimal.BrainOutput.Acceleration + double.Max(-1d, double.Min(1d, -targetAnimal.BrainOutput.Rotation)) * 0.15d) * 0.5d,
                                                 Color.FromArgb(255, 255, 255)
                                             );
                                         }
@@ -296,12 +296,12 @@ namespace Paramecium.Forms.Renderer
             Graphics targetGraphics = Graphics.FromImage(targetBitmap);
             double cameraZoomFactor = double.Pow(2, cameraZoomLevel);
 
-            DrawSelectedObjectFrame(targetBitmap, targetGraphics, cameraPosition, cameraZoomLevel, cameraZoomFactor, selectedObjectType, selectedObjectIndex);
+            DrawSelectedObjectInformation(targetBitmap, targetGraphics, cameraPosition, cameraZoomLevel, cameraZoomFactor, selectedObjectType, selectedObjectIndex);
 
             targetGraphics.Dispose();
         }
 
-        public static void DrawSelectedObjectFrame(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor, SelectedObjectType selectedObjectType, int selectedObjectIndex)
+        public static void DrawSelectedObjectInformation(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor, SelectedObjectType selectedObjectType, int selectedObjectIndex)
         {
             if (cameraZoomLevel >= 4)
             {

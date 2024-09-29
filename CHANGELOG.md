@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5 indev-3] - 2024-09-29
+
+### Added
+- Added animal brain mutations.
+
+### Changed
+- The animal neural network was separated from the `Animal` class into the `Brain` class and its related classes.
+
 ## [0.5 indev-2] - 2024-09-28
 
 ### Added

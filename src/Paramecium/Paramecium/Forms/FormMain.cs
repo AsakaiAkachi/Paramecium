@@ -10,16 +10,16 @@ namespace Paramecium.Forms
     {
         Bitmap SoupViewCanvas;
 
+        CameraState CameraState;
         Double2d CameraPosition;
         int ZoomLevel;
+        long AutoTrackingTime;
 
         double FramesPerSecond;
 
         SoupViewOverlayRenderer.SelectedObjectType SelectedObjectType;
         int SelectedObjectIndex;
         long SelectedObjectId;
-        bool CameraTracking;
-        bool CameraAutoTracking;
 
         public FormMain()
         {
@@ -39,6 +39,8 @@ namespace Paramecium.Forms
 
         private async void FormMain_Shown(object sender, EventArgs e)
         {
+            long SoupElapsedTimeSteps = 0;
+
             while (true)
             {
                 if (SoupView.Width > 0 && SoupView.Height > 0)
@@ -50,16 +52,16 @@ namespace Paramecium.Forms
 
                     if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.None)
                     {
-                        if (!CameraAutoTracking) CameraTracking = false;
+                        if (CameraState == CameraState.Tracking) CameraState = CameraState.Default;
                     }
                     if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
                     {
                         if (!g_Soup.Plants[SelectedObjectIndex].Exist || SelectedObjectId != g_Soup.Plants[SelectedObjectIndex].Id)
                         {
                             SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.None;
-                            if (!CameraAutoTracking) CameraTracking = false;
+                            if (CameraState == CameraState.Tracking) CameraState = CameraState.Default;
                         }
-                        else if (CameraTracking)
+                        else if (CameraState == CameraState.Tracking || CameraState == CameraState.AutoTracking)
                         {
                             CameraPosition = g_Soup.Plants[SelectedObjectIndex].Position;
                         }
@@ -69,21 +71,29 @@ namespace Paramecium.Forms
                         if (!g_Soup.Animals[SelectedObjectIndex].Exist || SelectedObjectId != g_Soup.Animals[SelectedObjectIndex].Id)
                         {
                             SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.None;
-                            if (!CameraAutoTracking) CameraTracking = false;
+                            if (CameraState == CameraState.Tracking) CameraState = CameraState.Default;
                         }
-                        else if (CameraTracking)
+                        else if (CameraState == CameraState.Tracking || CameraState == CameraState.AutoTracking)
                         {
                             CameraPosition = g_Soup.Animals[SelectedObjectIndex].Position;
                         }
                     }
 
-                    if (CameraTracking && CameraAutoTracking && SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.None)
+                    if (CameraState == CameraState.AutoTracking)
                     {
-                        SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Animal;
-                        SelectedObjectIndex = new Random().Next(0, g_Soup.Animals.Count);
-                        while (!g_Soup.Animals[SelectedObjectIndex].Exist) SelectedObjectIndex = new Random().Next(0, g_Soup.Animals.Count);
-                        SelectedObjectId = g_Soup.Animals[SelectedObjectIndex].Id;
+                        if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.None || AutoTrackingTime >= 5000)
+                        {
+                            SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Animal;
+                            SelectedObjectIndex = new Random().Next(0, g_Soup.Animals.Count);
+                            while (!g_Soup.Animals[SelectedObjectIndex].Exist) SelectedObjectIndex = new Random().Next(0, g_Soup.Animals.Count);
+                            SelectedObjectId = g_Soup.Animals[SelectedObjectIndex].Id;
+
+                            AutoTrackingTime = 0;
+                        }
+                        else AutoTrackingTime += g_Soup.ElapsedTimeSteps - SoupElapsedTimeSteps;
                     }
+
+                    SoupElapsedTimeSteps = g_Soup.ElapsedTimeSteps;
 
                     SoupViewCanvas = new Bitmap(SoupView.Width, SoupView.Height);
                     SoupViewRenderer.DrawSoupView(ref SoupViewCanvas, CameraPosition, ZoomLevel);
@@ -95,6 +105,9 @@ namespace Paramecium.Forms
                     FramesPerSecond *= 0.96d;
                     FramesPerSecond += 1000000d / sw.Elapsed.TotalMicroseconds * 0.04d;
                 }
+
+                if (!g_Soup.Modified) Text = $"{Path.GetFileName(g_FilePath)} - {g_AppName} {g_AppVersion}";
+                else Text = $"*{Path.GetFileName(g_FilePath)} - {g_AppName} {g_AppVersion}";
 
                 BottomStat_SoupState.Text = $"Status : {g_Soup.SoupState}";
                 BottomStat_ElapsedTimeSteps.Text = $"Time Step : {g_Soup.ElapsedTimeSteps} (T{g_Soup.ThreadCount})";
@@ -126,26 +139,16 @@ namespace Paramecium.Forms
                     g_Soup.SetThreadCount(g_Soup.ThreadCount - 1);
                     break;
                 case Keys.T:
-                    if (!CameraTracking)
+                    if (CameraState == CameraState.Default)
                     {
-                        if (ModifierKeys == Keys.Control)
-                        {
-                            CameraTracking = true;
-                            CameraAutoTracking = true;
-                        }
+                        if (ModifierKeys == Keys.Control) CameraState = CameraState.AutoTracking;
                         else
                         {
-                            if (SelectedObjectType != SoupViewOverlayRenderer.SelectedObjectType.None)
-                            {
-                                CameraTracking = true;
-                            }
+                            if (SelectedObjectType != SoupViewOverlayRenderer.SelectedObjectType.None) CameraState = CameraState.Tracking;
+                            else CameraState = CameraState.Default;
                         }
                     }
-                    else
-                    {
-                        CameraTracking = false;
-                        CameraAutoTracking = false;
-                    }
+                    else CameraState = CameraState.Default;
                     break;
             }
         }
@@ -170,8 +173,7 @@ namespace Paramecium.Forms
                         default:
                             SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.None;
                             SelectedObjectIndex = -1;
-                            CameraTracking = false;
-                            CameraAutoTracking = false;
+                            if (CameraState == CameraState.AutoTracking) CameraState = CameraState.Tracking;
 
                             if (ZoomLevel >= 4)
                             {
@@ -239,7 +241,9 @@ namespace Paramecium.Forms
                                         }
                                     }
                                 }
-                                catch (Exception ex) { }
+                                catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+                                if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.None) CameraState = CameraState.Default;
                             }
                             break;
                     }
@@ -322,6 +326,9 @@ namespace Paramecium.Forms
 
         private void TopMenu_File_Save_Click(object sender, EventArgs e)
         {
+            g_Soup.SetSoupState(SoupState.Pause);
+            g_Soup.Modified = false;
+
             StreamWriter streamWriter = new StreamWriter(g_FilePath, false, Encoding.UTF8);
             streamWriter.Write(JsonSerializer.Serialize(g_Soup));
             streamWriter.Close();
@@ -332,6 +339,8 @@ namespace Paramecium.Forms
             if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
             {
                 g_Soup.SetSoupState(SoupState.Pause);
+                g_Soup.Modified = false;
+
                 StreamWriter streamWriter = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
                 streamWriter.Write(JsonSerializer.Serialize(g_Soup));
                 streamWriter.Close();
@@ -345,5 +354,12 @@ namespace Paramecium.Forms
         {
             Application.Exit();
         }
+    }
+
+    public enum CameraState
+    {
+        Default,
+        Tracking,
+        AutoTracking
     }
 }
