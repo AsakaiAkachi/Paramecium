@@ -26,29 +26,34 @@ namespace Paramecium.Engine
         public double WallThickness { get; set; } = 0.008d;
 
         // Element Settings
-        public double TotalElementAmount { get; set; } = 262144d;
+        public double TotalElementAmount { get; set; } = 512 * 256 * 2;
         public double ElementFlowRate { get; set; } = 0.01d;
+
+        // Pheromone Settings
+        public double PheromoneFlowRate { get; set; } = 0.1d;
+        public double PheromoneDecayRate { get; set; } = 0.01d;
+        public double PheromoneGenerateRate { get; set; } = 0.1d;
 
         // Physical Settings
         public double Drag { get; set; } = 0.025d;
-        public double AngularVelocityDrag { get; set; } = 0.025d;
+        public double AngularVelocityDrag { get; set; } = 0.01d;
         public double MaximumVelocity { get; set; } = 0.1d;
         public double MaximumAngularVelocity { get; set; } = 0.1d;
         public double RestitutionCoefficient { get; set; } = 0.1d;
 
         // Plant Settings
-        public int InitialPlantPopulation { get; set; } = 4096;
+        public int InitialPlantPopulation { get; set; } = 512 * 256 * 2 / 2 / 16;
         public double InitialPlantElementAmount { get; set; } = 16d;
         public double PlantForkCost { get; set; } = 16d;
         public int PlantForkOffspringCountMin { get; set; } = 4;
         public int PlantForkOffspringCountMax { get; set; } = 8;
-        public double PlantElementCollectRate { get; set; } = 0.01d;
+        public double PlantElementCollectRate { get; set; } = 0.04d;
 
         // Animal Basic Settings
-        public int InitialAnimalPopulation { get; set; } = 1024;
+        public int InitialAnimalPopulation { get; set; } = 512 * 256 * 2 / 2 / 64;
         public double InitialAnimalElementAmount { get; set; } = 64d;
         public double AnimalForkCost { get; set; } = 64d;
-        public double AnimalElementUpkeep { get; set; } = 0.02d;
+        public double AnimalElementUpkeep { get; set; } = 0.04d;
         public double AnimalPlantIngestionRate { get; set; } = 0.2d;
         public double AnimalAnimalIngestionRate { get; set; } = 0.8d;
         public int AnimalMaximumAge { get; set; } = 15000;
@@ -172,6 +177,11 @@ namespace Paramecium.Engine
                     Animals[Animals.Count - 1].Initialize(Animals.Count - 1, random);
                 }
 
+                PopulationPlant = 0;
+                PopulationAnimal = 0;
+                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) PopulationPlant++;
+                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) PopulationAnimal++;
+
                 CurrentSeed = random.Next(int.MinValue, int.MaxValue);
 
                 Initialized = true;
@@ -200,6 +210,9 @@ namespace Paramecium.Engine
                                 };
 
                                 double[] elementFlowAmount = new double[SizeX * SizeY];
+                                double[] pheromoneRedFlowAmount = new double[SizeX * SizeY];
+                                double[] pheromoneGreenFlowAmount = new double[SizeX * SizeY];
+                                double[] pheromoneBlueFlowAmount = new double[SizeX * SizeY];
                                 //for (int x = 0; x < SizeX; x++)
                                 Parallel.For(0, SizeX, parallelOptions, x =>
                                 {
@@ -222,6 +235,9 @@ namespace Paramecium.Engine
                                                             if (targetTile2.Type == TileType.Default)
                                                             {
                                                                 elementFlowAmount[y * SizeX + x] -= (targetTile1.Element - targetTile2.Element) * ElementFlowRate;
+                                                                pheromoneRedFlowAmount[y * SizeX + x] -= (targetTile1.PheromoneRed - targetTile2.PheromoneRed) * PheromoneFlowRate;
+                                                                pheromoneGreenFlowAmount[y * SizeX + x] -= (targetTile1.PheromoneGreen - targetTile2.PheromoneGreen) * PheromoneFlowRate;
+                                                                pheromoneBlueFlowAmount[y * SizeX + x] -= (targetTile1.PheromoneBlue - targetTile2.PheromoneBlue) * PheromoneFlowRate;
                                                             }
                                                         }
                                                     }
@@ -236,7 +252,14 @@ namespace Paramecium.Engine
                                     {
                                         Tile targetTile = Tiles[y * SizeX + x];
                                         targetTile.Element += elementFlowAmount[y * SizeX + x];
+                                        targetTile.PheromoneRed += pheromoneRedFlowAmount[y * SizeX + x];
+                                        targetTile.PheromoneGreen += pheromoneGreenFlowAmount[y * SizeX + x];
+                                        targetTile.PheromoneBlue += pheromoneBlueFlowAmount[y * SizeX + x];
                                         if (targetTile.Element < 0) targetTile.Element = 0;
+
+                                        targetTile.PheromoneRed *= 1d - PheromoneDecayRate;
+                                        targetTile.PheromoneGreen *= 1d - PheromoneDecayRate;
+                                        targetTile.PheromoneBlue *= 1d - PheromoneDecayRate;
                                     }
                                 });
 

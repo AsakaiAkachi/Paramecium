@@ -18,6 +18,7 @@ namespace Paramecium.Engine
 
         public int Generation { get; set; }
         public int Age { get; set; }
+        public int OffspringCount { get; set; }
 
         public Double2d Position { get; set; }
         public Double2d Velocity { get; set; }
@@ -31,18 +32,19 @@ namespace Paramecium.Engine
 
         public double Element { get; set; }
         public double Efficiency { get; set; }
-        public double Fertility { get; set; }
 
         public int ColorRed { get; set; }
         public int ColorGreen { get; set; }
         public int ColorBlue { get; set; }
 
         public Brain Brain { get; set; }
+        public BrainInput BrainInput { get; set; }
         public BrainOutput BrainOutput { get; set; }
 
         public Animal()
         {
             Brain = Brain.GetDefaultBrain;
+            BrainInput = new BrainInput();
             BrainOutput = new BrainOutput();
         }
 
@@ -68,6 +70,7 @@ namespace Paramecium.Engine
             ColorBlue = random.Next(0, 255 + 1);
 
             Brain = Brain.GetDefaultBrain;
+            BrainInput = new BrainInput();
             BrainOutput = new BrainOutput();
         }
 
@@ -108,6 +111,7 @@ namespace Paramecium.Engine
                 }
             }
 
+            BrainInput = new BrainInput();
             BrainOutput = new BrainOutput();
         }
 
@@ -123,6 +127,8 @@ namespace Paramecium.Engine
                 g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].LocalAnimalIndexes.Add(Index);
 
                 Initialized = true;
+
+                g_Soup.TotalBornCount++;
             }
             else throw new InvalidOperationException("This animal has already been initialized.");
         }
@@ -131,7 +137,21 @@ namespace Paramecium.Engine
         {
             if (Initialized)
             {
-                BrainOutput = Brain.UpdateBrain(new BrainInput() { VisionData = AnimalVision.Observe(Position, Angle, Id, SpeciesId, 9, 29, 0.5d, 3, 7, 0.4d), PrevStepOutput = BrainOutput, Velocity = Velocity.Length / g_Soup.MaximumVelocity, AngularVelocity = AngularVelocity / g_Soup.MaximumAngularVelocity, Satiety = Element / g_Soup.AnimalForkCost });
+                Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX];
+
+                BrainInput = new BrainInput()
+                {
+                    VisionData = AnimalVision.Observe(Position, Angle, Id, SpeciesId, 9, 29, 0.5d, 3, 7, 0.4d),
+                    PrevStepOutput = BrainOutput,
+                    Velocity = Velocity.Length / g_Soup.MaximumVelocity,
+                    AngularVelocity = AngularVelocity / g_Soup.MaximumAngularVelocity,
+                    Satiety = Element / g_Soup.AnimalForkCost,
+                    PheromoneRed = targetTile.PheromoneRed,
+                    PheromoneGreen = targetTile.PheromoneGreen,
+                    PheromoneBlue = targetTile.PheromoneBlue
+                };
+
+                BrainOutput = Brain.UpdateBrain(BrainInput);
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }
@@ -143,11 +163,21 @@ namespace Paramecium.Engine
                 Velocity += Double2d.FromAngle(Angle) * double.Max(-1d, double.Min(1d, BrainOutput.Acceleration)) * g_Soup.MaximumVelocity * g_Soup.Drag;
                 AngularVelocity += double.Max(-1d, double.Min(1d, BrainOutput.Rotation)) * g_Soup.MaximumAngularVelocity * g_Soup.AngularVelocityDrag;
 
-                //Console.WriteLine($"Animal {Id} :");
-                //Console.WriteLine($" - Acceleration {BrainOutput.Acceleration}");
-                //Console.WriteLine($" - Rotation {BrainOutput.Rotation}");
-                //Console.WriteLine($" - Attack {BrainOutput.Attack}");
-                //Console.WriteLine("");
+                if (BrainOutput.PheromoneRed > 0)
+                {
+                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX];
+                    targetTile.PheromoneRed += double.Min(1d, BrainOutput.PheromoneRed) * g_Soup.PheromoneGenerateRate;
+                }
+                if (BrainOutput.PheromoneGreen > 0)
+                {
+                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX];
+                    targetTile.PheromoneGreen += double.Min(1d, BrainOutput.PheromoneGreen) * g_Soup.PheromoneGenerateRate;
+                }
+                if (BrainOutput.PheromoneBlue > 0)
+                {
+                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX];
+                    targetTile.PheromoneBlue += double.Min(1d, BrainOutput.PheromoneBlue) * g_Soup.PheromoneGenerateRate;
+                }
 
                 if (BrainOutput.Attack > 0)
                 {
@@ -345,7 +375,7 @@ namespace Paramecium.Engine
                     )
                     {
                         Element -= g_Soup.AnimalForkCost;
-                        g_Soup.TotalBornCount++;
+                        OffspringCount++;
                         return new Animal(this, Position + Double2d.FromAngle(Angle + 0.5) * 0.5, g_Soup.AnimalForkCost, random);
                     }
                     else return null;

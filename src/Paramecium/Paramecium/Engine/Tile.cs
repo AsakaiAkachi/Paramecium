@@ -9,6 +9,10 @@
 
         public double Element { get; set; } = 0d;
 
+        public double PheromoneRed { get; set; } = 0d;
+        public double PheromoneGreen { get; set; } = 0d;
+        public double PheromoneBlue { get; set; } = 0d;
+
         public List<int> LocalPlantIndexes { get; set; } = new List<int>();
         public int LocalPlantPopulation { get => LocalPlantIndexes.Count; }
 

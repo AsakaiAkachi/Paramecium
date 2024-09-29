@@ -113,9 +113,24 @@ namespace Paramecium.Engine
 
                         for (int j = 0; j < 8; j++)
                         {
-                            result.nodes[MutationTarget].Connections.Add(new BrainNodeConnection());
-                            result.nodes[MutationTarget].Connections[j].TargetIndex = random.Next(0, result.nodes.Count);
-                            result.nodes[MutationTarget].Connections[j].Weight = random.NextDouble() * 4d - 2d;
+                            if (BrainNode.NodeIsInput(result.nodes[MutationTarget].Type) || BrainNode.NodeIsHidden(result.nodes[MutationTarget].Type))
+                            {
+                                result.nodes[MutationTarget].Connections.Add(new BrainNodeConnection());
+                                result.nodes[MutationTarget].Connections[j].TargetIndex = random.Next(0, result.nodes.Count);
+                                result.nodes[MutationTarget].Connections[j].Weight = random.NextDouble() * 4d - 2d;
+                            }
+
+                            if (BrainNode.NodeIsHidden(result.nodes[MutationTarget].Type) || BrainNode.NodeIsOutput(result.nodes[MutationTarget].Type))
+                            {
+                                int AddConnectionTarget = random.Next(0, result.nodes.Count);
+
+                                if (result.nodes[AddConnectionTarget].Connections.Count < g_Soup.AnimalBrainMaximumConnectionCount)
+                                {
+                                    result.nodes[AddConnectionTarget].Connections.Add(new BrainNodeConnection());
+                                    result.nodes[AddConnectionTarget].Connections[result.nodes[AddConnectionTarget].Connections.Count - 1].TargetIndex = MutationTarget;
+                                    result.nodes[AddConnectionTarget].Connections[result.nodes[AddConnectionTarget].Connections.Count - 1].Weight = random.NextDouble() * 4d - 2d;
+                                }
+                            }
 
                             if (random.NextDouble() < 0.5d) break;
                         }
@@ -152,6 +167,7 @@ namespace Paramecium.Engine
                     if (result.nodes.Count > 1)
                     {
                         MutationTarget = random.Next(0, result.nodes.Count);
+                        BrainNodeType MutationTargetPrevBrainNodeType = result.nodes[MutationTarget].Type;
 
                         int NodeType = random.Next(0, 2 + 1);
                         switch (NodeType)
@@ -165,6 +181,22 @@ namespace Paramecium.Engine
                             case 2:
                                 result.nodes[MutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Output_Acceleration, (int)BrainNodeType.Output_Memory7 + 1);
                                 break;
+                        }
+
+                        if (!BrainNode.NodeIsOutput(MutationTargetPrevBrainNodeType) && BrainNode.NodeIsOutput(result.nodes[MutationTarget].Type))
+                        {
+                            result.nodes[MutationTarget].Connections.Clear();
+                        }
+                        else if (BrainNode.NodeIsOutput(MutationTargetPrevBrainNodeType) && !BrainNode.NodeIsOutput(result.nodes[MutationTarget].Type))
+                        {
+                            for (int j = 0; j < 8; j++)
+                            {
+                                result.nodes[MutationTarget].Connections.Add(new BrainNodeConnection());
+                                result.nodes[MutationTarget].Connections[j].TargetIndex = random.Next(0, result.nodes.Count);
+                                result.nodes[MutationTarget].Connections[j].Weight = random.NextDouble() * 4d - 2d;
+
+                                if (random.NextDouble() < 0.5d) break;
+                            }
                         }
                     }
                 }
@@ -229,9 +261,112 @@ namespace Paramecium.Engine
 
                         if (random.NextDouble() < 0.5d) break;
                     }
+
                 }
 
                 if (random.NextDouble() < 0.5d) break;
+            }
+
+            for (int j = 0; j < result.nodes.Count; j++)
+            {
+                List<int> connectionTargetIndexes = new List<int>();
+
+                if (BrainNode.NodeIsOutput(result.nodes[j].Type))
+                {
+                    result.nodes[j].Connections.Clear();
+                }
+                else
+                {
+                    for (int k = result.nodes[j].Connections.Count - 1; k >= 0; k--)
+                    {
+                        if (result.nodes[j].Connections[k].TargetIndex == j)
+                        {
+                            result.nodes[j].Connections.RemoveAt(k);
+                        }
+                        else if (BrainNode.NodeIsInput(result.nodes[result.nodes[j].Connections[k].TargetIndex].Type))
+                        {
+                            result.nodes[j].Connections.RemoveAt(k);
+                        }
+                        else if (connectionTargetIndexes.Contains(result.nodes[j].Connections[k].TargetIndex))
+                        {
+                            result.nodes[j].Connections.RemoveAt(k);
+                        }
+                        else
+                        {
+                            connectionTargetIndexes.Add(result.nodes[j].Connections[k].TargetIndex);
+                        }
+                    }
+                }
+            }
+
+            for (int i = result.nodes.Count - 1; i >= 0; i--)
+            {
+                if (!BrainNode.NodeIsOutput(result.nodes[i].Type) && result.nodes[i].Connections.Count == 0)
+                {
+                    result.nodes.RemoveAt(i);
+
+                    for (int j = 0; j < result.nodes.Count; j++)
+                    {
+                        if (result.nodes[j].Connections.Count > 0)
+                        {
+                            for (int k = result.nodes[j].Connections.Count - 1; k >= 0; k--)
+                            {
+                                if (result.nodes[j].Connections[k].TargetIndex == j)
+                                {
+                                    result.nodes[j].Connections.RemoveAt(k);
+                                }
+                                else if (result.nodes[j].Connections[k].TargetIndex > j)
+                                {
+                                    result.nodes[j].Connections[k].TargetIndex--;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = result.nodes.Count - 1; i >= 0; i--)
+            {
+                if (!BrainNode.NodeIsInput(result.nodes[i].Type))
+                {
+                    bool hasInput = false;
+
+                    for (int j = 0; j < result.nodes.Count; j++)
+                    {
+                        for (int k = 0; k < result.nodes[j].Connections.Count; k++)
+                        {
+                            if (result.nodes[j].Connections[k].TargetIndex == i)
+                            {
+                                hasInput = true;
+                                break;
+                            }
+                        }
+                        if (hasInput) break;
+                    }
+
+                    if (!hasInput)
+                    {
+                        result.nodes.RemoveAt(i);
+
+                        for (int j = 0; j < result.nodes.Count; j++)
+                        {
+                            if (result.nodes[j].Connections.Count > 0)
+                            {
+                                for (int k = result.nodes[j].Connections.Count - 1; k >= 0; k--)
+                                {
+                                    if (result.nodes[j].Connections[k].TargetIndex == j)
+                                    {
+                                        result.nodes[j].Connections.RemoveAt(k);
+                                    }
+                                    else if (result.nodes[j].Connections[k].TargetIndex > j)
+                                    {
+                                        result.nodes[j].Connections[k].TargetIndex--;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             return result;
@@ -430,6 +565,22 @@ namespace Paramecium.Engine
                     break;
             }
         }
+
+        public static bool NodeIsInput(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Input_Bias && (int)type <= (int)BrainNodeType.Input_Memory7) return true;
+            else return false;
+        }
+        public static bool NodeIsHidden(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Hidden_ReLU && (int)type <= (int)BrainNodeType.Hidden_LimitedTangent) return true;
+            else return false;
+        }
+        public static bool NodeIsOutput(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Output_Acceleration && (int)type <= (int)BrainNodeType.Output_Memory7) return true;
+            else return false;
+        }
     }
 
     public class BrainNodeConnection
@@ -526,10 +677,12 @@ namespace Paramecium.Engine
         {
             AnimalVisionOutput result = new AnimalVisionOutput();
 
-            int WallAvgAngleEntryCount = 0;
-            int PlantAvgAngleEntryCount = 0;
-            int AnimalSameSpeciesAvgAngleEntryCount = 0;
-            int AnimalOtherSpeciesAvgAngleEntryCount = 0;
+            double WallAvgAngleDenominator = 0;
+            double PlantAvgAngleDenominator = 0;
+            double AnimalSameSpeciesAvgAngleDenominator = 0;
+            double AnimalOtherSpeciesAvgAngleDenominator = 0;
+
+            double frontViewRangeDouble = frontViewRange;
 
             for (int i = 0; i < frontViewRayCount; i++)
             {
@@ -551,11 +704,9 @@ namespace Paramecium.Engine
 
                             if (rayScanPosition.X < 0d || rayScanPosition.X > g_Soup.SizeX || rayScanPosition.Y < 0d || rayScanPosition.Y > g_Soup.SizeY)
                             {
-                                //result.WallAvgAngle += Double2d.ToAngle(Double2d.Rotate(rayScanPosition - originPosition, -angle)) * 2d * ((frontViewRange - j) / frontViewRange);
-                                result.WallAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRange);
-                                //result.WallProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(rayScanPosition, originPosition) / frontViewRange));
-                                result.WallProximity = double.Max(result.WallProximity, 1d - ((frontViewRange - j) / frontViewRange));
-                                WallAvgAngleEntryCount++;
+                                result.WallAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
+                                result.WallProximity = double.Max(result.WallProximity, ((frontViewRange - j) / frontViewRangeDouble));
+                                WallAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
                                 WallHitFlag = true;
                             }
                             else
@@ -567,11 +718,9 @@ namespace Paramecium.Engine
 
                                 if (targetTile.Type == TileType.Wall)
                                 {
-                                    //result.WallAvgAngle += Double2d.ToAngle(Double2d.Rotate(rayScanPosition - originPosition, -angle)) * 2d * ((frontViewRange - j) / frontViewRange);
-                                    result.WallAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRange);
-                                    //result.WallProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(rayScanPosition, originPosition) / frontViewRange));
-                                    result.WallProximity = double.Max(result.WallProximity, 1d - ((frontViewRange - j) / frontViewRange));
-                                    WallAvgAngleEntryCount++;
+                                    result.WallAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
+                                    result.WallProximity = double.Max(result.WallProximity, ((frontViewRange - j) / frontViewRangeDouble));
+                                    WallAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
                                     WallHitFlag = true;
                                 }
                             }
@@ -605,11 +754,9 @@ namespace Paramecium.Engine
 
                                         if (Double2d.DistanceSquared(rayPosition, targetPlant.Position) < 0.5d * 0.5d)
                                         {
-                                            //result.PlantAvgAngle += Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - originPosition, -angle)) * 2d * ((frontViewRange - j) / frontViewRange);
-                                            result.PlantAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRange);
-                                            //result.PlantProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(targetPlant.Position, originPosition) / frontViewRange));
-                                            result.PlantProximity = double.Max(result.WallProximity, 1d - ((frontViewRange - j) / frontViewRange));
-                                            PlantAvgAngleEntryCount++;
+                                            result.PlantAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
+                                            result.PlantProximity = double.Max(result.PlantProximity, ((frontViewRange - j) / frontViewRangeDouble));
+                                            PlantAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
                                         }
                                     }
                                 }
@@ -625,22 +772,18 @@ namespace Paramecium.Engine
                                             {
                                                 if (Double2d.DistanceSquared(rayPosition, targetAnimal.Position) < 0.5d * 0.5d)
                                                 {
-                                                    //result.AnimalSameSpeciesAvgAngle += Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - originPosition, -angle)) * 2d * ((frontViewRange - j) / frontViewRange);
-                                                    result.AnimalSameSpeciesAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRange);
-                                                    //result.AnimalSameSpeciesProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(targetAnimal.Position, originPosition) / frontViewRange));
-                                                    result.AnimalSameSpeciesProximity = double.Max(result.WallProximity, 1d - ((frontViewRange - j) / frontViewRange));
-                                                    AnimalSameSpeciesAvgAngleEntryCount++;
+                                                    result.AnimalSameSpeciesAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
+                                                    result.AnimalSameSpeciesProximity = double.Max(result.AnimalSameSpeciesProximity, ((frontViewRange - j) / frontViewRangeDouble));
+                                                    AnimalSameSpeciesAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
                                                 }
                                             }
                                             else
                                             {
                                                 if (Double2d.DistanceSquared(rayPosition, targetAnimal.Position) < 0.5d * 0.5d)
                                                 {
-                                                    //result.AnimalOtherSpeciesAvgAngle += Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - originPosition, -angle)) * 2d * ((frontViewRange - j) / frontViewRange);
-                                                    result.AnimalOtherSpeciesAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRange);
-                                                    //result.AnimalOtherSpeciesProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(targetAnimal.Position, originPosition) / frontViewRange));
-                                                    result.AnimalOtherSpeciesProximity = double.Max(result.WallProximity, 1d - ((frontViewRange - j) / frontViewRange));
-                                                    AnimalOtherSpeciesAvgAngleEntryCount++;
+                                                    result.AnimalOtherSpeciesAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
+                                                    result.AnimalOtherSpeciesProximity = double.Max(result.AnimalOtherSpeciesProximity, ((frontViewRange - j) / frontViewRangeDouble));
+                                                    AnimalOtherSpeciesAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
                                                 }
                                             }
                                         }
@@ -660,6 +803,8 @@ namespace Paramecium.Engine
                 if (rayAngle < -0.5d) rayAngle += 1;
                 Double2d rayVector = Double2d.FromAngle(angle + rayAngle);
 
+                double backViewRangeDouble = backViewRange;
+
                 for (int j = 0; j < backViewRange; j++)
                 {
                     Double2d rayPosition = originPosition + rayVector * (j + 1);
@@ -673,11 +818,9 @@ namespace Paramecium.Engine
 
                             if (rayScanPosition.X < 0d || rayScanPosition.X > g_Soup.SizeX || rayScanPosition.Y < 0d || rayScanPosition.Y > g_Soup.SizeY)
                             {
-                                //result.WallAvgAngle += Double2d.ToAngle(Double2d.Rotate(rayScanPosition - originPosition, -angle)) * 2d * ((backViewRange - j) / backViewRange);
-                                result.WallAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRange);
-                                //result.WallProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(rayScanPosition, originPosition) / backViewRange));
-                                result.WallProximity = double.Max(result.WallProximity, 1d - ((backViewRange - j) / backViewRange));
-                                WallAvgAngleEntryCount++;
+                                result.WallAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRangeDouble);
+                                result.WallProximity = double.Max(result.WallProximity, ((backViewRange - j) / backViewRangeDouble));
+                                WallAvgAngleDenominator += ((backViewRange - j) / backViewRangeDouble);
                                 WallHitFlag = true;
                             }
                             else
@@ -689,11 +832,9 @@ namespace Paramecium.Engine
 
                                 if (targetTile.Type == TileType.Wall)
                                 {
-                                    //result.WallAvgAngle += Double2d.ToAngle(Double2d.Rotate(rayScanPosition - originPosition, -angle)) * 2d * ((backViewRange - j) / backViewRange);
-                                    result.WallAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRange);
-                                    //result.WallProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(rayScanPosition, originPosition) / backViewRange));
-                                    result.WallProximity = double.Max(result.WallProximity, 1d - ((backViewRange - j) / backViewRange));
-                                    WallAvgAngleEntryCount++;
+                                    result.WallAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRangeDouble);
+                                    result.WallProximity = double.Max(result.WallProximity, ((backViewRange - j) / backViewRangeDouble));
+                                    WallAvgAngleDenominator += ((backViewRange - j) / backViewRangeDouble);
                                     WallHitFlag = true;
                                 }
                             }
@@ -727,11 +868,9 @@ namespace Paramecium.Engine
 
                                         if (Double2d.DistanceSquared(rayPosition, targetPlant.Position) < 0.5d * 0.5d)
                                         {
-                                            //result.PlantAvgAngle += Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - originPosition, -angle)) * 2d * ((backViewRange - j) / backViewRange);
-                                            result.PlantAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRange);
-                                            //result.PlantProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(targetPlant.Position, originPosition) / backViewRange));
-                                            result.PlantProximity = double.Max(result.WallProximity, 1d - ((backViewRange - j) / backViewRange));
-                                            PlantAvgAngleEntryCount++;
+                                            result.PlantAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRangeDouble);
+                                            result.PlantProximity = double.Max(result.PlantProximity, ((backViewRange - j) / backViewRangeDouble));
+                                            PlantAvgAngleDenominator += ((backViewRange - j) / backViewRangeDouble);
                                         }
                                     }
                                 }
@@ -747,22 +886,18 @@ namespace Paramecium.Engine
                                             {
                                                 if (Double2d.DistanceSquared(rayPosition, targetAnimal.Position) < 0.5d * 0.5d)
                                                 {
-                                                    //result.AnimalSameSpeciesAvgAngle += Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - originPosition, -angle)) * 2d * ((backViewRange - j) / backViewRange);
-                                                    result.AnimalSameSpeciesAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRange);
-                                                    //result.AnimalSameSpeciesProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(targetAnimal.Position, originPosition) / backViewRange));
-                                                    result.AnimalSameSpeciesProximity = double.Max(result.WallProximity, 1d - ((backViewRange - j) / backViewRange));
-                                                    AnimalSameSpeciesAvgAngleEntryCount++;
+                                                    result.AnimalSameSpeciesAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRangeDouble);
+                                                    result.AnimalSameSpeciesProximity = double.Max(result.AnimalSameSpeciesProximity, ((backViewRange - j) / backViewRangeDouble));
+                                                    AnimalSameSpeciesAvgAngleDenominator += ((backViewRange - j) / backViewRangeDouble);
                                                 }
                                             }
                                             else
                                             {
                                                 if (Double2d.DistanceSquared(rayPosition, targetAnimal.Position) < 0.5d * 0.5d)
                                                 {
-                                                    //result.AnimalOtherSpeciesAvgAngle += Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - originPosition, -angle)) * 2d * ((backViewRange - j) / backViewRange);
-                                                    result.AnimalOtherSpeciesAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRange);
-                                                    //result.AnimalOtherSpeciesProximity = double.Max(result.WallProximity, 1d - (Double2d.Distance(targetAnimal.Position, originPosition) / backViewRange));
-                                                    result.AnimalOtherSpeciesProximity = double.Max(result.WallProximity, 1d - ((backViewRange - j) / backViewRange));
-                                                    AnimalOtherSpeciesAvgAngleEntryCount++;
+                                                    result.AnimalOtherSpeciesAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRangeDouble);
+                                                    result.AnimalOtherSpeciesProximity = double.Max(result.AnimalOtherSpeciesProximity, ((backViewRange - j) / backViewRangeDouble));
+                                                    AnimalOtherSpeciesAvgAngleDenominator += ((backViewRange - j) / backViewRangeDouble);
                                                 }
                                             }
                                         }
@@ -776,10 +911,10 @@ namespace Paramecium.Engine
                 }
             }
 
-            if (WallAvgAngleEntryCount > 0) result.WallAvgAngle /= WallAvgAngleEntryCount;
-            if (PlantAvgAngleEntryCount > 0) result.PlantAvgAngle /= PlantAvgAngleEntryCount;
-            if (AnimalSameSpeciesAvgAngleEntryCount > 0) result.AnimalSameSpeciesAvgAngle /= AnimalSameSpeciesAvgAngleEntryCount;
-            if (AnimalOtherSpeciesAvgAngleEntryCount > 0) result.AnimalOtherSpeciesAvgAngle /= AnimalOtherSpeciesAvgAngleEntryCount;
+            if (WallAvgAngleDenominator > 0) result.WallAvgAngle /= WallAvgAngleDenominator;
+            if (PlantAvgAngleDenominator > 0) result.PlantAvgAngle /= PlantAvgAngleDenominator;
+            if (AnimalSameSpeciesAvgAngleDenominator > 0) result.AnimalSameSpeciesAvgAngle /= AnimalSameSpeciesAvgAngleDenominator;
+            if (AnimalOtherSpeciesAvgAngleDenominator > 0) result.AnimalOtherSpeciesAvgAngle /= AnimalOtherSpeciesAvgAngleDenominator;
 
             //Console.WriteLine(result.PlantAvgAngle);
 
