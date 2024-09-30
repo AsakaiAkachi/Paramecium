@@ -372,6 +372,11 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm (-{target.CurrentStepElementCost.ToString("0.000")} elm/step)", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
+                //overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                //overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * (double.Abs(target.Fertility) / g_Soup.AnimalForkCost)), 16, Color.FromArgb(255, 128, 128, 128));
+                //overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Fertility : {target.Fertility.ToString("0.000")} rot/s", 0, 0, Color.FromArgb(255, 255, 255));
+                //overlayInformationRenderer.OffsetY += 16;
+
                 /**
                 if (g_Soup.AnimalElementEfficiency > g_Soup.PlantElementEfficiency)
                 {
