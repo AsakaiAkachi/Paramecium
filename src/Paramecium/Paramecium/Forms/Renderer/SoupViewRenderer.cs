@@ -373,6 +373,25 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
+                /**
+                if (g_Soup.AnimalElementEfficiency > g_Soup.PlantElementEfficiency)
+                {
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, 192, 0, 0));
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * (1d - (target.Efficiency - g_Soup.PlantElementEfficiency) / (g_Soup.AnimalElementEfficiency - g_Soup.PlantElementEfficiency))), 16, Color.FromArgb(255, 0, 192, 0));
+                }
+                else if (g_Soup.AnimalElementEfficiency < g_Soup.PlantElementEfficiency)
+                {
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, 0, 192, 0));
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * (1d - (target.Efficiency - g_Soup.AnimalElementEfficiency) / (g_Soup.PlantElementEfficiency - g_Soup.AnimalElementEfficiency))), 16, Color.FromArgb(255, 192, 0, 0));
+                }
+                else
+                {
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, 0, 192, 0));
+                }
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Efficiency : {target.Efficiency.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OffsetY += 16;
+                **/
+
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, target.ColorRed, target.ColorGreen, target.ColorBlue));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Color : ({target.ColorRed}, {target.ColorGreen}, {target.ColorBlue})", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
@@ -381,15 +400,17 @@ namespace Paramecium.Forms.Renderer
 
                 overlayInformationRenderer.OffsetX += 300;
 
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 400, 420, Color.FromArgb(128, 64, 64, 64));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, 500, 420, Color.FromArgb(128, 64, 64, 64));
 
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Brain Information", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Brain Diagram", 0, 0, Color.FromArgb(255, 255, 255));
+
+                Double2d brainDiagramCenterPos = new Double2d(250, 220);
 
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
                 {
                     BrainNode targetNode = target.Brain.Nodes[i];
 
-                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(200, 220);
+                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + brainDiagramCenterPos;
 
                     for (int j = 0; j < targetNode.Connections.Count; j++)
                     {
@@ -397,7 +418,7 @@ namespace Paramecium.Forms.Renderer
 
                         if (targetConnection.TargetIndex != i)
                         {
-                            Double2d connectionTargetPos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * targetConnection.TargetIndex) * 180 + new Double2d(200, 220);
+                            Double2d connectionTargetPos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * targetConnection.TargetIndex) * 180 + brainDiagramCenterPos;
 
                             Double2d arrowVector = (connectionTargetPos - nodePos).Normalized;
                             Double2d arrowStartPos = nodePos + arrowVector * 7.5d;
@@ -424,7 +445,7 @@ namespace Paramecium.Forms.Renderer
 
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
                 {
-                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(200, 220);
+                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + brainDiagramCenterPos;
                     BrainNode targetNode = target.Brain.Nodes[i];
                     Color nodeColor;
 
@@ -461,12 +482,15 @@ namespace Paramecium.Forms.Renderer
 
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
                 {
-                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(200, 220);
+                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + brainDiagramCenterPos;
+                    BrainNode targetNode = target.Brain.Nodes[i];
+
+                    if (targetNode.IsInput) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Input", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    else if (targetNode.IsHidden) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Hidden", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    else if (targetNode.IsOutput) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Output", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
 
                     if (mousePointClient.X > nodePos.X + overlayInformationRenderer.OffsetX - 7.5d && mousePointClient.X < nodePos.X + overlayInformationRenderer.OffsetX + 7.5d && mousePointClient.Y > nodePos.Y + overlayInformationRenderer.OffsetY - 7.5d && mousePointClient.Y < nodePos.Y + overlayInformationRenderer.OffsetY + 7.5)
                     {
-                        BrainNode targetNode = target.Brain.Nodes[i];
-
                         int PrevOffsetX = overlayInformationRenderer.OffsetX;
                         int PrevOffsetY = overlayInformationRenderer.OffsetY;
                         overlayInformationRenderer.OffsetX += (int)(nodePos.X + 7.5);
@@ -524,8 +548,6 @@ namespace Paramecium.Forms.Renderer
 
                         overlayInformationRenderer.OffsetX = PrevOffsetX;
                         overlayInformationRenderer.OffsetY = PrevOffsetY;
-
-                        break;
                     }
                 }
 

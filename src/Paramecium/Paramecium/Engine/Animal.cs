@@ -63,7 +63,7 @@ namespace Paramecium.Engine
             Mass = 16 + element;
 
             Element = element;
-            Efficiency = 10d;
+            Efficiency = g_Soup.PlantElementEfficiency;
 
             ColorRed = random.Next(0, 255 + 1);
             ColorGreen = random.Next(0, 255 + 1);
@@ -91,7 +91,7 @@ namespace Paramecium.Engine
             Mass = 16 + element;
 
             Element = element;
-            Efficiency = 10d;
+            Efficiency = parent.Efficiency;
 
             ColorRed = parent.ColorRed;
             ColorGreen = parent.ColorGreen;
@@ -198,8 +198,11 @@ namespace Paramecium.Engine
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - Position, -Angle))) < 0.167d)
                                             {
-                                                Element += double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate);
-                                                targetPlant.Element -= double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate);
+                                                double ElementMoveAmount = double.Min(targetPlant.Element, g_Soup.AnimalIngestionRatePlant);
+
+                                                //Efficiency = ((Efficiency * Element) + (g_Soup.PlantElementEfficiency * ElementMoveAmount)) / (Element + ElementMoveAmount);
+                                                Element += ElementMoveAmount;
+                                                targetPlant.Element -= ElementMoveAmount;
                                             }
                                         }
                                     }
@@ -217,8 +220,11 @@ namespace Paramecium.Engine
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle))) < 0.167d)
                                             {
-                                                Element += double.Min(targetAnimal.Element, g_Soup.AnimalAnimalIngestionRate);
-                                                targetAnimal.Element -= double.Min(targetAnimal.Element, g_Soup.AnimalAnimalIngestionRate);
+                                                double ElementMoveAmount = double.Min(targetAnimal.Element, g_Soup.AnimalIngestionRateAnimal);
+
+                                                //Efficiency = ((Efficiency * Element) + (g_Soup.AnimalElementEfficiency * ElementMoveAmount)) / (Element + ElementMoveAmount);
+                                                Element += ElementMoveAmount;
+                                                targetAnimal.Element -= ElementMoveAmount;
                                             }
                                         }
                                     }
@@ -226,6 +232,9 @@ namespace Paramecium.Engine
                             }
                         }
                     }
+
+                    if (Efficiency < double.Min(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency)) Efficiency = double.Min(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency);
+                    if (Efficiency > double.Max(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency)) Efficiency = double.Max(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency);
                 }
             }
             else throw new InvalidOperationException("This animal is not initialized.");
@@ -333,8 +342,8 @@ namespace Paramecium.Engine
                     g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].LocalAnimalIndexes.Add(Index);
                 }
 
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].Element += double.Min(Element, g_Soup.AnimalElementUpkeep);
-                Element -= double.Min(Element, g_Soup.AnimalElementUpkeep);
+                g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].Element += double.Min(Element, g_Soup.AnimalElementUpkeep);// / Efficiency;
+                Element -= double.Min(Element, g_Soup.AnimalElementUpkeep);// / Efficiency;
 
                 Radius = 0.5;
                 Mass = 16 + Element;
@@ -346,6 +355,7 @@ namespace Paramecium.Engine
                 }
 
                 if (Element <= 0) OnDisable();
+                if (g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
 
                 Age++;
             }

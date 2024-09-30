@@ -132,9 +132,13 @@ namespace Paramecium.Forms
 
                     SoupElapsedTimeSteps = g_Soup.ElapsedTimeSteps;
 
-                    SoupViewCanvas = new Bitmap(SoupView.Width, SoupView.Height);
-                    SoupViewRenderer.DrawSoupView(ref SoupViewCanvas, CameraPosition, ZoomLevel);
-                    SoupViewOverlayRenderer.DrawSoupOverlayView(ref SoupViewCanvas, CameraPosition, ZoomLevel, mousePointClient, SelectedObjectType, SelectedObjectIndex);
+                    try
+                    {
+                        SoupViewCanvas = new Bitmap(SoupView.Width, SoupView.Height);
+                        SoupViewRenderer.DrawSoupView(ref SoupViewCanvas, CameraPosition, ZoomLevel);
+                        SoupViewOverlayRenderer.DrawSoupOverlayView(ref SoupViewCanvas, CameraPosition, ZoomLevel, mousePointClient, SelectedObjectType, SelectedObjectIndex);
+                    }
+                    catch (Exception ex) { Console.WriteLine(ex.Message); }
 
                     SoupView.Image = SoupViewCanvas;
 
@@ -197,6 +201,8 @@ namespace Paramecium.Forms
         bool Dragging;
         int MousePrevX, MousePrevY;
 
+        bool ObjectMoving;
+
         private void SoupView_MouseDown(object sender, MouseEventArgs e)
         {
             switch (e.Button)
@@ -205,11 +211,21 @@ namespace Paramecium.Forms
                     switch (ModifierKeys)
                     {
                         case Keys.Shift:
+                            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant || SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
+                            {
+                                g_Soup.SetSoupState(SoupState.Pause);
+                                ObjectMoving = true;
+                            }
                             break;
                         case Keys.Control:
                             if (ZoomLevel < 8) ZoomLevel++;
                             break;
                         case Keys.Alt:
+                            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
+                            {
+                                g_Soup.SetSoupState(SoupState.Pause);
+                                g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Wall;
+                            }
                             break;
                         default:
                             SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.None;
@@ -309,6 +325,11 @@ namespace Paramecium.Forms
                             if (ZoomLevel > 0) ZoomLevel--;
                             break;
                         case Keys.Alt:
+                            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
+                            {
+                                g_Soup.SetSoupState(SoupState.Pause);
+                                g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Default;
+                            }
                             break;
                         default:
                             Dragging = true;
@@ -335,11 +356,103 @@ namespace Paramecium.Forms
                 MousePrevX = e.X;
                 MousePrevY = e.Y;
             }
+            else
+            {
+                switch (e.Button)
+                {
+                    case MouseButtons.Left:
+                        switch (ModifierKeys)
+                        {
+                            case Keys.Shift:
+                                if (ObjectMoving)
+                                {
+                                    g_Soup.SetSoupState(SoupState.Pause);
+                                    if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
+                                    {
+                                        Plant target = g_Soup.Plants[SelectedObjectIndex];
+
+                                        target.Position = new Double2d(
+                                            WorldPosViewPosConversion.ViewPosToWorldPosX(SoupView.Width, CameraPosition, double.Pow(2, ZoomLevel), e.X),
+                                            WorldPosViewPosConversion.ViewPosToWorldPosY(SoupView.Height, CameraPosition, double.Pow(2, ZoomLevel), e.Y)
+                                        );
+
+                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Remove(target.Index);
+
+                                        target.IntegerizedPositionX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(target.Position.X)));
+                                        target.IntegerizedPositionY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(target.Position.Y)));
+
+                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Add(target.Index);
+                                    }
+                                    else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
+                                    {
+                                        Animal target = g_Soup.Animals[SelectedObjectIndex];
+
+                                        target.Position = new Double2d(
+                                            WorldPosViewPosConversion.ViewPosToWorldPosX(SoupView.Width, CameraPosition, double.Pow(2, ZoomLevel), e.X),
+                                            WorldPosViewPosConversion.ViewPosToWorldPosY(SoupView.Height, CameraPosition, double.Pow(2, ZoomLevel), e.Y)
+                                        );
+
+                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Remove(target.Index);
+
+                                        target.IntegerizedPositionX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(target.Position.X)));
+                                        target.IntegerizedPositionY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(target.Position.Y)));
+
+                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Add(target.Index);
+                                    }
+                                }
+                                break;
+                            case Keys.Control:
+                                break;
+                            case Keys.Alt:
+                                if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
+                                {
+                                    g_Soup.SetSoupState(SoupState.Pause);
+                                    g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Wall;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case MouseButtons.Middle:
+                        switch (ModifierKeys)
+                        {
+                            case Keys.Shift:
+                                break;
+                            case Keys.Control:
+                                break;
+                            case Keys.Alt:
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case MouseButtons.Right:
+                        switch (ModifierKeys)
+                        {
+                            case Keys.Shift:
+                                break;
+                            case Keys.Control:
+                                break;
+                            case Keys.Alt:
+                                if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
+                                {
+                                    g_Soup.SetSoupState(SoupState.Pause);
+                                    g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Default;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                }
+            }
         }
 
         private void SoupView_MouseUp(object sender, MouseEventArgs e)
         {
             if (Dragging) Dragging = false;
+            if (ObjectMoving) ObjectMoving = false;
         }
 
         private void SoupView_MouseWheel(object? sender, MouseEventArgs e)
@@ -352,6 +465,47 @@ namespace Paramecium.Forms
         {
             if (OpenFileDialog_LoadSoup.ShowDialog() == DialogResult.OK)
             {
+                if (g_Soup.Modified)
+                {
+                    DialogResult result = MessageBox.Show(
+                        $"Save changes to {Path.GetFileName(g_FilePath)}?",
+                        $"{g_AppName}",
+                        MessageBoxButtons.YesNoCancel,
+                        MessageBoxIcon.Exclamation,
+                        MessageBoxDefaultButton.Button1
+                    );
+
+                    if (result == DialogResult.Yes)
+                    {
+                        if (File.Exists(g_FilePath))
+                        {
+                            g_Soup.SetSoupState(SoupState.Pause);
+                            g_Soup.Modified = false;
+
+                            StreamWriter streamWriter1 = new StreamWriter(g_FilePath, false, Encoding.UTF8);
+                            streamWriter1.Write(JsonSerializer.Serialize(g_Soup));
+                            streamWriter1.Close();
+                        }
+                        else
+                        {
+                            if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
+                            {
+                                g_Soup.SetSoupState(SoupState.Pause);
+                                g_Soup.Modified = false;
+
+                                StreamWriter streamWriter1 = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
+                                streamWriter1.Write(JsonSerializer.Serialize(g_Soup));
+                                streamWriter1.Close();
+
+                                g_FilePath = SaveFileDialog_SaveSoup.FileName;
+                                Text = $"{Path.GetFileName(g_FilePath)} - {g_AppName} {g_AppVersion}";
+                            }
+                            else return;
+                        }
+                    }
+                    else if (result == DialogResult.Cancel) return;
+                }
+
                 g_Soup.SetSoupState(SoupState.Stop);
                 StreamReader streamWriter = new StreamReader(OpenFileDialog_LoadSoup.FileName, Encoding.UTF8);
                 Soup? loadedSoup = JsonSerializer.Deserialize<Soup>(streamWriter.ReadToEnd());
@@ -395,7 +549,92 @@ namespace Paramecium.Forms
 
         private void TopMenu_File_Exit_Click(object sender, EventArgs e)
         {
+            if (g_Soup.Modified)
+            {
+                DialogResult result = MessageBox.Show(
+                    $"Save changes to {Path.GetFileName(g_FilePath)}?",
+                    $"{g_AppName}",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Exclamation,
+                    MessageBoxDefaultButton.Button1
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    if (File.Exists(g_FilePath))
+                    {
+                        g_Soup.SetSoupState(SoupState.Pause);
+                        g_Soup.Modified = false;
+
+                        StreamWriter streamWriter = new StreamWriter(g_FilePath, false, Encoding.UTF8);
+                        streamWriter.Write(JsonSerializer.Serialize(g_Soup));
+                        streamWriter.Close();
+                    }
+                    else
+                    {
+                        if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
+                        {
+                            g_Soup.SetSoupState(SoupState.Pause);
+                            g_Soup.Modified = false;
+
+                            StreamWriter streamWriter = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
+                            streamWriter.Write(JsonSerializer.Serialize(g_Soup));
+                            streamWriter.Close();
+
+                            g_FilePath = SaveFileDialog_SaveSoup.FileName;
+                            Text = $"{Path.GetFileName(g_FilePath)} - {g_AppName} {g_AppVersion}";
+                        }
+                        else return;
+                    }
+                }
+                else if (result == DialogResult.Cancel) return;
+            }
+
             Application.Exit();
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (g_Soup.Modified)
+            {
+                DialogResult result = MessageBox.Show(
+                    $"Save changes to {Path.GetFileName(g_FilePath)}?",
+                    $"{g_AppName}",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Exclamation,
+                    MessageBoxDefaultButton.Button1
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    if (File.Exists(g_FilePath))
+                    {
+                        g_Soup.SetSoupState(SoupState.Pause);
+                        g_Soup.Modified = false;
+
+                        StreamWriter streamWriter = new StreamWriter(g_FilePath, false, Encoding.UTF8);
+                        streamWriter.Write(JsonSerializer.Serialize(g_Soup));
+                        streamWriter.Close();
+                    }
+                    else
+                    {
+                        if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
+                        {
+                            g_Soup.SetSoupState(SoupState.Pause);
+                            g_Soup.Modified = false;
+
+                            StreamWriter streamWriter = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
+                            streamWriter.Write(JsonSerializer.Serialize(g_Soup));
+                            streamWriter.Close();
+
+                            g_FilePath = SaveFileDialog_SaveSoup.FileName;
+                            Text = $"{Path.GetFileName(g_FilePath)} - {g_AppName} {g_AppVersion}";
+                        }
+                        else e.Cancel = true;
+                    }
+                }
+                else if (result == DialogResult.Cancel) e.Cancel = true;
+            }
         }
     }
 

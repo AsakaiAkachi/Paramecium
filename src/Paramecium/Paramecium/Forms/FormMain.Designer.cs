@@ -72,39 +72,39 @@
             // TopMenu_File_New
             // 
             TopMenu_File_New.Name = "TopMenu_File_New";
-            TopMenu_File_New.Size = new Size(180, 22);
+            TopMenu_File_New.Size = new Size(123, 22);
             TopMenu_File_New.Text = "New";
             // 
             // TopMenu_File_Open
             // 
             TopMenu_File_Open.Name = "TopMenu_File_Open";
-            TopMenu_File_Open.Size = new Size(180, 22);
+            TopMenu_File_Open.Size = new Size(123, 22);
             TopMenu_File_Open.Text = "Open...";
             TopMenu_File_Open.Click += TopMenu_File_Open_Click;
             // 
             // TopMenu_File_Save
             // 
             TopMenu_File_Save.Name = "TopMenu_File_Save";
-            TopMenu_File_Save.Size = new Size(180, 22);
+            TopMenu_File_Save.Size = new Size(123, 22);
             TopMenu_File_Save.Text = "Save";
             TopMenu_File_Save.Click += TopMenu_File_Save_Click;
             // 
             // TopMenu_File_SaveAs
             // 
             TopMenu_File_SaveAs.Name = "TopMenu_File_SaveAs";
-            TopMenu_File_SaveAs.Size = new Size(180, 22);
+            TopMenu_File_SaveAs.Size = new Size(123, 22);
             TopMenu_File_SaveAs.Text = "Save As...";
             TopMenu_File_SaveAs.Click += TopMenu_File_SaveAs_Click;
             // 
             // TopMenu_File_Separator1
             // 
             TopMenu_File_Separator1.Name = "TopMenu_File_Separator1";
-            TopMenu_File_Separator1.Size = new Size(177, 6);
+            TopMenu_File_Separator1.Size = new Size(120, 6);
             // 
             // TopMenu_File_Exit
             // 
             TopMenu_File_Exit.Name = "TopMenu_File_Exit";
-            TopMenu_File_Exit.Size = new Size(180, 22);
+            TopMenu_File_Exit.Size = new Size(123, 22);
             TopMenu_File_Exit.Text = "Exit";
             TopMenu_File_Exit.Click += TopMenu_File_Exit_Click;
             // 
@@ -200,6 +200,7 @@
             MainMenuStrip = TopMenu;
             Name = "FormMain";
             Text = "Paramecium";
+            FormClosing += FormMain_FormClosing;
             Shown += FormMain_Shown;
             KeyDown += FormMain_KeyDown;
             TopMenu.ResumeLayout(false);

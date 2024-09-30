@@ -381,6 +381,29 @@ namespace Paramecium.Engine
         public double Input { get; set; }
         public double Output { get; set; }
 
+        [JsonIgnore]
+        public bool IsInput { get => NodeIsInput(Type); }
+        [JsonIgnore]
+        public bool IsHidden { get => NodeIsHidden(Type); }
+        [JsonIgnore]
+        public bool IsOutput { get => NodeIsOutput(Type); }
+
+        public static bool NodeIsInput(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Input_Bias && (int)type <= (int)BrainNodeType.Input_Memory7) return true;
+            else return false;
+        }
+        public static bool NodeIsHidden(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Hidden_ReLU && (int)type <= (int)BrainNodeType.Hidden_LimitedTangent) return true;
+            else return false;
+        }
+        public static bool NodeIsOutput(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Output_Acceleration && (int)type <= (int)BrainNodeType.Output_Memory7) return true;
+            else return false;
+        }
+
         public void ApplyBrainInput(BrainInput brainInput)
         {
             switch (Type)
@@ -564,22 +587,6 @@ namespace Paramecium.Engine
                 default:
                     break;
             }
-        }
-
-        public static bool NodeIsInput(BrainNodeType type)
-        {
-            if ((int)type >= (int)BrainNodeType.Input_Bias && (int)type <= (int)BrainNodeType.Input_Memory7) return true;
-            else return false;
-        }
-        public static bool NodeIsHidden(BrainNodeType type)
-        {
-            if ((int)type >= (int)BrainNodeType.Hidden_ReLU && (int)type <= (int)BrainNodeType.Hidden_LimitedTangent) return true;
-            else return false;
-        }
-        public static bool NodeIsOutput(BrainNodeType type)
-        {
-            if ((int)type >= (int)BrainNodeType.Output_Acceleration && (int)type <= (int)BrainNodeType.Output_Memory7) return true;
-            else return false;
         }
     }
 
