@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Xml.Linq;
 
 namespace Paramecium.Engine
 {
@@ -128,7 +127,7 @@ namespace Paramecium.Engine
                 Perlin perlin = new Perlin();
 
                 Tiles = new Tile[SizeX * SizeY];
-                int DefaultTypeTileCount = SizeX * SizeY;
+                int DefaultTypeTileCount = 0;
                 for (int x = 0; x < SizeX; x++)
                 {
                     for (int y = 0; y < SizeY; y++)
@@ -140,8 +139,72 @@ namespace Paramecium.Engine
                             if (Math.Abs(perlin.OctavePerlin(WallNoiseX + x * WallNoiseScale, WallNoiseY + y * WallNoiseScale, WallNoiseZ, WallNoiseOctave, 0.5d) - 0.5d) < WallThickness)
                             {
                                 Tiles[y * SizeX + x].Type = TileType.Wall;
-                                DefaultTypeTileCount--;
                             }
+                        }
+                    }
+                }
+
+                bool[] continuousRegionFlag = new bool[SizeX * SizeY];
+                int continuousRegionArea = 0;
+
+                while (continuousRegionArea < SizeX * SizeY / 2)
+                {
+                    continuousRegionArea = 0;
+
+                    List<int> exploreTiles = new List<int>();
+                    bool[] exploredTiles = new bool[SizeX * SizeY];
+
+                    exploreTiles.Add(new Random().Next(0, SizeX * SizeY));
+                    while (Tiles[exploreTiles[0]].Type == TileType.Wall) exploreTiles[0] = new Random().Next(0, SizeX * SizeY);
+
+                    while (exploreTiles.Count > 0)
+                    {
+                        List<int> nextStepExploreTiles = new List<int>();
+
+                        for (int i = 0; i < exploreTiles.Count; i++)
+                        {
+                            int x = exploreTiles[i] % SizeX;
+                            int y = exploreTiles[i] / SizeX;
+
+                            for (int ix = -1; ix <= 1; ix++)
+                            {
+                                for (int iy = -1; iy <= 1; iy++)
+                                {
+                                    if (int.Abs(ix + iy) == 1)
+                                    {
+                                        if (x + ix >= 0 && x + ix < SizeX && y + iy >= 0 && y + iy < SizeY)
+                                        {
+                                            if (Tiles[(y + iy) * SizeX + (x + ix)].Type == TileType.Default && !exploredTiles[(y + iy) * SizeX + (x + ix)])
+                                            {
+                                                exploredTiles[(y + iy) * SizeX + (x + ix)] = true;
+                                                nextStepExploreTiles.Add((y + iy) * SizeX + (x + ix));
+                                                continuousRegionArea++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        exploreTiles = nextStepExploreTiles;
+                    }
+
+                    continuousRegionFlag = exploredTiles;
+                }
+
+                for (int x = 0; x < SizeX; x++)
+                {
+                    for (int y = 0; y < SizeY; y++)
+                    {
+                        Tile targetTile = Tiles[y * SizeX + x];
+
+                        if (!continuousRegionFlag[y * SizeX + x])
+                        {
+                            targetTile.Type = TileType.Wall;
+                        }
+                        else
+                        {
+                            DefaultTypeTileCount++;
                         }
                     }
                 }

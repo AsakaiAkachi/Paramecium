@@ -8,6 +8,8 @@ namespace Paramecium.Forms
 {
     public partial class FormMain : Form
     {
+        FormInspector FormInspector = new FormInspector();
+
         Bitmap SoupViewCanvas;
 
         CameraState CameraState;
@@ -194,6 +196,31 @@ namespace Paramecium.Forms
                 case Keys.C:
                     CameraPosition = new Double2d(g_Soup.SizeX / 2d, g_Soup.SizeY / 2d);
                     ZoomLevel = 0;
+                    break;
+                case Keys.D:
+                    if (ModifierKeys == Keys.Control)
+                    {
+                        if (FormInspector.IsDisposed)
+                        {
+                            FormInspector = new FormInspector();
+                        }
+
+                        if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
+                        {
+                            FormInspector.Inspect(0, SelectedObjectIndex);
+                        }
+                        else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
+                        {
+                            FormInspector.Inspect(1, SelectedObjectIndex);
+                        }
+                        else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
+                        {
+                            FormInspector.Inspect(2, SelectedObjectIndex);
+                        }
+
+                        FormInspector.Show();
+                        FormInspector.Activate();
+                    }
                     break;
             }
         }

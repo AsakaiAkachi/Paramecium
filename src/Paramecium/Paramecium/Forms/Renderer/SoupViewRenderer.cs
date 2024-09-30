@@ -1,9 +1,6 @@
 ﻿using Paramecium.Engine;
-using System.Drawing;
 using System.Drawing.Imaging;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using static Paramecium.Forms.Renderer.SoupViewDrawShape;
 using static Paramecium.Forms.Renderer.WorldPosViewPosConversion;
 
@@ -277,7 +274,7 @@ namespace Paramecium.Forms.Renderer
                 string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
                 for (int i = 0; i < 12; i++)
                 {
-                    targetIdString += chars[(int)(targetId % 36)];
+                    targetIdString = chars[(int)(targetId % 36)] + targetIdString;
                     targetId /= 36;
                 }
 
@@ -312,7 +309,7 @@ namespace Paramecium.Forms.Renderer
                 string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
                 for (int i = 0; i < 12; i++)
                 {
-                    targetIdString += chars[(int)(targetId % 36)];
+                    targetIdString = chars[(int)(targetId % 36)] + targetIdString;
                     targetId /= 36;
                 }
 
@@ -371,30 +368,6 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OverlayFillRectangle(0, 12, (int)(300 * double.Min(1d, target.CurrentStepElementCost / (g_Soup.AnimalElementBaseCost + g_Soup.AnimalElementAccelerationCost + g_Soup.AnimalElementRotationCost + g_Soup.AnimalElementAttackCost + (g_Soup.AnimalElementPheromoneProductionCost * 3d)))), 16, Color.FromArgb(255, 192, 192, 192));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm (-{target.CurrentStepElementCost.ToString("0.000")} elm/step)", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
-
-                //overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                //overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * (double.Abs(target.Fertility) / g_Soup.AnimalForkCost)), 16, Color.FromArgb(255, 128, 128, 128));
-                //overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Fertility : {target.Fertility.ToString("0.000")} rot/s", 0, 0, Color.FromArgb(255, 255, 255));
-                //overlayInformationRenderer.OffsetY += 16;
-
-                /**
-                if (g_Soup.AnimalElementEfficiency > g_Soup.PlantElementEfficiency)
-                {
-                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(192, 0, 0));
-                    overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, 1d - (target.Efficiency - g_Soup.PlantElementEfficiency) / (g_Soup.AnimalElementEfficiency - g_Soup.PlantElementEfficiency))), 16, Color.FromArgb(0, 192, 0));
-                }
-                else if (g_Soup.PlantElementEfficiency > g_Soup.AnimalElementEfficiency)
-                {
-                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(0, 192, 0));
-                    overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, 1d - (target.Efficiency - g_Soup.AnimalElementEfficiency) / (g_Soup.PlantElementEfficiency - g_Soup.AnimalElementEfficiency))), 16, Color.FromArgb(192, 0, 0));
-                }
-                else
-                {
-                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(0, 192, 0));
-                }
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Efficiency : {target.Efficiency.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-                **/
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, target.ColorRed, target.ColorGreen, target.ColorBlue));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Color : ({target.ColorRed}, {target.ColorGreen}, {target.ColorBlue})", 0, 0, Color.FromArgb(255, 255, 255));

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Formats.Tar;
-using System.Reflection.Metadata;
-using System.Security.Cryptography.X509Certificates;
-using System.Text.Json.Serialization;
-using System.Xml.Linq;
-
-namespace Paramecium.Engine
+﻿namespace Paramecium.Engine
 {
     public class Animal
     {
@@ -31,7 +24,6 @@ namespace Paramecium.Engine
         public double Mass { get; set; }
 
         public double Element { get; set; }
-        //public double Fertility { get; set; }
 
         public double CurrentStepElementCost { get; set; }
 
@@ -65,15 +57,12 @@ namespace Paramecium.Engine
             Mass = 16 + element;
 
             Element = element;
-            //Efficiency = 1d;
 
             ColorRed = random.Next(0, 255 + 1);
             ColorGreen = random.Next(0, 255 + 1);
             ColorBlue = random.Next(0, 255 + 1);
 
             Brain = Brain.GetDefaultBrain;
-            //Brain = new Brain();
-            //for (int i = 0; i < 64; i++) Brain = Brain.Mutate(Brain, random, false);
             BrainInput = new BrainInput();
             BrainOutput = new BrainOutput();
         }
@@ -95,7 +84,6 @@ namespace Paramecium.Engine
             Mass = 16 + element;
 
             Element = element;
-            //Efficiency = parent.Efficiency;
 
             ColorRed = parent.ColorRed;
             ColorGreen = parent.ColorGreen;
@@ -212,8 +200,6 @@ namespace Paramecium.Engine
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - Position, -Angle))) < 0.167d)
                                             {
-                                                //Efficiency = (Efficiency * Element + g_Soup.PlantElementEfficiency * double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate)) / (Element + double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate));
-
                                                 Element += double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate);
                                                 targetPlant.Element -= double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate);
                                             }
@@ -233,8 +219,6 @@ namespace Paramecium.Engine
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle))) < 0.167d)
                                             {
-                                                //Efficiency = (Efficiency * Element + g_Soup.AnimalElementEfficiency * double.Min(targetAnimal.Element, g_Soup.AnimalPlantIngestionRate)) / (Element + double.Min(targetAnimal.Element, g_Soup.AnimalPlantIngestionRate));
-
                                                 Element += double.Min(targetAnimal.Element, g_Soup.AnimalAnimalIngestionRate);
                                                 targetAnimal.Element -= double.Min(targetAnimal.Element, g_Soup.AnimalAnimalIngestionRate);
                                             }
@@ -244,9 +228,6 @@ namespace Paramecium.Engine
                             }
                         }
                     }
-
-                    //if (Efficiency < double.Min(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency)) Efficiency = double.Min(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency);
-                    //if (Efficiency > double.Max(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency)) Efficiency = double.Max(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency);
                 }
             }
             else throw new InvalidOperationException("This animal is not initialized.");
@@ -411,30 +392,6 @@ namespace Paramecium.Engine
                     else return null;
                 }
                 else return null;
-
-                /**
-                if (Element > g_Soup.AnimalForkCost)
-                {
-                    Fertility += double.Min(Element - g_Soup.AnimalForkCost, 0.04d);
-                    Element -= double.Min(Element - g_Soup.AnimalForkCost, 0.04d);
-                }
-
-                if (Fertility > g_Soup.AnimalForkCost)
-                {
-                    Double2d OffspringPosition = Position + Double2d.FromAngle(Angle + 0.5) * 0.5;
-                    if (
-                        OffspringPosition.X >= 0 && OffspringPosition.X <= g_Soup.SizeX && OffspringPosition.Y >= 0 && OffspringPosition.Y <= g_Soup.SizeY &&
-                        g_Soup.Tiles[int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(OffspringPosition.Y))) * g_Soup.SizeX + int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(OffspringPosition.X)))].Type == TileType.Default
-                    )
-                    {
-                        Fertility -= g_Soup.AnimalForkCost;
-                        OffspringCount++;
-                        return new Animal(this, Position + Double2d.FromAngle(Angle + 0.5) * 0.5, g_Soup.AnimalForkCost, random);
-                    }
-                    else return null;
-                }
-                else return null;
-                **/
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }

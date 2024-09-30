@@ -2,6 +2,15 @@
 
 ## [0.5.0 indev-6] - 2024-09-30
 
+### Added
+- Added `Object Inspector`.
+
+### Changed
+- When generating walls in the soup, areas isolated from the outside world are now filled with walls.
+
+### Fixed
+- Fixed a bug that could cause connections to be duplicated when mutating.
+
 ## [0.5.0 indev-5] - 2024-09-30
 
 ### Added

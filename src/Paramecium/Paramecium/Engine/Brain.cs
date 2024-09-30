@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Reflection.Metadata.Ecma335;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Paramecium.Engine
 {
@@ -129,6 +127,7 @@ namespace Paramecium.Engine
                             if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
                             {
                                 result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
+                                connectionTargetIndexes.Add(connectionTarget);
                             }
 
                             if (random.NextDouble() < 0.5d) break;
@@ -261,6 +260,7 @@ namespace Paramecium.Engine
                             if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
                             {
                                 result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
+                                connectionTargetIndexes.Add(connectionTarget);
                                 mutationSuccessFlag = true;
                             }
                         }
