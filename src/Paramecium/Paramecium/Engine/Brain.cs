@@ -96,7 +96,7 @@ namespace Paramecium.Engine
 
             if (mutationType == 0) // Add Node
             {
-                if (result.nodes.Count < g_Soup.AnimalBrainMaximumNodeCount)
+                if (result.nodes.Count < g_Soup.Settings.AnimalBrainMaximumNodeCount)
                 {
                     mutationTarget = result.nodes.Count;
 
@@ -119,7 +119,7 @@ namespace Paramecium.Engine
 
                     if (result.nodes[mutationTarget].IsInput || result.nodes[mutationTarget].IsHidden)
                     {
-                        for (int i = 0; i < g_Soup.AnimalBrainMaximumConnectionCount / 2; i++)
+                        for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
                             List<int> connectionTargetIndexes = new List<int>();
                             int connectionTarget = random.Next(0, result.nodes.Count);
@@ -135,12 +135,12 @@ namespace Paramecium.Engine
                     }
                     if (result.nodes[mutationTarget].IsHidden || result.nodes[mutationTarget].IsOutput)
                     {
-                        for (int i = 0; i < g_Soup.AnimalBrainMaximumConnectionCount / 2; i++)
+                        for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
                             List<int> connectionTargetIndexes = new List<int>();
                             int connectionOrigin = random.Next(0, result.nodes.Count);
 
-                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.AnimalBrainMaximumConnectionCount)
+                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount)
                             {
                                 for (int j = 0; j < result.nodes[connectionOrigin].Connections.Count; j++) connectionTargetIndexes.Add(result.nodes[connectionOrigin].Connections[j].TargetIndex);
 
@@ -195,7 +195,7 @@ namespace Paramecium.Engine
 
                     if (BrainNode.BrainNodeTypeIsOutput(prevBrainNodeType) && !result.nodes[mutationTarget].IsOutput)
                     {
-                        for (int i = 0; i < g_Soup.AnimalBrainMaximumConnectionCount / 2; i++)
+                        for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
                             List<int> connectionTargetIndexes = new List<int>();
                             int connectionTarget = random.Next(0, result.nodes.Count);
@@ -210,12 +210,12 @@ namespace Paramecium.Engine
                     }
                     if (BrainNode.BrainNodeTypeIsInput(prevBrainNodeType) && !result.nodes[mutationTarget].IsInput)
                     {
-                        for (int i = 0; i < g_Soup.AnimalBrainMaximumConnectionCount / 2; i++)
+                        for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
                             List<int> connectionTargetIndexes = new List<int>();
                             int connectionOrigin = random.Next(0, result.nodes.Count);
 
-                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.AnimalBrainMaximumConnectionCount)
+                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount)
                             {
                                 for (int j = 0; j < result.nodes[connectionOrigin].Connections.Count; j++) connectionTargetIndexes.Add(result.nodes[connectionOrigin].Connections[j].TargetIndex);
 
@@ -251,7 +251,7 @@ namespace Paramecium.Engine
                 {
                     if (!result.nodes[mutationTarget].IsOutput)
                     {
-                        if (result.nodes[mutationTarget].Connections.Count < g_Soup.AnimalBrainMaximumConnectionCount)
+                        if (result.nodes[mutationTarget].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount)
                         {
                             List<int> connectionTargetIndexes = new List<int>();
                             for (int i = 0; i < result.nodes[mutationTarget].Connections.Count; i++) connectionTargetIndexes.Add(result.nodes[mutationTarget].Connections[i].TargetIndex);
@@ -713,7 +713,7 @@ namespace Paramecium.Engine
                         {
                             Double2d rayScanPosition = rayPosition + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
 
-                            if (rayScanPosition.X < 0d || rayScanPosition.X > g_Soup.SizeX || rayScanPosition.Y < 0d || rayScanPosition.Y > g_Soup.SizeY)
+                            if (rayScanPosition.X < 0d || rayScanPosition.X > g_Soup.Settings.SizeX || rayScanPosition.Y < 0d || rayScanPosition.Y > g_Soup.Settings.SizeY)
                             {
                                 result.WallAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
                                 result.WallProximity = double.Max(result.WallProximity, ((frontViewRange - j) / frontViewRangeDouble));
@@ -722,10 +722,10 @@ namespace Paramecium.Engine
                             }
                             else
                             {
-                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(rayScanPosition.X)));
-                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(rayScanPosition.Y)));
+                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(rayScanPosition.X)));
+                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(rayScanPosition.Y)));
 
-                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * g_Soup.SizeX + rayScanPositionIntegerizedX];
+                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * g_Soup.Settings.SizeX + rayScanPositionIntegerizedX];
 
                                 if (targetTile.Type == TileType.Wall)
                                 {
@@ -752,10 +752,10 @@ namespace Paramecium.Engine
                             {
                                 Double2d rayScanPosition = rayPosition + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
 
-                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(rayScanPosition.X)));
-                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(rayScanPosition.Y)));
+                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(rayScanPosition.X)));
+                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(rayScanPosition.Y)));
 
-                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * g_Soup.SizeX + rayScanPositionIntegerizedX];
+                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * g_Soup.Settings.SizeX + rayScanPositionIntegerizedX];
 
                                 if (targetTile.LocalPlantPopulation > 0)
                                 {
@@ -827,7 +827,7 @@ namespace Paramecium.Engine
                         {
                             Double2d rayScanPosition = rayPosition + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
 
-                            if (rayScanPosition.X < 0d || rayScanPosition.X > g_Soup.SizeX || rayScanPosition.Y < 0d || rayScanPosition.Y > g_Soup.SizeY)
+                            if (rayScanPosition.X < 0d || rayScanPosition.X > g_Soup.Settings.SizeX || rayScanPosition.Y < 0d || rayScanPosition.Y > g_Soup.Settings.SizeY)
                             {
                                 result.WallAvgAngle += rayAngle * 2d * ((backViewRange - j) / backViewRangeDouble);
                                 result.WallProximity = double.Max(result.WallProximity, ((backViewRange - j) / backViewRangeDouble));
@@ -836,10 +836,10 @@ namespace Paramecium.Engine
                             }
                             else
                             {
-                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(rayScanPosition.X)));
-                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(rayScanPosition.Y)));
+                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(rayScanPosition.X)));
+                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(rayScanPosition.Y)));
 
-                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * g_Soup.SizeX + rayScanPositionIntegerizedX];
+                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * g_Soup.Settings.SizeX + rayScanPositionIntegerizedX];
 
                                 if (targetTile.Type == TileType.Wall)
                                 {
@@ -866,10 +866,10 @@ namespace Paramecium.Engine
                             {
                                 Double2d rayScanPosition = rayPosition + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
 
-                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(rayScanPosition.X)));
-                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(rayScanPosition.Y)));
+                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(rayScanPosition.X)));
+                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(rayScanPosition.Y)));
 
-                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * g_Soup.SizeX + rayScanPositionIntegerizedX];
+                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * g_Soup.Settings.SizeX + rayScanPositionIntegerizedX];
 
                                 if (targetTile.LocalPlantPopulation > 0)
                                 {

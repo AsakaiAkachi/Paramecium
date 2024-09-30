@@ -37,7 +37,7 @@ namespace Paramecium.Forms
 
             SoupViewCanvas = new Bitmap(1, 1);
 
-            CameraPosition = new Double2d(g_Soup.SizeX / 2d, g_Soup.SizeY / 2d);
+            CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
             ZoomLevel = 0;
         }
 
@@ -90,13 +90,13 @@ namespace Paramecium.Forms
                         WorldPosViewPosConversion.ViewPosToWorldPosY(SoupView.Height, CameraPosition, double.Pow(2, ZoomLevel), mousePointClient.Y)
                     );
 
-                    if (mouseWorldPos.X >= 0 && mouseWorldPos.X <= g_Soup.SizeX && mouseWorldPos.Y >= 0 && mouseWorldPos.Y <= g_Soup.SizeY)
+                    if (mouseWorldPos.X >= 0 && mouseWorldPos.X <= g_Soup.Settings.SizeX && mouseWorldPos.Y >= 0 && mouseWorldPos.Y <= g_Soup.Settings.SizeY)
                     {
-                        int mouseWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(mouseWorldPos.X)));
-                        int mouseWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(mouseWorldPos.Y)));
+                        int mouseWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(mouseWorldPos.X)));
+                        int mouseWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(mouseWorldPos.Y)));
 
                         SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Tile;
-                        SelectedObjectIndex = mouseWorldPosIntegerizedY * g_Soup.SizeX + mouseWorldPosIntegerizedX;
+                        SelectedObjectIndex = mouseWorldPosIntegerizedY * g_Soup.Settings.SizeX + mouseWorldPosIntegerizedX;
                         SelectedObjectId = -1;
                     }
                     else
@@ -194,7 +194,7 @@ namespace Paramecium.Forms
                     else CameraState = CameraState.Default;
                     break;
                 case Keys.C:
-                    CameraPosition = new Double2d(g_Soup.SizeX / 2d, g_Soup.SizeY / 2d);
+                    CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
                     ZoomLevel = 0;
                     break;
                 case Keys.D:
@@ -246,10 +246,10 @@ namespace Paramecium.Forms
                                     WorldPosViewPosConversion.ViewPosToWorldPosX(SoupView.Width, CameraPosition, double.Pow(2, ZoomLevel), e.X),
                                     WorldPosViewPosConversion.ViewPosToWorldPosY(SoupView.Height, CameraPosition, double.Pow(2, ZoomLevel), e.Y)
                                 );
-                                int clickedWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(clickedWorldPos.X)));
-                                int clickedWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(clickedWorldPos.Y)));
+                                int clickedWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(clickedWorldPos.X)));
+                                int clickedWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(clickedWorldPos.Y)));
 
-                                if (clickedWorldPos.X >= 0 && clickedWorldPos.X <= g_Soup.SizeX && clickedWorldPos.Y >= 0 && clickedWorldPos.Y <= g_Soup.SizeY)
+                                if (clickedWorldPos.X >= 0 && clickedWorldPos.X <= g_Soup.Settings.SizeX && clickedWorldPos.Y >= 0 && clickedWorldPos.Y <= g_Soup.Settings.SizeY)
                                 {
                                     if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
                                     {
@@ -257,10 +257,10 @@ namespace Paramecium.Forms
 
                                         target.Position = clickedWorldPos;
 
-                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Remove(target.Index);
+                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Remove(target.Index);
                                         target.IntegerizedPositionX = clickedWorldPosIntegerizedX;
                                         target.IntegerizedPositionY = clickedWorldPosIntegerizedY;
-                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Add(target.Index);
+                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Add(target.Index);
                                     }
                                     else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
                                     {
@@ -268,10 +268,10 @@ namespace Paramecium.Forms
 
                                         target.Position = clickedWorldPos;
 
-                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Remove(target.Index);
+                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Remove(target.Index);
                                         target.IntegerizedPositionX = clickedWorldPosIntegerizedX;
                                         target.IntegerizedPositionY = clickedWorldPosIntegerizedY;
-                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Add(target.Index);
+                                        g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Add(target.Index);
                                     }
                                 }
                             }
@@ -294,16 +294,16 @@ namespace Paramecium.Forms
                                     WorldPosViewPosConversion.ViewPosToWorldPosY(SoupView.Height, CameraPosition, double.Pow(2, ZoomLevel), e.Y)
                                 );
 
-                                if (clickedWorldPos.X >= 0 && clickedWorldPos.X <= g_Soup.SizeX && clickedWorldPos.Y >= 0 && clickedWorldPos.Y <= g_Soup.SizeY)
+                                if (clickedWorldPos.X >= 0 && clickedWorldPos.X <= g_Soup.Settings.SizeX && clickedWorldPos.Y >= 0 && clickedWorldPos.Y <= g_Soup.Settings.SizeY)
                                 {
-                                    int clickedWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(clickedWorldPos.X)));
-                                    int clickedWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(clickedWorldPos.Y)));
+                                    int clickedWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(clickedWorldPos.X)));
+                                    int clickedWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(clickedWorldPos.Y)));
 
-                                    for (int x = int.Max(0, clickedWorldPosIntegerizedX - 1); x <= int.Min(g_Soup.SizeX - 1, clickedWorldPosIntegerizedX + 1); x++)
+                                    for (int x = int.Max(0, clickedWorldPosIntegerizedX - 1); x <= int.Min(g_Soup.Settings.SizeX - 1, clickedWorldPosIntegerizedX + 1); x++)
                                     {
-                                        for (int y = int.Max(0, clickedWorldPosIntegerizedY - 1); y <= int.Min(g_Soup.SizeY - 1, clickedWorldPosIntegerizedY + 1); y++)
+                                        for (int y = int.Max(0, clickedWorldPosIntegerizedY - 1); y <= int.Min(g_Soup.Settings.SizeY - 1, clickedWorldPosIntegerizedY + 1); y++)
                                         {
-                                            Tile targetTile = g_Soup.Tiles[y * g_Soup.SizeX + x];
+                                            Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
                                             if (targetTile.Type == TileType.Default)
                                             {
@@ -324,11 +324,11 @@ namespace Paramecium.Forms
                                             }
                                         }
                                     }
-                                    for (int x = int.Max(0, clickedWorldPosIntegerizedX - 1); x <= int.Min(g_Soup.SizeX - 1, clickedWorldPosIntegerizedX + 1); x++)
+                                    for (int x = int.Max(0, clickedWorldPosIntegerizedX - 1); x <= int.Min(g_Soup.Settings.SizeX - 1, clickedWorldPosIntegerizedX + 1); x++)
                                     {
-                                        for (int y = int.Max(0, clickedWorldPosIntegerizedY - 1); y <= int.Min(g_Soup.SizeY - 1, clickedWorldPosIntegerizedY + 1); y++)
+                                        for (int y = int.Max(0, clickedWorldPosIntegerizedY - 1); y <= int.Min(g_Soup.Settings.SizeY - 1, clickedWorldPosIntegerizedY + 1); y++)
                                         {
-                                            Tile targetTile = g_Soup.Tiles[y * g_Soup.SizeX + x];
+                                            Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
                                             if (targetTile.Type == TileType.Default)
                                             {
@@ -400,7 +400,7 @@ namespace Paramecium.Forms
                     (MousePrevY - e.Y) / double.Pow(2, ZoomLevel)
                 );
 
-                //if (CameraPosition.X < 0 || CameraPosition.X > g_Soup.SizeX || CameraPosition.Y < 0 || CameraPosition.Y > g_Soup.SizeY) CameraPosition = new Double2d(double.Max(0, double.Min(g_Soup.SizeX, CameraPosition.X)), double.Max(0, double.Min(g_Soup.SizeY, CameraPosition.Y)));
+                //if (CameraPosition.X < 0 || CameraPosition.X > g_Soup.Settings.SizeX || CameraPosition.Y < 0 || CameraPosition.Y > g_Soup.Settings.SizeY) CameraPosition = new Double2d(double.Max(0, double.Min(g_Soup.Settings.SizeX, CameraPosition.X)), double.Max(0, double.Min(g_Soup.Settings.SizeY, CameraPosition.Y)));
 
                 MousePrevX = e.X;
                 MousePrevY = e.Y;
@@ -419,10 +419,10 @@ namespace Paramecium.Forms
                                         WorldPosViewPosConversion.ViewPosToWorldPosX(SoupView.Width, CameraPosition, double.Pow(2, ZoomLevel), e.X),
                                         WorldPosViewPosConversion.ViewPosToWorldPosY(SoupView.Height, CameraPosition, double.Pow(2, ZoomLevel), e.Y)
                                     );
-                                    int clickedWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(clickedWorldPos.X)));
-                                    int clickedWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(clickedWorldPos.Y)));
+                                    int clickedWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(clickedWorldPos.X)));
+                                    int clickedWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(clickedWorldPos.Y)));
 
-                                    if (clickedWorldPos.X >= 0 && clickedWorldPos.X <= g_Soup.SizeX && clickedWorldPos.Y >= 0 && clickedWorldPos.Y <= g_Soup.SizeY)
+                                    if (clickedWorldPos.X >= 0 && clickedWorldPos.X <= g_Soup.Settings.SizeX && clickedWorldPos.Y >= 0 && clickedWorldPos.Y <= g_Soup.Settings.SizeY)
                                     {
                                         if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
                                         {
@@ -430,10 +430,10 @@ namespace Paramecium.Forms
 
                                             target.Position = clickedWorldPos;
 
-                                            g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Remove(target.Index);
+                                            g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Remove(target.Index);
                                             target.IntegerizedPositionX = clickedWorldPosIntegerizedX;
                                             target.IntegerizedPositionY = clickedWorldPosIntegerizedY;
-                                            g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Add(target.Index);
+                                            g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Add(target.Index);
                                         }
                                         else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
                                         {
@@ -441,10 +441,10 @@ namespace Paramecium.Forms
 
                                             target.Position = clickedWorldPos;
 
-                                            g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Remove(target.Index);
+                                            g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Remove(target.Index);
                                             target.IntegerizedPositionX = clickedWorldPosIntegerizedX;
                                             target.IntegerizedPositionY = clickedWorldPosIntegerizedY;
-                                            g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Add(target.Index);
+                                            g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Add(target.Index);
                                         }
                                     }
                                 }
@@ -564,7 +564,7 @@ namespace Paramecium.Forms
                 g_FilePath = OpenFileDialog_LoadSoup.FileName;
                 Text = $"{Path.GetFileName(g_FilePath)} - {g_AppName} {g_AppVersion}";
 
-                CameraPosition = new Double2d(g_Soup.SizeX / 2d, g_Soup.SizeY / 2d);
+                CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
                 ZoomLevel = 0;
             }
         }

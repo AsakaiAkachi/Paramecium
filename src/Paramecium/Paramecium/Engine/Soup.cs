@@ -8,69 +8,7 @@ namespace Paramecium.Engine
         // Soup Environment Settings //
         ///////////////////////////////
 
-        // Seed Settings
-        public int InitialSeed { get; set; } = 0;
-
-        // Soup Size Settings
-        public int SizeX { get; set; } = 128;
-        public int SizeY { get; set; } = 128;
-
-        // Wall Settings
-        public bool WallEnabled { get; set; } = true;
-        public double WallNoiseX { get; set; } = 0d;
-        public double WallNoiseY { get; set; } = 0d;
-        public double WallNoiseZ { get; set; } = 0d;
-        public double WallNoiseScale { get; set; } = 0.03d;
-        public int WallNoiseOctave { get; set; } = 4;
-        public double WallThickness { get; set; } = 0.008d;
-
-        // Element Settings
-        public double TotalElementAmount { get; set; } = 128 * 128 * 2;
-        public double ElementFlowRate { get; set; } = 0.01d;
-        public double PlantElementEfficiency { get; set; } = 1d;
-        public double AnimalElementEfficiency { get; set; } = 5d;
-
-        // Pheromone Settings
-        public double PheromoneFlowRate { get; set; } = 0.1d;
-        public double PheromoneDecayRate { get; set; } = 0.01d;
-        public double PheromoneProductionRate { get; set; } = 0.1d;
-
-        // Physical Settings
-        public double Drag { get; set; } = 0.025d;
-        public double AngularVelocityDrag { get; set; } = 0.01d;
-        public double MaximumVelocity { get; set; } = 0.1d;
-        public double MaximumAngularVelocity { get; set; } = 0.1d;
-        public double RestitutionCoefficient { get; set; } = 0.1d;
-
-        // Plant Settings
-        public int InitialPlantPopulation { get; set; } = 128 * 128 * 2 / 2 / 16;
-        public double InitialPlantElementAmount { get; set; } = 16d;
-        public double PlantForkCost { get; set; } = 16d;
-        public int PlantForkOffspringCountMin { get; set; } = 4;
-        public int PlantForkOffspringCountMax { get; set; } = 8;
-        public double PlantElementCollectRate { get; set; } = 0.01d;
-
-        // Animal Basic Settings
-        public int InitialAnimalPopulation { get; set; } = 128 * 128 * 2 / 2 / 64;
-        public double InitialAnimalElementAmount { get; set; } = 64d;
-        public double AnimalForkCost { get; set; } = 64d;
-        public double AnimalElementBaseCost { get; set; } = 0.01d;
-        public double AnimalElementAccelerationCost { get; set; } = 0.02d;
-        public double AnimalElementRotationCost { get; set; } = 0.01d;
-        public double AnimalElementAttackCost { get; set; } = 0.02d;
-        public double AnimalElementPheromoneProductionCost { get; set; } = 0.0025d;
-        public double AnimalPlantIngestionRate { get; set; } = 0.2d;
-        public double AnimalAnimalIngestionRate { get; set; } = 0.8d;
-        public int AnimalMaximumAge { get; set; } = 15000;
-
-        // Animal Mutation Settings
-        public double AnimalMutationRate { get; set; } = 0.25d;
-        public int AnimalMaximumMutationCount { get; set; } = 8;
-        public double AnimalSpeciesIdMutationRate { get; set; } = 0.25d;
-
-        // Animal Brain Settings
-        public int AnimalBrainMaximumNodeCount { get; set; } = 64;
-        public int AnimalBrainMaximumConnectionCount { get; set; } = 8;
+        public SoupSettings Settings { get; set; } = new SoupSettings();
 
 
 
@@ -126,123 +64,134 @@ namespace Paramecium.Engine
             {
                 Perlin perlin = new Perlin();
 
-                Tiles = new Tile[SizeX * SizeY];
-                int DefaultTypeTileCount = 0;
-                for (int x = 0; x < SizeX; x++)
-                {
-                    for (int y = 0; y < SizeY; y++)
-                    {
-                        Tiles[y * SizeX + x] = new Tile(x, y);
+                Tiles = new Tile[Settings.SizeX * Settings.SizeY];
+                int DefaultTypeTileCount = Settings.SizeX * Settings.SizeY;
 
-                        if (WallEnabled)
-                        {
-                            if (Math.Abs(perlin.OctavePerlin(WallNoiseX + x * WallNoiseScale, WallNoiseY + y * WallNoiseScale, WallNoiseZ, WallNoiseOctave, 0.5d) - 0.5d) < WallThickness)
-                            {
-                                Tiles[y * SizeX + x].Type = TileType.Wall;
-                            }
-                        }
+                for (int x = 0; x < Settings.SizeX; x++)
+                {
+                    for (int y = 0; y < Settings.SizeY; y++)
+                    {
+                        Tiles[y * Settings.SizeX + x] = new Tile(x, y);
                     }
                 }
 
-                bool[] continuousRegionFlag = new bool[SizeX * SizeY];
-                int continuousRegionArea = 0;
-
-                while (continuousRegionArea < SizeX * SizeY / 2)
+                if (Settings.WallEnabled)
                 {
-                    continuousRegionArea = 0;
-
-                    List<int> exploreTiles = new List<int>();
-                    bool[] exploredTiles = new bool[SizeX * SizeY];
-
-                    exploreTiles.Add(new Random().Next(0, SizeX * SizeY));
-                    while (Tiles[exploreTiles[0]].Type == TileType.Wall) exploreTiles[0] = new Random().Next(0, SizeX * SizeY);
-
-                    while (exploreTiles.Count > 0)
+                    for (int x = 0; x < Settings.SizeX; x++)
                     {
-                        List<int> nextStepExploreTiles = new List<int>();
-
-                        for (int i = 0; i < exploreTiles.Count; i++)
+                        for (int y = 0; y < Settings.SizeY; y++)
                         {
-                            int x = exploreTiles[i] % SizeX;
-                            int y = exploreTiles[i] / SizeX;
-
-                            for (int ix = -1; ix <= 1; ix++)
+                            if (Math.Abs(perlin.OctavePerlin(Settings.WallNoiseX + x * Settings.WallNoiseScale, Settings.WallNoiseY + y * Settings.WallNoiseScale, Settings.WallNoiseZ, Settings.WallNoiseOctave, 0.5d) - 0.5d) < Settings.WallThickness)
                             {
-                                for (int iy = -1; iy <= 1; iy++)
+                                Tiles[y * Settings.SizeX + x].Type = TileType.Wall;
+                            }
+                        }
+                    }
+
+                    bool[] continuousRegionFlag = new bool[Settings.SizeX * Settings.SizeY];
+                    int continuousRegionArea = 0;
+
+                    for (int i = 0; i < 16; i++)
+                    {
+                        int exploredTileCount = 0;
+
+                        List<int> exploreTiles = new List<int>();
+                        bool[] exploredTiles = new bool[Settings.SizeX * Settings.SizeY];
+
+                        exploreTiles.Add(new Random().Next(0, Settings.SizeX * Settings.SizeY));
+                        while (Tiles[exploreTiles[0]].Type == TileType.Wall) exploreTiles[0] = new Random().Next(0, Settings.SizeX * Settings.SizeY);
+
+                        while (exploreTiles.Count > 0)
+                        {
+                            List<int> nextStepExploreTiles = new List<int>();
+
+                            for (int j = 0; j < exploreTiles.Count; j++)
+                            {
+                                int x = exploreTiles[j] % Settings.SizeX;
+                                int y = exploreTiles[j] / Settings.SizeX;
+
+                                for (int ix = -1; ix <= 1; ix++)
                                 {
-                                    if (int.Abs(ix + iy) == 1)
+                                    for (int iy = -1; iy <= 1; iy++)
                                     {
-                                        if (x + ix >= 0 && x + ix < SizeX && y + iy >= 0 && y + iy < SizeY)
+                                        if (int.Abs(ix + iy) == 1)
                                         {
-                                            if (Tiles[(y + iy) * SizeX + (x + ix)].Type == TileType.Default && !exploredTiles[(y + iy) * SizeX + (x + ix)])
+                                            if (x + ix >= 0 && x + ix < Settings.SizeX && y + iy >= 0 && y + iy < Settings.SizeY)
                                             {
-                                                exploredTiles[(y + iy) * SizeX + (x + ix)] = true;
-                                                nextStepExploreTiles.Add((y + iy) * SizeX + (x + ix));
-                                                continuousRegionArea++;
+                                                if (Tiles[(y + iy) * Settings.SizeX + (x + ix)].Type == TileType.Default && !exploredTiles[(y + iy) * Settings.SizeX + (x + ix)])
+                                                {
+                                                    exploredTiles[(y + iy) * Settings.SizeX + (x + ix)] = true;
+                                                    nextStepExploreTiles.Add((y + iy) * Settings.SizeX + (x + ix));
+                                                    exploredTileCount++;
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
+
+                            exploreTiles = nextStepExploreTiles;
                         }
 
-                        exploreTiles = nextStepExploreTiles;
+                        if (exploredTileCount > continuousRegionArea)
+                        {
+                            continuousRegionFlag = exploredTiles;
+                            continuousRegionArea = exploredTileCount;
+                        }
+
+                        if (exploredTileCount > Settings.SizeX * Settings.SizeY / 2) break;
                     }
 
-                    continuousRegionFlag = exploredTiles;
-                }
-
-                for (int x = 0; x < SizeX; x++)
-                {
-                    for (int y = 0; y < SizeY; y++)
+                    for (int x = 0; x < Settings.SizeX; x++)
                     {
-                        Tile targetTile = Tiles[y * SizeX + x];
+                        for (int y = 0; y < Settings.SizeY; y++)
+                        {
+                            Tile targetTile = Tiles[y * Settings.SizeX + x];
 
-                        if (!continuousRegionFlag[y * SizeX + x])
-                        {
-                            targetTile.Type = TileType.Wall;
-                        }
-                        else
-                        {
-                            DefaultTypeTileCount++;
+                            if (!continuousRegionFlag[y * Settings.SizeX + x])
+                            {
+                                targetTile.Type = TileType.Wall;
+                            }
                         }
                     }
+
+                    DefaultTypeTileCount = continuousRegionArea;
                 }
 
-                for (int x = 0; x < SizeX; x++)
+                for (int x = 0; x < Settings.SizeX; x++)
                 {
-                    for (int y = 0; y < SizeY; y++)
+                    for (int y = 0; y < Settings.SizeY; y++)
                     {
-                        Tile targetTile = Tiles[y * SizeX + x];
+                        Tile targetTile = Tiles[y * Settings.SizeX + x];
 
                         if (targetTile.Type == TileType.Default)
                         {
-                            targetTile.Element = (TotalElementAmount - (InitialPlantElementAmount * InitialPlantPopulation + InitialAnimalElementAmount * InitialAnimalPopulation)) / DefaultTypeTileCount;
+                            targetTile.Element = (Settings.TotalElementAmount - (Settings.InitialPlantElementAmount * Settings.InitialPlantPopulation + Settings.InitialAnimalElementAmount * Settings.InitialAnimalPopulation)) / DefaultTypeTileCount;
                         }
                     }
                 }
 
-                Random random = new Random(InitialSeed);
+                Random random = new Random(Settings.InitialSeed);
 
-                for (int i = 0; i < InitialPlantPopulation; i++)
+                for (int i = 0; i < Settings.InitialPlantPopulation; i++)
                 {
                     int targetTileIndex = random.Next(0, Tiles.Length);
                     while (Tiles[targetTileIndex].Type == TileType.Wall) targetTileIndex = random.Next(0, Tiles.Length);
 
                     Tile targetTile = Tiles[targetTileIndex];
 
-                    Plants.Add(new Plant(new Double2d(targetTile.PositionX + random.NextDouble(), targetTile.PositionY + random.NextDouble()), InitialPlantElementAmount));
+                    Plants.Add(new Plant(new Double2d(targetTile.PositionX + random.NextDouble(), targetTile.PositionY + random.NextDouble()), Settings.InitialPlantElementAmount));
                     Plants[Plants.Count - 1].Initialize(Plants.Count - 1, random);
                 }
 
-                for (int i = 0; i < InitialAnimalPopulation; i++)
+                for (int i = 0; i < Settings.InitialAnimalPopulation; i++)
                 {
                     int targetTileIndex = random.Next(0, Tiles.Length);
                     while (Tiles[targetTileIndex].Type == TileType.Wall) targetTileIndex = random.Next(0, Tiles.Length);
 
                     Tile targetTile = Tiles[targetTileIndex];
 
-                    Animals.Add(new Animal(new Double2d(targetTile.PositionX + random.NextDouble(), targetTile.PositionY + random.NextDouble()), random.NextDouble(), InitialAnimalElementAmount, random));
+                    Animals.Add(new Animal(new Double2d(targetTile.PositionX + random.NextDouble(), targetTile.PositionY + random.NextDouble()), random.NextDouble(), Settings.InitialAnimalElementAmount, random));
                     Animals[Animals.Count - 1].Initialize(Animals.Count - 1, random);
                 }
 
@@ -278,16 +227,16 @@ namespace Paramecium.Engine
                                     MaxDegreeOfParallelism = ThreadCount
                                 };
 
-                                double[] elementFlowAmount = new double[SizeX * SizeY];
-                                double[] pheromoneRedFlowAmount = new double[SizeX * SizeY];
-                                double[] pheromoneGreenFlowAmount = new double[SizeX * SizeY];
-                                double[] pheromoneBlueFlowAmount = new double[SizeX * SizeY];
-                                //for (int x = 0; x < SizeX; x++)
-                                Parallel.For(0, SizeX, parallelOptions, x =>
+                                double[] elementFlowAmount = new double[Settings.SizeX * Settings.SizeY];
+                                double[] pheromoneRedFlowAmount = new double[Settings.SizeX * Settings.SizeY];
+                                double[] pheromoneGreenFlowAmount = new double[Settings.SizeX * Settings.SizeY];
+                                double[] pheromoneBlueFlowAmount = new double[Settings.SizeX * Settings.SizeY];
+                                //for (int x = 0; x < Settings.SizeX; x++)
+                                Parallel.For(0, Settings.SizeX, parallelOptions, x =>
                                 {
-                                    for (int y = 0; y < SizeY; y++)
+                                    for (int y = 0; y < Settings.SizeY; y++)
                                     {
-                                        Tile targetTile1 = Tiles[y * SizeX + x];
+                                        Tile targetTile1 = Tiles[y * Settings.SizeX + x];
 
                                         if (targetTile1.Type == TileType.Default)
                                         {
@@ -297,16 +246,16 @@ namespace Paramecium.Engine
                                                 {
                                                     if (int.Abs(ix) + int.Abs(iy) == 1)
                                                     {
-                                                        if (x + ix >= 0 && x + ix < SizeX && y + iy >= 0 && y + iy < SizeY)
+                                                        if (x + ix >= 0 && x + ix < Settings.SizeX && y + iy >= 0 && y + iy < Settings.SizeY)
                                                         {
-                                                            Tile targetTile2 = Tiles[(y + iy) * SizeX + (x + ix)];
+                                                            Tile targetTile2 = Tiles[(y + iy) * Settings.SizeX + (x + ix)];
 
                                                             if (targetTile2.Type == TileType.Default)
                                                             {
-                                                                elementFlowAmount[y * SizeX + x] -= (targetTile1.Element - targetTile2.Element) * ElementFlowRate;
-                                                                pheromoneRedFlowAmount[y * SizeX + x] -= (targetTile1.PheromoneRed - targetTile2.PheromoneRed) * PheromoneFlowRate;
-                                                                pheromoneGreenFlowAmount[y * SizeX + x] -= (targetTile1.PheromoneGreen - targetTile2.PheromoneGreen) * PheromoneFlowRate;
-                                                                pheromoneBlueFlowAmount[y * SizeX + x] -= (targetTile1.PheromoneBlue - targetTile2.PheromoneBlue) * PheromoneFlowRate;
+                                                                elementFlowAmount[y * Settings.SizeX + x] -= (targetTile1.Element - targetTile2.Element) * Settings.ElementFlowRate;
+                                                                pheromoneRedFlowAmount[y * Settings.SizeX + x] -= (targetTile1.PheromoneRed - targetTile2.PheromoneRed) * Settings.PheromoneFlowRate;
+                                                                pheromoneGreenFlowAmount[y * Settings.SizeX + x] -= (targetTile1.PheromoneGreen - targetTile2.PheromoneGreen) * Settings.PheromoneFlowRate;
+                                                                pheromoneBlueFlowAmount[y * Settings.SizeX + x] -= (targetTile1.PheromoneBlue - targetTile2.PheromoneBlue) * Settings.PheromoneFlowRate;
                                                             }
                                                         }
                                                     }
@@ -316,29 +265,29 @@ namespace Paramecium.Engine
                                         else if (targetTile1.Type == TileType.Wall && targetTile1.Element > 0) targetTile1.Element = 0;
                                     }
                                 });
-                                Parallel.For(0, SizeX, parallelOptions, x =>
+                                Parallel.For(0, Settings.SizeX, parallelOptions, x =>
                                 {
-                                    for (int y = 0; y < SizeY; y++)
+                                    for (int y = 0; y < Settings.SizeY; y++)
                                     {
-                                        Tile targetTile = Tiles[y * SizeX + x];
-                                        targetTile.Element += elementFlowAmount[y * SizeX + x];
-                                        targetTile.PheromoneRed += pheromoneRedFlowAmount[y * SizeX + x];
-                                        targetTile.PheromoneGreen += pheromoneGreenFlowAmount[y * SizeX + x];
-                                        targetTile.PheromoneBlue += pheromoneBlueFlowAmount[y * SizeX + x];
+                                        Tile targetTile = Tiles[y * Settings.SizeX + x];
+                                        targetTile.Element += elementFlowAmount[y * Settings.SizeX + x];
+                                        targetTile.PheromoneRed += pheromoneRedFlowAmount[y * Settings.SizeX + x];
+                                        targetTile.PheromoneGreen += pheromoneGreenFlowAmount[y * Settings.SizeX + x];
+                                        targetTile.PheromoneBlue += pheromoneBlueFlowAmount[y * Settings.SizeX + x];
                                         if (targetTile.Element < 0) targetTile.Element = 0;
 
-                                        targetTile.PheromoneRed *= 1d - PheromoneDecayRate;
-                                        targetTile.PheromoneGreen *= 1d - PheromoneDecayRate;
-                                        targetTile.PheromoneBlue *= 1d - PheromoneDecayRate;
+                                        targetTile.PheromoneRed *= 1d - Settings.PheromoneDecayRate;
+                                        targetTile.PheromoneGreen *= 1d - Settings.PheromoneDecayRate;
+                                        targetTile.PheromoneBlue *= 1d - Settings.PheromoneDecayRate;
                                     }
                                 });
 
                                 double CurrentTotalElementAmount = 0d;
-                                for(int x = 0; x < SizeX; x++)
+                                for(int x = 0; x < Settings.SizeX; x++)
                                 {
-                                    for (int y = 0; y < SizeY; y++)
+                                    for (int y = 0; y < Settings.SizeY; y++)
                                     {
-                                        Tile targetTile = Tiles[y * SizeX + x];
+                                        Tile targetTile = Tiles[y * Settings.SizeX + x];
                                         CurrentTotalElementAmount += targetTile.Element;
                                     }
                                 }
@@ -346,16 +295,16 @@ namespace Paramecium.Engine
                                 for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) CurrentTotalElementAmount += Animals[i].Element;
 
                                 //Console.WriteLine($"{CurrentTotalElementAmount} / {TotalElementAmount}");
-                                double GlobalElementAmountMultiplier = TotalElementAmount / CurrentTotalElementAmount;
-                                Parallel.For(0, SizeX, parallelOptions, x =>
+                                double GlobalElementAmountMultiplier = Settings.TotalElementAmount / CurrentTotalElementAmount;
+                                Parallel.For(0, Settings.SizeX, parallelOptions, x =>
                                 {
-                                    for (int y = 0; y < SizeY; y++)
+                                    for (int y = 0; y < Settings.SizeY; y++)
                                     {
-                                        Tile targetTile = Tiles[y * SizeX + x];
+                                        Tile targetTile = Tiles[y * Settings.SizeX + x];
                                         targetTile.Element *= GlobalElementAmountMultiplier;
                                     }
                                 });
-                                Parallel.For(0, Plants.Count, parallelOptions, i => { Plants[i].Element *= GlobalElementAmountMultiplier; Plants[i].Radius = Math.Sqrt(Plants[i].Element / g_Soup.PlantForkCost) / 2d; Plants[i].Mass = Plants[i].Element; });
+                                Parallel.For(0, Plants.Count, parallelOptions, i => { Plants[i].Element *= GlobalElementAmountMultiplier; Plants[i].Radius = Math.Sqrt(Plants[i].Element / Settings.PlantForkCost) / 2d; Plants[i].Mass = Plants[i].Element; });
                                 Parallel.For(0, Animals.Count, parallelOptions, i => { Animals[i].Element *= GlobalElementAmountMultiplier; Animals[i].Mass = 16d + Animals[i].Element; });
 
                                 for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].CollectElement();

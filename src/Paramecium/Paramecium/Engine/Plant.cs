@@ -23,10 +23,10 @@
         public Plant(Double2d position, double element)
         {
             Position = position;
-            IntegerizedPositionX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(Position.X)));
-            IntegerizedPositionY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(Position.Y)));
+            IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
+            IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
 
-            Radius = Math.Sqrt(element / g_Soup.PlantForkCost) * 0.5d;
+            Radius = Math.Sqrt(element / g_Soup.Settings.PlantForkCost) * 0.5d;
             Mass = element;
 
             Element = element;
@@ -41,9 +41,9 @@
                 Index = index;
                 Id = random.NextInt64(0, 4738381338321616896);
 
-                //Velocity = Double2d.FromAngle(random.NextDouble()) * g_Soup.MaximumVelocity;
+                //Velocity = Double2d.FromAngle(random.NextDouble()) * g_Soup.Settings.MaximumVelocity;
 
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
+                g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
 
                 Initialized = true;
             }
@@ -54,12 +54,12 @@
         {
             if (Initialized)
             {
-                Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX];
+                Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX];
 
                 if (targetTile.Element > 0)
                 {
-                    Element += targetTile.Element * g_Soup.PlantElementCollectRate;
-                    targetTile.Element -= targetTile.Element * g_Soup.PlantElementCollectRate;
+                    Element += targetTile.Element * g_Soup.Settings.PlantElementCollectRate;
+                    targetTile.Element -= targetTile.Element * g_Soup.Settings.PlantElementCollectRate;
 
                     if (targetTile.Element < 0) targetTile.Element = 0;
                 }
@@ -71,19 +71,19 @@
         {
             if (Initialized)
             {
-                for (int x = int.Max(0, int.Min(g_Soup.SizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(g_Soup.SizeX - 1, IntegerizedPositionX + 1)); x++)
+                for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX + 1)); x++)
                 {
-                    for (int y = int.Max(0, int.Min(g_Soup.SizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(g_Soup.SizeY - 1, IntegerizedPositionY + 1)); y++)
+                    for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY + 1)); y++)
                     {
-                        Tile targetTile = g_Soup.Tiles[y * g_Soup.SizeX + x];
+                        Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
                         if (targetTile.Type == TileType.Wall)
                         {
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.25d), 0.356d) * g_Soup.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.25d), 0.356d) * g_Soup.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.75d), 0.356d) * g_Soup.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.75d), 0.356d) * g_Soup.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.5d, y + 0.5d), 0.5d) * g_Soup.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.25d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.25d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.75d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.75d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
+                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.5d, y + 0.5d), 0.5d) * g_Soup.Settings.RestitutionCoefficient;
                         }
 
                         if (targetTile.LocalPlantPopulation > 0)
@@ -91,7 +91,7 @@
                             for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
                             {
                                 Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
-                                if (targetPlant.Exist && targetPlant.Id != Id) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetPlant.Position, targetPlant.Radius, targetPlant.Mass) * g_Soup.RestitutionCoefficient;
+                                if (targetPlant.Exist && targetPlant.Id != Id) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetPlant.Position, targetPlant.Radius, targetPlant.Mass) * g_Soup.Settings.RestitutionCoefficient;
                             }
                         }
 
@@ -100,7 +100,7 @@
                             for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
                             {
                                 Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
-                                if (targetAnimal.Exist) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetAnimal.Position, targetAnimal.Radius, targetAnimal.Mass) * g_Soup.RestitutionCoefficient;
+                                if (targetAnimal.Exist) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetAnimal.Position, targetAnimal.Radius, targetAnimal.Mass) * g_Soup.Settings.RestitutionCoefficient;
                             }
                         }
                     }
@@ -123,12 +123,12 @@
         {
             if (Initialized)
             {
-                if (Velocity.LengthSquared > g_Soup.MaximumVelocity * g_Soup.MaximumVelocity)
+                if (Velocity.LengthSquared > g_Soup.Settings.MaximumVelocity * g_Soup.Settings.MaximumVelocity)
                 {
-                    Velocity /= Velocity.Length / g_Soup.MaximumVelocity;
+                    Velocity /= Velocity.Length / g_Soup.Settings.MaximumVelocity;
                 }
 
-                //Velocity /= Velocity.Length / g_Soup.MaximumVelocity;
+                //Velocity /= Velocity.Length / g_Soup.Settings.MaximumVelocity;
 
                 Position += Velocity;
 
@@ -137,9 +137,9 @@
                     Position = new Double2d(0 + Radius, Position.Y);
                     Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
                 }
-                if (Position.X > g_Soup.SizeX - Radius)
+                if (Position.X > g_Soup.Settings.SizeX - Radius)
                 {
-                    Position = new Double2d(g_Soup.SizeX - Radius, Position.Y);
+                    Position = new Double2d(g_Soup.Settings.SizeX - Radius, Position.Y);
                     Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
                 }
                 if (Position.Y < Radius)
@@ -147,27 +147,27 @@
                     Position = new Double2d(Position.X, Radius);
                     Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
                 }
-                if (Position.Y > g_Soup.SizeY - Radius)
+                if (Position.Y > g_Soup.Settings.SizeY - Radius)
                 {
-                    Position = new Double2d(Position.X, g_Soup.SizeY - Radius);
+                    Position = new Double2d(Position.X, g_Soup.Settings.SizeY - Radius);
                     Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
                 }
 
-                if (int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(Position.X))) != IntegerizedPositionX || int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(Position.Y))) != IntegerizedPositionY)
+                if (int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X))) != IntegerizedPositionX || int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y))) != IntegerizedPositionY)
                 {
-                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].LocalPlantIndexes.Remove(Index);
+                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Remove(Index);
 
-                    IntegerizedPositionX = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)double.Floor(Position.X)));
-                    IntegerizedPositionY = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)double.Floor(Position.Y)));
+                    IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
+                    IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
 
-                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
+                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
                 }
 
-                Radius = Math.Sqrt(Element / g_Soup.PlantForkCost) / 2d;
+                Radius = Math.Sqrt(Element / g_Soup.Settings.PlantForkCost) / 2d;
                 Mass = Element;
 
                 if (Element <= 0) OnDisable();
-                if (g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
+                if (g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }
@@ -176,7 +176,7 @@
         {
             if (Initialized)
             {
-                Velocity *= 1d - g_Soup.Drag;
+                Velocity *= 1d - g_Soup.Settings.Drag;
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }
@@ -185,10 +185,10 @@
         {
             if (Initialized)
             {
-                if (Element >= g_Soup.PlantForkCost)
+                if (Element >= g_Soup.Settings.PlantForkCost)
                 {
                     List<Plant> result = new List<Plant>();
-                    int offspringCount = random.Next(g_Soup.PlantForkOffspringCountMin, g_Soup.PlantForkOffspringCountMax + 1);
+                    int offspringCount = random.Next(g_Soup.Settings.PlantForkOffspringCountMin, g_Soup.Settings.PlantForkOffspringCountMax + 1);
                     double[] offspringElementAmount = new double[offspringCount];
                     for (int i = 0; i < offspringCount; i++) offspringElementAmount[i] = random.NextDouble() * 0.9d + 0.1d;
                     double offspringElementAmountTotal = 0;
@@ -210,7 +210,7 @@
             {
                 Exist = false;
 
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].LocalPlantIndexes.Remove(Index);
+                g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Remove(Index);
                 g_Soup.PlantUnusedIndexes.Add(Index);
             }
             else throw new InvalidOperationException("This animal is not initialized.");

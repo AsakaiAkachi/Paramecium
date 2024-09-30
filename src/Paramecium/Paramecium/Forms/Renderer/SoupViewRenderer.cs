@@ -27,29 +27,29 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupBackground(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor)
         {
-            Bitmap backgroundCanvas = new Bitmap(g_Soup.SizeX, g_Soup.SizeY, PixelFormat.Format32bppRgb);
+            Bitmap backgroundCanvas = new Bitmap(g_Soup.Settings.SizeX, g_Soup.Settings.SizeY, PixelFormat.Format32bppRgb);
 
             BitmapData backgroundCanvasData = backgroundCanvas.LockBits(
-                new Rectangle(0, 0, g_Soup.SizeX, g_Soup.SizeY),
+                new Rectangle(0, 0, g_Soup.Settings.SizeX, g_Soup.Settings.SizeY),
                 ImageLockMode.WriteOnly,
                 PixelFormat.Format32bppRgb
             );
 
             byte[] backgroundCanvasByte = new byte[backgroundCanvas.Width * backgroundCanvas.Height * 4];
 
-            for (int x = 0; x < g_Soup.SizeX; x++)
+            for (int x = 0; x < g_Soup.Settings.SizeX; x++)
             {
-                for (int y = 0; y < g_Soup.SizeY; y++)
+                for (int y = 0; y < g_Soup.Settings.SizeY; y++)
                 {
                     Color pixelColor = Color.FromArgb(0, 0, 0);
 
-                    Tile targetTile = g_Soup.Tiles[y * g_Soup.SizeX + x];
+                    Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
                     if (targetTile.Type == TileType.Default)
                     {
                         if (targetTile.Element <= 0) pixelColor = Color.FromArgb(0, 0, 32);
-                        else if (targetTile.Element <= g_Soup.TotalElementAmount / (g_Soup.SizeX * g_Soup.SizeY)) pixelColor = Lerp(Color.FromArgb(0, 0, 32), Color.FromArgb(0, 64, 0), targetTile.Element / (g_Soup.TotalElementAmount / (g_Soup.SizeX * g_Soup.SizeY)));
-                        else if (targetTile.Element <= g_Soup.TotalElementAmount / (g_Soup.SizeX * g_Soup.SizeY) * 2d) pixelColor = Lerp(Color.FromArgb(0, 64, 0), Color.FromArgb(0, 128, 0), (targetTile.Element - (g_Soup.TotalElementAmount / (g_Soup.SizeX * g_Soup.SizeY))) / (g_Soup.TotalElementAmount / (g_Soup.SizeX * g_Soup.SizeY)));
+                        else if (targetTile.Element <= g_Soup.Settings.TotalElementAmount / (g_Soup.Settings.SizeX * g_Soup.Settings.SizeY)) pixelColor = Lerp(Color.FromArgb(0, 0, 32), Color.FromArgb(0, 64, 0), targetTile.Element / (g_Soup.Settings.TotalElementAmount / (g_Soup.Settings.SizeX * g_Soup.Settings.SizeY)));
+                        else if (targetTile.Element <= g_Soup.Settings.TotalElementAmount / (g_Soup.Settings.SizeX * g_Soup.Settings.SizeY) * 2d) pixelColor = Lerp(Color.FromArgb(0, 64, 0), Color.FromArgb(0, 128, 0), (targetTile.Element - (g_Soup.Settings.TotalElementAmount / (g_Soup.Settings.SizeX * g_Soup.Settings.SizeY))) / (g_Soup.Settings.TotalElementAmount / (g_Soup.Settings.SizeX * g_Soup.Settings.SizeY)));
                         else pixelColor = Color.FromArgb(0, 128, 0);
 
                         pixelColor = Color.FromArgb(
@@ -64,15 +64,15 @@ namespace Paramecium.Forms.Renderer
                             if (targetTile.LocalAnimalPopulation > 0) pixelColor = Color.FromArgb(255, 255, 255);
                         }
                     }
-                    else if (g_Soup.Tiles[y * g_Soup.SizeX + x].Type == TileType.Wall)
+                    else if (g_Soup.Tiles[y * g_Soup.Settings.SizeX + x].Type == TileType.Wall)
                     {
                         pixelColor = Color.FromArgb(128, 128, 128);
                     }
 
-                    backgroundCanvasByte[(y * g_Soup.SizeX + x) * 4] = (byte)int.Max(0, int.Min(255, pixelColor.B));
-                    backgroundCanvasByte[(y * g_Soup.SizeX + x) * 4 + 1] = (byte)int.Max(0, int.Min(255, pixelColor.G));
-                    backgroundCanvasByte[(y * g_Soup.SizeX + x) * 4 + 2] = (byte)int.Max(0, int.Min(255, pixelColor.R));
-                    backgroundCanvasByte[(y * g_Soup.SizeX + x) * 4 + 3] = (byte)int.Max(0, int.Min(255, pixelColor.A));
+                    backgroundCanvasByte[(y * g_Soup.Settings.SizeX + x) * 4] = (byte)int.Max(0, int.Min(255, pixelColor.B));
+                    backgroundCanvasByte[(y * g_Soup.Settings.SizeX + x) * 4 + 1] = (byte)int.Max(0, int.Min(255, pixelColor.G));
+                    backgroundCanvasByte[(y * g_Soup.Settings.SizeX + x) * 4 + 2] = (byte)int.Max(0, int.Min(255, pixelColor.R));
+                    backgroundCanvasByte[(y * g_Soup.Settings.SizeX + x) * 4 + 3] = (byte)int.Max(0, int.Min(255, pixelColor.A));
                 }
             }
 
@@ -80,7 +80,7 @@ namespace Paramecium.Forms.Renderer
 
             backgroundCanvas.UnlockBits(backgroundCanvasData);
 
-            Bitmap backgroundCanvasDrawImageBuffer = new Bitmap(g_Soup.SizeX + 1, g_Soup.SizeY + 1);
+            Bitmap backgroundCanvasDrawImageBuffer = new Bitmap(g_Soup.Settings.SizeX + 1, g_Soup.Settings.SizeY + 1);
 
             Graphics backgroundCanvasBufferGraphics = Graphics.FromImage(backgroundCanvasDrawImageBuffer);
             backgroundCanvasBufferGraphics.DrawImage(backgroundCanvas, 1, 1, backgroundCanvas.Width, backgroundCanvas.Height);
@@ -101,21 +101,21 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupBorder(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
-            FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, -1d), new Double2d(g_Soup.SizeX + 1, 0), Color.FromArgb(0, 0, 0));
-            FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, g_Soup.SizeY), new Double2d(g_Soup.SizeX + 1, g_Soup.SizeY + 1), Color.FromArgb(0, 0, 0));
-            FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, -1d), new Double2d(0, g_Soup.SizeY + 1), Color.FromArgb(0, 0, 0));
-            FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(g_Soup.SizeX, -1d), new Double2d(g_Soup.SizeX + 1, g_Soup.SizeY + 1), Color.FromArgb(0, 0, 0));
+            FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, -1d), new Double2d(g_Soup.Settings.SizeX + 1, 0), Color.FromArgb(0, 0, 0));
+            FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, g_Soup.Settings.SizeY), new Double2d(g_Soup.Settings.SizeX + 1, g_Soup.Settings.SizeY + 1), Color.FromArgb(0, 0, 0));
+            FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, -1d), new Double2d(0, g_Soup.Settings.SizeY + 1), Color.FromArgb(0, 0, 0));
+            FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(g_Soup.Settings.SizeX, -1d), new Double2d(g_Soup.Settings.SizeX + 1, g_Soup.Settings.SizeY + 1), Color.FromArgb(0, 0, 0));
 
-            DrawRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(0d, 0d), new Double2d(g_Soup.SizeX, g_Soup.SizeY), Color.FromArgb(255, 0, 0));
+            DrawRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(0d, 0d), new Double2d(g_Soup.Settings.SizeX, g_Soup.Settings.SizeY), Color.FromArgb(255, 0, 0));
         }
 
         public static void DrawSoupWall(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
-            for (int x = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
+            for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
             {
-                for (int y = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
+                for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
                 {
-                    Tile targetTile = g_Soup.Tiles[y * g_Soup.SizeX + x];
+                    Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
                     if (targetTile.Type == TileType.Wall)
                     {
@@ -130,11 +130,11 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupPlant(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
-            for (int x = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
+            for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
             {
-                for (int y = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
+                for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
                 {
-                    Tile targetTile = g_Soup.Tiles[y * g_Soup.SizeX + x];
+                    Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
                     if (targetTile.LocalPlantPopulation > 0)
                     {
@@ -145,7 +145,7 @@ namespace Paramecium.Forms.Renderer
 
                             if (targetPlant.Exist)
                             {
-                                FillEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetPlant.Position, targetPlant.Radius, Lerp(Color.FromArgb(0, 64, 0), Color.FromArgb(0, 255, 0), targetPlant.Element / g_Soup.PlantForkCost));
+                                FillEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetPlant.Position, targetPlant.Radius, Lerp(Color.FromArgb(0, 64, 0), Color.FromArgb(0, 255, 0), targetPlant.Element / g_Soup.Settings.PlantForkCost));
                                 DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetPlant.Position, targetPlant.Radius, Color.FromArgb(255, 255, 255));
                             }
                         }
@@ -156,11 +156,11 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupAnimal(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor)
         {
-            for (int x = int.Max(0, int.Min(g_Soup.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
+            for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
             {
-                for (int y = int.Max(0, int.Min(g_Soup.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
+                for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
                 {
-                    Tile targetTile = g_Soup.Tiles[y * g_Soup.SizeX + x];
+                    Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
                     if (targetTile.LocalAnimalPopulation > 0)
                     {
@@ -243,8 +243,8 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, target.Element / (g_Soup.TotalElementAmount / (g_Soup.SizeX * g_Soup.SizeY)))), 16, Color.FromArgb(255, 128, 128, 128));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Max(0d, double.Min(1d, target.Element / (g_Soup.TotalElementAmount / (g_Soup.SizeX * g_Soup.SizeY)) - 1d))), 16, Color.FromArgb(255, 0, 192, 0));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, target.Element / (g_Soup.Settings.TotalElementAmount / (g_Soup.Settings.SizeX * g_Soup.Settings.SizeY)))), 16, Color.FromArgb(255, 128, 128, 128));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Max(0d, double.Min(1d, target.Element / (g_Soup.Settings.TotalElementAmount / (g_Soup.Settings.SizeX * g_Soup.Settings.SizeY)) - 1d))), 16, Color.FromArgb(255, 0, 192, 0));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
@@ -289,12 +289,12 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * ((double)target.Velocity.Length / g_Soup.MaximumVelocity)), 16, Color.FromArgb(255, 128, 128, 128));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * ((double)target.Velocity.Length / g_Soup.Settings.MaximumVelocity)), 16, Color.FromArgb(255, 128, 128, 128));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Velocity : ({target.Velocity.X.ToString("0.000")}, {target.Velocity.Y.ToString("0.000")}) / {target.Velocity.Length.ToString("0.000")} u/s", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, target.Element / g_Soup.PlantForkCost)), 16, Color.FromArgb(255, 0, 192, 0));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, target.Element / g_Soup.Settings.PlantForkCost)), 16, Color.FromArgb(255, 0, 192, 0));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
             }
@@ -340,7 +340,7 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * ((double)target.Age / g_Soup.AnimalMaximumAge)), 16, Color.FromArgb(255, 128, 128, 128));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * ((double)target.Age / g_Soup.Settings.AnimalMaximumAge)), 16, Color.FromArgb(255, 128, 128, 128));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Age : {target.Age}", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
@@ -349,7 +349,7 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * ((double)target.Velocity.Length / g_Soup.MaximumVelocity)), 16, Color.FromArgb(255, 128, 128, 128));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * ((double)target.Velocity.Length / g_Soup.Settings.MaximumVelocity)), 16, Color.FromArgb(255, 128, 128, 128));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Velocity : ({target.Velocity.X.ToString("0.000")}, {target.Velocity.Y.ToString("0.000")}) / {target.Velocity.Length.ToString("0.000")} u/s", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
@@ -358,14 +358,14 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * (double.Abs(target.AngularVelocity) / g_Soup.MaximumAngularVelocity)), 16, Color.FromArgb(255, 128, 128, 128));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * (double.Abs(target.AngularVelocity) / g_Soup.Settings.MaximumAngularVelocity)), 16, Color.FromArgb(255, 128, 128, 128));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Angular Velocity : {target.AngularVelocity.ToString("0.000")} rot/s", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, target.Element / g_Soup.AnimalForkCost)), 16, Color.FromArgb(255, 128, 128, 128));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Max(0d, double.Min(1d, target.Element / g_Soup.AnimalForkCost - 1d))), 16, Color.FromArgb(255, 0, 192, 0));
-                overlayInformationRenderer.OverlayFillRectangle(0, 12, (int)(300 * double.Min(1d, target.CurrentStepElementCost / (g_Soup.AnimalElementBaseCost + g_Soup.AnimalElementAccelerationCost + g_Soup.AnimalElementRotationCost + g_Soup.AnimalElementAttackCost + (g_Soup.AnimalElementPheromoneProductionCost * 3d)))), 16, Color.FromArgb(255, 192, 192, 192));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, target.Element / g_Soup.Settings.AnimalForkCost)), 16, Color.FromArgb(255, 128, 128, 128));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Max(0d, double.Min(1d, target.Element / g_Soup.Settings.AnimalForkCost - 1d))), 16, Color.FromArgb(255, 0, 192, 0));
+                overlayInformationRenderer.OverlayFillRectangle(0, 12, (int)(300 * double.Min(1d, target.CurrentStepElementCost / (g_Soup.Settings.AnimalElementBaseCost + g_Soup.Settings.AnimalElementAccelerationCost + g_Soup.Settings.AnimalElementRotationCost + g_Soup.Settings.AnimalElementAttackCost + (g_Soup.Settings.AnimalElementPheromoneProductionCost * 3d)))), 16, Color.FromArgb(255, 192, 192, 192));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm (-{target.CurrentStepElementCost.ToString("0.000")} elm/step)", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 

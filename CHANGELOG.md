@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.0 indev-7] - 2024-10-01
+
+### Changed
+- Soup environment settings have been separated into a `SoupSettings` class.
+- Improved algorithm for filling isolated areas with walls.
+
 ## [0.5.0 indev-6] - 2024-09-30
 
 ### Added
