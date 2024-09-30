@@ -28,6 +28,11 @@ namespace Paramecium
                 Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations\autosaves");
             }
 
+            List<int> test = new List<int>();
+            test.Clear();
+            List<int> test2 = new List<int>(test);
+            Console.WriteLine(test2.Count);
+
             ApplicationConfiguration.Initialize();
             Application.Run(new FormMain());
         }

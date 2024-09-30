@@ -13,8 +13,8 @@ namespace Paramecium.Engine
         public int InitialSeed { get; set; } = 0;
 
         // Soup Size Settings
-        public int SizeX { get; set; } = 512;
-        public int SizeY { get; set; } = 256;
+        public int SizeX { get; set; } = 128;
+        public int SizeY { get; set; } = 128;
 
         // Wall Settings
         public bool WallEnabled { get; set; } = true;
@@ -26,13 +26,15 @@ namespace Paramecium.Engine
         public double WallThickness { get; set; } = 0.008d;
 
         // Element Settings
-        public double TotalElementAmount { get; set; } = 512 * 256 * 2;
+        public double TotalElementAmount { get; set; } = 128 * 128 * 2;
         public double ElementFlowRate { get; set; } = 0.01d;
+        public double PlantElementEfficiency { get; set; } = 1d;
+        public double AnimalElementEfficiency { get; set; } = 5d;
 
         // Pheromone Settings
         public double PheromoneFlowRate { get; set; } = 0.1d;
         public double PheromoneDecayRate { get; set; } = 0.01d;
-        public double PheromoneGenerateRate { get; set; } = 0.1d;
+        public double PheromoneProductionRate { get; set; } = 0.1d;
 
         // Physical Settings
         public double Drag { get; set; } = 0.025d;
@@ -42,18 +44,22 @@ namespace Paramecium.Engine
         public double RestitutionCoefficient { get; set; } = 0.1d;
 
         // Plant Settings
-        public int InitialPlantPopulation { get; set; } = 512 * 256 * 2 / 2 / 16;
+        public int InitialPlantPopulation { get; set; } = 128 * 128 * 2 / 2 / 16;
         public double InitialPlantElementAmount { get; set; } = 16d;
         public double PlantForkCost { get; set; } = 16d;
         public int PlantForkOffspringCountMin { get; set; } = 4;
         public int PlantForkOffspringCountMax { get; set; } = 8;
-        public double PlantElementCollectRate { get; set; } = 0.04d;
+        public double PlantElementCollectRate { get; set; } = 0.01d;
 
         // Animal Basic Settings
-        public int InitialAnimalPopulation { get; set; } = 512 * 256 * 2 / 2 / 64;
+        public int InitialAnimalPopulation { get; set; } = 128 * 128 * 2 / 2 / 64;
         public double InitialAnimalElementAmount { get; set; } = 64d;
         public double AnimalForkCost { get; set; } = 64d;
-        public double AnimalElementUpkeep { get; set; } = 0.04d;
+        public double AnimalElementBaseCost { get; set; } = 0.01d;
+        public double AnimalElementAccelerationCost { get; set; } = 0.02d;
+        public double AnimalElementRotationCost { get; set; } = 0.01d;
+        public double AnimalElementAttackCost { get; set; } = 0.02d;
+        public double AnimalElementPheromoneProductionCost { get; set; } = 0.0025d;
         public double AnimalPlantIngestionRate { get; set; } = 0.2d;
         public double AnimalAnimalIngestionRate { get; set; } = 0.8d;
         public int AnimalMaximumAge { get; set; } = 15000;
@@ -244,6 +250,7 @@ namespace Paramecium.Engine
                                                 }
                                             }
                                         }
+                                        else if (targetTile1.Type == TileType.Wall && targetTile1.Element > 0) targetTile1.Element = 0;
                                     }
                                 });
                                 Parallel.For(0, SizeX, parallelOptions, x =>

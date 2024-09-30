@@ -30,8 +30,6 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupBackground(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor)
         {
-            //FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(0d, 0d), new Double2d(g_Soup.SizeX, g_Soup.SizeY), Color.FromArgb(0, 0, 32));
-
             Bitmap backgroundCanvas = new Bitmap(g_Soup.SizeX, g_Soup.SizeY, PixelFormat.Format32bppRgb);
 
             BitmapData backgroundCanvasData = backgroundCanvas.LockBits(
@@ -370,8 +368,28 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, target.Element / g_Soup.AnimalForkCost)), 16, Color.FromArgb(255, 128, 128, 128));
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Max(0d, double.Min(1d, target.Element / g_Soup.AnimalForkCost - 1d))), 16, Color.FromArgb(255, 0, 192, 0));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayFillRectangle(0, 12, (int)(300 * double.Min(1d, target.CurrentStepElementCost / (g_Soup.AnimalElementBaseCost + g_Soup.AnimalElementAccelerationCost + g_Soup.AnimalElementRotationCost + g_Soup.AnimalElementAttackCost + (g_Soup.AnimalElementPheromoneProductionCost * 3d)))), 16, Color.FromArgb(255, 192, 192, 192));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm (-{target.CurrentStepElementCost.ToString("0.000")} elm/step)", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
+
+                /**
+                if (g_Soup.AnimalElementEfficiency > g_Soup.PlantElementEfficiency)
+                {
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(192, 0, 0));
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, 1d - (target.Efficiency - g_Soup.PlantElementEfficiency) / (g_Soup.AnimalElementEfficiency - g_Soup.PlantElementEfficiency))), 16, Color.FromArgb(0, 192, 0));
+                }
+                else if (g_Soup.PlantElementEfficiency > g_Soup.AnimalElementEfficiency)
+                {
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(0, 192, 0));
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, 1d - (target.Efficiency - g_Soup.AnimalElementEfficiency) / (g_Soup.PlantElementEfficiency - g_Soup.AnimalElementEfficiency))), 16, Color.FromArgb(192, 0, 0));
+                }
+                else
+                {
+                    overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(0, 192, 0));
+                }
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Efficiency : {target.Efficiency.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OffsetY += 16;
+                **/
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, target.ColorRed, target.ColorGreen, target.ColorBlue));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Color : ({target.ColorRed}, {target.ColorGreen}, {target.ColorBlue})", 0, 0, Color.FromArgb(255, 255, 255));
@@ -381,15 +399,15 @@ namespace Paramecium.Forms.Renderer
 
                 overlayInformationRenderer.OffsetX += 300;
 
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 400, 420, Color.FromArgb(128, 64, 64, 64));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, 500, 420, Color.FromArgb(128, 64, 64, 64));
 
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Brain Information", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Brain Diagram", 0, 0, Color.FromArgb(255, 255, 255));
 
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
                 {
                     BrainNode targetNode = target.Brain.Nodes[i];
 
-                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(200, 220);
+                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(250, 220);
 
                     for (int j = 0; j < targetNode.Connections.Count; j++)
                     {
@@ -397,7 +415,7 @@ namespace Paramecium.Forms.Renderer
 
                         if (targetConnection.TargetIndex != i)
                         {
-                            Double2d connectionTargetPos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * targetConnection.TargetIndex) * 180 + new Double2d(200, 220);
+                            Double2d connectionTargetPos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * targetConnection.TargetIndex) * 180 + new Double2d(250, 220);
 
                             Double2d arrowVector = (connectionTargetPos - nodePos).Normalized;
                             Double2d arrowStartPos = nodePos + arrowVector * 7.5d;
@@ -424,11 +442,11 @@ namespace Paramecium.Forms.Renderer
 
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
                 {
-                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(200, 220);
+                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(250, 220);
                     BrainNode targetNode = target.Brain.Nodes[i];
                     Color nodeColor;
 
-                    if (!BrainNode.NodeIsOutput(targetNode.Type))
+                    if (!BrainNode.BrainNodeTypeIsOutput(targetNode.Type))
                     {
                         if (targetNode.Output >= 0)
                         {
@@ -439,7 +457,7 @@ namespace Paramecium.Forms.Renderer
                             nodeColor = Lerp(Color.FromArgb(0, 0, 0), Color.FromArgb(255, 0, 0), double.Min(1d, -targetNode.Output));
                         }
                     }
-                    else if (BrainNode.NodeIsOutput(targetNode.Type))
+                    else if (BrainNode.BrainNodeTypeIsOutput(targetNode.Type))
                     {
                         if (targetNode.Output >= 0)
                         {
@@ -457,11 +475,51 @@ namespace Paramecium.Forms.Renderer
 
                     overlayInformationRenderer.OverlayFillEllipse((int)(nodePos.X), (int)(nodePos.Y), 15, nodeColor);
                     overlayInformationRenderer.OverlayDrawEllipse((int)(nodePos.X), (int)(nodePos.Y), 15, Color.FromArgb(255, 255, 255));
+
+                    if (BrainNode.BrainNodeTypeIsInput(targetNode.Type))
+                    {
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Input", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    }
+                    else if (BrainNode.BrainNodeTypeIsHidden(targetNode.Type))
+                    {
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Hidden", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    }
+                    else if (BrainNode.BrainNodeTypeIsOutput(targetNode.Type))
+                    {
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Output", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    }
+                    else if (targetNode.Type == BrainNodeType.NonOperation)
+                    {
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Nop", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    }
                 }
 
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
                 {
-                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(200, 220);
+                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(250, 220);
+                    BrainNode targetNode = target.Brain.Nodes[i];
+
+                    if (BrainNode.BrainNodeTypeIsInput(targetNode.Type))
+                    {
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Input", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    }
+                    else if (BrainNode.BrainNodeTypeIsHidden(targetNode.Type))
+                    {
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Hidden", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    }
+                    else if (BrainNode.BrainNodeTypeIsOutput(targetNode.Type))
+                    {
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Output", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    }
+                    else if (targetNode.Type == BrainNodeType.NonOperation)
+                    {
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Nop", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
+                    }
+                }
+
+                for (int i = 0; i < target.Brain.Nodes.Count; i++)
+                {
+                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(250, 220);
 
                     if (mousePointClient.X > nodePos.X + overlayInformationRenderer.OffsetX - 7.5d && mousePointClient.X < nodePos.X + overlayInformationRenderer.OffsetX + 7.5d && mousePointClient.Y > nodePos.Y + overlayInformationRenderer.OffsetY - 7.5d && mousePointClient.Y < nodePos.Y + overlayInformationRenderer.OffsetY + 7.5)
                     {

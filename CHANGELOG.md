@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0 indev-5] - 2024-09-30
+
+### Added
+- Added the ability to create and delete walls.
+- Added the ability to move plants and animals.
+- When closing a program or attempting to load another soup while the currently running soup is not saved, the program now asks if the current soup should be saved.
+
+### Changed
+- Brain Diagram now displays node index and types.
+- Improved brain mutations in animals.
+- Element consumption rate of animals now changes depending on the action they are performing.
+
+### Fixed
+- Fixed a rare crash related to `SoupView` rendering.
+- Fixed a bug that caused nodes with no connection in rare cases when animals mutated.
+
 ## [0.5.0 indev-4] - 2024-09-29
 
 ### Added

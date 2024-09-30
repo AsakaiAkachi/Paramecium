@@ -32,6 +32,7 @@ namespace Paramecium.Engine
 
         public double Element { get; set; }
         public double Efficiency { get; set; }
+        public double CurrentStepElementCost { get; set; }
 
         public int ColorRed { get; set; }
         public int ColorGreen { get; set; }
@@ -63,13 +64,15 @@ namespace Paramecium.Engine
             Mass = 16 + element;
 
             Element = element;
-            Efficiency = 10d;
+            Efficiency = 1d;
 
             ColorRed = random.Next(0, 255 + 1);
             ColorGreen = random.Next(0, 255 + 1);
             ColorBlue = random.Next(0, 255 + 1);
 
-            Brain = Brain.GetDefaultBrain;
+            //Brain = Brain.GetDefaultBrain;
+            Brain = new Brain();
+            for (int i = 0; i < 64; i++) Brain = Brain.Mutate(Brain, random, false);
             BrainInput = new BrainInput();
             BrainOutput = new BrainOutput();
         }
@@ -91,7 +94,7 @@ namespace Paramecium.Engine
             Mass = 16 + element;
 
             Element = element;
-            Efficiency = 10d;
+            Efficiency = parent.Efficiency;
 
             ColorRed = parent.ColorRed;
             ColorGreen = parent.ColorGreen;
@@ -100,14 +103,24 @@ namespace Paramecium.Engine
             Brain = Brain.Duplicate(parent.Brain);
             if (random.NextDouble() < g_Soup.AnimalMutationRate)
             {
-                Brain = Brain.Mutate(Brain, random);
-                if (random.NextDouble() < g_Soup.AnimalSpeciesIdMutationRate)
+                for (int i = 0; i < g_Soup.AnimalMaximumMutationCount; i++)
                 {
-                    SpeciesId = random.NextInt64(0, 2176782335 + 1);
+                    bool mutationSuccessFlag;
+                    Brain = Brain.Mutate(Brain, random, out mutationSuccessFlag);
 
-                    ColorRed = random.Next(0, 255 + 1);
-                    ColorGreen = random.Next(0, 255 + 1);
-                    ColorBlue = random.Next(0, 255 + 1);
+                    if (mutationSuccessFlag)
+                    {
+                        if (random.NextDouble() < g_Soup.AnimalSpeciesIdMutationRate)
+                        {
+                            SpeciesId = random.NextInt64(0, 2176782335 + 1);
+
+                            ColorRed = random.Next(0, 255 + 1);
+                            ColorGreen = random.Next(0, 255 + 1);
+                            ColorBlue = random.Next(0, 255 + 1);
+                        }
+                    }
+
+                    if (random.NextDouble() < 0.5d) break;
                 }
             }
 
@@ -166,17 +179,17 @@ namespace Paramecium.Engine
                 if (BrainOutput.PheromoneRed > 0)
                 {
                     Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX];
-                    targetTile.PheromoneRed += double.Min(1d, BrainOutput.PheromoneRed) * g_Soup.PheromoneGenerateRate;
+                    targetTile.PheromoneRed += double.Min(1d, BrainOutput.PheromoneRed) * g_Soup.PheromoneProductionRate;
                 }
                 if (BrainOutput.PheromoneGreen > 0)
                 {
                     Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX];
-                    targetTile.PheromoneGreen += double.Min(1d, BrainOutput.PheromoneGreen) * g_Soup.PheromoneGenerateRate;
+                    targetTile.PheromoneGreen += double.Min(1d, BrainOutput.PheromoneGreen) * g_Soup.PheromoneProductionRate;
                 }
                 if (BrainOutput.PheromoneBlue > 0)
                 {
                     Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX];
-                    targetTile.PheromoneBlue += double.Min(1d, BrainOutput.PheromoneBlue) * g_Soup.PheromoneGenerateRate;
+                    targetTile.PheromoneBlue += double.Min(1d, BrainOutput.PheromoneBlue) * g_Soup.PheromoneProductionRate;
                 }
 
                 if (BrainOutput.Attack > 0)
@@ -198,6 +211,8 @@ namespace Paramecium.Engine
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - Position, -Angle))) < 0.167d)
                                             {
+                                                //Efficiency = (Efficiency * Element + g_Soup.PlantElementEfficiency * double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate)) / (Element + double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate));
+
                                                 Element += double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate);
                                                 targetPlant.Element -= double.Min(targetPlant.Element, g_Soup.AnimalPlantIngestionRate);
                                             }
@@ -206,17 +221,19 @@ namespace Paramecium.Engine
                                 }
                             }
 
-                            if (targetTile.LocalAnimalPopulation > 0)
+                            if (targetTile.LocalAnimalPopulation > 0 && BrainOutput.Attack >= 1)
                             {
                                 for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
                                 {
                                     Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
-                                    if (targetAnimal.Exist && targetAnimal.Id != Id)
+                                    if (targetAnimal.Exist && targetAnimal.Id != Id && targetAnimal.SpeciesId != SpeciesId)
                                     {
                                         if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius + 0.1) * (Radius + targetAnimal.Radius + 0.1))
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle))) < 0.167d)
                                             {
+                                                //Efficiency = (Efficiency * Element + g_Soup.AnimalElementEfficiency * double.Min(targetAnimal.Element, g_Soup.AnimalPlantIngestionRate)) / (Element + double.Min(targetAnimal.Element, g_Soup.AnimalPlantIngestionRate));
+
                                                 Element += double.Min(targetAnimal.Element, g_Soup.AnimalAnimalIngestionRate);
                                                 targetAnimal.Element -= double.Min(targetAnimal.Element, g_Soup.AnimalAnimalIngestionRate);
                                             }
@@ -226,6 +243,9 @@ namespace Paramecium.Engine
                             }
                         }
                     }
+
+                    if (Efficiency < double.Min(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency)) Efficiency = double.Min(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency);
+                    if (Efficiency > double.Max(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency)) Efficiency = double.Max(g_Soup.PlantElementEfficiency, g_Soup.AnimalElementEfficiency);
                 }
             }
             else throw new InvalidOperationException("This animal is not initialized.");
@@ -333,8 +353,16 @@ namespace Paramecium.Engine
                     g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].LocalAnimalIndexes.Add(Index);
                 }
 
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].Element += double.Min(Element, g_Soup.AnimalElementUpkeep);
-                Element -= double.Min(Element, g_Soup.AnimalElementUpkeep);
+                CurrentStepElementCost = double.Min(Element,
+                    g_Soup.AnimalElementBaseCost +
+                    (g_Soup.AnimalElementAccelerationCost * double.Min(1d, double.Abs(BrainOutput.Acceleration))) +
+                    (g_Soup.AnimalElementRotationCost * double.Min(1d, double.Abs(BrainOutput.Rotation))) +
+                    (g_Soup.AnimalElementAttackCost * double.Max(0d, double.Min(1d, BrainOutput.Attack))) +
+                    (g_Soup.AnimalElementPheromoneProductionCost * (double.Max(0d, double.Min(1d, BrainOutput.PheromoneRed)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneGreen)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneBlue))))
+                );
+
+                g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].Element += CurrentStepElementCost;
+                Element -= CurrentStepElementCost;
 
                 Radius = 0.5;
                 Mass = 16 + Element;
@@ -346,6 +374,7 @@ namespace Paramecium.Engine
                 }
 
                 if (Element <= 0) OnDisable();
+                if (g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
 
                 Age++;
             }

@@ -167,6 +167,7 @@
                 Mass = Element;
 
                 if (Element <= 0) OnDisable();
+                if (g_Soup.Tiles[IntegerizedPositionY * g_Soup.SizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }

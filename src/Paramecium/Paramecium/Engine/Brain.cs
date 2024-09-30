@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Data;
+using System.Reflection.Metadata.Ecma335;
+using System.Text.Json.Serialization;
 
 namespace Paramecium.Engine
 {
@@ -75,60 +77,77 @@ namespace Paramecium.Engine
 
         public static Brain Mutate(Brain brain, Random random)
         {
+            return Mutate(brain, random, true, out bool mutationSuccessFlag);
+        }
+        public static Brain Mutate(Brain brain, Random random, bool applyMutationRule)
+        {
+            return Mutate(brain, random, applyMutationRule, out bool mutationSuccessFlag);
+        }
+        public static Brain Mutate(Brain brain, Random random, out bool mutationSuccessFlag)
+        {
+            return Mutate(brain, random, true, out mutationSuccessFlag);
+        }
+
+        public static Brain Mutate(Brain brain, Random random, bool applyMutationRule, out bool mutationSuccessFlag)
+        {
             Brain result = Duplicate(brain);
+            mutationSuccessFlag = false;
 
-            for (int i = 0; i < g_Soup.AnimalMaximumMutationCount; i++)
+            int mutationType = random.Next(0, 6 + 1);
+            int mutationTarget = random.Next(0, result.nodes.Count);
+
+            if (mutationType == 0) // Add Node
             {
-                int MutationType = random.Next(0, 6 + 1);
-                int MutationTarget;
-
-                if (MutationType == 0) // Add Node
+                if (result.nodes.Count < g_Soup.AnimalBrainMaximumNodeCount)
                 {
-                    if (result.nodes.Count < g_Soup.AnimalBrainMaximumNodeCount)
+                    mutationTarget = result.nodes.Count;
+
+                    result.nodes.Add(new BrainNode());
+                    mutationSuccessFlag = true;
+
+                    int nodeType = random.Next(0, 3 + 1);
+                    if (nodeType == 0)
                     {
-                        MutationTarget = random.Next(0, result.nodes.Count + 1);
-                        result.nodes.Insert(MutationTarget, new BrainNode());
+                        result.nodes[mutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Input_Bias, (int)BrainNodeType.Input_Memory7 + 1);
+                    }
+                    else if (nodeType == 1)
+                    {
+                        result.nodes[mutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Output_Acceleration, (int)BrainNodeType.Output_Memory7 + 1);
+                    }
+                    else
+                    {
+                        result.nodes[mutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Hidden_ReLU, (int)BrainNodeType.Hidden_LimitedTangent + 1);
+                    }
 
-                        for (int j = 0; j < result.nodes.Count; j++)
+                    if (result.nodes[mutationTarget].IsInput || result.nodes[mutationTarget].IsHidden)
+                    {
+                        for (int i = 0; i < g_Soup.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
-                            for (int k = 0; k < result.nodes[j].Connections.Count; k++)
+                            List<int> connectionTargetIndexes = new List<int>();
+                            int connectionTarget = random.Next(0, result.nodes.Count);
+
+                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
                             {
-                                if (result.nodes[j].Connections[k].TargetIndex >= MutationTarget) result.nodes[j].Connections[k].TargetIndex++;
-                            }
-                        }
-
-                        int NodeType = random.Next(0, 2 + 1);
-                        switch (NodeType)
-                        {
-                            case 0:
-                                result.nodes[MutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Input_Bias, (int)BrainNodeType.Input_Memory7 + 1);
-                                break;
-                            case 1:
-                                result.nodes[MutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Hidden_ReLU, (int)BrainNodeType.Hidden_LimitedTangent + 1);
-                                break;
-                            case 2:
-                                result.nodes[MutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Output_Acceleration, (int)BrainNodeType.Output_Memory7 + 1);
-                                break;
-                        }
-
-                        for (int j = 0; j < 8; j++)
-                        {
-                            if (BrainNode.NodeIsInput(result.nodes[MutationTarget].Type) || BrainNode.NodeIsHidden(result.nodes[MutationTarget].Type))
-                            {
-                                result.nodes[MutationTarget].Connections.Add(new BrainNodeConnection());
-                                result.nodes[MutationTarget].Connections[j].TargetIndex = random.Next(0, result.nodes.Count);
-                                result.nodes[MutationTarget].Connections[j].Weight = random.NextDouble() * 4d - 2d;
+                                result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
                             }
 
-                            if (BrainNode.NodeIsHidden(result.nodes[MutationTarget].Type) || BrainNode.NodeIsOutput(result.nodes[MutationTarget].Type))
-                            {
-                                int AddConnectionTarget = random.Next(0, result.nodes.Count);
+                            if (random.NextDouble() < 0.5d) break;
+                        }
+                    }
+                    if (result.nodes[mutationTarget].IsHidden || result.nodes[mutationTarget].IsOutput)
+                    {
+                        for (int i = 0; i < g_Soup.AnimalBrainMaximumConnectionCount / 2; i++)
+                        {
+                            List<int> connectionTargetIndexes = new List<int>();
+                            int connectionOrigin = random.Next(0, result.nodes.Count);
 
-                                if (result.nodes[AddConnectionTarget].Connections.Count < g_Soup.AnimalBrainMaximumConnectionCount)
+                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.AnimalBrainMaximumConnectionCount)
+                            {
+                                for (int j = 0; j < result.nodes[connectionOrigin].Connections.Count; j++) connectionTargetIndexes.Add(result.nodes[connectionOrigin].Connections[j].TargetIndex);
+
+                                if (!connectionTargetIndexes.Contains(mutationTarget))
                                 {
-                                    result.nodes[AddConnectionTarget].Connections.Add(new BrainNodeConnection());
-                                    result.nodes[AddConnectionTarget].Connections[result.nodes[AddConnectionTarget].Connections.Count - 1].TargetIndex = MutationTarget;
-                                    result.nodes[AddConnectionTarget].Connections[result.nodes[AddConnectionTarget].Connections.Count - 1].Weight = random.NextDouble() * 4d - 2d;
+                                    result.nodes[connectionOrigin].Connections.Add(new BrainNodeConnection() { TargetIndex = mutationTarget, Weight = random.NextDouble() * 4d - 2d });
                                 }
                             }
 
@@ -136,236 +155,221 @@ namespace Paramecium.Engine
                         }
                     }
                 }
-                else if (MutationType == 1) // Remove Node
+            }
+            else if (mutationType == 1) // Remove Node
+            {
+                if (result.nodes.Count > 0)
                 {
-                    if (result.nodes.Count > 1)
-                    {
-                        MutationTarget = random.Next(0, result.nodes.Count);
-                        result.nodes.RemoveAt(MutationTarget);
+                    result.nodes.RemoveAt(mutationTarget);
+                    mutationSuccessFlag = true;
 
-                        for (int j = 0; j < result.nodes.Count; j++)
+                    for (int i = 0; i < result.nodes.Count; i++)
+                    {
+                        for (int j = result.nodes[i].Connections.Count - 1; j >= 0; j--)
                         {
-                            if (result.nodes[j].Connections.Count > 0)
+                            if (result.nodes[i].Connections[j].TargetIndex == mutationTarget) result.nodes[i].Connections.RemoveAt(j);
+                            else if (result.nodes[i].Connections[j].TargetIndex > mutationTarget) result.nodes[i].Connections[j].TargetIndex--;
+                        }
+                    }
+                }
+            }
+            else if (mutationType == 2) // Change Node Type
+            {
+                if (result.nodes.Count > 0)
+                {
+                    BrainNodeType prevBrainNodeType = result.nodes[mutationTarget].Type;
+
+                    int nodeType = random.Next(0, 3 + 1);
+                    if (nodeType == 0)
+                    {
+                        result.nodes[mutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Input_Bias, (int)BrainNodeType.Input_Memory7 + 1);
+                    }
+                    else if (nodeType == 1)
+                    {
+                        result.nodes[mutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Output_Acceleration, (int)BrainNodeType.Output_Memory7 + 1);
+                    }
+                    else
+                    {
+                        result.nodes[mutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Hidden_ReLU, (int)BrainNodeType.Hidden_LimitedTangent + 1);
+                    }
+                    mutationSuccessFlag = true;
+
+                    if (BrainNode.BrainNodeTypeIsOutput(prevBrainNodeType) && !result.nodes[mutationTarget].IsOutput)
+                    {
+                        for (int i = 0; i < g_Soup.AnimalBrainMaximumConnectionCount / 2; i++)
+                        {
+                            List<int> connectionTargetIndexes = new List<int>();
+                            int connectionTarget = random.Next(0, result.nodes.Count);
+
+                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
+                            {
+                                result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
+                            }
+
+                            if (random.NextDouble() < 0.5d) break;
+                        }
+                    }
+                    if (BrainNode.BrainNodeTypeIsInput(prevBrainNodeType) && !result.nodes[mutationTarget].IsInput)
+                    {
+                        for (int i = 0; i < g_Soup.AnimalBrainMaximumConnectionCount / 2; i++)
+                        {
+                            List<int> connectionTargetIndexes = new List<int>();
+                            int connectionOrigin = random.Next(0, result.nodes.Count);
+
+                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.AnimalBrainMaximumConnectionCount)
+                            {
+                                for (int j = 0; j < result.nodes[connectionOrigin].Connections.Count; j++) connectionTargetIndexes.Add(result.nodes[connectionOrigin].Connections[j].TargetIndex);
+
+                                if (!connectionTargetIndexes.Contains(mutationTarget))
+                                {
+                                    result.nodes[connectionOrigin].Connections.Add(new BrainNodeConnection() { TargetIndex = mutationTarget, Weight = random.NextDouble() * 4d - 2d });
+                                }
+                            }
+
+                            if (random.NextDouble() < 0.5d) break;
+                        }
+                    }
+
+                    if (!BrainNode.BrainNodeTypeIsOutput(prevBrainNodeType) && result.nodes[mutationTarget].IsOutput)
+                    {
+                        result.nodes[mutationTarget].Connections.Clear();
+                    }
+                    if (!BrainNode.BrainNodeTypeIsInput(prevBrainNodeType) && result.nodes[mutationTarget].IsInput)
+                    {
+                        for (int i = 0; i < result.nodes.Count; i++)
+                        {
+                            for (int j = result.nodes[i].Connections.Count - 1; j >= 0; j--)
+                            {
+                                if (result.nodes[i].Connections[j].TargetIndex == mutationTarget) result.nodes[i].Connections.RemoveAt(j);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (mutationType == 3) // Add Connection
+            {
+                if (result.nodes.Count > 0)
+                {
+                    if (!result.nodes[mutationTarget].IsOutput)
+                    {
+                        if (result.nodes[mutationTarget].Connections.Count < g_Soup.AnimalBrainMaximumConnectionCount)
+                        {
+                            List<int> connectionTargetIndexes = new List<int>();
+                            for (int i = 0; i < result.nodes[mutationTarget].Connections.Count; i++) connectionTargetIndexes.Add(result.nodes[mutationTarget].Connections[i].TargetIndex);
+                            int connectionTarget = random.Next(0, result.nodes.Count);
+
+                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
+                            {
+                                result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
+                                mutationSuccessFlag = true;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (mutationType == 4) // Remove Connection
+            {
+                if (result.nodes.Count > 0)
+                {
+                    if (!result.nodes[mutationTarget].IsOutput)
+                    {
+                        if (result.nodes[mutationTarget].Connections.Count > 0)
+                        {
+                            int targetConnection = random.Next(0, result.nodes[mutationTarget].Connections.Count);
+
+                            result.nodes[mutationTarget].Connections.RemoveAt(targetConnection);
+                            mutationSuccessFlag = true;
+                        }
+                    }
+                }
+            }
+            else if (mutationTarget == 5) // Change Connection Target
+            {
+                if (result.nodes.Count > 0)
+                {
+                    if (!result.nodes[mutationTarget].IsOutput)
+                    {
+                        if (result.nodes[mutationTarget].Connections.Count > 0)
+                        {
+                            List<int> connectionTargetIndexes = new List<int>();
+                            for (int i = 0; i < result.nodes[mutationTarget].Connections.Count; i++) connectionTargetIndexes.Add(result.nodes[mutationTarget].Connections[i].TargetIndex);
+
+                            int targetConnection = random.Next(0, result.nodes[mutationTarget].Connections.Count);
+                            int targetConnectionNewConnectionTargetIndex = random.Next(0, result.nodes.Count);
+
+                            if (targetConnectionNewConnectionTargetIndex != mutationTarget && !result.nodes[targetConnectionNewConnectionTargetIndex].IsInput && !connectionTargetIndexes.Contains(targetConnectionNewConnectionTargetIndex))
+                            {
+                                result.nodes[mutationTarget].Connections[targetConnection].TargetIndex = targetConnectionNewConnectionTargetIndex;
+                                mutationSuccessFlag = true;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (mutationTarget == 6) // Change Connection Weight
+            {
+                if (result.nodes.Count > 0)
+                {
+                    if (!result.nodes[mutationTarget].IsOutput)
+                    {
+                        if (result.nodes[mutationTarget].Connections.Count > 0)
+                        {
+                            int targetConnection = random.Next(0, result.nodes[mutationTarget].Connections.Count);
+
+                            result.nodes[mutationTarget].Connections[targetConnection].Weight = random.NextDouble() * 4d - 2d;
+                            mutationSuccessFlag = true;
+                        }
+                    }
+                }
+            }
+
+            if (applyMutationRule)
+            {
+                while (true)
+                {
+                    List<int> removeNodeIndexes = new List<int>();
+
+                    for (int i = 0; i < result.nodes.Count; i++)
+                    {
+                        if (!result.nodes[i].IsOutput && result.nodes[i].Connections.Count == 0) if (!removeNodeIndexes.Contains(i)) removeNodeIndexes.Add(i);
+
+                        if (!result.nodes[i].IsInput)
+                        {
+                            bool hasIncomingConnection = false;
+                            for (int j = 0; j < result.nodes.Count; j++)
+                            {
+                                for (int k = 0; k < result.nodes[j].Connections.Count; k++)
+                                {
+                                    if (result.nodes[j].Connections[k].TargetIndex == i)
+                                    {
+                                        hasIncomingConnection = true;
+                                        break;
+                                    }
+                                }
+                                if (hasIncomingConnection) break;
+                            }
+                            if (!hasIncomingConnection) if (!removeNodeIndexes.Contains(i)) removeNodeIndexes.Add(i);
+                        }
+                    }
+
+                    for (int i = result.nodes.Count - 1; i >= 0; i--)
+                    {
+                        if (removeNodeIndexes.Contains(i))
+                        {
+                            result.nodes.RemoveAt(i);
+
+                            for (int j = 0; j < result.nodes.Count; j++)
                             {
                                 for (int k = result.nodes[j].Connections.Count - 1; k >= 0; k--)
                                 {
-                                    if (result.nodes[j].Connections[k].TargetIndex == MutationTarget)
-                                    {
-                                        result.nodes[j].Connections.RemoveAt(k);
-                                    }
-                                    else if (result.nodes[j].Connections[k].TargetIndex > MutationTarget)
-                                    {
-                                        result.nodes[j].Connections[k].TargetIndex--;
-                                    }
+                                    if (result.nodes[j].Connections[k].TargetIndex == i) result.nodes[j].Connections.RemoveAt(k);
+                                    else if (result.nodes[j].Connections[k].TargetIndex > i) result.nodes[j].Connections[k].TargetIndex--;
                                 }
                             }
                         }
                     }
-                }
-                else if (MutationType == 2) // Change Node Type
-                {
-                    if (result.nodes.Count > 1)
-                    {
-                        MutationTarget = random.Next(0, result.nodes.Count);
-                        BrainNodeType MutationTargetPrevBrainNodeType = result.nodes[MutationTarget].Type;
 
-                        int NodeType = random.Next(0, 2 + 1);
-                        switch (NodeType)
-                        {
-                            case 0:
-                                result.nodes[MutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Input_Bias, (int)BrainNodeType.Input_Memory7 + 1);
-                                break;
-                            case 1:
-                                result.nodes[MutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Hidden_ReLU, (int)BrainNodeType.Hidden_LimitedTangent + 1);
-                                break;
-                            case 2:
-                                result.nodes[MutationTarget].Type = (BrainNodeType)random.Next((int)BrainNodeType.Output_Acceleration, (int)BrainNodeType.Output_Memory7 + 1);
-                                break;
-                        }
-
-                        if (!BrainNode.NodeIsOutput(MutationTargetPrevBrainNodeType) && BrainNode.NodeIsOutput(result.nodes[MutationTarget].Type))
-                        {
-                            result.nodes[MutationTarget].Connections.Clear();
-                        }
-                        else if (BrainNode.NodeIsOutput(MutationTargetPrevBrainNodeType) && !BrainNode.NodeIsOutput(result.nodes[MutationTarget].Type))
-                        {
-                            for (int j = 0; j < 8; j++)
-                            {
-                                result.nodes[MutationTarget].Connections.Add(new BrainNodeConnection());
-                                result.nodes[MutationTarget].Connections[j].TargetIndex = random.Next(0, result.nodes.Count);
-                                result.nodes[MutationTarget].Connections[j].Weight = random.NextDouble() * 4d - 2d;
-
-                                if (random.NextDouble() < 0.5d) break;
-                            }
-                        }
-                    }
-                }
-                else if (MutationType == 3) // Add Connection
-                {
-                    MutationTarget = random.Next(0, result.nodes.Count);
-
-                    for (int j = 0; j < 8; j++)
-                    {
-                        if (result.nodes[MutationTarget].Connections.Count >= g_Soup.AnimalBrainMaximumConnectionCount) break;
-
-                        int ConnectionMutationTarget = random.Next(0, result.nodes[MutationTarget].Connections.Count + 1);
-
-                        result.nodes[MutationTarget].Connections.Insert(ConnectionMutationTarget, new BrainNodeConnection());
-                        result.nodes[MutationTarget].Connections[ConnectionMutationTarget].TargetIndex = random.Next(0, result.nodes.Count);
-                        result.nodes[MutationTarget].Connections[ConnectionMutationTarget].Weight = random.NextDouble() * 4d - 2d;
-
-                        if (random.NextDouble() < 0.5d) break;
-                    }
-                }
-                else if (MutationType == 4) // Remove Connection
-                {
-                    MutationTarget = random.Next(0, result.nodes.Count);
-
-                    for (int j = 0; j < 8; j++)
-                    {
-                        if (result.nodes[MutationTarget].Connections.Count == 0) break;
-
-                        int ConnectionMutationTarget = random.Next(0, result.nodes[MutationTarget].Connections.Count);
-
-                        result.nodes[MutationTarget].Connections.RemoveAt(ConnectionMutationTarget);
-
-                        if (random.NextDouble() < 0.5d) break;
-                    }
-                }
-                else if (MutationType == 5) // Change Connection Target
-                {
-                    MutationTarget = random.Next(0, result.nodes.Count);
-
-                    for (int j = 0; j < 8; j++)
-                    {
-                        if (result.nodes[MutationTarget].Connections.Count == 0) break;
-
-                        int ConnectionMutationTarget = random.Next(0, result.nodes[MutationTarget].Connections.Count);
-
-                        result.nodes[MutationTarget].Connections[ConnectionMutationTarget].TargetIndex = random.Next(0, result.nodes.Count);
-
-                        if (random.NextDouble() < 0.5d) break;
-                    }
-                }
-                else if (MutationType == 6) // Change Connection Weight
-                {
-                    MutationTarget = random.Next(0, result.nodes.Count);
-
-                    for (int j = 0; j < 8; j++)
-                    {
-                        if (result.nodes[MutationTarget].Connections.Count == 0) break;
-
-                        int ConnectionMutationTarget = random.Next(0, result.nodes[MutationTarget].Connections.Count);
-
-                        result.nodes[MutationTarget].Connections[ConnectionMutationTarget].Weight = random.NextDouble() * 4d - 2d;
-
-                        if (random.NextDouble() < 0.5d) break;
-                    }
-
-                }
-
-                if (random.NextDouble() < 0.5d) break;
-            }
-
-            for (int j = 0; j < result.nodes.Count; j++)
-            {
-                List<int> connectionTargetIndexes = new List<int>();
-
-                if (BrainNode.NodeIsOutput(result.nodes[j].Type))
-                {
-                    result.nodes[j].Connections.Clear();
-                }
-                else
-                {
-                    for (int k = result.nodes[j].Connections.Count - 1; k >= 0; k--)
-                    {
-                        if (result.nodes[j].Connections[k].TargetIndex == j)
-                        {
-                            result.nodes[j].Connections.RemoveAt(k);
-                        }
-                        else if (BrainNode.NodeIsInput(result.nodes[result.nodes[j].Connections[k].TargetIndex].Type))
-                        {
-                            result.nodes[j].Connections.RemoveAt(k);
-                        }
-                        else if (connectionTargetIndexes.Contains(result.nodes[j].Connections[k].TargetIndex))
-                        {
-                            result.nodes[j].Connections.RemoveAt(k);
-                        }
-                        else
-                        {
-                            connectionTargetIndexes.Add(result.nodes[j].Connections[k].TargetIndex);
-                        }
-                    }
-                }
-            }
-
-            for (int i = result.nodes.Count - 1; i >= 0; i--)
-            {
-                if (!BrainNode.NodeIsOutput(result.nodes[i].Type) && result.nodes[i].Connections.Count == 0)
-                {
-                    result.nodes.RemoveAt(i);
-
-                    for (int j = 0; j < result.nodes.Count; j++)
-                    {
-                        if (result.nodes[j].Connections.Count > 0)
-                        {
-                            for (int k = result.nodes[j].Connections.Count - 1; k >= 0; k--)
-                            {
-                                if (result.nodes[j].Connections[k].TargetIndex == j)
-                                {
-                                    result.nodes[j].Connections.RemoveAt(k);
-                                }
-                                else if (result.nodes[j].Connections[k].TargetIndex > j)
-                                {
-                                    result.nodes[j].Connections[k].TargetIndex--;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (int i = result.nodes.Count - 1; i >= 0; i--)
-            {
-                if (!BrainNode.NodeIsInput(result.nodes[i].Type))
-                {
-                    bool hasInput = false;
-
-                    for (int j = 0; j < result.nodes.Count; j++)
-                    {
-                        for (int k = 0; k < result.nodes[j].Connections.Count; k++)
-                        {
-                            if (result.nodes[j].Connections[k].TargetIndex == i)
-                            {
-                                hasInput = true;
-                                break;
-                            }
-                        }
-                        if (hasInput) break;
-                    }
-
-                    if (!hasInput)
-                    {
-                        result.nodes.RemoveAt(i);
-
-                        for (int j = 0; j < result.nodes.Count; j++)
-                        {
-                            if (result.nodes[j].Connections.Count > 0)
-                            {
-                                for (int k = result.nodes[j].Connections.Count - 1; k >= 0; k--)
-                                {
-                                    if (result.nodes[j].Connections[k].TargetIndex == j)
-                                    {
-                                        result.nodes[j].Connections.RemoveAt(k);
-                                    }
-                                    else if (result.nodes[j].Connections[k].TargetIndex > j)
-                                    {
-                                        result.nodes[j].Connections[k].TargetIndex--;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    if (removeNodeIndexes.Count == 0) break;
                 }
             }
 
@@ -380,6 +384,29 @@ namespace Paramecium.Engine
 
         public double Input { get; set; }
         public double Output { get; set; }
+
+        [JsonIgnore]
+        public bool IsInput { get { return (int)Type >= (int)BrainNodeType.Input_Bias && (int)Type <= (int)BrainNodeType.Input_Memory7; } }
+        [JsonIgnore]
+        public bool IsHidden { get { return (int)Type >= (int)BrainNodeType.Hidden_ReLU && (int)Type <= (int)BrainNodeType.Hidden_LimitedTangent; } }
+        [JsonIgnore]
+        public bool IsOutput { get { return (int)Type >= (int)BrainNodeType.Output_Acceleration && (int)Type <= (int)BrainNodeType.Output_Memory7; } }
+
+        public static bool BrainNodeTypeIsInput(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Input_Bias && (int)type <= (int)BrainNodeType.Input_Memory7) return true;
+            else return false;
+        }
+        public static bool BrainNodeTypeIsHidden(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Hidden_ReLU && (int)type <= (int)BrainNodeType.Hidden_LimitedTangent) return true;
+            else return false;
+        }
+        public static bool BrainNodeTypeIsOutput(BrainNodeType type)
+        {
+            if ((int)type >= (int)BrainNodeType.Output_Acceleration && (int)type <= (int)BrainNodeType.Output_Memory7) return true;
+            else return false;
+        }
 
         public void ApplyBrainInput(BrainInput brainInput)
         {
@@ -564,22 +591,6 @@ namespace Paramecium.Engine
                 default:
                     break;
             }
-        }
-
-        public static bool NodeIsInput(BrainNodeType type)
-        {
-            if ((int)type >= (int)BrainNodeType.Input_Bias && (int)type <= (int)BrainNodeType.Input_Memory7) return true;
-            else return false;
-        }
-        public static bool NodeIsHidden(BrainNodeType type)
-        {
-            if ((int)type >= (int)BrainNodeType.Hidden_ReLU && (int)type <= (int)BrainNodeType.Hidden_LimitedTangent) return true;
-            else return false;
-        }
-        public static bool NodeIsOutput(BrainNodeType type)
-        {
-            if ((int)type >= (int)BrainNodeType.Output_Acceleration && (int)type <= (int)BrainNodeType.Output_Memory7) return true;
-            else return false;
         }
     }
 
