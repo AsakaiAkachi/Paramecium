@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.1] - 2024-10-02
+
+### Fixed
+- Fixed a bug that the color display of output type nodes on the brain diagram was sometimes incorrect.
+
 ## [0.5.0] - 2024-10-01
 
 ### Added

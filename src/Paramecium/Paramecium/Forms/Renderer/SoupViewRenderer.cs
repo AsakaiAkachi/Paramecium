@@ -453,7 +453,7 @@ namespace Paramecium.Forms.Renderer
                     }
                     else if (BrainNode.BrainNodeTypeIsOutput(targetNode.Type))
                     {
-                        if (targetNode.Output >= 0)
+                        if (targetNode.Input >= 0)
                         {
                             nodeColor = Lerp(Color.FromArgb(0, 0, 0), Color.FromArgb(0, 255, 0), double.Min(1d, targetNode.Input));
                         }
