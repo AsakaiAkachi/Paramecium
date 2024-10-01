@@ -22,6 +22,8 @@
 
         public Plant(Double2d position, double element)
         {
+            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+
             Position = position;
             IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
             IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
@@ -34,6 +36,8 @@
 
         public void Initialize(int index, Random random)
         {
+            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+
             if (!Initialized)
             {
                 Exist = true;
@@ -52,6 +56,8 @@
 
         public void CollectElement()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX];
@@ -69,6 +75,8 @@
 
         public void UpdateCollision()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX + 1)); x++)
@@ -121,6 +129,8 @@
 
         public void UpdatePosition()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 if (Velocity.LengthSquared > g_Soup.Settings.MaximumVelocity * g_Soup.Settings.MaximumVelocity)
@@ -174,6 +184,8 @@
 
         public void ApplyDrag()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 Velocity *= 1d - g_Soup.Settings.Drag;
@@ -183,6 +195,8 @@
 
         public List<Plant>? CreateOffspring(in Random random)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 if (Element >= g_Soup.Settings.PlantForkCost)
@@ -206,6 +220,8 @@
 
         public void OnDisable()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 Exist = false;

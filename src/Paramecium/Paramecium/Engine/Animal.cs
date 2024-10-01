@@ -44,6 +44,8 @@
 
         public Animal(Double2d position, double angle, double element, Random random)
         {
+            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+
             SpeciesId = random.NextInt64(0, 2176782335 + 1);
 
             Generation = 1;
@@ -69,6 +71,8 @@
 
         public Animal(Animal parent, Double2d position, double element, Random random)
         {
+            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+
             SpeciesId = parent.SpeciesId;
 
             Generation = parent.Generation + 1;
@@ -119,6 +123,8 @@
 
         public void Initialize(int index, Random random)
         {
+            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+
             if (!Initialized)
             {
                 Exist = true;
@@ -137,6 +143,8 @@
 
         public void UpdateNeuralNet()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX];
@@ -160,6 +168,8 @@
 
         public void ApplyNeuralNetOutput()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 Velocity += Double2d.FromAngle(Angle) * double.Max(-1d, double.Min(1d, BrainOutput.Acceleration)) * g_Soup.Settings.MaximumVelocity * g_Soup.Settings.Drag;
@@ -235,6 +245,8 @@
 
         public void UpdateCollision()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX + 1)); x++)
@@ -287,6 +299,8 @@
 
         public void UpdatePosition()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 if (Velocity.LengthSquared > g_Soup.Settings.MaximumVelocity * g_Soup.Settings.MaximumVelocity)
@@ -365,6 +379,8 @@
 
         public void ApplyDrag()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 Velocity *= 1d - g_Soup.Settings.Drag;
@@ -375,6 +391,8 @@
 
         public Animal? CreateOffspring(Random random)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 if (Element >= g_Soup.Settings.AnimalForkCost * 2)
@@ -398,6 +416,8 @@
 
         public void OnDisable()
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (Initialized)
             {
                 Exist = false;

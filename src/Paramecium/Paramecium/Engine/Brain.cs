@@ -88,6 +88,8 @@ namespace Paramecium.Engine
 
         public static Brain Mutate(Brain brain, Random random, bool applyMutationRule, out bool mutationSuccessFlag)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             Brain result = Duplicate(brain);
             mutationSuccessFlag = false;
 
@@ -686,6 +688,8 @@ namespace Paramecium.Engine
     {
         public static AnimalVisionOutput Observe(Double2d originPosition, double angle, long originId, long originSpeciesId, int frontViewRange, int frontViewRayCount, double frontViewAngleRange, int backViewRange, int backViewRayCount, double backViewAngleRange)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             AnimalVisionOutput result = new AnimalVisionOutput();
 
             double WallAvgAngleDenominator = 0;

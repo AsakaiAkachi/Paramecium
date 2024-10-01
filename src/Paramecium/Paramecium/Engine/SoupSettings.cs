@@ -21,8 +21,6 @@
         // Element Settings
         public double TotalElementAmount { get; set; } = 128 * 128 * 2;
         public double ElementFlowRate { get; set; } = 0.01d;
-        public double PlantElementEfficiency { get; set; } = 1d;
-        public double AnimalElementEfficiency { get; set; } = 5d;
 
         // Pheromone Settings
         public double PheromoneFlowRate { get; set; } = 0.1d;

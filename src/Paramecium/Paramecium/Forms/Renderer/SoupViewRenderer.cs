@@ -10,6 +10,8 @@ namespace Paramecium.Forms.Renderer
     {
         public static void DrawSoupView(ref Bitmap targetBitmap, Double2d cameraPosition, int cameraZoomLevel)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             Graphics targetGraphics = Graphics.FromImage(targetBitmap);
             double cameraZoomFactor = double.Pow(2, cameraZoomLevel);
 
@@ -27,6 +29,8 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupBackground(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             Bitmap backgroundCanvas = new Bitmap(g_Soup.Settings.SizeX, g_Soup.Settings.SizeY, PixelFormat.Format32bppRgb);
 
             BitmapData backgroundCanvasData = backgroundCanvas.LockBits(
@@ -101,6 +105,8 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupBorder(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, -1d), new Double2d(g_Soup.Settings.SizeX + 1, 0), Color.FromArgb(0, 0, 0));
             FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, g_Soup.Settings.SizeY), new Double2d(g_Soup.Settings.SizeX + 1, g_Soup.Settings.SizeY + 1), Color.FromArgb(0, 0, 0));
             FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, -1d), new Double2d(0, g_Soup.Settings.SizeY + 1), Color.FromArgb(0, 0, 0));
@@ -111,6 +117,8 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupWall(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
             {
                 for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
@@ -130,6 +138,8 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupPlant(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
             {
                 for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
@@ -156,6 +166,8 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupAnimal(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
             {
                 for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
@@ -214,6 +226,8 @@ namespace Paramecium.Forms.Renderer
     {
         public static void DrawSoupOverlayView(ref Bitmap targetBitmap, Double2d cameraPosition, int cameraZoomLevel, Point mousePointClient, SelectedObjectType selectedObjectType, int selectedObjectIndex)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             Graphics targetGraphics = Graphics.FromImage(targetBitmap);
             double cameraZoomFactor = double.Pow(2, cameraZoomLevel);
 
@@ -224,6 +238,8 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSelectedObjectInformation(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor, Point mousePointClient, SelectedObjectType selectedObjectType, int selectedObjectIndex)
         {
+            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+
             if (selectedObjectType == SelectedObjectType.Tile)
             {
                 Tile target = g_Soup.Tiles[selectedObjectIndex];

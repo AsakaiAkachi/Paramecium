@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.0] - 2024-10-01
+
+### Added
+- Soup settings can now be edited when creating soups.
+- Soup settings can now be edited while the soup is running.
+
+### Changed
+- When serializing Soup data to JSON, enum is now serialized to a string instead of a number.
+- Soup is no longer automatically created when the program is started.
+
 ## [0.5.0 indev-7] - 2024-10-01
 
 ### Changed

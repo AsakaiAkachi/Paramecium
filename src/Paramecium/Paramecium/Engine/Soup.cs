@@ -58,6 +58,11 @@ namespace Paramecium.Engine
 
         public Soup() { }
 
+        public Soup(SoupSettings settings)
+        {
+            Settings = settings;
+        }
+
         public void InitializeSoup()
         {
             if (!Initialized)

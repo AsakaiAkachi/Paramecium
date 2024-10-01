@@ -1,5 +1,6 @@
 ﻿using Paramecium.Engine;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Paramecium.Forms
 {
@@ -15,26 +16,23 @@ namespace Paramecium.Forms
 
         public void Inspect(int objectType, int index)
         {
-            JsonSerializerOptions options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
+            if (g_Soup is null || !g_Soup.Initialized) return;
 
             try
             {
                 if (objectType == 0)
                 {
-                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Tiles[index], options);
+                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Tiles[index], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                     ComboBoxObjectType.SelectedIndex = 0;
                 }
                 else if (objectType == 1)
                 {
-                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Plants[index], options);
+                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Plants[index], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                     ComboBoxObjectType.SelectedIndex = 1;
                 }
                 else if (objectType == 2)
                 {
-                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Animals[index], options);
+                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Animals[index], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                     ComboBoxObjectType.SelectedIndex = 2;
                 }
                 NumericUpDownObjectIndex.Value = index;
@@ -60,24 +58,21 @@ namespace Paramecium.Forms
 
         private void ButtonInspect_Click(object sender, EventArgs e)
         {
-            JsonSerializerOptions options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
+            if (g_Soup is null || !g_Soup.Initialized) return;
 
             try
             {
                 if (ComboBoxObjectType.SelectedIndex == 0)
                 {
-                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Tiles[(int)NumericUpDownObjectIndex.Value], options);
+                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Tiles[(int)NumericUpDownObjectIndex.Value], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                 }
                 else if (ComboBoxObjectType.SelectedIndex == 1)
                 {
-                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Plants[(int)NumericUpDownObjectIndex.Value], options);
+                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Plants[(int)NumericUpDownObjectIndex.Value], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                 }
                 else if (ComboBoxObjectType.SelectedIndex == 2)
                 {
-                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Animals[(int)NumericUpDownObjectIndex.Value], options);
+                    RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Animals[(int)NumericUpDownObjectIndex.Value], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                 }
             }
             catch (Exception ex)
@@ -96,21 +91,23 @@ namespace Paramecium.Forms
 
         private void ButtonSave_Click(object sender, EventArgs e)
         {
+            if (g_Soup is null || !g_Soup.Initialized) return;
+
             try
             {
                 if (ComboBoxObjectType.SelectedIndex == 0)
                 {
-                    Tile? deserializedObject = JsonSerializer.Deserialize<Tile>(RichTextBoxInspectResult.Text);
+                    Tile? deserializedObject = JsonSerializer.Deserialize<Tile>(RichTextBoxInspectResult.Text, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
                     if (deserializedObject is not null) g_Soup.Tiles[(int)NumericUpDownObjectIndex.Value] = deserializedObject;
                 }
                 else if (ComboBoxObjectType.SelectedIndex == 1)
                 {
-                    Plant? deserializedObject = JsonSerializer.Deserialize<Plant>(RichTextBoxInspectResult.Text);
+                    Plant? deserializedObject = JsonSerializer.Deserialize<Plant>(RichTextBoxInspectResult.Text, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
                     if (deserializedObject is not null) g_Soup.Plants[(int)NumericUpDownObjectIndex.Value] = deserializedObject;
                 }
                 else if (ComboBoxObjectType.SelectedIndex == 2)
                 {
-                    Animal? deserializedObject = JsonSerializer.Deserialize<Animal>(RichTextBoxInspectResult.Text);
+                    Animal? deserializedObject = JsonSerializer.Deserialize<Animal>(RichTextBoxInspectResult.Text, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
                     if (deserializedObject is not null) g_Soup.Animals[(int)NumericUpDownObjectIndex.Value] = deserializedObject;
                 }
 
@@ -138,6 +135,8 @@ namespace Paramecium.Forms
 
         private void ComboBoxObjectType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (g_Soup is null) return;
+
             if (ComboBoxObjectType.SelectedIndex == 0)
             {
                 NumericUpDownObjectIndex.Maximum = g_Soup.Tiles.Length - 1;
