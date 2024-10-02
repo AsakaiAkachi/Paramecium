@@ -135,6 +135,10 @@
             label52 = new Label();
             ButtonApply = new Button();
             ButtonCancel = new Button();
+            ButtonImportPreset = new Button();
+            ButtonExportPreset = new Button();
+            ImportPresetDialog = new OpenFileDialog();
+            ExportPresetDialog = new SaveFileDialog();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Input_InitialSeed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Input_SizeX).BeginInit();
@@ -335,6 +339,7 @@
             Input_WallEnabled.Size = new Size(15, 14);
             Input_WallEnabled.TabIndex = 13;
             Input_WallEnabled.UseVisualStyleBackColor = true;
+            Input_WallEnabled.CheckedChanged += Input_WallEnabled_CheckedChanged;
             // 
             // Input_WallNoiseY
             // 
@@ -684,7 +689,7 @@
             // 
             // Input_PlantForkOffspringCountMax
             // 
-            Input_PlantForkOffspringCountMax.Location = new Point(352, 883);
+            Input_PlantForkOffspringCountMax.Location = new Point(867, 692);
             Input_PlantForkOffspringCountMax.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_PlantForkOffspringCountMax.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_PlantForkOffspringCountMax.Name = "Input_PlantForkOffspringCountMax";
@@ -695,7 +700,7 @@
             // label27
             // 
             label27.AutoSize = true;
-            label27.Location = new Point(22, 885);
+            label27.Location = new Point(537, 694);
             label27.Name = "label27";
             label27.Size = new Size(147, 15);
             label27.TabIndex = 57;
@@ -703,7 +708,7 @@
             // 
             // Input_PlantForkOffspringCountMin
             // 
-            Input_PlantForkOffspringCountMin.Location = new Point(352, 854);
+            Input_PlantForkOffspringCountMin.Location = new Point(867, 663);
             Input_PlantForkOffspringCountMin.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_PlantForkOffspringCountMin.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_PlantForkOffspringCountMin.Name = "Input_PlantForkOffspringCountMin";
@@ -714,7 +719,7 @@
             // label28
             // 
             label28.AutoSize = true;
-            label28.Location = new Point(22, 856);
+            label28.Location = new Point(537, 665);
             label28.Name = "label28";
             label28.Size = new Size(145, 15);
             label28.TabIndex = 55;
@@ -724,7 +729,7 @@
             // 
             Input_PlantForkCost.DecimalPlaces = 3;
             Input_PlantForkCost.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_PlantForkCost.Location = new Point(352, 825);
+            Input_PlantForkCost.Location = new Point(867, 634);
             Input_PlantForkCost.Maximum = new decimal(new int[] { 1024, 0, 0, 0 });
             Input_PlantForkCost.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_PlantForkCost.Name = "Input_PlantForkCost";
@@ -735,7 +740,7 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(22, 827);
+            label29.Location = new Point(537, 636);
             label29.Name = "label29";
             label29.Size = new Size(56, 15);
             label29.TabIndex = 53;
@@ -745,7 +750,7 @@
             // 
             Input_InitialPlantElementAmount.DecimalPlaces = 3;
             Input_InitialPlantElementAmount.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_InitialPlantElementAmount.Location = new Point(352, 796);
+            Input_InitialPlantElementAmount.Location = new Point(867, 605);
             Input_InitialPlantElementAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_InitialPlantElementAmount.Name = "Input_InitialPlantElementAmount";
             Input_InitialPlantElementAmount.Size = new Size(150, 23);
@@ -755,7 +760,7 @@
             // label30
             // 
             label30.AutoSize = true;
-            label30.Location = new Point(22, 798);
+            label30.Location = new Point(537, 607);
             label30.Name = "label30";
             label30.Size = new Size(177, 15);
             label30.TabIndex = 51;
@@ -763,7 +768,7 @@
             // 
             // Input_InitialPlantPopulation
             // 
-            Input_InitialPlantPopulation.Location = new Point(352, 767);
+            Input_InitialPlantPopulation.Location = new Point(867, 576);
             Input_InitialPlantPopulation.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_InitialPlantPopulation.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_InitialPlantPopulation.Name = "Input_InitialPlantPopulation";
@@ -774,7 +779,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(22, 769);
+            label31.Location = new Point(537, 578);
             label31.Name = "label31";
             label31.Size = new Size(97, 15);
             label31.TabIndex = 49;
@@ -784,7 +789,7 @@
             // 
             panel7.BackColor = SystemColors.ControlDark;
             panel7.Controls.Add(label32);
-            panel7.Location = new Point(12, 742);
+            panel7.Location = new Point(527, 551);
             panel7.Name = "panel7";
             panel7.Size = new Size(500, 19);
             panel7.TabIndex = 48;
@@ -802,7 +807,7 @@
             // 
             Input_PlantElementCollectRate.DecimalPlaces = 3;
             Input_PlantElementCollectRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_PlantElementCollectRate.Location = new Point(352, 912);
+            Input_PlantElementCollectRate.Location = new Point(867, 721);
             Input_PlantElementCollectRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_PlantElementCollectRate.Name = "Input_PlantElementCollectRate";
             Input_PlantElementCollectRate.Size = new Size(150, 23);
@@ -812,7 +817,7 @@
             // label33
             // 
             label33.AutoSize = true;
-            label33.Location = new Point(22, 914);
+            label33.Location = new Point(537, 723);
             label33.Name = "label33";
             label33.Size = new Size(114, 15);
             label33.TabIndex = 59;
@@ -1187,7 +1192,8 @@
             // 
             // ButtonApply
             // 
-            ButtonApply.Location = new Point(821, 912);
+            ButtonApply.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            ButtonApply.Location = new Point(821, 757);
             ButtonApply.Name = "ButtonApply";
             ButtonApply.Size = new Size(100, 23);
             ButtonApply.TabIndex = 96;
@@ -1197,7 +1203,8 @@
             // 
             // ButtonCancel
             // 
-            ButtonCancel.Location = new Point(927, 912);
+            ButtonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            ButtonCancel.Location = new Point(927, 757);
             ButtonCancel.Name = "ButtonCancel";
             ButtonCancel.Size = new Size(100, 23);
             ButtonCancel.TabIndex = 97;
@@ -1205,11 +1212,45 @@
             ButtonCancel.UseVisualStyleBackColor = true;
             ButtonCancel.Click += ButtonCancel_Click;
             // 
+            // ButtonImportPreset
+            // 
+            ButtonImportPreset.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            ButtonImportPreset.Location = new Point(12, 757);
+            ButtonImportPreset.Name = "ButtonImportPreset";
+            ButtonImportPreset.Size = new Size(100, 23);
+            ButtonImportPreset.TabIndex = 98;
+            ButtonImportPreset.Text = "Import Preset";
+            ButtonImportPreset.UseVisualStyleBackColor = true;
+            ButtonImportPreset.Click += ButtonImportPreset_Click;
+            // 
+            // ButtonExportPreset
+            // 
+            ButtonExportPreset.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            ButtonExportPreset.Location = new Point(118, 757);
+            ButtonExportPreset.Name = "ButtonExportPreset";
+            ButtonExportPreset.Size = new Size(100, 23);
+            ButtonExportPreset.TabIndex = 99;
+            ButtonExportPreset.Text = "Export Preset";
+            ButtonExportPreset.UseVisualStyleBackColor = true;
+            ButtonExportPreset.Click += ButtonExportPreset_Click;
+            // 
+            // ImportPresetDialog
+            // 
+            ImportPresetDialog.Filter = "Paramecium Soup Preset File|*.souppreset|All Files|*.*";
+            ImportPresetDialog.Title = "Import";
+            // 
+            // ExportPresetDialog
+            // 
+            ExportPresetDialog.Filter = "Paramecium Soup Preset File|*.souppreset|All Files|*.*";
+            ExportPresetDialog.Title = "Export";
+            // 
             // FormSoupSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1041, 947);
+            ClientSize = new Size(1041, 792);
+            Controls.Add(ButtonExportPreset);
+            Controls.Add(ButtonImportPreset);
             Controls.Add(ButtonCancel);
             Controls.Add(ButtonApply);
             Controls.Add(Input_AnimalBrainMaximumConnectionCount);
@@ -1482,5 +1523,9 @@
         private Label label52;
         private Button ButtonApply;
         private Button ButtonCancel;
+        private Button ButtonImportPreset;
+        private Button ButtonExportPreset;
+        private OpenFileDialog ImportPresetDialog;
+        private SaveFileDialog ExportPresetDialog;
     }
 }

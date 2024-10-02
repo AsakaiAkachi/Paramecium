@@ -7,6 +7,8 @@ using System.Drawing;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,11 +16,19 @@ namespace Paramecium.Forms
 {
     public partial class FormSoupSettings : Form
     {
+        bool IsAllSettingsEditable;
+
         public FormSoupSettings(SoupSettings soupSettings, bool isAllSettingsEditable)
         {
             InitializeComponent();
 
-            GenerateInputsFromSoupSettings(soupSettings);
+            ImportPresetDialog.InitialDirectory = $"{g_PresetDefaultFilePath}";
+            ExportPresetDialog.InitialDirectory = $"{g_PresetDefaultFilePath}";
+            ExportPresetDialog.FileName = $"{g_PresetDefaultFileName}";
+
+            GenerateInputsFromSoupSettings(soupSettings, true);
+
+            IsAllSettingsEditable = isAllSettingsEditable;
 
             if (!isAllSettingsEditable)
             {
@@ -103,22 +113,25 @@ namespace Paramecium.Forms
             };
         }
 
-        private void GenerateInputsFromSoupSettings(SoupSettings soupSettings)
+        private void GenerateInputsFromSoupSettings(SoupSettings soupSettings, bool isAllSettingsEditable)
         {
-            Input_InitialSeed.Value = soupSettings.InitialSeed;
+            if (isAllSettingsEditable)
+            {
+                Input_InitialSeed.Value = soupSettings.InitialSeed;
 
-            Input_SizeX.Value = soupSettings.SizeX;
-            Input_SizeY.Value = soupSettings.SizeY;
+                Input_SizeX.Value = soupSettings.SizeX;
+                Input_SizeY.Value = soupSettings.SizeY;
 
-            Input_WallEnabled.Checked = soupSettings.WallEnabled;
-            Input_WallNoiseX.Value = (decimal)soupSettings.WallNoiseX;
-            Input_WallNoiseY.Value = (decimal)soupSettings.WallNoiseY;
-            Input_WallNoiseZ.Value = (decimal)soupSettings.WallNoiseZ;
-            Input_WallNoiseScale.Value = (decimal)soupSettings.WallNoiseScale;
-            Input_WallNoiseOctave.Value = (decimal)soupSettings.WallNoiseOctave;
-            Input_WallThickness.Value = (decimal)soupSettings.WallThickness;
+                Input_WallEnabled.Checked = soupSettings.WallEnabled;
+                Input_WallNoiseX.Value = (decimal)soupSettings.WallNoiseX;
+                Input_WallNoiseY.Value = (decimal)soupSettings.WallNoiseY;
+                Input_WallNoiseZ.Value = (decimal)soupSettings.WallNoiseZ;
+                Input_WallNoiseScale.Value = (decimal)soupSettings.WallNoiseScale;
+                Input_WallNoiseOctave.Value = soupSettings.WallNoiseOctave;
+                Input_WallThickness.Value = (decimal)soupSettings.WallThickness;
 
-            Input_TotalElementAmount.Value = (decimal)soupSettings.TotalElementAmount;
+                Input_TotalElementAmount.Value = (decimal)soupSettings.TotalElementAmount;
+            }
             Input_ElementFlowRate.Value = (decimal)soupSettings.ElementFlowRate;
 
             Input_PheromoneFlowRate.Value = (decimal)soupSettings.PheromoneFlowRate;
@@ -131,15 +144,21 @@ namespace Paramecium.Forms
             Input_MaximumAngularVelocity.Value = (decimal)soupSettings.MaximumAngularVelocity;
             Input_RestitutionCoefficient.Value = (decimal)soupSettings.RestitutionCoefficient;
 
-            Input_InitialPlantPopulation.Value = soupSettings.InitialPlantPopulation;
-            Input_InitialPlantElementAmount.Value = (decimal)soupSettings.InitialPlantElementAmount;
+            if (isAllSettingsEditable)
+            {
+                Input_InitialPlantPopulation.Value = soupSettings.InitialPlantPopulation;
+                Input_InitialPlantElementAmount.Value = (decimal)soupSettings.InitialPlantElementAmount;
+            }
             Input_PlantForkCost.Value = (decimal)soupSettings.PlantForkCost;
             Input_PlantForkOffspringCountMin.Value = soupSettings.PlantForkOffspringCountMin;
             Input_PlantForkOffspringCountMax.Value = soupSettings.PlantForkOffspringCountMax;
             Input_PlantElementCollectRate.Value = (decimal)soupSettings.PlantElementCollectRate;
 
-            Input_InitialAnimalPopulation.Value = soupSettings.InitialAnimalPopulation;
-            Input_InitialAnimalElementAmount.Value = (decimal)soupSettings.InitialAnimalElementAmount;
+            if (isAllSettingsEditable)
+            {
+                Input_InitialAnimalPopulation.Value = soupSettings.InitialAnimalPopulation;
+                Input_InitialAnimalElementAmount.Value = (decimal)soupSettings.InitialAnimalElementAmount;
+            }
             Input_AnimalForkCost.Value = (decimal)soupSettings.AnimalForkCost;
             Input_AnimalElementBaseCost.Value = (decimal)soupSettings.AnimalElementBaseCost;
             Input_AnimalElementAccelerationCost.Value = (decimal)soupSettings.AnimalElementAccelerationCost;
@@ -158,6 +177,51 @@ namespace Paramecium.Forms
             Input_AnimalBrainMaximumConnectionCount.Value = soupSettings.AnimalBrainMaximumConnectionCount;
         }
 
+        private void Input_WallEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            if (Input_WallEnabled.Checked)
+            {
+                Input_WallNoiseX.Enabled = true;
+                Input_WallNoiseY.Enabled = true;
+                Input_WallNoiseZ.Enabled = true;
+                Input_WallNoiseScale.Enabled = true;
+                Input_WallNoiseOctave.Enabled = true;
+                Input_WallThickness.Enabled = true;
+            }
+            else
+            {
+                Input_WallNoiseX.Enabled = false;
+                Input_WallNoiseY.Enabled = false;
+                Input_WallNoiseZ.Enabled = false;
+                Input_WallNoiseScale.Enabled = false;
+                Input_WallNoiseOctave.Enabled = false;
+                Input_WallThickness.Enabled = false;
+            }
+        }
+
+        private void ButtonImportPreset_Click(object sender, EventArgs e)
+        {
+            if (ImportPresetDialog.ShowDialog() == DialogResult.OK)
+            {
+                StreamReader streamReader = new StreamReader(ImportPresetDialog.FileName, Encoding.UTF8);
+                SoupSettings? loadedSoupSettings = JsonSerializer.Deserialize<SoupSettings>(streamReader.ReadToEnd(), new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
+                if (loadedSoupSettings is not null)
+                {
+                    GenerateInputsFromSoupSettings(loadedSoupSettings, IsAllSettingsEditable);
+                }
+            }
+        }
+
+        private void ButtonExportPreset_Click(object sender, EventArgs e)
+        {
+            if (ExportPresetDialog.ShowDialog() == DialogResult.OK)
+            {
+                StreamWriter streamWriter = new StreamWriter(ExportPresetDialog.FileName, false, Encoding.UTF8);
+                streamWriter.Write(JsonSerializer.Serialize(GenerateSoupSettingsFromInputs(), new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
+                streamWriter.Close();
+            }
+        }
+
         private void ButtonApply_Click(object sender, EventArgs e)
         {
             if (Owner is not null && Owner.GetType() == typeof(FormCreateNewSoup))
@@ -167,7 +231,7 @@ namespace Paramecium.Forms
             else if (Owner is not null && Owner.GetType() == typeof(FormMain))
             {
                 if (g_Soup is not null && g_Soup.Initialized && g_Soup.SoupState == SoupState.Pause)
-                g_Soup.Settings = GenerateSoupSettingsFromInputs();
+                    g_Soup.Settings = GenerateSoupSettingsFromInputs();
             }
 
             Close();

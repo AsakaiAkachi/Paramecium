@@ -48,11 +48,11 @@
             // 
             // ButtonEditSoupSettings
             // 
-            ButtonEditSoupSettings.Location = new Point(57, 165);
+            ButtonEditSoupSettings.Location = new Point(85, 165);
             ButtonEditSoupSettings.Name = "ButtonEditSoupSettings";
-            ButtonEditSoupSettings.Size = new Size(206, 23);
+            ButtonEditSoupSettings.Size = new Size(150, 23);
             ButtonEditSoupSettings.TabIndex = 0;
-            ButtonEditSoupSettings.Text = "View More and Edit Soup Settings";
+            ButtonEditSoupSettings.Text = "View More and Edit";
             ButtonEditSoupSettings.UseVisualStyleBackColor = true;
             ButtonEditSoupSettings.Click += ButtonEditSoupSettings_Click;
             // 

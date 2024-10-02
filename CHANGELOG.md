@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.2] - 2024-10-02
+
+### Added
+- Added the ability to import and export soup settings.
+
 ## [0.5.1] - 2024-10-02
 
 ### Fixed

@@ -27,6 +27,10 @@ namespace Paramecium
             {
                 Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations\autosaves");
             }
+            if (!Directory.Exists($@"{Path.GetDirectoryName(Application.ExecutablePath)}\presets"))
+            {
+                Directory.CreateDirectory($@"{Path.GetDirectoryName(Application.ExecutablePath)}\presets");
+            }
 
             ApplicationConfiguration.Initialize();
             Application.Run(new FormMain());
