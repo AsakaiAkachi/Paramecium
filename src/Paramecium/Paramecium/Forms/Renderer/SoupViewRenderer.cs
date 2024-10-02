@@ -333,7 +333,7 @@ namespace Paramecium.Forms.Renderer
                 long targetSpecieId = target.SpeciesId;
                 for (int i = 0; i < 6; i++)
                 {
-                    targetSpecieIdString += chars[(int)(targetSpecieId % 36)];
+                    targetSpecieIdString = chars[(int)(targetSpecieId % 36)] + targetSpecieIdString;
                     targetSpecieId /= 36;
                 }
 
@@ -383,6 +383,15 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Max(0d, double.Min(1d, target.Element / g_Soup.Settings.AnimalForkCost - 1d))), 16, Color.FromArgb(255, 0, 192, 0));
                 overlayInformationRenderer.OverlayFillRectangle(0, 12, (int)(300 * double.Min(1d, target.CurrentStepElementCost / (g_Soup.Settings.AnimalElementBaseCost + g_Soup.Settings.AnimalElementAccelerationCost + g_Soup.Settings.AnimalElementRotationCost + g_Soup.Settings.AnimalElementAttackCost + (g_Soup.Settings.AnimalElementPheromoneProductionCost * 3d)))), 16, Color.FromArgb(255, 192, 192, 192));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm (-{target.CurrentStepElementCost.ToString("0.000")} elm/step)", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OffsetY += 16;
+
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, 192, 0, 0));
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * (1d - target.Diet)), 16, Color.FromArgb(255, 0, 192, 0));
+                if (target.Diet <= 0.1d) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Fully Herbivorous)", 0, 0, Color.FromArgb(255, 255, 255));
+                else if (target.Diet <= 0.333d) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Herbivorous)", 0, 0, Color.FromArgb(255, 255, 255));
+                else if (target.Diet <= 0.5d) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Omnivorous)", 0, 0, Color.FromArgb(255, 255, 255));
+                else if (target.Diet <= 0.9d) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Carnivorous)", 0, 0, Color.FromArgb(255, 255, 255));
+                else overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Fully Carnivorous)", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, target.ColorRed, target.ColorGreen, target.ColorBlue));

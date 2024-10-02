@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.3] - 2024-10-02
+
+### Added
+- Diet added. Children cannot efficiently eat anything other than the same food that their parents ate.
+
+### Fixed
+- Fixed a bug in which animals were only scanning an area of 3x3 tiles when they should have been scanning an area of 5x5 tiles when determining predation on surrounding plants and animals.
+
 ## [0.5.2] - 2024-10-02
 
 ### Added

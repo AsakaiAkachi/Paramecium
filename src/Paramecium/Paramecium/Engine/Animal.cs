@@ -24,8 +24,9 @@
         public double Mass { get; set; }
 
         public double Element { get; set; }
-
         public double CurrentStepElementCost { get; set; }
+        public double Diet { get; set; }
+        public double ElementOriginRatio { get; set; }
 
         public int ColorRed { get; set; }
         public int ColorGreen { get; set; }
@@ -59,6 +60,7 @@
             Mass = 16 + element;
 
             Element = element;
+            Diet = 0;
 
             ColorRed = random.Next(0, 255 + 1);
             ColorGreen = random.Next(0, 255 + 1);
@@ -88,6 +90,8 @@
             Mass = 16 + element;
 
             Element = element;
+            Diet = parent.ElementOriginRatio;
+            ElementOriginRatio = parent.ElementOriginRatio;
 
             ColorRed = parent.ColorRed;
             ColorGreen = parent.ColorGreen;
@@ -193,9 +197,9 @@
 
                 if (BrainOutput.Attack > 0)
                 {
-                    for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX + 1)); x++)
+                    for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX - 2)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX + 2)); x++)
                     {
-                        for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY + 1)); y++)
+                        for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY - 2)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY + 2)); y++)
                         {
                             Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
@@ -210,8 +214,13 @@
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - Position, -Angle))) < 0.167d)
                                             {
-                                                Element += double.Min(targetPlant.Element, g_Soup.Settings.AnimalPlantIngestionRate);
-                                                targetPlant.Element -= double.Min(targetPlant.Element, g_Soup.Settings.AnimalPlantIngestionRate);
+                                                double IngestionEfficiency = 1d - Diet * 0.9d;
+                                                double ElementIngestionAmount = double.Min(targetPlant.Element, g_Soup.Settings.AnimalPlantIngestionRate * IngestionEfficiency);
+
+                                                Element += ElementIngestionAmount;
+                                                targetPlant.Element -= ElementIngestionAmount;
+
+                                                ElementOriginRatio = (ElementOriginRatio * Element) / (Element + ElementIngestionAmount);
                                             }
                                         }
                                     }
@@ -229,8 +238,13 @@
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle))) < 0.167d)
                                             {
-                                                Element += double.Min(targetAnimal.Element, g_Soup.Settings.AnimalAnimalIngestionRate);
-                                                targetAnimal.Element -= double.Min(targetAnimal.Element, g_Soup.Settings.AnimalAnimalIngestionRate);
+                                                double IngestionEfficiency = 0.333d + (0.667d * Diet);
+                                                double ElementIngestionAmount = double.Min(targetAnimal.Element, g_Soup.Settings.AnimalAnimalIngestionRate * IngestionEfficiency);
+
+                                                Element += ElementIngestionAmount;
+                                                targetAnimal.Element -= ElementIngestionAmount;
+
+                                                ElementOriginRatio = (ElementOriginRatio * Element + ElementIngestionAmount) / (Element + ElementIngestionAmount);
                                             }
                                         }
                                     }
@@ -238,6 +252,9 @@
                             }
                         }
                     }
+
+                    if (ElementOriginRatio < 0) ElementOriginRatio = 0;
+                    if (ElementOriginRatio > 1) ElementOriginRatio = 1;
                 }
             }
             else throw new InvalidOperationException("This animal is not initialized.");
