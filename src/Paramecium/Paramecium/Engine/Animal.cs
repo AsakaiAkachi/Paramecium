@@ -160,9 +160,6 @@
                     Velocity = Velocity.Length / g_Soup.Settings.MaximumVelocity,
                     AngularVelocity = AngularVelocity / g_Soup.Settings.MaximumAngularVelocity,
                     Satiety = Element / g_Soup.Settings.AnimalForkCost,
-                    PheromoneRed = targetTile.PheromoneRed,
-                    PheromoneGreen = targetTile.PheromoneGreen,
-                    PheromoneBlue = targetTile.PheromoneBlue
                 };
 
                 BrainOutput = Brain.UpdateBrain(BrainInput);

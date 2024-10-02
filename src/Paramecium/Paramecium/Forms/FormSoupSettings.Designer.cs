@@ -689,7 +689,7 @@
             // 
             // Input_PlantForkOffspringCountMax
             // 
-            Input_PlantForkOffspringCountMax.Location = new Point(867, 692);
+            Input_PlantForkOffspringCountMax.Location = new Point(867, 153);
             Input_PlantForkOffspringCountMax.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_PlantForkOffspringCountMax.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_PlantForkOffspringCountMax.Name = "Input_PlantForkOffspringCountMax";
@@ -700,7 +700,7 @@
             // label27
             // 
             label27.AutoSize = true;
-            label27.Location = new Point(537, 694);
+            label27.Location = new Point(537, 155);
             label27.Name = "label27";
             label27.Size = new Size(147, 15);
             label27.TabIndex = 57;
@@ -708,7 +708,7 @@
             // 
             // Input_PlantForkOffspringCountMin
             // 
-            Input_PlantForkOffspringCountMin.Location = new Point(867, 663);
+            Input_PlantForkOffspringCountMin.Location = new Point(867, 124);
             Input_PlantForkOffspringCountMin.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_PlantForkOffspringCountMin.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_PlantForkOffspringCountMin.Name = "Input_PlantForkOffspringCountMin";
@@ -719,7 +719,7 @@
             // label28
             // 
             label28.AutoSize = true;
-            label28.Location = new Point(537, 665);
+            label28.Location = new Point(537, 126);
             label28.Name = "label28";
             label28.Size = new Size(145, 15);
             label28.TabIndex = 55;
@@ -729,7 +729,7 @@
             // 
             Input_PlantForkCost.DecimalPlaces = 3;
             Input_PlantForkCost.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_PlantForkCost.Location = new Point(867, 634);
+            Input_PlantForkCost.Location = new Point(867, 95);
             Input_PlantForkCost.Maximum = new decimal(new int[] { 1024, 0, 0, 0 });
             Input_PlantForkCost.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_PlantForkCost.Name = "Input_PlantForkCost";
@@ -740,7 +740,7 @@
             // label29
             // 
             label29.AutoSize = true;
-            label29.Location = new Point(537, 636);
+            label29.Location = new Point(537, 97);
             label29.Name = "label29";
             label29.Size = new Size(56, 15);
             label29.TabIndex = 53;
@@ -750,7 +750,7 @@
             // 
             Input_InitialPlantElementAmount.DecimalPlaces = 3;
             Input_InitialPlantElementAmount.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_InitialPlantElementAmount.Location = new Point(867, 605);
+            Input_InitialPlantElementAmount.Location = new Point(867, 66);
             Input_InitialPlantElementAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_InitialPlantElementAmount.Name = "Input_InitialPlantElementAmount";
             Input_InitialPlantElementAmount.Size = new Size(150, 23);
@@ -760,7 +760,7 @@
             // label30
             // 
             label30.AutoSize = true;
-            label30.Location = new Point(537, 607);
+            label30.Location = new Point(537, 68);
             label30.Name = "label30";
             label30.Size = new Size(177, 15);
             label30.TabIndex = 51;
@@ -768,9 +768,8 @@
             // 
             // Input_InitialPlantPopulation
             // 
-            Input_InitialPlantPopulation.Location = new Point(867, 576);
+            Input_InitialPlantPopulation.Location = new Point(867, 37);
             Input_InitialPlantPopulation.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
-            Input_InitialPlantPopulation.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_InitialPlantPopulation.Name = "Input_InitialPlantPopulation";
             Input_InitialPlantPopulation.Size = new Size(150, 23);
             Input_InitialPlantPopulation.TabIndex = 50;
@@ -779,7 +778,7 @@
             // label31
             // 
             label31.AutoSize = true;
-            label31.Location = new Point(537, 578);
+            label31.Location = new Point(537, 39);
             label31.Name = "label31";
             label31.Size = new Size(97, 15);
             label31.TabIndex = 49;
@@ -789,7 +788,7 @@
             // 
             panel7.BackColor = SystemColors.ControlDark;
             panel7.Controls.Add(label32);
-            panel7.Location = new Point(527, 551);
+            panel7.Location = new Point(527, 12);
             panel7.Name = "panel7";
             panel7.Size = new Size(500, 19);
             panel7.TabIndex = 48;
@@ -807,7 +806,7 @@
             // 
             Input_PlantElementCollectRate.DecimalPlaces = 3;
             Input_PlantElementCollectRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_PlantElementCollectRate.Location = new Point(867, 721);
+            Input_PlantElementCollectRate.Location = new Point(867, 182);
             Input_PlantElementCollectRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_PlantElementCollectRate.Name = "Input_PlantElementCollectRate";
             Input_PlantElementCollectRate.Size = new Size(150, 23);
@@ -817,7 +816,7 @@
             // label33
             // 
             label33.AutoSize = true;
-            label33.Location = new Point(537, 723);
+            label33.Location = new Point(537, 184);
             label33.Name = "label33";
             label33.Size = new Size(114, 15);
             label33.TabIndex = 59;
@@ -827,7 +826,7 @@
             // 
             Input_AnimalElementBaseCost.DecimalPlaces = 6;
             Input_AnimalElementBaseCost.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalElementBaseCost.Location = new Point(867, 124);
+            Input_AnimalElementBaseCost.Location = new Point(867, 323);
             Input_AnimalElementBaseCost.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalElementBaseCost.Name = "Input_AnimalElementBaseCost";
             Input_AnimalElementBaseCost.Size = new Size(150, 23);
@@ -837,7 +836,7 @@
             // label36
             // 
             label36.AutoSize = true;
-            label36.Location = new Point(537, 126);
+            label36.Location = new Point(537, 325);
             label36.Name = "label36";
             label36.Size = new Size(136, 15);
             label36.TabIndex = 68;
@@ -847,7 +846,7 @@
             // 
             Input_AnimalForkCost.DecimalPlaces = 3;
             Input_AnimalForkCost.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalForkCost.Location = new Point(867, 95);
+            Input_AnimalForkCost.Location = new Point(867, 294);
             Input_AnimalForkCost.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalForkCost.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalForkCost.Name = "Input_AnimalForkCost";
@@ -858,7 +857,7 @@
             // label37
             // 
             label37.AutoSize = true;
-            label37.Location = new Point(537, 97);
+            label37.Location = new Point(537, 296);
             label37.Name = "label37";
             label37.Size = new Size(56, 15);
             label37.TabIndex = 66;
@@ -868,7 +867,7 @@
             // 
             Input_InitialAnimalElementAmount.DecimalPlaces = 3;
             Input_InitialAnimalElementAmount.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_InitialAnimalElementAmount.Location = new Point(867, 66);
+            Input_InitialAnimalElementAmount.Location = new Point(867, 265);
             Input_InitialAnimalElementAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_InitialAnimalElementAmount.Name = "Input_InitialAnimalElementAmount";
             Input_InitialAnimalElementAmount.Size = new Size(150, 23);
@@ -878,7 +877,7 @@
             // label38
             // 
             label38.AutoSize = true;
-            label38.Location = new Point(537, 68);
+            label38.Location = new Point(537, 267);
             label38.Name = "label38";
             label38.Size = new Size(187, 15);
             label38.TabIndex = 64;
@@ -886,9 +885,8 @@
             // 
             // Input_InitialAnimalPopulation
             // 
-            Input_InitialAnimalPopulation.Location = new Point(867, 37);
+            Input_InitialAnimalPopulation.Location = new Point(867, 236);
             Input_InitialAnimalPopulation.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
-            Input_InitialAnimalPopulation.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_InitialAnimalPopulation.Name = "Input_InitialAnimalPopulation";
             Input_InitialAnimalPopulation.Size = new Size(150, 23);
             Input_InitialAnimalPopulation.TabIndex = 63;
@@ -897,7 +895,7 @@
             // label39
             // 
             label39.AutoSize = true;
-            label39.Location = new Point(537, 39);
+            label39.Location = new Point(537, 238);
             label39.Name = "label39";
             label39.Size = new Size(97, 15);
             label39.TabIndex = 62;
@@ -907,7 +905,7 @@
             // 
             panel8.BackColor = SystemColors.ControlDark;
             panel8.Controls.Add(label40);
-            panel8.Location = new Point(527, 12);
+            panel8.Location = new Point(527, 211);
             panel8.Name = "panel8";
             panel8.Size = new Size(500, 19);
             panel8.TabIndex = 61;
@@ -925,7 +923,7 @@
             // 
             Input_AnimalElementAccelerationCost.DecimalPlaces = 6;
             Input_AnimalElementAccelerationCost.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalElementAccelerationCost.Location = new Point(867, 153);
+            Input_AnimalElementAccelerationCost.Location = new Point(867, 352);
             Input_AnimalElementAccelerationCost.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalElementAccelerationCost.Name = "Input_AnimalElementAccelerationCost";
             Input_AnimalElementAccelerationCost.Size = new Size(150, 23);
@@ -935,7 +933,7 @@
             // label34
             // 
             label34.AutoSize = true;
-            label34.Location = new Point(537, 155);
+            label34.Location = new Point(537, 354);
             label34.Name = "label34";
             label34.Size = new Size(178, 15);
             label34.TabIndex = 70;
@@ -945,7 +943,7 @@
             // 
             Input_AnimalElementRotationCost.DecimalPlaces = 6;
             Input_AnimalElementRotationCost.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalElementRotationCost.Location = new Point(867, 182);
+            Input_AnimalElementRotationCost.Location = new Point(867, 381);
             Input_AnimalElementRotationCost.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalElementRotationCost.Name = "Input_AnimalElementRotationCost";
             Input_AnimalElementRotationCost.Size = new Size(150, 23);
@@ -955,7 +953,7 @@
             // label35
             // 
             label35.AutoSize = true;
-            label35.Location = new Point(537, 184);
+            label35.Location = new Point(537, 383);
             label35.Name = "label35";
             label35.Size = new Size(157, 15);
             label35.TabIndex = 72;
@@ -965,7 +963,7 @@
             // 
             Input_AnimalElementAttackCost.DecimalPlaces = 6;
             Input_AnimalElementAttackCost.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalElementAttackCost.Location = new Point(867, 211);
+            Input_AnimalElementAttackCost.Location = new Point(867, 410);
             Input_AnimalElementAttackCost.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalElementAttackCost.Name = "Input_AnimalElementAttackCost";
             Input_AnimalElementAttackCost.Size = new Size(150, 23);
@@ -975,7 +973,7 @@
             // label41
             // 
             label41.AutoSize = true;
-            label41.Location = new Point(537, 213);
+            label41.Location = new Point(537, 412);
             label41.Name = "label41";
             label41.Size = new Size(146, 15);
             label41.TabIndex = 74;
@@ -985,7 +983,7 @@
             // 
             Input_AnimalElementPheromoneProductionCost.DecimalPlaces = 6;
             Input_AnimalElementPheromoneProductionCost.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalElementPheromoneProductionCost.Location = new Point(867, 240);
+            Input_AnimalElementPheromoneProductionCost.Location = new Point(867, 439);
             Input_AnimalElementPheromoneProductionCost.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalElementPheromoneProductionCost.Name = "Input_AnimalElementPheromoneProductionCost";
             Input_AnimalElementPheromoneProductionCost.Size = new Size(150, 23);
@@ -995,7 +993,7 @@
             // label42
             // 
             label42.AutoSize = true;
-            label42.Location = new Point(537, 242);
+            label42.Location = new Point(537, 441);
             label42.Name = "label42";
             label42.Size = new Size(289, 15);
             label42.TabIndex = 76;
@@ -1003,7 +1001,7 @@
             // 
             // Input_AnimalMaximumAge
             // 
-            Input_AnimalMaximumAge.Location = new Point(867, 327);
+            Input_AnimalMaximumAge.Location = new Point(867, 526);
             Input_AnimalMaximumAge.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalMaximumAge.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalMaximumAge.Name = "Input_AnimalMaximumAge";
@@ -1014,7 +1012,7 @@
             // label43
             // 
             label43.AutoSize = true;
-            label43.Location = new Point(537, 329);
+            label43.Location = new Point(537, 528);
             label43.Name = "label43";
             label43.Size = new Size(84, 15);
             label43.TabIndex = 82;
@@ -1024,7 +1022,7 @@
             // 
             Input_AnimalAnimalIngestionRate.DecimalPlaces = 3;
             Input_AnimalAnimalIngestionRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalAnimalIngestionRate.Location = new Point(867, 298);
+            Input_AnimalAnimalIngestionRate.Location = new Point(867, 497);
             Input_AnimalAnimalIngestionRate.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalAnimalIngestionRate.Name = "Input_AnimalAnimalIngestionRate";
             Input_AnimalAnimalIngestionRate.Size = new Size(150, 23);
@@ -1034,7 +1032,7 @@
             // label44
             // 
             label44.AutoSize = true;
-            label44.Location = new Point(537, 300);
+            label44.Location = new Point(537, 499);
             label44.Name = "label44";
             label44.Size = new Size(130, 15);
             label44.TabIndex = 80;
@@ -1044,7 +1042,7 @@
             // 
             Input_AnimalPlantIngestionRate.DecimalPlaces = 3;
             Input_AnimalPlantIngestionRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalPlantIngestionRate.Location = new Point(867, 269);
+            Input_AnimalPlantIngestionRate.Location = new Point(867, 468);
             Input_AnimalPlantIngestionRate.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalPlantIngestionRate.Name = "Input_AnimalPlantIngestionRate";
             Input_AnimalPlantIngestionRate.Size = new Size(150, 23);
@@ -1054,7 +1052,7 @@
             // label45
             // 
             label45.AutoSize = true;
-            label45.Location = new Point(537, 271);
+            label45.Location = new Point(537, 470);
             label45.Name = "label45";
             label45.Size = new Size(120, 15);
             label45.TabIndex = 78;
@@ -1062,7 +1060,7 @@
             // 
             // Input_AnimalBrainMaximumConnectionCount
             // 
-            Input_AnimalBrainMaximumConnectionCount.Location = new Point(867, 522);
+            Input_AnimalBrainMaximumConnectionCount.Location = new Point(867, 721);
             Input_AnimalBrainMaximumConnectionCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalBrainMaximumConnectionCount.Name = "Input_AnimalBrainMaximumConnectionCount";
             Input_AnimalBrainMaximumConnectionCount.Size = new Size(150, 23);
@@ -1072,7 +1070,7 @@
             // label46
             // 
             label46.AutoSize = true;
-            label46.Location = new Point(537, 524);
+            label46.Location = new Point(537, 723);
             label46.Name = "label46";
             label46.Size = new Size(211, 15);
             label46.TabIndex = 94;
@@ -1080,7 +1078,7 @@
             // 
             // Input_AnimalBrainMaximumNodeCount
             // 
-            Input_AnimalBrainMaximumNodeCount.Location = new Point(867, 493);
+            Input_AnimalBrainMaximumNodeCount.Location = new Point(867, 692);
             Input_AnimalBrainMaximumNodeCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalBrainMaximumNodeCount.Name = "Input_AnimalBrainMaximumNodeCount";
             Input_AnimalBrainMaximumNodeCount.Size = new Size(150, 23);
@@ -1090,7 +1088,7 @@
             // label47
             // 
             label47.AutoSize = true;
-            label47.Location = new Point(537, 495);
+            label47.Location = new Point(537, 694);
             label47.Name = "label47";
             label47.Size = new Size(127, 15);
             label47.TabIndex = 92;
@@ -1100,7 +1098,7 @@
             // 
             panel9.BackColor = SystemColors.ControlDark;
             panel9.Controls.Add(label48);
-            panel9.Location = new Point(527, 468);
+            panel9.Location = new Point(527, 667);
             panel9.Name = "panel9";
             panel9.Size = new Size(500, 19);
             panel9.TabIndex = 91;
@@ -1118,7 +1116,7 @@
             // 
             Input_AnimalSpeciesIdMutationRate.DecimalPlaces = 3;
             Input_AnimalSpeciesIdMutationRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalSpeciesIdMutationRate.Location = new Point(867, 439);
+            Input_AnimalSpeciesIdMutationRate.Location = new Point(867, 638);
             Input_AnimalSpeciesIdMutationRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalSpeciesIdMutationRate.Name = "Input_AnimalSpeciesIdMutationRate";
             Input_AnimalSpeciesIdMutationRate.Size = new Size(150, 23);
@@ -1128,7 +1126,7 @@
             // label49
             // 
             label49.AutoSize = true;
-            label49.Location = new Point(537, 441);
+            label49.Location = new Point(537, 640);
             label49.Name = "label49";
             label49.Size = new Size(240, 15);
             label49.TabIndex = 89;
@@ -1136,7 +1134,7 @@
             // 
             // Input_AnimalMaximumMutationCount
             // 
-            Input_AnimalMaximumMutationCount.Location = new Point(867, 410);
+            Input_AnimalMaximumMutationCount.Location = new Point(867, 609);
             Input_AnimalMaximumMutationCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalMaximumMutationCount.Name = "Input_AnimalMaximumMutationCount";
             Input_AnimalMaximumMutationCount.Size = new Size(150, 23);
@@ -1146,7 +1144,7 @@
             // label50
             // 
             label50.AutoSize = true;
-            label50.Location = new Point(537, 412);
+            label50.Location = new Point(537, 611);
             label50.Name = "label50";
             label50.Size = new Size(177, 15);
             label50.TabIndex = 87;
@@ -1156,7 +1154,7 @@
             // 
             Input_AnimalMutationRate.DecimalPlaces = 3;
             Input_AnimalMutationRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalMutationRate.Location = new Point(867, 381);
+            Input_AnimalMutationRate.Location = new Point(867, 580);
             Input_AnimalMutationRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalMutationRate.Name = "Input_AnimalMutationRate";
             Input_AnimalMutationRate.Size = new Size(150, 23);
@@ -1166,7 +1164,7 @@
             // label51
             // 
             label51.AutoSize = true;
-            label51.Location = new Point(537, 383);
+            label51.Location = new Point(537, 582);
             label51.Name = "label51";
             label51.Size = new Size(112, 15);
             label51.TabIndex = 85;
@@ -1176,7 +1174,7 @@
             // 
             panel10.BackColor = SystemColors.ControlDark;
             panel10.Controls.Add(label52);
-            panel10.Location = new Point(527, 356);
+            panel10.Location = new Point(527, 555);
             panel10.Name = "panel10";
             panel10.Size = new Size(500, 19);
             panel10.TabIndex = 84;
@@ -1193,7 +1191,7 @@
             // ButtonApply
             // 
             ButtonApply.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            ButtonApply.Location = new Point(821, 757);
+            ButtonApply.Location = new Point(821, 756);
             ButtonApply.Name = "ButtonApply";
             ButtonApply.Size = new Size(100, 23);
             ButtonApply.TabIndex = 96;
@@ -1204,7 +1202,7 @@
             // ButtonCancel
             // 
             ButtonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            ButtonCancel.Location = new Point(927, 757);
+            ButtonCancel.Location = new Point(927, 756);
             ButtonCancel.Name = "ButtonCancel";
             ButtonCancel.Size = new Size(100, 23);
             ButtonCancel.TabIndex = 97;
@@ -1215,7 +1213,7 @@
             // ButtonImportPreset
             // 
             ButtonImportPreset.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            ButtonImportPreset.Location = new Point(12, 757);
+            ButtonImportPreset.Location = new Point(12, 756);
             ButtonImportPreset.Name = "ButtonImportPreset";
             ButtonImportPreset.Size = new Size(100, 23);
             ButtonImportPreset.TabIndex = 98;
@@ -1226,7 +1224,7 @@
             // ButtonExportPreset
             // 
             ButtonExportPreset.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            ButtonExportPreset.Location = new Point(118, 757);
+            ButtonExportPreset.Location = new Point(118, 756);
             ButtonExportPreset.Name = "ButtonExportPreset";
             ButtonExportPreset.Size = new Size(100, 23);
             ButtonExportPreset.TabIndex = 99;
@@ -1248,7 +1246,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1041, 792);
+            ClientSize = new Size(1041, 791);
             Controls.Add(ButtonExportPreset);
             Controls.Add(ButtonImportPreset);
             Controls.Add(ButtonCancel);

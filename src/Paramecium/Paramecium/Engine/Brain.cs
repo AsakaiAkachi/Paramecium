@@ -451,13 +451,22 @@ namespace Paramecium.Engine
                     Output = brainInput.Satiety;
                     break;
                 case BrainNodeType.Input_PheromoneRed:
-                    Output = brainInput.PheromoneRed;
+                    Output = brainInput.VisionData.PheromoneRed;
                     break;
                 case BrainNodeType.Input_PheromoneGreen:
-                    Output = brainInput.PheromoneGreen;
+                    Output = brainInput.VisionData.PheromoneGreen;
                     break;
                 case BrainNodeType.Input_PheromoneBlue:
-                    Output = brainInput.PheromoneBlue;
+                    Output = brainInput.VisionData.PheromoneBlue;
+                    break;
+                case BrainNodeType.Input_PheromoneRedAvgAngle:
+                    Output = brainInput.VisionData.PheromoneRedAvgAngle;
+                    break;
+                case BrainNodeType.Input_PheromoneGreenAvgAngle:
+                    Output = brainInput.VisionData.PheromoneGreenAvgAngle;
+                    break;
+                case BrainNodeType.Input_PheromoneBlueAvgAngle:
+                    Output = brainInput.VisionData.PheromoneBlueAvgAngle;
                     break;
                 case BrainNodeType.Input_Memory0:
                     Output = brainInput.PrevStepOutput.Memory0;
@@ -609,9 +618,6 @@ namespace Paramecium.Engine
         public double Velocity;
         public double AngularVelocity;
         public double Satiety;
-        public double PheromoneRed;
-        public double PheromoneGreen;
-        public double PheromoneBlue;
     }
 
     public class BrainOutput
@@ -650,6 +656,9 @@ namespace Paramecium.Engine
         Input_PheromoneRed,
         Input_PheromoneGreen,
         Input_PheromoneBlue,
+        Input_PheromoneRedAvgAngle,
+        Input_PheromoneGreenAvgAngle,
+        Input_PheromoneBlueAvgAngle,
         Input_Memory0,
         Input_Memory1,
         Input_Memory2,
@@ -931,7 +940,66 @@ namespace Paramecium.Engine
             if (AnimalSameSpeciesAvgAngleDenominator > 0) result.AnimalSameSpeciesAvgAngle /= AnimalSameSpeciesAvgAngleDenominator;
             if (AnimalOtherSpeciesAvgAngleDenominator > 0) result.AnimalOtherSpeciesAvgAngle /= AnimalOtherSpeciesAvgAngleDenominator;
 
-            //Console.WriteLine(result.PlantAvgAngle);
+            double pheromoneRed = 0;
+            double pheromoneGreen = 0;
+            double pheromoneBlue = 0;
+            Double2d pheromoneRedAvgVector = Double2d.Zero;
+            Double2d pheromoneGreenAvgVector = Double2d.Zero;
+            Double2d pheromoneBlueAvgVector = Double2d.Zero;
+
+            for (int x = 0; x <= 1; x++)
+            {
+                for (int y = 0; y <= 1; y++)
+                {
+                    Double2d pheromoneScanPosition = originPosition + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
+                    pheromoneScanPosition = new Double2d(double.Max(0, double.Min(g_Soup.Settings.SizeX, pheromoneScanPosition.X)), double.Max(0, double.Min(g_Soup.Settings.SizeY, pheromoneScanPosition.Y)));
+
+                    int pheromoneScanPositionIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(pheromoneScanPosition.X)));
+                    int pheromoneScanPositionIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(pheromoneScanPosition.Y)));
+
+                    double tileRedPheromoneAmount = g_Soup.Tiles[pheromoneScanPositionIntegerizedY * g_Soup.Settings.SizeX + pheromoneScanPositionIntegerizedX].PheromoneRed;
+                    double tileGreenPheromoneAmount = g_Soup.Tiles[pheromoneScanPositionIntegerizedY * g_Soup.Settings.SizeX + pheromoneScanPositionIntegerizedX].PheromoneGreen;
+                    double tileBluePheromoneAmount = g_Soup.Tiles[pheromoneScanPositionIntegerizedY * g_Soup.Settings.SizeX + pheromoneScanPositionIntegerizedX].PheromoneBlue;
+
+                    if (tileRedPheromoneAmount >= 0.001d)
+                    {
+                        pheromoneRed += tileRedPheromoneAmount;
+                        pheromoneRedAvgVector += (new Double2d(-0.5d, -0.5d) + new Double2d(x, y)) * tileRedPheromoneAmount;
+                    }
+                    if (tileGreenPheromoneAmount >= 0.001d)
+                    {
+                        pheromoneGreen += tileGreenPheromoneAmount;
+                        pheromoneGreenAvgVector += (new Double2d(-0.5d, -0.5d) + new Double2d(x, y)) * tileGreenPheromoneAmount;
+                    }
+                    if (tileBluePheromoneAmount >= 0.001d)
+                    {
+                        pheromoneBlue += tileBluePheromoneAmount;
+                        pheromoneBlueAvgVector += (new Double2d(-0.5d, -0.5d) + new Double2d(x, y)) * tileBluePheromoneAmount;
+                    }
+                }
+            }
+
+            result.PheromoneRed = pheromoneRed / 4d;
+            result.PheromoneGreen = pheromoneGreen / 4d;
+            result.PheromoneBlue = pheromoneBlue / 4d;
+            if (pheromoneRed > 0)
+            {
+                result.PheromoneRedAvgAngle = Double2d.ToAngle(pheromoneRedAvgVector) - angle;
+                if (result.PheromoneRedAvgAngle < -0.5d) result.PheromoneRedAvgAngle += 1d;
+                if (result.PheromoneRedAvgAngle > 0.5d) result.PheromoneRedAvgAngle -= 1d;
+            }
+            if (pheromoneGreen > 0)
+            {
+                result.PheromoneGreenAvgAngle = Double2d.ToAngle(pheromoneGreenAvgVector) - angle;
+                if (result.PheromoneGreenAvgAngle < -0.5d) result.PheromoneGreenAvgAngle += 1d;
+                if (result.PheromoneGreenAvgAngle > 0.5d) result.PheromoneGreenAvgAngle -= 1d;
+            }
+            if (pheromoneBlue > 0)
+            {
+                result.PheromoneBlueAvgAngle = Double2d.ToAngle(pheromoneBlueAvgVector) - angle;
+                if (result.PheromoneBlueAvgAngle < -0.5d) result.PheromoneBlueAvgAngle += 1d;
+                if (result.PheromoneBlueAvgAngle > 0.5d) result.PheromoneBlueAvgAngle -= 1d;
+            }
 
             return result;
         }
@@ -947,5 +1015,11 @@ namespace Paramecium.Engine
         public double AnimalSameSpeciesProximity { get; set; }
         public double AnimalOtherSpeciesAvgAngle { get; set; }
         public double AnimalOtherSpeciesProximity { get; set; }
+        public double PheromoneRed { get; set; }
+        public double PheromoneGreen { get; set; }
+        public double PheromoneBlue { get; set; }
+        public double PheromoneRedAvgAngle { get; set; }
+        public double PheromoneGreenAvgAngle { get; set; }
+        public double PheromoneBlueAvgAngle { get; set; }
     }
 }

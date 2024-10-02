@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.4] - 2024-10-02
+
+### Added
+- Added 3 new brain node types. (`Input_PheromoneRedAvgAngle` `Input_PheromoneGreenAvgAngle` `Input_PheromoneBlueAvgAngle`)
+
+### Fixed
+- Fixed an incorrect layout in the `Soup Settings` window.
+
 ## [0.5.3] - 2024-10-02
 
 ### Added
