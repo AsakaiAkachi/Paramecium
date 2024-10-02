@@ -26,7 +26,8 @@
         public double Element { get; set; }
         public double CurrentStepElementCost { get; set; }
         public double Diet { get; set; }
-        public double ElementOriginRatio { get; set; }
+        public double TotalIngestedElementAmount { get; set; }
+        public double IngestedElementOriginRatio { get; set; }
 
         public int ColorRed { get; set; }
         public int ColorGreen { get; set; }
@@ -90,8 +91,9 @@
             Mass = 16 + element;
 
             Element = element;
-            Diet = parent.ElementOriginRatio;
-            ElementOriginRatio = parent.ElementOriginRatio;
+            Diet = parent.IngestedElementOriginRatio;
+            IngestedElementOriginRatio = parent.IngestedElementOriginRatio;
+            TotalIngestedElementAmount = g_Soup.Settings.AnimalForkCost;
 
             ColorRed = parent.ColorRed;
             ColorGreen = parent.ColorGreen;
@@ -210,17 +212,18 @@
                                                 double IngestionEfficiency = 1d - Diet * 0.9d;
                                                 double ElementIngestionAmount = double.Min(targetPlant.Element, g_Soup.Settings.AnimalPlantIngestionRate * IngestionEfficiency);
 
+                                                IngestedElementOriginRatio = (TotalIngestedElementAmount * IngestedElementOriginRatio) / (TotalIngestedElementAmount + ElementIngestionAmount);
+                                                TotalIngestedElementAmount += ElementIngestionAmount;
+
                                                 Element += ElementIngestionAmount;
                                                 targetPlant.Element -= ElementIngestionAmount;
-
-                                                ElementOriginRatio = (ElementOriginRatio * Element) / (Element + ElementIngestionAmount);
                                             }
                                         }
                                     }
                                 }
                             }
 
-                            if (targetTile.LocalAnimalPopulation > 0 && BrainOutput.Attack >= 1)
+                            if (targetTile.LocalAnimalPopulation > 0)// && BrainOutput.Attack >= 1)
                             {
                                 for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
                                 {
@@ -234,10 +237,11 @@
                                                 double IngestionEfficiency = 0.333d + (0.667d * Diet);
                                                 double ElementIngestionAmount = double.Min(targetAnimal.Element, g_Soup.Settings.AnimalAnimalIngestionRate * IngestionEfficiency);
 
+                                                IngestedElementOriginRatio = (TotalIngestedElementAmount * IngestedElementOriginRatio + ElementIngestionAmount) / (TotalIngestedElementAmount + ElementIngestionAmount);
+                                                TotalIngestedElementAmount += ElementIngestionAmount;
+
                                                 Element += ElementIngestionAmount;
                                                 targetAnimal.Element -= ElementIngestionAmount;
-
-                                                ElementOriginRatio = (ElementOriginRatio * Element + ElementIngestionAmount) / (Element + ElementIngestionAmount);
                                             }
                                         }
                                     }
@@ -246,8 +250,8 @@
                         }
                     }
 
-                    if (ElementOriginRatio < 0) ElementOriginRatio = 0;
-                    if (ElementOriginRatio > 1) ElementOriginRatio = 1;
+                    if (IngestedElementOriginRatio < 0) IngestedElementOriginRatio = 0;
+                    if (IngestedElementOriginRatio > 1) IngestedElementOriginRatio = 1;
                 }
             }
             else throw new InvalidOperationException("This animal is not initialized.");

@@ -106,9 +106,9 @@ namespace Paramecium.Engine
 
                     if (result.nodes[mutationTarget].IsInput || result.nodes[mutationTarget].IsHidden)
                     {
+                        List<int> connectionTargetIndexes = new List<int>();
                         for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
-                            List<int> connectionTargetIndexes = new List<int>();
                             int connectionTarget = random.Next(0, result.nodes.Count);
 
                             if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
@@ -180,14 +180,15 @@ namespace Paramecium.Engine
 
                     if (BrainNode.BrainNodeTypeIsOutput(prevBrainNodeType) && !result.nodes[mutationTarget].IsOutput)
                     {
+                        List<int> connectionTargetIndexes = new List<int>();
                         for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
-                            List<int> connectionTargetIndexes = new List<int>();
                             int connectionTarget = random.Next(0, result.nodes.Count);
 
                             if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
                             {
                                 result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
+                                connectionTargetIndexes.Add(connectionTarget);
                             }
 
                             if (random.NextDouble() < 0.5d) break;
@@ -197,11 +198,11 @@ namespace Paramecium.Engine
                     {
                         for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
-                            List<int> connectionTargetIndexes = new List<int>();
                             int connectionOrigin = random.Next(0, result.nodes.Count);
 
                             if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount)
                             {
+                                List<int> connectionTargetIndexes = new List<int>();
                                 for (int j = 0; j < result.nodes[connectionOrigin].Connections.Count; j++) connectionTargetIndexes.Add(result.nodes[connectionOrigin].Connections[j].TargetIndex);
 
                                 if (!connectionTargetIndexes.Contains(mutationTarget))

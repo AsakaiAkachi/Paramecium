@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.7] - 2024-10-03
+
+### Added
+- Added the ability to randomize the seed value and wall noise offset when editing soup settings.
+
+### Changed
+- Animals can now attack other animals if the sum of the inputs to `Output_Attack` type nodes is greater than or equal to 0 (previously the sum needed to be greater than or equal to 1).
+- The method for determining the diet of the animals was changed.
+
+### Fixed
+- Fixed a bug that could cause duplicate node connections when mutating animal brains.
+- 
+
 ## [0.5.6] - 2024-10-02
 
 ### Added

@@ -33,6 +33,7 @@ namespace Paramecium.Forms
             if (!isAllSettingsEditable)
             {
                 Input_InitialSeed.Enabled = false;
+                Randomize_InitialSeed.Enabled = false;
 
                 Input_SizeX.Enabled = false;
                 Input_SizeY.Enabled = false;
@@ -41,6 +42,7 @@ namespace Paramecium.Forms
                 Input_WallNoiseX.Enabled = false;
                 Input_WallNoiseY.Enabled = false;
                 Input_WallNoiseZ.Enabled = false;
+                Randomize_WallNoise.Enabled = false;
                 Input_WallNoiseScale.Enabled = false;
                 Input_WallNoiseOctave.Enabled = false;
                 Input_WallThickness.Enabled = false;
@@ -184,6 +186,7 @@ namespace Paramecium.Forms
                 Input_WallNoiseX.Enabled = true;
                 Input_WallNoiseY.Enabled = true;
                 Input_WallNoiseZ.Enabled = true;
+                Randomize_WallNoise.Enabled = true;
                 Input_WallNoiseScale.Enabled = true;
                 Input_WallNoiseOctave.Enabled = true;
                 Input_WallThickness.Enabled = true;
@@ -193,6 +196,7 @@ namespace Paramecium.Forms
                 Input_WallNoiseX.Enabled = false;
                 Input_WallNoiseY.Enabled = false;
                 Input_WallNoiseZ.Enabled = false;
+                Randomize_WallNoise.Enabled = false;
                 Input_WallNoiseScale.Enabled = false;
                 Input_WallNoiseOctave.Enabled = false;
                 Input_WallThickness.Enabled = false;
@@ -240,6 +244,18 @@ namespace Paramecium.Forms
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void Randomize_InitialSeed_Click(object sender, EventArgs e)
+        {
+            Input_InitialSeed.Value = new Random().Next(int.MinValue, int.MaxValue);
+        }
+
+        private void Randomize_WallNoise_Click(object sender, EventArgs e)
+        {
+            Input_WallNoiseX.Value = (decimal)(new Random().NextDouble() * 256d);
+            Input_WallNoiseY.Value = (decimal)(new Random().NextDouble() * 256d);
+            Input_WallNoiseZ.Value = (decimal)(new Random().NextDouble() * 256d);
         }
     }
 }
