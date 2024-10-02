@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.6] - 2024-10-02
+
+### Added
+- Animals now mutate their species ID regardless of whether they successfully mutated their brains when they mutate.
+
+### Changed
+- Changed some of the notations of the setting items in the `Soup Settings` window.
+- Animals now have tail lengths that vary slightly from individual to individual.
+
 ## [0.5.5] - 2024-10-02
 
 ### Added

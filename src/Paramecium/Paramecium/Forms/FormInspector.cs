@@ -14,6 +14,30 @@ namespace Paramecium.Forms
             RichTextBoxInspectResult.LanguageOption = RichTextBoxLanguageOptions.UIFonts;
         }
 
+        private async void FormInspector_Shown(object sender, EventArgs e)
+        {
+            while (true)
+            {
+                if (g_Soup is not null && g_Soup.Initialized)
+                {
+                    if (ComboBoxObjectType.SelectedIndex == 0)
+                    {
+                        NumericUpDownObjectIndex.Maximum = g_Soup.Tiles.Length - 1;
+                    }
+                    else if (ComboBoxObjectType.SelectedIndex == 1)
+                    {
+                        NumericUpDownObjectIndex.Maximum = g_Soup.Plants.Count - 1;
+                    }
+                    else if (ComboBoxObjectType.SelectedIndex == 2)
+                    {
+                        NumericUpDownObjectIndex.Maximum = g_Soup.Animals.Count - 1;
+                    }
+                }
+
+                await Task.Delay(1);
+            }
+        }
+
         public void Inspect(int objectType, int index)
         {
             if (g_Soup is null || !g_Soup.Initialized) return;
@@ -24,22 +48,25 @@ namespace Paramecium.Forms
                 {
                     RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Tiles[index], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                     ComboBoxObjectType.SelectedIndex = 0;
+                    NumericUpDownObjectIndex.Maximum = g_Soup.Tiles.Length - 1;
                 }
                 else if (objectType == 1)
                 {
                     RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Plants[index], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                     ComboBoxObjectType.SelectedIndex = 1;
+                    NumericUpDownObjectIndex.Maximum = g_Soup.Plants.Count - 1;
                 }
                 else if (objectType == 2)
                 {
                     RichTextBoxInspectResult.Text = JsonSerializer.Serialize(g_Soup.Animals[index], new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } });
                     ComboBoxObjectType.SelectedIndex = 2;
+                    NumericUpDownObjectIndex.Maximum = g_Soup.Animals.Count - 1;
                 }
                 NumericUpDownObjectIndex.Value = index;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex.Message);
 
                 MessageBox.Show(
                     $"Could not load object.\r\nWrong index or invalid object.",
@@ -49,11 +76,6 @@ namespace Paramecium.Forms
                     MessageBoxDefaultButton.Button1
                 );
             }
-        }
-
-        private void FormInspector_Shown(object sender, EventArgs e)
-        {
-
         }
 
         private void ButtonInspect_Click(object sender, EventArgs e)
@@ -135,20 +157,8 @@ namespace Paramecium.Forms
 
         private void ComboBoxObjectType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (g_Soup is null) return;
+            if (g_Soup is null || !g_Soup.Initialized) return;
 
-            if (ComboBoxObjectType.SelectedIndex == 0)
-            {
-                NumericUpDownObjectIndex.Maximum = g_Soup.Tiles.Length - 1;
-            }
-            else if (ComboBoxObjectType.SelectedIndex == 1)
-            {
-                NumericUpDownObjectIndex.Maximum = g_Soup.Plants.Count - 1;
-            }
-            else if (ComboBoxObjectType.SelectedIndex == 2)
-            {
-                NumericUpDownObjectIndex.Maximum = g_Soup.Animals.Count - 1;
-            }
             NumericUpDownObjectIndex.Value = 0;
         }
     }

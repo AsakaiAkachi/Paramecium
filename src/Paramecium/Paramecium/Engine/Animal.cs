@@ -102,19 +102,15 @@
             {
                 for (int i = 0; i < g_Soup.Settings.AnimalMaximumMutationCount; i++)
                 {
-                    bool mutationSuccessFlag;
-                    Brain = Brain.Mutate(Brain, random, out mutationSuccessFlag);
+                    Brain = Brain.Mutate(Brain, random);
 
-                    if (mutationSuccessFlag)
+                    if (random.NextDouble() < g_Soup.Settings.AnimalSpeciesIdMutationRate)
                     {
-                        if (random.NextDouble() < g_Soup.Settings.AnimalSpeciesIdMutationRate)
-                        {
-                            SpeciesId = random.NextInt64(0, 2176782335 + 1);
+                        SpeciesId = random.NextInt64(0, 2176782335 + 1);
 
-                            ColorRed = random.Next(0, 255 + 1);
-                            ColorGreen = random.Next(0, 255 + 1);
-                            ColorBlue = random.Next(0, 255 + 1);
-                        }
+                        ColorRed = random.Next(0, 255 + 1);
+                        ColorGreen = random.Next(0, 255 + 1);
+                        ColorBlue = random.Next(0, 255 + 1);
                     }
 
                     if (random.NextDouble() < 0.5d) break;
@@ -379,7 +375,7 @@
 
                 if (Age >= g_Soup.Settings.AnimalMaximumAge)
                 {
-                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].Element = Element;
+                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].Element += Element;
                     Element = 0;
                 }
 

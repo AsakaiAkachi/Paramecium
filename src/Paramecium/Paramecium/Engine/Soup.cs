@@ -53,6 +53,10 @@ namespace Paramecium.Engine
         // Animal
         public List<Animal> Animals { get; set; } = new List<Animal>();
         public List<int> AnimalUnusedIndexes { get; set; } = new List<int>();
+        
+        
+        
+        // public double GlobalElementAmountMultiplier;
 
 
 
@@ -267,7 +271,13 @@ namespace Paramecium.Engine
                                                 }
                                             }
                                         }
-                                        else if (targetTile1.Type == TileType.Wall && targetTile1.Element > 0) targetTile1.Element = 0;
+                                        else if (targetTile1.Type == TileType.Wall)
+                                        {
+                                            targetTile1.Element = 0;
+                                            targetTile1.PheromoneRed = 0;
+                                            targetTile1.PheromoneGreen = 0;
+                                            targetTile1.PheromoneBlue = 0;
+                                        }
                                     }
                                 });
                                 Parallel.For(0, Settings.SizeX, parallelOptions, x =>
@@ -299,8 +309,8 @@ namespace Paramecium.Engine
                                 for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) CurrentTotalElementAmount += Plants[i].Element;
                                 for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) CurrentTotalElementAmount += Animals[i].Element;
 
-                                //Console.WriteLine($"{CurrentTotalElementAmount} / {TotalElementAmount}");
                                 double GlobalElementAmountMultiplier = Settings.TotalElementAmount / CurrentTotalElementAmount;
+                                GlobalElementAmountMultiplier = Settings.TotalElementAmount / CurrentTotalElementAmount;
                                 Parallel.For(0, Settings.SizeX, parallelOptions, x =>
                                 {
                                     for (int y = 0; y < Settings.SizeY; y++)

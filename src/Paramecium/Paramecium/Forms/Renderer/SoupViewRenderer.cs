@@ -1,7 +1,6 @@
 ﻿using Paramecium.Engine;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using static Paramecium.Forms.Renderer.SoupViewDrawShape;
 using static Paramecium.Forms.Renderer.WorldPosViewPosConversion;
 
@@ -190,14 +189,15 @@ namespace Paramecium.Forms.Renderer
 
                                 if (cameraZoomLevel >= 5)
                                 {
-                                    Random tailAngleRandom = new Random((int)((targetAnimal.Id % int.MaxValue + g_Soup.ElapsedTimeSteps % int.MaxValue) % int.MaxValue));
+                                    Random tailAngleRandom = new Random((int)((targetAnimal.Id + targetAnimal.Age) % int.MaxValue));
+                                    Random tailLengthRandom = new Random((int)(targetAnimal.Id % int.MaxValue));
 
                                     for (int j = 0; j < 3; j++)
                                     {
                                         DrawLine(
                                             targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
                                             targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d,
-                                            targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.05d * targetAnimal.BrainOutput.Acceleration + double.Max(-1d, double.Min(1d, -targetAnimal.BrainOutput.Rotation)) * 0.15d) * 0.5d,
+                                            targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.05d * targetAnimal.BrainOutput.Acceleration + double.Max(-1d, double.Min(1d, -targetAnimal.BrainOutput.Rotation)) * 0.15d) * (0.4d + tailLengthRandom.NextDouble() * 0.2d),
                                             Color.FromArgb(255, 255, 255)
                                         );
                                     }
@@ -242,6 +242,11 @@ namespace Paramecium.Forms.Renderer
             if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
 
             OverlayInformationRenderer overlayInformationRenderer = new OverlayInformationRenderer(targetGraphics);
+
+            //overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+            //overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * double.Min(1d, double.Abs(g_Soup.GlobalElementAmountMultiplier - 1d) * 1000000d)), 16, Color.FromArgb(255, 128, 128, 128));
+            //overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"GlobalElementAmountMultiplier : {g_Soup.GlobalElementAmountMultiplier}", 0, 0, Color.FromArgb(255, 255, 255));
+            //overlayInformationRenderer.OffsetY += 16;
 
             if (selectedObjectType == SelectedObjectType.Tile)
             {

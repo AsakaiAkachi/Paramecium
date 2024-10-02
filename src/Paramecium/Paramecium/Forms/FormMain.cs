@@ -227,6 +227,8 @@ namespace Paramecium.Forms
                         {
                             FormInspector = new FormInspector();
                         }
+                        FormInspector.Show();
+                        FormInspector.Activate();
 
                         if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
                         {
@@ -240,9 +242,6 @@ namespace Paramecium.Forms
                         {
                             FormInspector.Inspect(2, SelectedObjectIndex);
                         }
-
-                        FormInspector.Show();
-                        FormInspector.Activate();
                     }
                     break;
             }
