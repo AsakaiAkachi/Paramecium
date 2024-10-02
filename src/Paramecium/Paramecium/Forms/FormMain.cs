@@ -483,7 +483,6 @@ namespace Paramecium.Forms
                                 {
                                     g_Soup.SetSoupState(SoupState.Pause);
                                     g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Wall;
-                                    g_Soup.Tiles[SelectedObjectIndex].Element = 0;
                                 }
                                 break;
                             default:
@@ -577,7 +576,6 @@ namespace Paramecium.Forms
                                 streamWriter1.Close();
 
                                 g_SoupFilePath = SaveFileDialog_SaveSoup.FileName;
-                                Text = $"{Path.GetFileName(g_SoupFilePath)} - {g_AppName} {g_AppVersion}";
                             }
                             else return;
                         }
@@ -652,7 +650,7 @@ namespace Paramecium.Forms
                 streamReader.Close();
 
                 g_SoupFilePath = OpenFileDialog_LoadSoup.FileName;
-                Text = $"{Path.GetFileName(g_SoupFilePath)} - {g_AppName} {g_AppVersion}";
+                SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_SoupFilePath)}";
 
                 CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
                 ZoomLevel = 0;
@@ -685,7 +683,7 @@ namespace Paramecium.Forms
                 streamWriter.Close();
 
                 g_SoupFilePath = SaveFileDialog_SaveSoup.FileName;
-                Text = $"{Path.GetFileName(g_SoupFilePath)} - {g_AppName} {g_AppVersion}";
+                SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_SoupFilePath)}";
             }
         }
 
@@ -726,7 +724,6 @@ namespace Paramecium.Forms
                             streamWriter.Close();
 
                             g_SoupFilePath = SaveFileDialog_SaveSoup.FileName;
-                            Text = $"{Path.GetFileName(g_SoupFilePath)} - {g_AppName} {g_AppVersion}";
                         }
                         else return;
                     }
@@ -743,6 +740,11 @@ namespace Paramecium.Forms
 
             g_Soup.SetSoupState(SoupState.Pause);
             new FormSoupSettings(g_Soup.Settings, false).ShowDialog(this);
+        }
+
+        private void TopMenu_Help_AboutParamecium_Click(object sender, EventArgs e)
+        {
+            new FormAbout().ShowDialog();
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)

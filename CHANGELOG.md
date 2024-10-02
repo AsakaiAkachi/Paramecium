@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.5] - 2024-10-02
+
+### Added
+- Added `About Paramecium` window.
+
+### Changed
+- Updated `README.md`.
+
+### Fixed
+- Fixed a bug that could cause the file name in the `Save As` dialog to be the wrong value.
+
 ## [0.5.4] - 2024-10-02
 
 ### Added
@@ -20,6 +31,9 @@
 
 ### Added
 - Added the ability to import and export soup settings.
+
+### Changed
+- Updated `README.md`.
 
 ## [0.5.1] - 2024-10-02
 

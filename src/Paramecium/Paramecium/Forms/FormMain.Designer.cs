@@ -37,6 +37,8 @@
             TopMenu_File_SaveAs = new ToolStripMenuItem();
             TopMenu_File_Separator1 = new ToolStripSeparator();
             TopMenu_File_Exit = new ToolStripMenuItem();
+            TopMenu_Soup = new ToolStripMenuItem();
+            TopMenu_Soup_EditSettings = new ToolStripMenuItem();
             BottomStat = new StatusStrip();
             BottomStat_SoupState = new ToolStripStatusLabel();
             BottomStat_ElapsedTimeSteps = new ToolStripStatusLabel();
@@ -48,8 +50,8 @@
             SoupView = new PictureBox();
             SaveFileDialog_SaveSoup = new SaveFileDialog();
             OpenFileDialog_LoadSoup = new OpenFileDialog();
-            TopMenu_Soup = new ToolStripMenuItem();
-            TopMenu_Soup_EditSettings = new ToolStripMenuItem();
+            TopMenu_Help = new ToolStripMenuItem();
+            TopMenu_Help_AboutParamecium = new ToolStripMenuItem();
             TopMenu.SuspendLayout();
             BottomStat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SoupView).BeginInit();
@@ -57,7 +59,7 @@
             // 
             // TopMenu
             // 
-            TopMenu.Items.AddRange(new ToolStripItem[] { TopMenu_File, TopMenu_Soup });
+            TopMenu.Items.AddRange(new ToolStripItem[] { TopMenu_File, TopMenu_Soup, TopMenu_Help });
             TopMenu.Location = new Point(0, 0);
             TopMenu.Name = "TopMenu";
             TopMenu.Size = new Size(1200, 24);
@@ -74,42 +76,56 @@
             // TopMenu_File_New
             // 
             TopMenu_File_New.Name = "TopMenu_File_New";
-            TopMenu_File_New.Size = new Size(180, 22);
+            TopMenu_File_New.Size = new Size(123, 22);
             TopMenu_File_New.Text = "New";
             TopMenu_File_New.Click += TopMenu_File_New_Click;
             // 
             // TopMenu_File_Open
             // 
             TopMenu_File_Open.Name = "TopMenu_File_Open";
-            TopMenu_File_Open.Size = new Size(180, 22);
+            TopMenu_File_Open.Size = new Size(123, 22);
             TopMenu_File_Open.Text = "Open...";
             TopMenu_File_Open.Click += TopMenu_File_Open_Click;
             // 
             // TopMenu_File_Save
             // 
             TopMenu_File_Save.Name = "TopMenu_File_Save";
-            TopMenu_File_Save.Size = new Size(180, 22);
+            TopMenu_File_Save.Size = new Size(123, 22);
             TopMenu_File_Save.Text = "Save";
             TopMenu_File_Save.Click += TopMenu_File_Save_Click;
             // 
             // TopMenu_File_SaveAs
             // 
             TopMenu_File_SaveAs.Name = "TopMenu_File_SaveAs";
-            TopMenu_File_SaveAs.Size = new Size(180, 22);
+            TopMenu_File_SaveAs.Size = new Size(123, 22);
             TopMenu_File_SaveAs.Text = "Save As...";
             TopMenu_File_SaveAs.Click += TopMenu_File_SaveAs_Click;
             // 
             // TopMenu_File_Separator1
             // 
             TopMenu_File_Separator1.Name = "TopMenu_File_Separator1";
-            TopMenu_File_Separator1.Size = new Size(177, 6);
+            TopMenu_File_Separator1.Size = new Size(120, 6);
             // 
             // TopMenu_File_Exit
             // 
             TopMenu_File_Exit.Name = "TopMenu_File_Exit";
-            TopMenu_File_Exit.Size = new Size(180, 22);
+            TopMenu_File_Exit.Size = new Size(123, 22);
             TopMenu_File_Exit.Text = "Exit";
             TopMenu_File_Exit.Click += TopMenu_File_Exit_Click;
+            // 
+            // TopMenu_Soup
+            // 
+            TopMenu_Soup.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Soup_EditSettings });
+            TopMenu_Soup.Name = "TopMenu_Soup";
+            TopMenu_Soup.Size = new Size(46, 20);
+            TopMenu_Soup.Text = "Soup";
+            // 
+            // TopMenu_Soup_EditSettings
+            // 
+            TopMenu_Soup_EditSettings.Name = "TopMenu_Soup_EditSettings";
+            TopMenu_Soup_EditSettings.Size = new Size(139, 22);
+            TopMenu_Soup_EditSettings.Text = "Edit Settings";
+            TopMenu_Soup_EditSettings.Click += TopMenu_Soup_EditSettings_Click;
             // 
             // BottomStat
             // 
@@ -191,19 +207,19 @@
             OpenFileDialog_LoadSoup.Filter = "Paramecium Soup File|*.soup|All Files|*.*";
             OpenFileDialog_LoadSoup.Title = "Open";
             // 
-            // TopMenu_Soup
+            // TopMenu_Help
             // 
-            TopMenu_Soup.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Soup_EditSettings });
-            TopMenu_Soup.Name = "TopMenu_Soup";
-            TopMenu_Soup.Size = new Size(46, 20);
-            TopMenu_Soup.Text = "Soup";
+            TopMenu_Help.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Help_AboutParamecium });
+            TopMenu_Help.Name = "TopMenu_Help";
+            TopMenu_Help.Size = new Size(44, 20);
+            TopMenu_Help.Text = "Help";
             // 
-            // TopMenu_Soup_EditSettings
+            // TopMenu_Help_AboutParamecium
             // 
-            TopMenu_Soup_EditSettings.Name = "TopMenu_Soup_EditSettings";
-            TopMenu_Soup_EditSettings.Size = new Size(180, 22);
-            TopMenu_Soup_EditSettings.Text = "Edit Settings";
-            TopMenu_Soup_EditSettings.Click += TopMenu_Soup_EditSettings_Click;
+            TopMenu_Help_AboutParamecium.Name = "TopMenu_Help_AboutParamecium";
+            TopMenu_Help_AboutParamecium.Size = new Size(180, 22);
+            TopMenu_Help_AboutParamecium.Text = "About Paramecium";
+            TopMenu_Help_AboutParamecium.Click += TopMenu_Help_AboutParamecium_Click;
             // 
             // FormMain
             // 
@@ -252,5 +268,7 @@
         private ToolStripStatusLabel BottomStat_LatestGeneration;
         private ToolStripMenuItem TopMenu_Soup;
         private ToolStripMenuItem TopMenu_Soup_EditSettings;
+        private ToolStripMenuItem TopMenu_Help;
+        private ToolStripMenuItem TopMenu_Help_AboutParamecium;
     }
 }

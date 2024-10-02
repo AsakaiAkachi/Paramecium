@@ -1,6 +1,7 @@
 ﻿using Paramecium.Engine;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using static Paramecium.Forms.Renderer.SoupViewDrawShape;
 using static Paramecium.Forms.Renderer.WorldPosViewPosConversion;
 
@@ -45,7 +46,7 @@ namespace Paramecium.Forms.Renderer
             {
                 for (int y = 0; y < g_Soup.Settings.SizeY; y++)
                 {
-                    Color pixelColor = Color.FromArgb(0, 0, 0);
+                    Color pixelColor = Color.FromArgb(0, 0, 32);
 
                     Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
@@ -240,11 +241,11 @@ namespace Paramecium.Forms.Renderer
         {
             if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
 
+            OverlayInformationRenderer overlayInformationRenderer = new OverlayInformationRenderer(targetGraphics);
+
             if (selectedObjectType == SelectedObjectType.Tile)
             {
                 Tile target = g_Soup.Tiles[selectedObjectIndex];
-
-                OverlayInformationRenderer overlayInformationRenderer = new OverlayInformationRenderer(targetGraphics);
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Tile #{selectedObjectIndex}", 0, 0, Color.FromArgb(255, 255, 255));
@@ -294,8 +295,6 @@ namespace Paramecium.Forms.Renderer
                     targetId /= 36;
                 }
 
-                OverlayInformationRenderer overlayInformationRenderer = new OverlayInformationRenderer(targetGraphics);
-
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Plant #{targetIdString}", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
@@ -336,8 +335,6 @@ namespace Paramecium.Forms.Renderer
                     targetSpecieIdString = chars[(int)(targetSpecieId % 36)] + targetSpecieIdString;
                     targetSpecieId /= 36;
                 }
-
-                OverlayInformationRenderer overlayInformationRenderer = new OverlayInformationRenderer(targetGraphics);
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Animal #{targetIdString}", 0, 0, Color.FromArgb(255, 255, 255));
@@ -399,7 +396,6 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OffsetY = 0;
-
                 overlayInformationRenderer.OffsetX += 300;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 500, 420, Color.FromArgb(128, 64, 64, 64));
@@ -589,43 +585,6 @@ namespace Paramecium.Forms.Renderer
                         break;
                     }
                 }
-
-                /**
-                overlayInformationRenderer.OffsetX += 400;
-                overlayInformationRenderer.OffsetY = 0;
-
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"WallAvgAngle : {target.BrainInput.VisionData.WallAvgAngle.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"WallProximity : {target.BrainInput.VisionData.WallProximity.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"PlantAvgAngle : {target.BrainInput.VisionData.PlantAvgAngle.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"PlantProximity : {target.BrainInput.VisionData.PlantProximity.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"AnimalSameSpeciesAvgAngle : {target.BrainInput.VisionData.AnimalSameSpeciesAvgAngle.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"AnimalSameSpeciesProximity : {target.BrainInput.VisionData.AnimalSameSpeciesProximity.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"AnimalOtherSpeciesAvgAngle : {target.BrainInput.VisionData.AnimalOtherSpeciesAvgAngle.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"AnimalOtherSpeciesProximity : {target.BrainInput.VisionData.AnimalOtherSpeciesProximity.ToString("0.000")}", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-                **/
             }
         }
 

@@ -32,6 +32,24 @@ Every animal has a neural network (called simply “brain” in Paramecium) to d
 <!-- エレメントは、Parameciumにおいてすべての生物が必要とする栄養素です。スープ全体でのエレメントの量は常に一定であり、増減することはありません。動物はエレメントを消費しますが、消費されたエレメントは消滅するのではなくタイルに放出され、植物が成長のためにそのエレメントを再び使えるようになります。また、エレメントは量が多いタイルから少ないタイルへとゆっくりと流れる性質があります。 -->
 Elements are nutrients needed by all organisms in Paramecium. The amount of elements throughout the soup is always constant and does not increase or decrease. Animals consume elements, but the consumed elements are not extinguished but released into the tiles so that plants can use them again for growth. Also, the elements have a tendency to flow slowly from tiles with higher quantities to tiles with lower quantities.
 
+## Key Binding
+
+- `Space`: Run/Pause Simulation
+- `Period`: Increase the number of threads by 1
+- `Comma`: Decrease the number of threads by 1
+- `Question Mark`: Advance the simulation by one step
+- `T`: Make the camera follow the selected object
+- `Crtl + T`: Enables auto-tracking of the camera
+- `C`: Reset the camera position
+- `Left Click`: Select an object
+- `Right Drag`: Move the camera
+- `Crtl + Left Click / Mouse Wheel Up`: Zoom in
+- `Crtl + Right Click / Mouse Wheel Down`: Zoom out
+- `Shift + Left Drag`: Move selected objects
+- `Alt + Left Drag`: Create wall
+- `Alt + Right Drag`: Delete Wall
+- `Crtl + D`: Open Object Inspector **(WARNING: FOR ADVANCED USER FEATURE)**
+
 ## Requirements
 
 <!-- ParameciumはWindows 11で開発されているため、それ以外でのOSの動作は保証されません。 -->
@@ -43,4 +61,4 @@ There are no minimum CPU or GPU requirements, but high-performance CPUs may be n
 ## Others
 
 <!-- - このプロジェクトの製作者は英語圏の人ではなく(日本人です)、英語を読み書きできないため、READNE.mdなどを書くのにはDeelL翻訳などを使用しています。そのため、文章が一部間違っている可能性があります。 -->
-The creator of this project is not an English speaker ( I'm Japanese) and cannot read or write English, so I use DeelL translation, etc. to write `README.md` and other documents. Therefore, some sentences may be incorrect.
+The creator of this project is not an English speaker (I'm Japanese) and cannot read or write English, so I use DeelL translation, etc. to write `README.md` and other documents. Therefore, some sentences may be incorrect.
