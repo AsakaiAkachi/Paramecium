@@ -171,77 +171,107 @@
 
             if (Initialized)
             {
+                int soupSizeX = g_Soup.Settings.SizeX;
+                int soupSizeY = g_Soup.Settings.SizeY;
+
                 Velocity += Double2d.FromAngle(Angle) * double.Max(-1d, double.Min(1d, BrainOutput.Acceleration)) * g_Soup.Settings.MaximumVelocity * g_Soup.Settings.Drag;
                 AngularVelocity += double.Max(-1d, double.Min(1d, BrainOutput.Rotation)) * g_Soup.Settings.MaximumAngularVelocity * g_Soup.Settings.AngularVelocityDrag;
 
                 if (BrainOutput.PheromoneRed > 0)
                 {
-                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX];
+                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX];
                     targetTile.PheromoneRed += double.Min(1d, BrainOutput.PheromoneRed) * g_Soup.Settings.PheromoneProductionRate;
                 }
                 if (BrainOutput.PheromoneGreen > 0)
                 {
-                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX];
+                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX];
                     targetTile.PheromoneGreen += double.Min(1d, BrainOutput.PheromoneGreen) * g_Soup.Settings.PheromoneProductionRate;
                 }
                 if (BrainOutput.PheromoneBlue > 0)
                 {
-                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX];
+                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX];
                     targetTile.PheromoneBlue += double.Min(1d, BrainOutput.PheromoneBlue) * g_Soup.Settings.PheromoneProductionRate;
                 }
 
-                if (BrainOutput.Attack > 0)
+                for (int x = int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX - 2)); x <= int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX + 2)); x++)
                 {
-                    for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX - 2)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX + 2)); x++)
+                    for (int y = int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY - 2)); y <= int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY + 2)); y++)
                     {
-                        for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY - 2)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY + 2)); y++)
-                        {
-                            Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
+                        Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
 
-                            if (targetTile.LocalPlantPopulation > 0)
+                        if (targetTile.LocalPlantPopulation > 0)
+                        {
+                            for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
                             {
-                                for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
+                                Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
+                                if (targetPlant.Exist)
                                 {
-                                    Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
-                                    if (targetPlant.Exist)
+                                    if (Double2d.DistanceSquared(Position, targetPlant.Position) < (Radius + targetPlant.Radius + 0.1) * (Radius + targetPlant.Radius + 0.1))
                                     {
-                                        if (Double2d.DistanceSquared(Position, targetPlant.Position) < (Radius + targetPlant.Radius + 0.1) * (Radius + targetPlant.Radius + 0.1))
+                                        if (BrainOutput.Attack > 0d)
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - Position, -Angle))) < 0.167d)
                                             {
+                                                /**
                                                 double IngestionEfficiency = 1d - Diet * 0.9d;
                                                 double ElementIngestionAmount = double.Min(targetPlant.Element, g_Soup.Settings.AnimalPlantIngestionRate * IngestionEfficiency);
 
                                                 IngestedElementOriginRatio = (TotalIngestedElementAmount * IngestedElementOriginRatio) / (TotalIngestedElementAmount + ElementIngestionAmount);
                                                 TotalIngestedElementAmount += ElementIngestionAmount;
 
-                                                Element += ElementIngestionAmount;
+                                                Element += ElementIngestionAmount * g_Soup.ElementAmountMultiplier;
                                                 targetPlant.Element -= ElementIngestionAmount;
+                                                **/
+
+                                                double ElementMoveAmount = double.Min(targetPlant.Element, g_Soup.Settings.AnimalPlantIngestionRate);
+
+                                                Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
+                                                targetPlant.Element -= ElementMoveAmount;
                                             }
                                         }
                                     }
                                 }
                             }
+                        }
 
-                            if (targetTile.LocalAnimalPopulation > 0)// && BrainOutput.Attack >= 1)
+                        if (targetTile.LocalAnimalPopulation > 0)// && BrainOutput.Attack >= 1)
+                        {
+                            for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
                             {
-                                for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
+                                Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
+                                if (targetAnimal.Exist && targetAnimal.Id != Id)
                                 {
-                                    Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
-                                    if (targetAnimal.Exist && targetAnimal.Id != Id && targetAnimal.SpeciesId != SpeciesId)
+                                    if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius + 0.1) * (Radius + targetAnimal.Radius + 0.1))
                                     {
-                                        if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius + 0.1) * (Radius + targetAnimal.Radius + 0.1))
+                                        if (BrainOutput.Attack > 0d && targetAnimal.SpeciesId != SpeciesId)
                                         {
                                             if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle))) < 0.167d)
                                             {
+                                                /**
                                                 double IngestionEfficiency = 0.333d + (0.667d * Diet);
                                                 double ElementIngestionAmount = double.Min(targetAnimal.Element, g_Soup.Settings.AnimalAnimalIngestionRate * IngestionEfficiency);
 
                                                 IngestedElementOriginRatio = (TotalIngestedElementAmount * IngestedElementOriginRatio + ElementIngestionAmount) / (TotalIngestedElementAmount + ElementIngestionAmount);
                                                 TotalIngestedElementAmount += ElementIngestionAmount;
 
-                                                Element += ElementIngestionAmount;
+                                                Element += ElementIngestionAmount * g_Soup.ElementAmountMultiplier;
                                                 targetAnimal.Element -= ElementIngestionAmount;
+                                                **/
+
+                                                double ElementMoveAmount = double.Min(targetAnimal.Element, g_Soup.Settings.AnimalAnimalIngestionRate);
+
+                                                Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
+                                                targetAnimal.Element -= ElementMoveAmount;
+                                            }
+                                        }
+                                        else if (BrainOutput.ShareElement > 0d && targetAnimal.SpeciesId == SpeciesId)
+                                        {
+                                            double ElementMoveAmount = (Element - targetAnimal.Element) * 0.1d;
+
+                                            if (ElementMoveAmount > 0d)
+                                            {
+                                                Element -= ElementMoveAmount;
+                                                targetAnimal.Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
                                             }
                                         }
                                     }
@@ -249,10 +279,10 @@
                             }
                         }
                     }
-
-                    if (IngestedElementOriginRatio < 0) IngestedElementOriginRatio = 0;
-                    if (IngestedElementOriginRatio > 1) IngestedElementOriginRatio = 1;
                 }
+
+                //if (IngestedElementOriginRatio < 0) IngestedElementOriginRatio = 0;
+                //if (IngestedElementOriginRatio > 1) IngestedElementOriginRatio = 1;
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }
@@ -263,11 +293,14 @@
 
             if (Initialized)
             {
-                for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX + 1)); x++)
+                int soupSizeX = g_Soup.Settings.SizeX;
+                int soupSizeY = g_Soup.Settings.SizeY;
+
+                for (int x = int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX + 1)); x++)
                 {
-                    for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY + 1)); y++)
+                    for (int y = int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY + 1)); y++)
                     {
-                        Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
+                        Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
 
                         if (targetTile.Type == TileType.Wall)
                         {
@@ -317,6 +350,9 @@
 
             if (Initialized)
             {
+                int soupSizeX = g_Soup.Settings.SizeX;
+                int soupSizeY = g_Soup.Settings.SizeY;
+
                 if (Velocity.LengthSquared > g_Soup.Settings.MaximumVelocity * g_Soup.Settings.MaximumVelocity)
                 {
                     Velocity /= Velocity.Length / g_Soup.Settings.MaximumVelocity;
@@ -328,9 +364,9 @@
                     Position = new Double2d(0 + Radius, Position.Y);
                     Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
                 }
-                if (Position.X > g_Soup.Settings.SizeX - Radius)
+                if (Position.X > soupSizeX - Radius)
                 {
-                    Position = new Double2d(g_Soup.Settings.SizeX - Radius, Position.Y);
+                    Position = new Double2d(soupSizeX - Radius, Position.Y);
                     Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
                 }
                 if (Position.Y < Radius)
@@ -338,9 +374,9 @@
                     Position = new Double2d(Position.X, Radius);
                     Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
                 }
-                if (Position.Y > g_Soup.Settings.SizeY - Radius)
+                if (Position.Y > soupSizeY - Radius)
                 {
-                    Position = new Double2d(Position.X, g_Soup.Settings.SizeY - Radius);
+                    Position = new Double2d(Position.X, soupSizeY - Radius);
                     Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
                 }
 
@@ -353,14 +389,14 @@
                 if (Angle < -0.5) Angle += 1;
                 if (Angle > 0.5) Angle -= 1;
 
-                if (int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X))) != IntegerizedPositionX || int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y))) != IntegerizedPositionY)
+                if (int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(Position.X))) != IntegerizedPositionX || int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(Position.Y))) != IntegerizedPositionY)
                 {
-                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalAnimalIndexes.Remove(Index);
+                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalAnimalIndexes.Remove(Index);
 
-                    IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
-                    IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
+                    IntegerizedPositionX = int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(Position.X)));
+                    IntegerizedPositionY = int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(Position.Y)));
 
-                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalAnimalIndexes.Add(Index);
+                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalAnimalIndexes.Add(Index);
                 }
 
                 CurrentStepElementCost = double.Min(Element,
@@ -371,20 +407,20 @@
                     (g_Soup.Settings.AnimalElementPheromoneProductionCost * (double.Max(0d, double.Min(1d, BrainOutput.PheromoneRed)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneGreen)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneBlue))))
                 );
 
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].Element += CurrentStepElementCost;
+                g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Element += CurrentStepElementCost * g_Soup.ElementAmountMultiplier;
                 Element -= CurrentStepElementCost;
 
                 Radius = 0.5;
                 Mass = 16 + Element;
 
-                if (Age >= g_Soup.Settings.AnimalMaximumAge)
-                {
-                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].Element += Element;
-                    Element = 0;
-                }
-
                 if (Element <= 0) OnDisable();
-                if (g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
+                else if (g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
+                else if (Age >= g_Soup.Settings.AnimalMaximumAge)
+                {
+                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Element += Element * g_Soup.ElementAmountMultiplier;
+                    Element = 0;
+                    OnDisable();
+                }
 
                 Age++;
             }

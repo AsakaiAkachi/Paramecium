@@ -32,9 +32,9 @@ namespace Paramecium.Forms
             SoupView.MouseWheel += SoupView_MouseWheel;
 
             Text = $"{g_AppName} {g_AppVersion}";
-            OpenFileDialog_LoadSoup.InitialDirectory = $"{Path.GetDirectoryName(g_SoupFilePath)}";
-            SaveFileDialog_SaveSoup.InitialDirectory = $"{Path.GetDirectoryName(g_SoupFilePath)}";
-            SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_SoupFilePath)}";
+            OpenFileDialog_LoadSoup.InitialDirectory = $"{g_SoupDefaultFilePath}";
+            SaveFileDialog_SaveSoup.InitialDirectory = $"{g_SoupDefaultFilePath}";
+            SaveFileDialog_SaveSoup.FileName = $"{g_SoupDefaultFileName}";
 
             SoupViewCanvas = new Bitmap(1, 1);
 
@@ -55,8 +55,8 @@ namespace Paramecium.Forms
 
                     TopMenu_Soup.Enabled = true;
 
-                    if (!g_Soup.Modified) Text = $"{Path.GetFileName(g_SoupFilePath)} - {g_AppName} {g_AppVersion}";
-                    else Text = $"*{Path.GetFileName(g_SoupFilePath)} - {g_AppName} {g_AppVersion}";
+                    if (!g_Soup.Modified) Text = $"{Path.GetFileName(g_Soup.FilePath)} - {g_AppName} {g_AppVersion}";
+                    else Text = $"*{Path.GetFileName(g_Soup.FilePath)} - {g_AppName} {g_AppVersion}";
                 }
                 else
                 {
@@ -545,7 +545,7 @@ namespace Paramecium.Forms
                 if (g_Soup.Modified)
                 {
                     DialogResult result = MessageBox.Show(
-                        $"Save changes to {Path.GetFileName(g_SoupFilePath)}?",
+                        $"Save changes to {Path.GetFileName(g_Soup.FilePath)}?",
                         $"{g_AppName}",
                         MessageBoxButtons.YesNoCancel,
                         MessageBoxIcon.Exclamation,
@@ -554,27 +554,15 @@ namespace Paramecium.Forms
 
                     if (result == DialogResult.Yes)
                     {
-                        if (File.Exists(g_SoupFilePath))
+                        if (File.Exists(g_Soup.FilePath))
                         {
-                            g_Soup.SetSoupState(SoupState.Pause);
-                            g_Soup.Modified = false;
-
-                            StreamWriter streamWriter1 = new StreamWriter(g_SoupFilePath, false, Encoding.UTF8);
-                            streamWriter1.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                            streamWriter1.Close();
+                            g_Soup.SaveSoup();
                         }
                         else
                         {
                             if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
                             {
-                                g_Soup.SetSoupState(SoupState.Pause);
-                                g_Soup.Modified = false;
-
-                                StreamWriter streamWriter1 = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
-                                streamWriter1.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                                streamWriter1.Close();
-
-                                g_SoupFilePath = SaveFileDialog_SaveSoup.FileName;
+                                g_Soup.SaveSoup(SaveFileDialog_SaveSoup.FileName, true);
                             }
                             else return;
                         }
@@ -584,7 +572,8 @@ namespace Paramecium.Forms
             }
 
             new FormCreateNewSoup().ShowDialog(this);
-            SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_SoupFilePath)}";
+            SaveFileDialog_SaveSoup.InitialDirectory = $"{g_SoupDefaultFilePath}";
+            SaveFileDialog_SaveSoup.FileName = $"{g_SoupDefaultFileName}";
         }
 
         private void TopMenu_File_Open_Click(object sender, EventArgs e)
@@ -596,7 +585,7 @@ namespace Paramecium.Forms
                     if (g_Soup.Modified)
                     {
                         DialogResult result = MessageBox.Show(
-                            $"Save changes to {Path.GetFileName(g_SoupFilePath)}?",
+                            $"Save changes to {Path.GetFileName(g_Soup.FilePath)}?",
                             $"{g_AppName}",
                             MessageBoxButtons.YesNoCancel,
                             MessageBoxIcon.Exclamation,
@@ -605,28 +594,15 @@ namespace Paramecium.Forms
 
                         if (result == DialogResult.Yes)
                         {
-                            if (File.Exists(g_SoupFilePath))
+                            if (File.Exists(g_Soup.FilePath))
                             {
-                                g_Soup.SetSoupState(SoupState.Pause);
-                                g_Soup.Modified = false;
-
-                                StreamWriter streamWriter1 = new StreamWriter(g_SoupFilePath, false, Encoding.UTF8);
-                                streamWriter1.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                                streamWriter1.Close();
+                                g_Soup.SaveSoup();
                             }
                             else
                             {
                                 if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
                                 {
-                                    g_Soup.SetSoupState(SoupState.Pause);
-                                    g_Soup.Modified = false;
-
-                                    StreamWriter streamWriter1 = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
-                                    streamWriter1.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                                    streamWriter1.Close();
-
-                                    g_SoupFilePath = SaveFileDialog_SaveSoup.FileName;
-                                    Text = $"{Path.GetFileName(g_SoupFilePath)} - {g_AppName} {g_AppVersion}";
+                                    g_Soup.SaveSoup(SaveFileDialog_SaveSoup.FileName, true);
                                 }
                                 else return;
                             }
@@ -642,17 +618,16 @@ namespace Paramecium.Forms
                 {
                     g_Soup = loadedSoup;
                     if (!g_Soup.Initialized) g_Soup.InitializeSoup();
+                    g_Soup.FilePath = OpenFileDialog_LoadSoup.FileName;
                     g_Soup.StartSoupThread();
+
+                    SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_Soup.FilePath)}";
+
+                    CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
+                    ZoomLevel = 0;
                 }
-                else return;
 
                 streamReader.Close();
-
-                g_SoupFilePath = OpenFileDialog_LoadSoup.FileName;
-                SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_SoupFilePath)}";
-
-                CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
-                ZoomLevel = 0;
             }
         }
 
@@ -660,12 +635,18 @@ namespace Paramecium.Forms
         {
             if (g_Soup is null || !g_Soup.Initialized) return;
 
-            g_Soup.SetSoupState(SoupState.Pause);
-            g_Soup.Modified = false;
-
-            StreamWriter streamWriter = new StreamWriter(g_SoupFilePath, false, Encoding.UTF8);
-            streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-            streamWriter.Close();
+            if (File.Exists(g_Soup.FilePath))
+            {
+                g_Soup.SaveSoup();
+            }
+            else
+            {
+                if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
+                {
+                    g_Soup.SaveSoup(SaveFileDialog_SaveSoup.FileName, true);
+                }
+                else return;
+            }
         }
 
         private void TopMenu_File_SaveAs_Click(object sender, EventArgs e)
@@ -674,15 +655,8 @@ namespace Paramecium.Forms
 
             if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
             {
-                g_Soup.SetSoupState(SoupState.Pause);
-                g_Soup.Modified = false;
-
-                StreamWriter streamWriter = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
-                streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                streamWriter.Close();
-
-                g_SoupFilePath = SaveFileDialog_SaveSoup.FileName;
-                SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_SoupFilePath)}";
+                g_Soup.SaveSoup(SaveFileDialog_SaveSoup.FileName, true);
+                SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_Soup.FilePath)}";
             }
         }
 
@@ -693,7 +667,7 @@ namespace Paramecium.Forms
             if (g_Soup.Modified)
             {
                 DialogResult result = MessageBox.Show(
-                    $"Save changes to {Path.GetFileName(g_SoupFilePath)}?",
+                    $"Save changes to {Path.GetFileName(g_Soup.FilePath)}?",
                     $"{g_AppName}",
                     MessageBoxButtons.YesNoCancel,
                     MessageBoxIcon.Exclamation,
@@ -702,27 +676,15 @@ namespace Paramecium.Forms
 
                 if (result == DialogResult.Yes)
                 {
-                    if (File.Exists(g_SoupFilePath))
+                    if (File.Exists(g_Soup.FilePath))
                     {
-                        g_Soup.SetSoupState(SoupState.Pause);
-                        g_Soup.Modified = false;
-
-                        StreamWriter streamWriter = new StreamWriter(g_SoupFilePath, false, Encoding.UTF8);
-                        streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                        streamWriter.Close();
+                        g_Soup.SaveSoup();
                     }
                     else
                     {
                         if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
                         {
-                            g_Soup.SetSoupState(SoupState.Pause);
-                            g_Soup.Modified = false;
-
-                            StreamWriter streamWriter = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
-                            streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                            streamWriter.Close();
-
-                            g_SoupFilePath = SaveFileDialog_SaveSoup.FileName;
+                            g_Soup.SaveSoup(SaveFileDialog_SaveSoup.FileName, true);
                         }
                         else return;
                     }
@@ -733,12 +695,20 @@ namespace Paramecium.Forms
             Application.Exit();
         }
 
-        private void TopMenu_Soup_EditSettings_Click(object sender, EventArgs e)
+        private void TopMenu_Soup_EditSoupSettings_Click(object sender, EventArgs e)
         {
             if (g_Soup is null || !g_Soup.Initialized) return;
 
             g_Soup.SetSoupState(SoupState.Pause);
             new FormSoupSettings(g_Soup.Settings, false).ShowDialog(this);
+        }
+
+        private void TopMenuBar_Soup_EditAutosaveSettings_Click(object sender, EventArgs e)
+        {
+            if (g_Soup is null || !g_Soup.Initialized) return;
+
+            g_Soup.SetSoupState(SoupState.Pause);
+            new FormAutosaveSettings().ShowDialog();
         }
 
         private void TopMenu_Help_AboutParamecium_Click(object sender, EventArgs e)
@@ -753,7 +723,7 @@ namespace Paramecium.Forms
             if (g_Soup.Modified)
             {
                 DialogResult result = MessageBox.Show(
-                    $"Save changes to {Path.GetFileName(g_SoupFilePath)}?",
+                    $"Save changes to {Path.GetFileName(g_Soup.FilePath)}?",
                     $"{g_AppName}",
                     MessageBoxButtons.YesNoCancel,
                     MessageBoxIcon.Exclamation,
@@ -762,28 +732,15 @@ namespace Paramecium.Forms
 
                 if (result == DialogResult.Yes)
                 {
-                    if (File.Exists(g_SoupFilePath))
+                    if (File.Exists(g_Soup.FilePath))
                     {
-                        g_Soup.SetSoupState(SoupState.Pause);
-                        g_Soup.Modified = false;
-
-                        StreamWriter streamWriter = new StreamWriter(g_SoupFilePath, false, Encoding.UTF8);
-                        streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                        streamWriter.Close();
+                        g_Soup.SaveSoup();
                     }
                     else
                     {
                         if (SaveFileDialog_SaveSoup.ShowDialog() == DialogResult.OK)
                         {
-                            g_Soup.SetSoupState(SoupState.Pause);
-                            g_Soup.Modified = false;
-
-                            StreamWriter streamWriter = new StreamWriter(SaveFileDialog_SaveSoup.FileName, false, Encoding.UTF8);
-                            streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
-                            streamWriter.Close();
-
-                            g_SoupFilePath = SaveFileDialog_SaveSoup.FileName;
-                            Text = $"{Path.GetFileName(g_SoupFilePath)} - {g_AppName} {g_AppVersion}";
+                            g_Soup.SaveSoup(SaveFileDialog_SaveSoup.FileName, true);
                         }
                         else e.Cancel = true;
                     }

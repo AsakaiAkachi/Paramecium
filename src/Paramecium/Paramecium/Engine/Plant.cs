@@ -64,8 +64,10 @@
 
                 if (targetTile.Element > 0)
                 {
-                    Element += targetTile.Element * g_Soup.Settings.PlantElementCollectRate;
-                    targetTile.Element -= targetTile.Element * g_Soup.Settings.PlantElementCollectRate;
+                    double ElementMoveAmount = targetTile.Element * g_Soup.Settings.PlantElementCollectRate;
+
+                    Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
+                    targetTile.Element -= ElementMoveAmount;
 
                     if (targetTile.Element < 0) targetTile.Element = 0;
                 }
@@ -79,11 +81,14 @@
 
             if (Initialized)
             {
-                for (int x = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, IntegerizedPositionX + 1)); x++)
+                int soupSizeX = g_Soup.Settings.SizeX;
+                int soupSizeY = g_Soup.Settings.SizeY;
+
+                for (int x = int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX + 1)); x++)
                 {
-                    for (int y = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, IntegerizedPositionY + 1)); y++)
+                    for (int y = int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY + 1)); y++)
                     {
-                        Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
+                        Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
 
                         if (targetTile.Type == TileType.Wall)
                         {
@@ -133,6 +138,9 @@
 
             if (Initialized)
             {
+                int soupSizeX = g_Soup.Settings.SizeX;
+                int soupSizeY = g_Soup.Settings.SizeY;
+
                 if (Velocity.LengthSquared > g_Soup.Settings.MaximumVelocity * g_Soup.Settings.MaximumVelocity)
                 {
                     Velocity /= Velocity.Length / g_Soup.Settings.MaximumVelocity;
@@ -147,9 +155,9 @@
                     Position = new Double2d(0 + Radius, Position.Y);
                     Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
                 }
-                if (Position.X > g_Soup.Settings.SizeX - Radius)
+                if (Position.X > soupSizeX - Radius)
                 {
-                    Position = new Double2d(g_Soup.Settings.SizeX - Radius, Position.Y);
+                    Position = new Double2d(soupSizeX - Radius, Position.Y);
                     Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
                 }
                 if (Position.Y < Radius)
@@ -157,27 +165,27 @@
                     Position = new Double2d(Position.X, Radius);
                     Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
                 }
-                if (Position.Y > g_Soup.Settings.SizeY - Radius)
+                if (Position.Y > soupSizeY - Radius)
                 {
-                    Position = new Double2d(Position.X, g_Soup.Settings.SizeY - Radius);
+                    Position = new Double2d(Position.X, soupSizeY - Radius);
                     Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
                 }
 
-                if (int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X))) != IntegerizedPositionX || int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y))) != IntegerizedPositionY)
+                if (int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(Position.X))) != IntegerizedPositionX || int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(Position.Y))) != IntegerizedPositionY)
                 {
-                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Remove(Index);
+                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalPlantIndexes.Remove(Index);
 
-                    IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
-                    IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
+                    IntegerizedPositionX = int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(Position.X)));
+                    IntegerizedPositionY = int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(Position.Y)));
 
-                    g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
+                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
                 }
 
                 Radius = Math.Sqrt(Element / g_Soup.Settings.PlantForkCost) / 2d;
                 Mass = Element;
 
                 if (Element <= 0) OnDisable();
-                if (g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
+                else if (g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }
@@ -208,7 +216,7 @@
                     double offspringElementAmountTotal = 0;
                     for (int i = 0; i < offspringCount; i++) offspringElementAmountTotal += offspringElementAmount[i];
                     for (int i = 0; i < offspringCount; i++) offspringElementAmount[i] = offspringElementAmount[i] / offspringElementAmountTotal * Element;
-                    for (int i = 0; i < offspringCount; i++) result.Add(new Plant(Position + Double2d.FromAngle(random.NextDouble()) * 0.1d, offspringElementAmount[i]));
+                    for (int i = 0; i < offspringCount; i++) result.Add(new Plant(Position + Double2d.FromAngle(random.NextDouble()) * 0.1d, offspringElementAmount[i] * g_Soup.ElementAmountMultiplier));
 
                     OnDisable();
                     return result;

@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.8] - 2024-10-03
+
+### Added
+- Added autosave function.
+- Added new brain node type. (`Output_ShareElement`)
+
+### Changed
+- The mechanics for keeping element amounts constant have been changed. Previously, the multiplier was directly multiplied by the amount of the element. Now, the multiplier is multiplied when the element moves.
+- The probability of each type of mutation occurring is no longer equal when mutations occur. (Adding nodes, connections, and changing the weights of connections are now more likely to occur.)
+
+### Deleted
+- Diet removed.
+
 ## [0.5.7] - 2024-10-03
 
 ### Added
@@ -11,7 +24,6 @@
 
 ### Fixed
 - Fixed a bug that could cause duplicate node connections when mutating animal brains.
-- 
 
 ## [0.5.6] - 2024-10-02
 

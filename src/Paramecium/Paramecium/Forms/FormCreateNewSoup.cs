@@ -37,8 +37,6 @@ namespace Paramecium.Forms
             g_Soup.InitializeSoup();
             g_Soup.StartSoupThread();
 
-            g_SoupFilePath = @$"{Path.GetDirectoryName(g_SoupFilePath)}\New Soup.soup";
-
             Close();
         }
 

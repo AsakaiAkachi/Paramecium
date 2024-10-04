@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text;
 using Paramecium.Forms;
 
 namespace Paramecium
@@ -17,6 +18,7 @@ namespace Paramecium
         {
             AllocConsole();
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+            Console.OutputEncoding = Encoding.UTF8;
             Console.Title = "Paramecium";
 
             if (!Directory.Exists($@"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations"))

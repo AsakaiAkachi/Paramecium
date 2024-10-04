@@ -1,4 +1,7 @@
 ﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using System.Text;
 
 namespace Paramecium.Engine
 {
@@ -23,7 +26,11 @@ namespace Paramecium.Engine
         public long LatestGeneration { get; set; } = 0;
 
         // Soup File Information
-        public bool Modified { get; set; } = true;
+        public string FilePath = $@"{g_SoupDefaultFilePath}\{g_SoupDefaultFileName}";
+        public bool Modified = true;
+        public bool AutosaveEnabled { get; set; } = false;
+        public long AutosaveInterval { get; set; } = 100000;
+        public long PrevSaveTime { get; set; } = 0;
 
         // Population Information
         public int PopulationPlant { get; set; }
@@ -43,6 +50,10 @@ namespace Paramecium.Engine
         // Random Number
         public int CurrentSeed { get; set; }
 
+        // Element
+        public double CurrentTotalElementAmount { get; set; }
+        public double ElementAmountMultiplier { get; set; }
+
         // Tile
         public Tile[] Tiles { get; set; } = new Tile[0];
 
@@ -53,10 +64,6 @@ namespace Paramecium.Engine
         // Animal
         public List<Animal> Animals { get; set; } = new List<Animal>();
         public List<int> AnimalUnusedIndexes { get; set; } = new List<int>();
-        
-        
-        
-        // public double GlobalElementAmountMultiplier;
 
 
 
@@ -73,31 +80,34 @@ namespace Paramecium.Engine
             {
                 Perlin perlin = new Perlin();
 
-                Tiles = new Tile[Settings.SizeX * Settings.SizeY];
-                int DefaultTypeTileCount = Settings.SizeX * Settings.SizeY;
+                int soupSizeX = Settings.SizeX;
+                int soupSizeY = Settings.SizeY;
 
-                for (int x = 0; x < Settings.SizeX; x++)
+                Tiles = new Tile[soupSizeX * soupSizeY];
+                int DefaultTypeTileCount = soupSizeX * soupSizeY;
+
+                for (int x = 0; x < soupSizeX; x++)
                 {
-                    for (int y = 0; y < Settings.SizeY; y++)
+                    for (int y = 0; y < soupSizeY; y++)
                     {
-                        Tiles[y * Settings.SizeX + x] = new Tile(x, y);
+                        Tiles[y * soupSizeX + x] = new Tile(x, y);
                     }
                 }
 
                 if (Settings.WallEnabled)
                 {
-                    for (int x = 0; x < Settings.SizeX; x++)
+                    for (int x = 0; x < soupSizeX; x++)
                     {
-                        for (int y = 0; y < Settings.SizeY; y++)
+                        for (int y = 0; y < soupSizeY; y++)
                         {
                             if (Math.Abs(perlin.OctavePerlin(Settings.WallNoiseX + x * Settings.WallNoiseScale, Settings.WallNoiseY + y * Settings.WallNoiseScale, Settings.WallNoiseZ, Settings.WallNoiseOctave, 0.5d) - 0.5d) < Settings.WallThickness)
                             {
-                                Tiles[y * Settings.SizeX + x].Type = TileType.Wall;
+                                Tiles[y * soupSizeX + x].Type = TileType.Wall;
                             }
                         }
                     }
 
-                    bool[] continuousRegionFlag = new bool[Settings.SizeX * Settings.SizeY];
+                    bool[] continuousRegionFlag = new bool[soupSizeX * soupSizeY];
                     int continuousRegionArea = 0;
 
                     for (int i = 0; i < 16; i++)
@@ -105,10 +115,10 @@ namespace Paramecium.Engine
                         int exploredTileCount = 0;
 
                         List<int> exploreTiles = new List<int>();
-                        bool[] exploredTiles = new bool[Settings.SizeX * Settings.SizeY];
+                        bool[] exploredTiles = new bool[soupSizeX * soupSizeY];
 
-                        exploreTiles.Add(new Random().Next(0, Settings.SizeX * Settings.SizeY));
-                        while (Tiles[exploreTiles[0]].Type == TileType.Wall) exploreTiles[0] = new Random().Next(0, Settings.SizeX * Settings.SizeY);
+                        exploreTiles.Add(new Random().Next(0, soupSizeX * soupSizeY));
+                        while (Tiles[exploreTiles[0]].Type == TileType.Wall) exploreTiles[0] = new Random().Next(0, soupSizeX * soupSizeY);
 
                         while (exploreTiles.Count > 0)
                         {
@@ -116,8 +126,8 @@ namespace Paramecium.Engine
 
                             for (int j = 0; j < exploreTiles.Count; j++)
                             {
-                                int x = exploreTiles[j] % Settings.SizeX;
-                                int y = exploreTiles[j] / Settings.SizeX;
+                                int x = exploreTiles[j] % soupSizeX;
+                                int y = exploreTiles[j] / soupSizeX;
 
                                 for (int ix = -1; ix <= 1; ix++)
                                 {
@@ -125,12 +135,12 @@ namespace Paramecium.Engine
                                     {
                                         if (int.Abs(ix + iy) == 1)
                                         {
-                                            if (x + ix >= 0 && x + ix < Settings.SizeX && y + iy >= 0 && y + iy < Settings.SizeY)
+                                            if (x + ix >= 0 && x + ix < soupSizeX && y + iy >= 0 && y + iy < soupSizeY)
                                             {
-                                                if (Tiles[(y + iy) * Settings.SizeX + (x + ix)].Type == TileType.Default && !exploredTiles[(y + iy) * Settings.SizeX + (x + ix)])
+                                                if (Tiles[(y + iy) * soupSizeX + (x + ix)].Type == TileType.Default && !exploredTiles[(y + iy) * soupSizeX + (x + ix)])
                                                 {
-                                                    exploredTiles[(y + iy) * Settings.SizeX + (x + ix)] = true;
-                                                    nextStepExploreTiles.Add((y + iy) * Settings.SizeX + (x + ix));
+                                                    exploredTiles[(y + iy) * soupSizeX + (x + ix)] = true;
+                                                    nextStepExploreTiles.Add((y + iy) * soupSizeX + (x + ix));
                                                     exploredTileCount++;
                                                 }
                                             }
@@ -148,16 +158,16 @@ namespace Paramecium.Engine
                             continuousRegionArea = exploredTileCount;
                         }
 
-                        if (exploredTileCount > Settings.SizeX * Settings.SizeY / 2) break;
+                        if (exploredTileCount > soupSizeX * soupSizeY / 2) break;
                     }
 
-                    for (int x = 0; x < Settings.SizeX; x++)
+                    for (int x = 0; x < soupSizeX; x++)
                     {
-                        for (int y = 0; y < Settings.SizeY; y++)
+                        for (int y = 0; y < soupSizeY; y++)
                         {
-                            Tile targetTile = Tiles[y * Settings.SizeX + x];
+                            Tile targetTile = Tiles[y * soupSizeX + x];
 
-                            if (!continuousRegionFlag[y * Settings.SizeX + x])
+                            if (!continuousRegionFlag[y * soupSizeX + x])
                             {
                                 targetTile.Type = TileType.Wall;
                             }
@@ -167,11 +177,11 @@ namespace Paramecium.Engine
                     DefaultTypeTileCount = continuousRegionArea;
                 }
 
-                for (int x = 0; x < Settings.SizeX; x++)
+                for (int x = 0; x < soupSizeX; x++)
                 {
-                    for (int y = 0; y < Settings.SizeY; y++)
+                    for (int y = 0; y < soupSizeY; y++)
                     {
-                        Tile targetTile = Tiles[y * Settings.SizeX + x];
+                        Tile targetTile = Tiles[y * soupSizeX + x];
 
                         if (targetTile.Type == TileType.Default)
                         {
@@ -220,195 +230,228 @@ namespace Paramecium.Engine
         {
             if (SoupMainThread.IsCompleted && Initialized)
             {
-                SoupMainThread = Task.Run(() =>
-                {
-                    while (SoupState != SoupState.Stop)
-                    {
-                        lock (SoupStateLockObject)
-                        {
-                            if (SoupState == SoupState.Running || SoupState == SoupState.StepRun)
-                            {
-                                Stopwatch sw = new Stopwatch();
-                                sw.Start();
-
-                                ParallelOptions parallelOptions = new ParallelOptions()
-                                {
-                                    MaxDegreeOfParallelism = ThreadCount
-                                };
-
-                                double[] elementFlowAmount = new double[Settings.SizeX * Settings.SizeY];
-                                double[] pheromoneRedFlowAmount = new double[Settings.SizeX * Settings.SizeY];
-                                double[] pheromoneGreenFlowAmount = new double[Settings.SizeX * Settings.SizeY];
-                                double[] pheromoneBlueFlowAmount = new double[Settings.SizeX * Settings.SizeY];
-                                //for (int x = 0; x < Settings.SizeX; x++)
-                                Parallel.For(0, Settings.SizeX, parallelOptions, x =>
-                                {
-                                    for (int y = 0; y < Settings.SizeY; y++)
-                                    {
-                                        Tile targetTile1 = Tiles[y * Settings.SizeX + x];
-
-                                        if (targetTile1.Type == TileType.Default)
-                                        {
-                                            for (int ix = -1; ix <= 1; ix++)
-                                            {
-                                                for (int iy = -1; iy <= 1; iy++)
-                                                {
-                                                    if (int.Abs(ix) + int.Abs(iy) == 1)
-                                                    {
-                                                        if (x + ix >= 0 && x + ix < Settings.SizeX && y + iy >= 0 && y + iy < Settings.SizeY)
-                                                        {
-                                                            Tile targetTile2 = Tiles[(y + iy) * Settings.SizeX + (x + ix)];
-
-                                                            if (targetTile2.Type == TileType.Default)
-                                                            {
-                                                                elementFlowAmount[y * Settings.SizeX + x] -= (targetTile1.Element - targetTile2.Element) * Settings.ElementFlowRate;
-                                                                pheromoneRedFlowAmount[y * Settings.SizeX + x] -= (targetTile1.PheromoneRed - targetTile2.PheromoneRed) * Settings.PheromoneFlowRate;
-                                                                pheromoneGreenFlowAmount[y * Settings.SizeX + x] -= (targetTile1.PheromoneGreen - targetTile2.PheromoneGreen) * Settings.PheromoneFlowRate;
-                                                                pheromoneBlueFlowAmount[y * Settings.SizeX + x] -= (targetTile1.PheromoneBlue - targetTile2.PheromoneBlue) * Settings.PheromoneFlowRate;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        else if (targetTile1.Type == TileType.Wall)
-                                        {
-                                            targetTile1.Element = 0;
-                                            targetTile1.PheromoneRed = 0;
-                                            targetTile1.PheromoneGreen = 0;
-                                            targetTile1.PheromoneBlue = 0;
-                                        }
-                                    }
-                                });
-                                Parallel.For(0, Settings.SizeX, parallelOptions, x =>
-                                {
-                                    for (int y = 0; y < Settings.SizeY; y++)
-                                    {
-                                        Tile targetTile = Tiles[y * Settings.SizeX + x];
-                                        targetTile.Element += elementFlowAmount[y * Settings.SizeX + x];
-                                        targetTile.PheromoneRed += pheromoneRedFlowAmount[y * Settings.SizeX + x];
-                                        targetTile.PheromoneGreen += pheromoneGreenFlowAmount[y * Settings.SizeX + x];
-                                        targetTile.PheromoneBlue += pheromoneBlueFlowAmount[y * Settings.SizeX + x];
-                                        if (targetTile.Element < 0) targetTile.Element = 0;
-
-                                        targetTile.PheromoneRed *= 1d - Settings.PheromoneDecayRate;
-                                        targetTile.PheromoneGreen *= 1d - Settings.PheromoneDecayRate;
-                                        targetTile.PheromoneBlue *= 1d - Settings.PheromoneDecayRate;
-                                    }
-                                });
-
-                                double CurrentTotalElementAmount = 0d;
-                                for(int x = 0; x < Settings.SizeX; x++)
-                                {
-                                    for (int y = 0; y < Settings.SizeY; y++)
-                                    {
-                                        Tile targetTile = Tiles[y * Settings.SizeX + x];
-                                        CurrentTotalElementAmount += targetTile.Element;
-                                    }
-                                }
-                                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) CurrentTotalElementAmount += Plants[i].Element;
-                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) CurrentTotalElementAmount += Animals[i].Element;
-
-                                double GlobalElementAmountMultiplier = Settings.TotalElementAmount / CurrentTotalElementAmount;
-                                GlobalElementAmountMultiplier = Settings.TotalElementAmount / CurrentTotalElementAmount;
-                                Parallel.For(0, Settings.SizeX, parallelOptions, x =>
-                                {
-                                    for (int y = 0; y < Settings.SizeY; y++)
-                                    {
-                                        Tile targetTile = Tiles[y * Settings.SizeX + x];
-                                        targetTile.Element *= GlobalElementAmountMultiplier;
-                                    }
-                                });
-                                Parallel.For(0, Plants.Count, parallelOptions, i => { Plants[i].Element *= GlobalElementAmountMultiplier; Plants[i].Radius = Math.Sqrt(Plants[i].Element / Settings.PlantForkCost) / 2d; Plants[i].Mass = Plants[i].Element; });
-                                Parallel.For(0, Animals.Count, parallelOptions, i => { Animals[i].Element *= GlobalElementAmountMultiplier; Animals[i].Mass = 16d + Animals[i].Element; });
-
-                                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].CollectElement();
-
-                                Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].UpdateNeuralNet(); });
-                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) Animals[i].ApplyNeuralNetOutput();
-
-                                Parallel.For(0, Plants.Count, parallelOptions, i => { if (Plants[i].Exist) Plants[i].ApplyDrag(); });
-                                Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].ApplyDrag(); });
-
-                                Parallel.For(0, Plants.Count, parallelOptions, i => { if (Plants[i].Exist) Plants[i].UpdateCollision(); });
-                                Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].UpdateCollision(); });
-
-                                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].UpdatePosition();
-                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) Animals[i].UpdatePosition();
-
-                                Random random = new Random(CurrentSeed);
-
-                                List<Plant> PlantOffspringBuffer = new List<Plant>();
-                                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist)
-                                    {
-                                        List<Plant>? PlantOffspringLocalBuffer = Plants[i].CreateOffspring(random);
-
-                                        if (PlantOffspringLocalBuffer is not null) for (int j = 0; j < PlantOffspringLocalBuffer.Count; j++) PlantOffspringBuffer.Add(PlantOffspringLocalBuffer[j]);
-                                    }
-
-                                for (int i = 0; i < PlantOffspringBuffer.Count; i++)
-                                {
-                                    if (PlantUnusedIndexes.Count > 0)
-                                    {
-                                        Plants[PlantUnusedIndexes[PlantUnusedIndexes.Count - 1]] = PlantOffspringBuffer[i];
-                                        Plants[PlantUnusedIndexes[PlantUnusedIndexes.Count - 1]].Initialize(PlantUnusedIndexes[PlantUnusedIndexes.Count - 1], random);
-                                        PlantUnusedIndexes.RemoveAt(PlantUnusedIndexes.Count - 1);
-                                    }
-                                    else
-                                    {
-                                        Plants.Add(PlantOffspringBuffer[i]);
-                                        Plants[Plants.Count - 1].Initialize(Plants.Count - 1, random);
-                                    }
-                                }
-
-                                List<Animal> AnimalOffspringBuffer = new List<Animal>();
-                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist)
-                                    {
-                                        Animal? AnimalOffspringLocalBuffer = Animals[i].CreateOffspring(random);
-
-                                        if (AnimalOffspringLocalBuffer is not null) AnimalOffspringBuffer.Add(AnimalOffspringLocalBuffer);
-                                    }
-
-                                for (int i = 0; i < AnimalOffspringBuffer.Count; i++)
-                                {
-                                    if (AnimalUnusedIndexes.Count > 0)
-                                    {
-                                        Animals[AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1]] = AnimalOffspringBuffer[i];
-                                        Animals[AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1]].Initialize(AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1], random);
-                                        AnimalUnusedIndexes.RemoveAt(AnimalUnusedIndexes.Count - 1);
-                                    }
-                                    else
-                                    {
-                                        Animals.Add(AnimalOffspringBuffer[i]);
-                                        Animals[Animals.Count - 1].Initialize(Animals.Count - 1, random);
-                                    }
-                                }
-
-                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) LatestGeneration = long.Max(LatestGeneration, Animals[i].Generation);
-
-                                PopulationPlant = 0;
-                                PopulationAnimal = 0;
-                                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) PopulationPlant++;
-                                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) PopulationAnimal++;
-
-                                CurrentSeed = random.Next(int.MinValue, int.MaxValue);
-
-                                ElapsedTimeSteps++;
-                                Modified = true;
-
-                                if (SoupState == SoupState.StepRun) SoupState = SoupState.Pause;
-
-                                sw.Stop();
-                                TimeStepsPerSecond *= 0.96d;
-                                TimeStepsPerSecond += 1000000d / sw.Elapsed.TotalMicroseconds * 0.04d;
-                            }
-                        }
-                    }
-                });
+                SoupMainThread = Task.Run(MainLoop);
             }
             else if (!Initialized) throw new InvalidOperationException("Soup is not initialized.");
             else if (!SoupMainThread.IsCompleted) throw new InvalidOperationException("Soup Thread have already been started.");
             else throw new InvalidOperationException();
+        }
+
+        public void MainLoop()
+        {
+            while (SoupState != SoupState.Stop)
+            {
+                lock (SoupStateLockObject)
+                {
+                    if (SoupState == SoupState.Running || SoupState == SoupState.StepRun)
+                    {
+                        Stopwatch sw = new Stopwatch();
+                        sw.Start();
+
+                        ParallelOptions parallelOptions = new ParallelOptions()
+                        {
+                            MaxDegreeOfParallelism = ThreadCount
+                        };
+
+                        int soupSizeX = Settings.SizeX;
+                        int soupSizeY = Settings.SizeY;
+
+                        CurrentTotalElementAmount = 0d;
+                        for (int x = 0; x < soupSizeX; x++)
+                        {
+                            for (int y = 0; y < soupSizeY; y++)
+                            {
+                                Tile targetTile = Tiles[y * soupSizeX + x];
+                                CurrentTotalElementAmount += targetTile.Element;
+                            }
+                        }
+                        for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) CurrentTotalElementAmount += Plants[i].Element;
+                        for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) CurrentTotalElementAmount += Animals[i].Element;
+                        ElementAmountMultiplier = Settings.TotalElementAmount / CurrentTotalElementAmount;
+
+                        double[] elementFlowAmount = new double[soupSizeX * soupSizeY];
+                        double[] pheromoneRedFlowAmount = new double[soupSizeX * soupSizeY];
+                        double[] pheromoneGreenFlowAmount = new double[soupSizeX * soupSizeY];
+                        double[] pheromoneBlueFlowAmount = new double[soupSizeX * soupSizeY];
+                        //for (int x = 0; x < soupSizeX; x++)
+                        Parallel.For(0, soupSizeX, parallelOptions, x =>
+                        {
+                            for (int y = 0; y < soupSizeY; y++)
+                            {
+                                Tile targetTile1 = Tiles[y * soupSizeX + x];
+
+                                if (targetTile1.Type == TileType.Default)
+                                {
+                                    for (int ix = -1; ix <= 1; ix++)
+                                    {
+                                        for (int iy = -1; iy <= 1; iy++)
+                                        {
+                                            if (int.Abs(ix) + int.Abs(iy) == 1)
+                                            {
+                                                if (x + ix >= 0 && x + ix < soupSizeX && y + iy >= 0 && y + iy < soupSizeY)
+                                                {
+                                                    Tile targetTile2 = Tiles[(y + iy) * soupSizeX + (x + ix)];
+
+                                                    if (targetTile2.Type == TileType.Default)
+                                                    {
+                                                        elementFlowAmount[y * soupSizeX + x] -= (targetTile1.Element - targetTile2.Element) * Settings.ElementFlowRate;
+                                                        if (elementFlowAmount[y * soupSizeX + x] > 0) elementFlowAmount[y * soupSizeX + x] *= ElementAmountMultiplier;
+                                                        pheromoneRedFlowAmount[y * soupSizeX + x] -= (targetTile1.PheromoneRed - targetTile2.PheromoneRed) * Settings.PheromoneFlowRate;
+                                                        pheromoneGreenFlowAmount[y * soupSizeX + x] -= (targetTile1.PheromoneGreen - targetTile2.PheromoneGreen) * Settings.PheromoneFlowRate;
+                                                        pheromoneBlueFlowAmount[y * soupSizeX + x] -= (targetTile1.PheromoneBlue - targetTile2.PheromoneBlue) * Settings.PheromoneFlowRate;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (targetTile1.Type == TileType.Wall)
+                                {
+                                    targetTile1.Element = 0;
+                                    targetTile1.PheromoneRed = 0;
+                                    targetTile1.PheromoneGreen = 0;
+                                    targetTile1.PheromoneBlue = 0;
+                                }
+                            }
+                        });
+                        Parallel.For(0, soupSizeX, parallelOptions, x =>
+                        {
+                            for (int y = 0; y < soupSizeY; y++)
+                            {
+                                Tile targetTile = Tiles[y * soupSizeX + x];
+                                targetTile.Element += elementFlowAmount[y * soupSizeX + x];
+                                targetTile.PheromoneRed += pheromoneRedFlowAmount[y * soupSizeX + x];
+                                targetTile.PheromoneGreen += pheromoneGreenFlowAmount[y * soupSizeX + x];
+                                targetTile.PheromoneBlue += pheromoneBlueFlowAmount[y * soupSizeX + x];
+                                if (targetTile.Element < 0) targetTile.Element = 0;
+
+                                targetTile.PheromoneRed *= 1d - Settings.PheromoneDecayRate;
+                                targetTile.PheromoneGreen *= 1d - Settings.PheromoneDecayRate;
+                                targetTile.PheromoneBlue *= 1d - Settings.PheromoneDecayRate;
+                            }
+                        });
+
+                        for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].CollectElement();
+
+                        Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].UpdateNeuralNet(); });
+                        for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) Animals[i].ApplyNeuralNetOutput();
+
+                        Parallel.For(0, Plants.Count, parallelOptions, i => { if (Plants[i].Exist) Plants[i].ApplyDrag(); });
+                        Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].ApplyDrag(); });
+
+                        Parallel.For(0, Plants.Count, parallelOptions, i => { if (Plants[i].Exist) Plants[i].UpdateCollision(); });
+                        Parallel.For(0, Animals.Count, parallelOptions, i => { if (Animals[i].Exist) Animals[i].UpdateCollision(); });
+
+                        for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) Plants[i].UpdatePosition();
+                        for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) Animals[i].UpdatePosition();
+
+                        Random random = new Random(CurrentSeed);
+
+                        List<Plant> PlantOffspringBuffer = new List<Plant>();
+                        for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist)
+                            {
+                                List<Plant>? PlantOffspringLocalBuffer = Plants[i].CreateOffspring(random);
+
+                                if (PlantOffspringLocalBuffer is not null) for (int j = 0; j < PlantOffspringLocalBuffer.Count; j++) PlantOffspringBuffer.Add(PlantOffspringLocalBuffer[j]);
+                            }
+
+                        for (int i = 0; i < PlantOffspringBuffer.Count; i++)
+                        {
+                            if (PlantUnusedIndexes.Count > 0)
+                            {
+                                Plants[PlantUnusedIndexes[PlantUnusedIndexes.Count - 1]] = PlantOffspringBuffer[i];
+                                Plants[PlantUnusedIndexes[PlantUnusedIndexes.Count - 1]].Initialize(PlantUnusedIndexes[PlantUnusedIndexes.Count - 1], random);
+                                PlantUnusedIndexes.RemoveAt(PlantUnusedIndexes.Count - 1);
+                            }
+                            else
+                            {
+                                Plants.Add(PlantOffspringBuffer[i]);
+                                Plants[Plants.Count - 1].Initialize(Plants.Count - 1, random);
+                            }
+                        }
+
+                        List<Animal> AnimalOffspringBuffer = new List<Animal>();
+                        for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist)
+                            {
+                                Animal? AnimalOffspringLocalBuffer = Animals[i].CreateOffspring(random);
+
+                                if (AnimalOffspringLocalBuffer is not null) AnimalOffspringBuffer.Add(AnimalOffspringLocalBuffer);
+                            }
+
+                        for (int i = 0; i < AnimalOffspringBuffer.Count; i++)
+                        {
+                            if (AnimalUnusedIndexes.Count > 0)
+                            {
+                                Animals[AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1]] = AnimalOffspringBuffer[i];
+                                Animals[AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1]].Initialize(AnimalUnusedIndexes[AnimalUnusedIndexes.Count - 1], random);
+                                AnimalUnusedIndexes.RemoveAt(AnimalUnusedIndexes.Count - 1);
+                            }
+                            else
+                            {
+                                Animals.Add(AnimalOffspringBuffer[i]);
+                                Animals[Animals.Count - 1].Initialize(Animals.Count - 1, random);
+                            }
+                        }
+
+                        for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) LatestGeneration = long.Max(LatestGeneration, Animals[i].Generation);
+
+                        PopulationPlant = 0;
+                        PopulationAnimal = 0;
+                        for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) PopulationPlant++;
+                        for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) PopulationAnimal++;
+
+                        CurrentSeed = random.Next(int.MinValue, int.MaxValue);
+
+                        ElapsedTimeSteps++;
+                        Modified = true;
+
+                        if (SoupState == SoupState.StepRun) SoupState = SoupState.Pause;
+
+                        sw.Stop();
+                        TimeStepsPerSecond *= 0.96d;
+                        TimeStepsPerSecond += 1000000d / sw.Elapsed.TotalMicroseconds * 0.04d;
+                    }
+                }
+
+                if (ElapsedTimeSteps - PrevSaveTime >= AutosaveInterval && AutosaveEnabled)
+                {
+                    AutosaveEnabled = false;
+
+                    bool PrevModified = Modified;
+                    Modified = false;
+
+                    SaveSoup($@"{g_SoupAutosaveFilePath}\{Path.GetFileNameWithoutExtension(FilePath)}_{ElapsedTimeSteps}steps.soup", false);
+
+                    Modified = PrevModified;
+
+                    AutosaveEnabled = true;
+                }
+            }
+        }
+
+        public void SaveSoup()
+        {
+            SaveSoup(FilePath, false);
+        }
+
+        public void SaveSoup(string filePath, bool updatePath)
+        {
+            SoupState prevSoupState = SoupState;
+            SetSoupState(SoupState.Saving);
+
+            Modified = false;
+            PrevSaveTime = ElapsedTimeSteps;
+
+            StreamWriter streamWriter = new StreamWriter(filePath, false, Encoding.UTF8);
+            streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
+            streamWriter.Close();
+
+            if (updatePath)
+            {
+                FilePath = filePath;
+            }
+
+            SetSoupState(prevSoupState);
         }
 
         public void SetSoupState(SoupState soupState)
@@ -439,6 +482,7 @@ namespace Paramecium.Engine
         Stop,
         Pause,
         Running,
-        StepRun
+        StepRun,
+        Saving
     }
 }

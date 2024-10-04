@@ -10,7 +10,10 @@ namespace Paramecium
         public static string g_AppName;
         public static string g_AppVersion;
 
-        public static string g_SoupFilePath;
+        public static string g_SoupDefaultFilePath;
+        public static string g_SoupDefaultFileName;
+
+        public static string g_SoupAutosaveFilePath;
 
         public static string g_PresetDefaultFilePath;
         public static string g_PresetDefaultFileName;
@@ -20,12 +23,15 @@ namespace Paramecium
         static Global()
         {
             g_AppName = "Paramecium";
-            g_AppVersion = "0.5.7";
+            g_AppVersion = "0.5.8";
 
-            g_SoupFilePath = @$"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations\New Soup.soup";
+            g_SoupDefaultFilePath = @$"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations";
+            g_SoupDefaultFileName = @$"Untitled.soup";
 
-            g_PresetDefaultFilePath = @$"{Path.GetDirectoryName(Application.ExecutablePath)}\presets\";
-            g_PresetDefaultFileName = @$"New Preset.souppreset";
+            g_SoupAutosaveFilePath = @$"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations\autosaves";
+
+            g_PresetDefaultFilePath = @$"{Path.GetDirectoryName(Application.ExecutablePath)}\presets";
+            g_PresetDefaultFileName = @$"Untitled.souppreset";
 
             g_Soup = null;
         }

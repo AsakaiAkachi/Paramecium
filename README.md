@@ -58,7 +58,9 @@ Since Paramecium is developed on Windows 11, operation on other operating system
 <!-- CPU及びGPUの最低要件はありませんが、大規模なシミュレーションを実行するには高性能なCPUが必要になる場合があります。 -->
 There are no minimum CPU or GPU requirements, but high-performance CPUs may be needed to run large simulations.
 
-## Others
+<br>
+
+---
 
 <!-- - このプロジェクトの製作者は英語圏の人ではなく(日本人です)、英語を読み書きできないため、READNE.mdなどを書くのにはDeelL翻訳などを使用しています。そのため、文章が一部間違っている可能性があります。 -->
 The creator of this project is not an English speaker (I'm Japanese) and cannot read or write English, so I use DeelL translation, etc. to write `README.md` and other documents. Therefore, some sentences may be incorrect.
