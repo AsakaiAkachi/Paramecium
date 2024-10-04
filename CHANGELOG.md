@@ -1,6 +1,13 @@
 # Changelog
 
-## [0.5.8] - 2024-10-03
+## [0.5.8b] - 2024-10-05
+
+### Fixed
+- Fixed a bug that could cause the amount of elements to be NaN.
+- Fixed a bug that the `Modified` property of soups was not being saved.
+- Corrected errors in the contents of `CHANGELOG.md`.
+
+## [0.5.8] - 2024-10-05
 
 ### Added
 - Added autosave function.
@@ -9,6 +16,7 @@
 ### Changed
 - The mechanics for keeping element amounts constant have been changed. Previously, the multiplier was directly multiplied by the amount of the element. Now, the multiplier is multiplied when the element moves.
 - The probability of each type of mutation occurring is no longer equal when mutations occur. (Adding nodes, connections, and changing the weights of connections are now more likely to occur.)
+- The contents of the `Soup Settings` window can now be scrolled.
 
 ### Deleted
 - Diet removed.

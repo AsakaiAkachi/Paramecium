@@ -27,7 +27,7 @@ namespace Paramecium.Engine
 
         // Soup File Information
         public string FilePath = $@"{g_SoupDefaultFilePath}\{g_SoupDefaultFileName}";
-        public bool Modified = true;
+        public bool Modified { get; set; } = true;
         public bool AutosaveEnabled { get; set; } = false;
         public long AutosaveInterval { get; set; } = 100000;
         public long PrevSaveTime { get; set; } = 0;
@@ -262,11 +262,34 @@ namespace Paramecium.Engine
                             for (int y = 0; y < soupSizeY; y++)
                             {
                                 Tile targetTile = Tiles[y * soupSizeX + x];
+                                if (targetTile.Element < 0 || targetTile.Element > Settings.TotalElementAmount || targetTile.Element == double.PositiveInfinity || targetTile.Element == double.NegativeInfinity || targetTile.Element == double.NaN) targetTile.Element = 0;
                                 CurrentTotalElementAmount += targetTile.Element;
                             }
                         }
-                        for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) CurrentTotalElementAmount += Plants[i].Element;
-                        for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) CurrentTotalElementAmount += Animals[i].Element;
+                        for (int i = 0; i < Plants.Count; i++)
+                        {
+                            if (Plants[i].Exist)
+                            {
+                                if (Plants[i].Element < 0 || Plants[i].Element > Settings.TotalElementAmount || Plants[i].Element == double.PositiveInfinity || Plants[i].Element == double.NegativeInfinity || Plants[i].Element == double.NaN)
+                                {
+                                    Plants[i].Element = 0;
+                                    Plants[i].OnDisable();
+                                }
+                                CurrentTotalElementAmount += Plants[i].Element;
+                            }
+                        }
+                        for (int i = 0; i < Animals.Count; i++)
+                        {
+                            if (Animals[i].Exist)
+                            {
+                                if (Animals[i].Element < 0 || Animals[i].Element > Settings.TotalElementAmount || Animals[i].Element == double.PositiveInfinity || Animals[i].Element == double.NegativeInfinity || Animals[i].Element == double.NaN)
+                                {
+                                    Animals[i].Element = 0;
+                                    Animals[i].OnDisable();
+                                }
+                                CurrentTotalElementAmount += Animals[i].Element;
+                            }
+                        }
                         ElementAmountMultiplier = Settings.TotalElementAmount / CurrentTotalElementAmount;
 
                         double[] elementFlowAmount = new double[soupSizeX * soupSizeY];
