@@ -113,15 +113,13 @@ namespace Paramecium.Engine
 
                     if (result.nodes[mutationTarget].IsInput || result.nodes[mutationTarget].IsHidden)
                     {
-                        List<int> connectionTargetIndexes = new List<int>();
                         for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
                             int connectionTarget = random.Next(0, result.nodes.Count);
 
-                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
+                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !result.nodes[mutationTarget].ContainsConnection(connectionTarget))
                             {
                                 result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
-                                connectionTargetIndexes.Add(connectionTarget);
                             }
 
                             if (random.NextDouble() < 0.5d) break;
@@ -131,17 +129,11 @@ namespace Paramecium.Engine
                     {
                         for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
-                            List<int> connectionTargetIndexes = new List<int>();
                             int connectionOrigin = random.Next(0, result.nodes.Count);
 
-                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount)
+                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount && !result.nodes[mutationTarget].ContainsConnection(connectionOrigin) && result.nodes[connectionOrigin].ContainsConnection(mutationTarget))
                             {
-                                for (int j = 0; j < result.nodes[connectionOrigin].Connections.Count; j++) connectionTargetIndexes.Add(result.nodes[connectionOrigin].Connections[j].TargetIndex);
-
-                                if (!connectionTargetIndexes.Contains(mutationTarget))
-                                {
-                                    result.nodes[connectionOrigin].Connections.Add(new BrainNodeConnection() { TargetIndex = mutationTarget, Weight = random.NextDouble() * 4d - 2d });
-                                }
+                                result.nodes[connectionOrigin].Connections.Add(new BrainNodeConnection() { TargetIndex = mutationTarget, Weight = random.NextDouble() * 4d - 2d });
                             }
 
                             if (random.NextDouble() < 0.5d) break;
@@ -187,15 +179,13 @@ namespace Paramecium.Engine
 
                     if (BrainNode.BrainNodeTypeIsOutput(prevBrainNodeType) && !result.nodes[mutationTarget].IsOutput)
                     {
-                        List<int> connectionTargetIndexes = new List<int>();
                         for (int i = 0; i < g_Soup.Settings.AnimalBrainMaximumConnectionCount / 2; i++)
                         {
                             int connectionTarget = random.Next(0, result.nodes.Count);
 
-                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
+                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !result.nodes[mutationTarget].ContainsConnection(connectionTarget) && !result.nodes[connectionTarget].ContainsConnection(mutationTarget))
                             {
                                 result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
-                                connectionTargetIndexes.Add(connectionTarget);
                             }
 
                             if (random.NextDouble() < 0.5d) break;
@@ -207,15 +197,9 @@ namespace Paramecium.Engine
                         {
                             int connectionOrigin = random.Next(0, result.nodes.Count);
 
-                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount)
+                            if (connectionOrigin != mutationTarget && !result.nodes[connectionOrigin].IsOutput && result.nodes[connectionOrigin].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount && !result.nodes[mutationTarget].ContainsConnection(connectionOrigin) && result.nodes[connectionOrigin].ContainsConnection(mutationTarget))
                             {
-                                List<int> connectionTargetIndexes = new List<int>();
-                                for (int j = 0; j < result.nodes[connectionOrigin].Connections.Count; j++) connectionTargetIndexes.Add(result.nodes[connectionOrigin].Connections[j].TargetIndex);
-
-                                if (!connectionTargetIndexes.Contains(mutationTarget))
-                                {
-                                    result.nodes[connectionOrigin].Connections.Add(new BrainNodeConnection() { TargetIndex = mutationTarget, Weight = random.NextDouble() * 4d - 2d });
-                                }
+                                result.nodes[connectionOrigin].Connections.Add(new BrainNodeConnection() { TargetIndex = mutationTarget, Weight = random.NextDouble() * 4d - 2d });
                             }
 
                             if (random.NextDouble() < 0.5d) break;
@@ -246,14 +230,11 @@ namespace Paramecium.Engine
                     {
                         if (result.nodes[mutationTarget].Connections.Count < g_Soup.Settings.AnimalBrainMaximumConnectionCount)
                         {
-                            List<int> connectionTargetIndexes = new List<int>();
-                            for (int i = 0; i < result.nodes[mutationTarget].Connections.Count; i++) connectionTargetIndexes.Add(result.nodes[mutationTarget].Connections[i].TargetIndex);
                             int connectionTarget = random.Next(0, result.nodes.Count);
 
-                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !connectionTargetIndexes.Contains(connectionTarget))
+                            if (connectionTarget != mutationTarget && !result.nodes[connectionTarget].IsInput && !result.nodes[mutationTarget].ContainsConnection(connectionTarget) && !result.nodes[connectionTarget].ContainsConnection(mutationTarget))
                             {
                                 result.nodes[mutationTarget].Connections.Add(new BrainNodeConnection() { TargetIndex = connectionTarget, Weight = random.NextDouble() * 4d - 2d });
-                                connectionTargetIndexes.Add(connectionTarget);
                             }
                         }
                     }
@@ -282,16 +263,10 @@ namespace Paramecium.Engine
                     {
                         if (result.nodes[mutationTarget].Connections.Count > 0)
                         {
-                            List<int> connectionTargetIndexes = new List<int>();
-                            for (int i = 0; i < result.nodes[mutationTarget].Connections.Count; i++) connectionTargetIndexes.Add(result.nodes[mutationTarget].Connections[i].TargetIndex);
-
                             int targetConnection = random.Next(0, result.nodes[mutationTarget].Connections.Count);
                             int targetConnectionNewConnectionTargetIndex = random.Next(0, result.nodes.Count);
 
-                            List<int> connectionTargetConnectionIndexes = new List<int>();
-                            for (int i = 0; i < result.nodes[targetConnectionNewConnectionTargetIndex].Connections.Count; i++) connectionTargetIndexes.Add(result.nodes[targetConnectionNewConnectionTargetIndex].Connections[i].TargetIndex);
-
-                            if (targetConnectionNewConnectionTargetIndex != mutationTarget && !result.nodes[targetConnectionNewConnectionTargetIndex].IsInput && !connectionTargetIndexes.Contains(targetConnectionNewConnectionTargetIndex) && !connectionTargetConnectionIndexes.Contains(mutationTarget))
+                            if (targetConnectionNewConnectionTargetIndex != mutationTarget && !result.nodes[targetConnectionNewConnectionTargetIndex].IsInput && !result.nodes[mutationTarget].ContainsConnection(targetConnectionNewConnectionTargetIndex) && !result.nodes[targetConnectionNewConnectionTargetIndex].ContainsConnection(mutationTarget))
                             {
                                 result.nodes[mutationTarget].Connections[targetConnection].TargetIndex = targetConnectionNewConnectionTargetIndex;
                             }
@@ -342,6 +317,8 @@ namespace Paramecium.Engine
                     }
                 }
 
+                if (removeNodeIndexes.Count == 0) break;
+
                 for (int i = result.nodes.Count - 1; i >= 0; i--)
                 {
                     if (removeNodeIndexes.Contains(i))
@@ -358,8 +335,6 @@ namespace Paramecium.Engine
                         }
                     }
                 }
-
-                if (removeNodeIndexes.Count == 0) break;
             }
 
             return result;

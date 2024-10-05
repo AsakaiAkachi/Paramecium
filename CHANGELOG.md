@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.10] - 2024-10-05
+
+## Fixed
+- Fixed a bug that the angle of an animal's tail could be abnormal.
+- Fixed a bug that could cause two brain nodes to interconnect.
+- Fixed a bug that was applying drag at the wrong time.
+
 ## [0.5.9] - 2024-10-05
 
 ### Added

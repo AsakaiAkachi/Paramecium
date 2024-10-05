@@ -71,8 +71,9 @@ namespace Paramecium.Forms.Renderer
             overlayInformationRenderer.OffsetX = 0;
             overlayInformationRenderer.OffsetY -= 16;
 
-            if (!g_Soup.Modified) text = $"File Name : {Path.GetFileName(g_Soup.FilePath)}";
-            else text = $"File Name : {Path.GetFileName(g_Soup.FilePath)} (Unsaved)";
+            if (g_Soup.SoupState == SoupState.Saving) text = $"File Name : {Path.GetFileName(g_Soup.FilePath)} (saving)";
+            else if (g_Soup.Modified) text = $"File Name : {Path.GetFileName(g_Soup.FilePath)} (unsaved)";
+            else text = $"File Name : {Path.GetFileName(g_Soup.FilePath)}";
             testSize = overlayInformationRenderer.OverlayMeasureString("MS UI Gothic", 12, text);
             overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)testSize.Width + 20, 16, Color.FromArgb(128, 64, 64, 64));
             overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, text, 0, 0, Color.FromArgb(255, 255, 255));

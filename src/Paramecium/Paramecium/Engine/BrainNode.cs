@@ -38,6 +38,15 @@ namespace Paramecium.Engine
             else return false;
         }
 
+        public bool ContainsConnection(int targetIndex)
+        {
+            for (int i = 0; i < Connections.Count; i++)
+            {
+                if (Connections[i].TargetIndex == targetIndex) return true;
+            }
+            return false;
+        }
+
         public void ApplyBrainInput(BrainInput brainInput)
         {
             switch (Type)

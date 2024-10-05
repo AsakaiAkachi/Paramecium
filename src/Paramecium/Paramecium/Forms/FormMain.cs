@@ -188,6 +188,8 @@ namespace Paramecium.Forms
                     BottomStat_Fps.Text = $"FPS : {FramesPerSecond.ToString("0.0")}";
                 }
 
+                BottomStat.Refresh();
+
                 await Task.Delay(1);
             }
         }
