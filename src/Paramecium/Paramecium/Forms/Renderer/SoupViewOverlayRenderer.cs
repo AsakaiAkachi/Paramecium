@@ -5,7 +5,7 @@ namespace Paramecium.Forms.Renderer
 {
     public static class SoupViewOverlayRenderer
     {
-        public static void DrawSoupOverlayView(ref Bitmap targetBitmap, Double2d cameraPosition, int cameraZoomLevel, Point mousePointClient, SelectedObjectType selectedObjectType, int selectedObjectIndex)
+        public static void DrawSoupViewOverlay(ref Bitmap targetBitmap, Double2d cameraPosition, int cameraZoomLevel, Point mousePointClient, SelectedObjectType selectedObjectType, int selectedObjectIndex)
         {
             if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
 
@@ -378,91 +378,6 @@ namespace Paramecium.Forms.Renderer
                     }
                 }
             }
-        }
-
-        public class OverlayInformationRenderer
-        {
-            public int OffsetX;
-            public int OffsetY;
-
-            Graphics Graphics;
-
-            public OverlayInformationRenderer(Graphics graphics)
-            {
-                Graphics = graphics;
-            }
-
-            public void OverlayDrawRectangle(int startX, int startY, int endX, int endY, Color color)
-            {
-                SoupViewOverlayRenderer.OverlayDrawRectangle(Graphics, startX + OffsetX, startY + OffsetY, endX + OffsetX, endY + OffsetY, color);
-            }
-            public void OverlayFillRectangle(int startX, int startY, int endX, int endY, Color color)
-            {
-                SoupViewOverlayRenderer.OverlayFillRectangle(Graphics, startX + OffsetX, startY + OffsetY, endX + OffsetX, endY + OffsetY, color);
-            }
-
-            public void OverlayDrawEllipse(int centerX, int centerY, int diameter, Color color)
-            {
-                SoupViewOverlayRenderer.OverlayDrawEllipse(Graphics, centerX + OffsetX, centerY + OffsetY, diameter, color);
-            }
-            public void OverlayFillEllipse(int centerX, int centerY, int diameter, Color color)
-            {
-                SoupViewOverlayRenderer.OverlayFillEllipse(Graphics, centerX + OffsetX, centerY + OffsetY, diameter, color);
-            }
-
-            public void OverlayDrawLine(int startX, int startY, int endX, int endY, Color color)
-            {
-                SoupViewOverlayRenderer.OverlayDrawLine(Graphics, startX + OffsetX, startY + OffsetY, endX + OffsetX, endY + OffsetY, color);
-            }
-
-            public void OverlayDrawString(string fontName, int size, string text, int startX, int startY, Color color)
-            {
-                SoupViewOverlayRenderer.OverlayDrawString(Graphics, fontName, size, text, startX + OffsetX, startY + OffsetY, color);
-            }
-        }
-
-        public static void OverlayDrawRectangle(in Graphics targetGraphics, int startX, int startY, int endX, int endY, Color color)
-        {
-            Pen colorPen = new Pen(color);
-            targetGraphics.DrawRectangle(colorPen, startX, startY, endX - startX, endY - startY);
-            colorPen.Dispose();
-        }
-
-        public static void OverlayFillRectangle(in Graphics targetGraphics, int startX, int startY, int endX, int endY, Color color)
-        {
-            SolidBrush colorBrush = new SolidBrush(color);
-            targetGraphics.FillRectangle(colorBrush, startX, startY, endX - startX, endY - startY);
-            colorBrush.Dispose();
-        }
-
-        public static void OverlayDrawEllipse(in Graphics targetGraphics, int centerX, int centerY, int diameter, Color color)
-        {
-            Pen colorPen = new Pen(color);
-            targetGraphics.DrawEllipse(colorPen, centerX - diameter / 2, centerY - diameter / 2, diameter, diameter);
-            colorPen.Dispose();
-        }
-
-        public static void OverlayFillEllipse(in Graphics targetGraphics, int centerX, int centerY, int diameter, Color color)
-        {
-            SolidBrush colorBrush = new SolidBrush(color);
-            targetGraphics.FillEllipse(colorBrush, centerX - diameter / 2, centerY - diameter / 2, diameter, diameter);
-            colorBrush.Dispose();
-        }
-
-        public static void OverlayDrawLine(in Graphics targetGraphics, int startX, int startY, int endX, int endY, Color color)
-        {
-            Pen colorPen = new Pen(color);
-            targetGraphics.DrawLine(colorPen, startX, startY, endX, endY);
-            colorPen.Dispose();
-        }
-
-        public static void OverlayDrawString(in Graphics targetGraphics, string fontName, int size, string text, int startX, int startY, Color color)
-        {
-            SolidBrush colorBrush = new SolidBrush(color);
-            Font fnt = new Font(fontName, size);
-            targetGraphics.DrawString(text, fnt, colorBrush, startX, startY);
-            fnt.Dispose();
-            colorBrush.Dispose();
         }
 
         public enum SelectedObjectType

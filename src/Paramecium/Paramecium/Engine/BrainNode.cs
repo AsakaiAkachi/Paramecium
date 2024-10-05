@@ -125,8 +125,8 @@ namespace Paramecium.Engine
                     break;
             }
 
-            if (Output > 100d) Output = 100d;
-            else if (Output < -100d) Output = -100d;
+            if (double.IsInfinity(Output) || double.IsNaN(Output)) Output = 0;
+            Output = double.Max(-100d, double.Min(100d, Output));
         }
 
         public void CalculateNodeOutput()
@@ -160,17 +160,20 @@ namespace Paramecium.Engine
                     break;
                 case BrainNodeType.Hidden_Tangent:
                     Output = Math.Tan(Input * Math.PI / 2d);
-                    if (Output == double.PositiveInfinity || Output == double.NegativeInfinity || Output == double.NaN) Output = 100;
+                    if (double.IsInfinity(Output) || double.IsNaN(Output)) Output = 100;
                     break;
                 case BrainNodeType.Hidden_LimitedTangent:
                     Output = Math.Tan(Input * Math.PI / 2d);
-                    if (Output == double.PositiveInfinity || Output == double.NegativeInfinity || Output == double.NaN) Output = 100;
+                    if (double.IsInfinity(Output) || double.IsNaN(Output)) Output = 1;
                     Output = double.Max(-1d, double.Min(1d, Output));
                     break;
                 default:
                     break;
             }
             Input = 0d;
+
+            if (double.IsInfinity(Output) || double.IsNaN(Output)) Output = 0;
+            Output = double.Max(-100d, double.Min(100d, Output));
         }
 
         public void SendNodeOutput(ref List<BrainNode> brainNodes)
@@ -203,9 +206,9 @@ namespace Paramecium.Engine
                 case BrainNodeType.Output_PheromoneBlue:
                     brainOutput.PheromoneBlue += Input;
                     break;
-                case BrainNodeType.Output_ShareElement:
-                    brainOutput.ShareElement += Input;
-                    break;
+                //case BrainNodeType.Output_ShareElement:
+                //    brainOutput.ShareElement += Input;
+                //    break;
                 case BrainNodeType.Output_Memory0:
                     brainOutput.Memory0 += Input;
                     break;

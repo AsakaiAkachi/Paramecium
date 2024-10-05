@@ -149,8 +149,6 @@
 
             if (Initialized)
             {
-                Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX];
-
                 BrainInput = new BrainInput()
                 {
                     VisionData = AnimalVision.Observe(Position, Angle, Id, SpeciesId, 9, 29, 0.5d, 3, 7, 0.4d),
@@ -264,6 +262,7 @@
                                                 targetAnimal.Element -= ElementMoveAmount;
                                             }
                                         }
+                                        /**
                                         else if (BrainOutput.ShareElement > 0d && targetAnimal.SpeciesId == SpeciesId)
                                         {
                                             double ElementMoveAmount = (Element - targetAnimal.Element) * 0.1d;
@@ -274,6 +273,7 @@
                                                 targetAnimal.Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
                                             }
                                         }
+                                        **/
                                     }
                                 }
                             }

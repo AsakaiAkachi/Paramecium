@@ -31,7 +31,7 @@ namespace Paramecium.Forms
 
             g_Soup.AutosaveEnabled = CheckBoxAutosaveEnable.Checked;
             g_Soup.AutosaveInterval = (int)NumericUpDownAutosaveInterval.Value;
-            g_Soup.PrevSaveTime = g_Soup.ElapsedTimeSteps;
+            g_Soup.Modified = true;
 
             Close();
         }

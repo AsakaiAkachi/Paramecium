@@ -1,9 +1,26 @@
 # Changelog
 
+## [0.5.9] - 2024-10-05
+
+### Added
+- Added full screen function.
+- Added the ability to hide the overlay.
+
+### Changed
+- If an animal did not have a particular brain node, the site corresponding to that brain node was no longer displayed.
+- Auto save is now performed when the number of elapsed steps is a multiple of the auto save interval, rather than when a certain number of steps have elapsed since the last save.
+- The default soup settings have been changed.
+- Updated `README.md`.
+
+## Fixed
+- Fixed a bug that could cause the amount of elements to be NaN.
+
+### Deleted
+- Removed brain node type `Output_ShareElement`.
+
 ## [0.5.8b] - 2024-10-05
 
 ### Fixed
-- Fixed a bug that could cause the amount of elements to be NaN.
 - Fixed a bug that the `Modified` property of soups was not being saved.
 - Corrected errors in the contents of `CHANGELOG.md`.
 

@@ -1,16 +1,7 @@
 ﻿using Paramecium.Engine;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Security.Policy;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Text.Json.Serialization;
 
 namespace Paramecium.Forms
 {
@@ -213,6 +204,7 @@ namespace Paramecium.Forms
                 {
                     GenerateInputsFromSoupSettings(loadedSoupSettings, IsAllSettingsEditable);
                 }
+                streamReader.Close();
             }
         }
 
@@ -235,7 +227,10 @@ namespace Paramecium.Forms
             else if (Owner is not null && Owner.GetType() == typeof(FormMain))
             {
                 if (g_Soup is not null && g_Soup.Initialized && g_Soup.SoupState == SoupState.Pause)
+                {
                     g_Soup.Settings = GenerateSoupSettingsFromInputs();
+                    g_Soup.Modified = true;
+                }
             }
 
             Close();

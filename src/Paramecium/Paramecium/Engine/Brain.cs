@@ -288,7 +288,10 @@ namespace Paramecium.Engine
                             int targetConnection = random.Next(0, result.nodes[mutationTarget].Connections.Count);
                             int targetConnectionNewConnectionTargetIndex = random.Next(0, result.nodes.Count);
 
-                            if (targetConnectionNewConnectionTargetIndex != mutationTarget && !result.nodes[targetConnectionNewConnectionTargetIndex].IsInput && !connectionTargetIndexes.Contains(targetConnectionNewConnectionTargetIndex))
+                            List<int> connectionTargetConnectionIndexes = new List<int>();
+                            for (int i = 0; i < result.nodes[targetConnectionNewConnectionTargetIndex].Connections.Count; i++) connectionTargetIndexes.Add(result.nodes[targetConnectionNewConnectionTargetIndex].Connections[i].TargetIndex);
+
+                            if (targetConnectionNewConnectionTargetIndex != mutationTarget && !result.nodes[targetConnectionNewConnectionTargetIndex].IsInput && !connectionTargetIndexes.Contains(targetConnectionNewConnectionTargetIndex) && !connectionTargetConnectionIndexes.Contains(mutationTarget))
                             {
                                 result.nodes[mutationTarget].Connections[targetConnection].TargetIndex = targetConnectionNewConnectionTargetIndex;
                             }

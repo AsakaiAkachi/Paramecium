@@ -51,7 +51,7 @@ namespace Paramecium.Engine
         Output_PheromoneRed,
         Output_PheromoneGreen,
         Output_PheromoneBlue,
-        Output_ShareElement,
+        //Output_ShareElement,
         Output_Memory0,
         Output_Memory1,
         Output_Memory2,

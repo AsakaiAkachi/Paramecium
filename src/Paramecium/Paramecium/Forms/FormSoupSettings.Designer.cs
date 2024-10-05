@@ -241,7 +241,7 @@
             Input_SizeX.Name = "Input_SizeX";
             Input_SizeX.Size = new Size(150, 23);
             Input_SizeX.TabIndex = 5;
-            Input_SizeX.Value = new decimal(new int[] { 128, 0, 0, 0 });
+            Input_SizeX.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label3
             // 
@@ -279,7 +279,7 @@
             Input_SizeY.Name = "Input_SizeY";
             Input_SizeY.Size = new Size(150, 23);
             Input_SizeY.TabIndex = 7;
-            Input_SizeY.Value = new decimal(new int[] { 128, 0, 0, 0 });
+            Input_SizeY.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label5
             // 
@@ -392,7 +392,6 @@
             Input_WallNoiseScale.Name = "Input_WallNoiseScale";
             Input_WallNoiseScale.Size = new Size(150, 23);
             Input_WallNoiseScale.TabIndex = 19;
-            Input_WallNoiseScale.Value = new decimal(new int[] { 3, 0, 0, 131072 });
             // 
             // label11
             // 
@@ -411,7 +410,7 @@
             Input_WallNoiseOctave.Name = "Input_WallNoiseOctave";
             Input_WallNoiseOctave.Size = new Size(150, 23);
             Input_WallNoiseOctave.TabIndex = 21;
-            Input_WallNoiseOctave.Value = new decimal(new int[] { 4, 0, 0, 0 });
+            Input_WallNoiseOctave.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label12
             // 
@@ -431,7 +430,6 @@
             Input_WallThickness.Name = "Input_WallThickness";
             Input_WallThickness.Size = new Size(150, 23);
             Input_WallThickness.TabIndex = 23;
-            Input_WallThickness.Value = new decimal(new int[] { 8, 0, 0, 196608 });
             // 
             // label13
             // 
@@ -469,7 +467,7 @@
             Input_TotalElementAmount.Name = "Input_TotalElementAmount";
             Input_TotalElementAmount.Size = new Size(150, 23);
             Input_TotalElementAmount.TabIndex = 25;
-            Input_TotalElementAmount.Value = new decimal(new int[] { 32768, 0, 0, 0 });
+            Input_TotalElementAmount.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label15
             // 
@@ -485,11 +483,10 @@
             Input_ElementFlowRate.DecimalPlaces = 3;
             Input_ElementFlowRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
             Input_ElementFlowRate.Location = new Point(343, 438);
-            Input_ElementFlowRate.Maximum = new decimal(new int[] { 25, 0, 0, 131072 });
+            Input_ElementFlowRate.Maximum = new decimal(new int[] { 2, 0, 0, 65536 });
             Input_ElementFlowRate.Name = "Input_ElementFlowRate";
             Input_ElementFlowRate.Size = new Size(150, 23);
             Input_ElementFlowRate.TabIndex = 27;
-            Input_ElementFlowRate.Value = new decimal(new int[] { 1, 0, 0, 131072 });
             // 
             // label16
             // 
@@ -505,7 +502,7 @@
             Input_PheromoneFlowRate.DecimalPlaces = 3;
             Input_PheromoneFlowRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
             Input_PheromoneFlowRate.Location = new Point(343, 496);
-            Input_PheromoneFlowRate.Maximum = new decimal(new int[] { 25, 0, 0, 131072 });
+            Input_PheromoneFlowRate.Maximum = new decimal(new int[] { 2, 0, 0, 65536 });
             Input_PheromoneFlowRate.Name = "Input_PheromoneFlowRate";
             Input_PheromoneFlowRate.Size = new Size(150, 23);
             Input_PheromoneFlowRate.TabIndex = 32;
@@ -607,7 +604,7 @@
             Input_AngularVelocityDrag.Name = "Input_AngularVelocityDrag";
             Input_AngularVelocityDrag.Size = new Size(150, 23);
             Input_AngularVelocityDrag.TabIndex = 41;
-            Input_AngularVelocityDrag.Value = new decimal(new int[] { 1, 0, 0, 131072 });
+            Input_AngularVelocityDrag.Value = new decimal(new int[] { 1, 0, 0, 65536 });
             // 
             // label22
             // 
@@ -627,7 +624,7 @@
             Input_Drag.Name = "Input_Drag";
             Input_Drag.Size = new Size(150, 23);
             Input_Drag.TabIndex = 39;
-            Input_Drag.Value = new decimal(new int[] { 25, 0, 0, 196608 });
+            Input_Drag.Value = new decimal(new int[] { 1, 0, 0, 65536 });
             // 
             // label23
             // 
@@ -705,7 +702,7 @@
             Input_PlantForkOffspringCountMax.Name = "Input_PlantForkOffspringCountMax";
             Input_PlantForkOffspringCountMax.Size = new Size(150, 23);
             Input_PlantForkOffspringCountMax.TabIndex = 58;
-            Input_PlantForkOffspringCountMax.Value = new decimal(new int[] { 8, 0, 0, 0 });
+            Input_PlantForkOffspringCountMax.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label27
             // 
@@ -724,7 +721,7 @@
             Input_PlantForkOffspringCountMin.Name = "Input_PlantForkOffspringCountMin";
             Input_PlantForkOffspringCountMin.Size = new Size(150, 23);
             Input_PlantForkOffspringCountMin.TabIndex = 56;
-            Input_PlantForkOffspringCountMin.Value = new decimal(new int[] { 4, 0, 0, 0 });
+            Input_PlantForkOffspringCountMin.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label28
             // 
@@ -745,7 +742,7 @@
             Input_PlantForkCost.Name = "Input_PlantForkCost";
             Input_PlantForkCost.Size = new Size(150, 23);
             Input_PlantForkCost.TabIndex = 54;
-            Input_PlantForkCost.Value = new decimal(new int[] { 16, 0, 0, 0 });
+            Input_PlantForkCost.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label29
             // 
@@ -765,7 +762,6 @@
             Input_InitialPlantElementAmount.Name = "Input_InitialPlantElementAmount";
             Input_InitialPlantElementAmount.Size = new Size(150, 23);
             Input_InitialPlantElementAmount.TabIndex = 52;
-            Input_InitialPlantElementAmount.Value = new decimal(new int[] { 16, 0, 0, 0 });
             // 
             // label30
             // 
@@ -783,7 +779,6 @@
             Input_InitialPlantPopulation.Name = "Input_InitialPlantPopulation";
             Input_InitialPlantPopulation.Size = new Size(150, 23);
             Input_InitialPlantPopulation.TabIndex = 50;
-            Input_InitialPlantPopulation.Value = new decimal(new int[] { 1024, 0, 0, 0 });
             // 
             // label31
             // 
@@ -822,7 +817,6 @@
             Input_PlantElementCollectRate.Name = "Input_PlantElementCollectRate";
             Input_PlantElementCollectRate.Size = new Size(150, 23);
             Input_PlantElementCollectRate.TabIndex = 60;
-            Input_PlantElementCollectRate.Value = new decimal(new int[] { 1, 0, 0, 131072 });
             // 
             // label33
             // 
@@ -842,7 +836,6 @@
             Input_AnimalElementBaseCost.Name = "Input_AnimalElementBaseCost";
             Input_AnimalElementBaseCost.Size = new Size(150, 23);
             Input_AnimalElementBaseCost.TabIndex = 69;
-            Input_AnimalElementBaseCost.Value = new decimal(new int[] { 1, 0, 0, 131072 });
             // 
             // label36
             // 
@@ -863,7 +856,7 @@
             Input_AnimalForkCost.Name = "Input_AnimalForkCost";
             Input_AnimalForkCost.Size = new Size(150, 23);
             Input_AnimalForkCost.TabIndex = 67;
-            Input_AnimalForkCost.Value = new decimal(new int[] { 64, 0, 0, 0 });
+            Input_AnimalForkCost.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label37
             // 
@@ -883,7 +876,6 @@
             Input_InitialAnimalElementAmount.Name = "Input_InitialAnimalElementAmount";
             Input_InitialAnimalElementAmount.Size = new Size(150, 23);
             Input_InitialAnimalElementAmount.TabIndex = 65;
-            Input_InitialAnimalElementAmount.Value = new decimal(new int[] { 64, 0, 0, 0 });
             // 
             // label38
             // 
@@ -901,7 +893,6 @@
             Input_InitialAnimalPopulation.Name = "Input_InitialAnimalPopulation";
             Input_InitialAnimalPopulation.Size = new Size(150, 23);
             Input_InitialAnimalPopulation.TabIndex = 63;
-            Input_InitialAnimalPopulation.Value = new decimal(new int[] { 256, 0, 0, 0 });
             // 
             // label39
             // 
@@ -940,7 +931,6 @@
             Input_AnimalElementAccelerationCost.Name = "Input_AnimalElementAccelerationCost";
             Input_AnimalElementAccelerationCost.Size = new Size(150, 23);
             Input_AnimalElementAccelerationCost.TabIndex = 71;
-            Input_AnimalElementAccelerationCost.Value = new decimal(new int[] { 2, 0, 0, 131072 });
             // 
             // label34
             // 
@@ -960,7 +950,6 @@
             Input_AnimalElementRotationCost.Name = "Input_AnimalElementRotationCost";
             Input_AnimalElementRotationCost.Size = new Size(150, 23);
             Input_AnimalElementRotationCost.TabIndex = 73;
-            Input_AnimalElementRotationCost.Value = new decimal(new int[] { 1, 0, 0, 131072 });
             // 
             // label35
             // 
@@ -980,7 +969,6 @@
             Input_AnimalElementAttackCost.Name = "Input_AnimalElementAttackCost";
             Input_AnimalElementAttackCost.Size = new Size(150, 23);
             Input_AnimalElementAttackCost.TabIndex = 75;
-            Input_AnimalElementAttackCost.Value = new decimal(new int[] { 2, 0, 0, 131072 });
             // 
             // label41
             // 
@@ -1000,7 +988,6 @@
             Input_AnimalElementPheromoneProductionCost.Name = "Input_AnimalElementPheromoneProductionCost";
             Input_AnimalElementPheromoneProductionCost.Size = new Size(150, 23);
             Input_AnimalElementPheromoneProductionCost.TabIndex = 77;
-            Input_AnimalElementPheromoneProductionCost.Value = new decimal(new int[] { 25, 0, 0, 262144 });
             // 
             // label42
             // 
@@ -1019,7 +1006,7 @@
             Input_AnimalMaximumAge.Name = "Input_AnimalMaximumAge";
             Input_AnimalMaximumAge.Size = new Size(150, 23);
             Input_AnimalMaximumAge.TabIndex = 83;
-            Input_AnimalMaximumAge.Value = new decimal(new int[] { 15000, 0, 0, 0 });
+            Input_AnimalMaximumAge.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label43
             // 
@@ -1039,7 +1026,6 @@
             Input_AnimalAnimalIngestionRate.Name = "Input_AnimalAnimalIngestionRate";
             Input_AnimalAnimalIngestionRate.Size = new Size(150, 23);
             Input_AnimalAnimalIngestionRate.TabIndex = 81;
-            Input_AnimalAnimalIngestionRate.Value = new decimal(new int[] { 8, 0, 0, 65536 });
             // 
             // label44
             // 
@@ -1059,7 +1045,6 @@
             Input_AnimalPlantIngestionRate.Name = "Input_AnimalPlantIngestionRate";
             Input_AnimalPlantIngestionRate.Size = new Size(150, 23);
             Input_AnimalPlantIngestionRate.TabIndex = 79;
-            Input_AnimalPlantIngestionRate.Value = new decimal(new int[] { 2, 0, 0, 65536 });
             // 
             // label45
             // 
@@ -1074,10 +1059,11 @@
             // 
             Input_AnimalBrainMaximumConnectionCount.Location = new Point(343, 1482);
             Input_AnimalBrainMaximumConnectionCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            Input_AnimalBrainMaximumConnectionCount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMaximumConnectionCount.Name = "Input_AnimalBrainMaximumConnectionCount";
             Input_AnimalBrainMaximumConnectionCount.Size = new Size(150, 23);
             Input_AnimalBrainMaximumConnectionCount.TabIndex = 95;
-            Input_AnimalBrainMaximumConnectionCount.Value = new decimal(new int[] { 8, 0, 0, 0 });
+            Input_AnimalBrainMaximumConnectionCount.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label46
             // 
@@ -1092,10 +1078,11 @@
             // 
             Input_AnimalBrainMaximumNodeCount.Location = new Point(343, 1453);
             Input_AnimalBrainMaximumNodeCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            Input_AnimalBrainMaximumNodeCount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMaximumNodeCount.Name = "Input_AnimalBrainMaximumNodeCount";
             Input_AnimalBrainMaximumNodeCount.Size = new Size(150, 23);
             Input_AnimalBrainMaximumNodeCount.TabIndex = 93;
-            Input_AnimalBrainMaximumNodeCount.Value = new decimal(new int[] { 64, 0, 0, 0 });
+            Input_AnimalBrainMaximumNodeCount.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label47
             // 
@@ -1134,7 +1121,6 @@
             Input_AnimalSpeciesIdMutationRate.Name = "Input_AnimalSpeciesIdMutationRate";
             Input_AnimalSpeciesIdMutationRate.Size = new Size(150, 23);
             Input_AnimalSpeciesIdMutationRate.TabIndex = 90;
-            Input_AnimalSpeciesIdMutationRate.Value = new decimal(new int[] { 25, 0, 0, 131072 });
             // 
             // label49
             // 
@@ -1152,7 +1138,6 @@
             Input_AnimalMaximumMutationCount.Name = "Input_AnimalMaximumMutationCount";
             Input_AnimalMaximumMutationCount.Size = new Size(150, 23);
             Input_AnimalMaximumMutationCount.TabIndex = 88;
-            Input_AnimalMaximumMutationCount.Value = new decimal(new int[] { 8, 0, 0, 0 });
             // 
             // label50
             // 
@@ -1172,7 +1157,6 @@
             Input_AnimalMutationRate.Name = "Input_AnimalMutationRate";
             Input_AnimalMutationRate.Size = new Size(150, 23);
             Input_AnimalMutationRate.TabIndex = 86;
-            Input_AnimalMutationRate.Value = new decimal(new int[] { 25, 0, 0, 131072 });
             // 
             // label51
             // 

@@ -39,6 +39,7 @@
             TopMenu_File_Exit = new ToolStripMenuItem();
             TopMenu_Soup = new ToolStripMenuItem();
             TopMenu_Soup_EditSoupSettings = new ToolStripMenuItem();
+            TopMenuBar_Soup_EditAutosaveSettings = new ToolStripMenuItem();
             TopMenu_Help = new ToolStripMenuItem();
             TopMenu_Help_AboutParamecium = new ToolStripMenuItem();
             BottomStat = new StatusStrip();
@@ -52,7 +53,6 @@
             SoupView = new PictureBox();
             SaveFileDialog_SaveSoup = new SaveFileDialog();
             OpenFileDialog_LoadSoup = new OpenFileDialog();
-            TopMenuBar_Soup_EditAutosaveSettings = new ToolStripMenuItem();
             TopMenu.SuspendLayout();
             BottomStat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SoupView).BeginInit();
@@ -77,40 +77,40 @@
             // TopMenu_File_New
             // 
             TopMenu_File_New.Name = "TopMenu_File_New";
-            TopMenu_File_New.Size = new Size(180, 22);
+            TopMenu_File_New.Size = new Size(123, 22);
             TopMenu_File_New.Text = "New";
             TopMenu_File_New.Click += TopMenu_File_New_Click;
             // 
             // TopMenu_File_Open
             // 
             TopMenu_File_Open.Name = "TopMenu_File_Open";
-            TopMenu_File_Open.Size = new Size(180, 22);
+            TopMenu_File_Open.Size = new Size(123, 22);
             TopMenu_File_Open.Text = "Open...";
             TopMenu_File_Open.Click += TopMenu_File_Open_Click;
             // 
             // TopMenu_File_Save
             // 
             TopMenu_File_Save.Name = "TopMenu_File_Save";
-            TopMenu_File_Save.Size = new Size(180, 22);
+            TopMenu_File_Save.Size = new Size(123, 22);
             TopMenu_File_Save.Text = "Save";
             TopMenu_File_Save.Click += TopMenu_File_Save_Click;
             // 
             // TopMenu_File_SaveAs
             // 
             TopMenu_File_SaveAs.Name = "TopMenu_File_SaveAs";
-            TopMenu_File_SaveAs.Size = new Size(180, 22);
+            TopMenu_File_SaveAs.Size = new Size(123, 22);
             TopMenu_File_SaveAs.Text = "Save As...";
             TopMenu_File_SaveAs.Click += TopMenu_File_SaveAs_Click;
             // 
             // TopMenu_File_Separator1
             // 
             TopMenu_File_Separator1.Name = "TopMenu_File_Separator1";
-            TopMenu_File_Separator1.Size = new Size(177, 6);
+            TopMenu_File_Separator1.Size = new Size(120, 6);
             // 
             // TopMenu_File_Exit
             // 
             TopMenu_File_Exit.Name = "TopMenu_File_Exit";
-            TopMenu_File_Exit.Size = new Size(180, 22);
+            TopMenu_File_Exit.Size = new Size(123, 22);
             TopMenu_File_Exit.Text = "Exit";
             TopMenu_File_Exit.Click += TopMenu_File_Exit_Click;
             // 
@@ -124,9 +124,16 @@
             // TopMenu_Soup_EditSoupSettings
             // 
             TopMenu_Soup_EditSoupSettings.Name = "TopMenu_Soup_EditSoupSettings";
-            TopMenu_Soup_EditSoupSettings.Size = new Size(180, 22);
+            TopMenu_Soup_EditSoupSettings.Size = new Size(178, 22);
             TopMenu_Soup_EditSoupSettings.Text = "Edit Soup Settings...";
             TopMenu_Soup_EditSoupSettings.Click += TopMenu_Soup_EditSoupSettings_Click;
+            // 
+            // TopMenuBar_Soup_EditAutosaveSettings
+            // 
+            TopMenuBar_Soup_EditAutosaveSettings.Name = "TopMenuBar_Soup_EditAutosaveSettings";
+            TopMenuBar_Soup_EditAutosaveSettings.Size = new Size(178, 22);
+            TopMenuBar_Soup_EditAutosaveSettings.Text = "Autosave Settings...";
+            TopMenuBar_Soup_EditAutosaveSettings.Click += TopMenuBar_Soup_EditAutosaveSettings_Click;
             // 
             // TopMenu_Help
             // 
@@ -222,21 +229,14 @@
             OpenFileDialog_LoadSoup.Filter = "Paramecium Soup File|*.soup|All Files|*.*";
             OpenFileDialog_LoadSoup.Title = "Open";
             // 
-            // TopMenuBar_Soup_EditAutosaveSettings
-            // 
-            TopMenuBar_Soup_EditAutosaveSettings.Name = "TopMenuBar_Soup_EditAutosaveSettings";
-            TopMenuBar_Soup_EditAutosaveSettings.Size = new Size(180, 22);
-            TopMenuBar_Soup_EditAutosaveSettings.Text = "Autosave Settings...";
-            TopMenuBar_Soup_EditAutosaveSettings.Click += TopMenuBar_Soup_EditAutosaveSettings_Click;
-            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1200, 846);
+            Controls.Add(SoupView);
             Controls.Add(BottomStat);
             Controls.Add(TopMenu);
-            Controls.Add(SoupView);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = TopMenu;
             Name = "FormMain";

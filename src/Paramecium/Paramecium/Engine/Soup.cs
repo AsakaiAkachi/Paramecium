@@ -30,7 +30,6 @@ namespace Paramecium.Engine
         public bool Modified { get; set; } = true;
         public bool AutosaveEnabled { get; set; } = false;
         public long AutosaveInterval { get; set; } = 100000;
-        public long PrevSaveTime { get; set; } = 0;
 
         // Population Information
         public int PopulationPlant { get; set; }
@@ -262,7 +261,6 @@ namespace Paramecium.Engine
                             for (int y = 0; y < soupSizeY; y++)
                             {
                                 Tile targetTile = Tiles[y * soupSizeX + x];
-                                if (targetTile.Element < 0 || targetTile.Element > Settings.TotalElementAmount || targetTile.Element == double.PositiveInfinity || targetTile.Element == double.NegativeInfinity || targetTile.Element == double.NaN) targetTile.Element = 0;
                                 CurrentTotalElementAmount += targetTile.Element;
                             }
                         }
@@ -270,11 +268,6 @@ namespace Paramecium.Engine
                         {
                             if (Plants[i].Exist)
                             {
-                                if (Plants[i].Element < 0 || Plants[i].Element > Settings.TotalElementAmount || Plants[i].Element == double.PositiveInfinity || Plants[i].Element == double.NegativeInfinity || Plants[i].Element == double.NaN)
-                                {
-                                    Plants[i].Element = 0;
-                                    Plants[i].OnDisable();
-                                }
                                 CurrentTotalElementAmount += Plants[i].Element;
                             }
                         }
@@ -282,11 +275,6 @@ namespace Paramecium.Engine
                         {
                             if (Animals[i].Exist)
                             {
-                                if (Animals[i].Element < 0 || Animals[i].Element > Settings.TotalElementAmount || Animals[i].Element == double.PositiveInfinity || Animals[i].Element == double.NegativeInfinity || Animals[i].Element == double.NaN)
-                                {
-                                    Animals[i].Element = 0;
-                                    Animals[i].OnDisable();
-                                }
                                 CurrentTotalElementAmount += Animals[i].Element;
                             }
                         }
@@ -430,24 +418,29 @@ namespace Paramecium.Engine
 
                         if (SoupState == SoupState.StepRun) SoupState = SoupState.Pause;
 
+                        if (ElapsedTimeSteps >= AutosaveInterval && ElapsedTimeSteps % AutosaveInterval == 0 && AutosaveEnabled)
+                        {
+                            SoupState prevSoupState = SoupState;
+                            SoupState = SoupState.Saving;
+
+                            AutosaveEnabled = false;
+
+                            bool PrevModified = Modified;
+                            Modified = false;
+
+                            SaveSoup($@"{g_SoupAutosaveFilePath}\{Path.GetFileNameWithoutExtension(FilePath)}_{ElapsedTimeSteps}steps.soup", false);
+
+                            Modified = PrevModified;
+
+                            AutosaveEnabled = true;
+
+                            SoupState = prevSoupState;
+                        }
+
                         sw.Stop();
                         TimeStepsPerSecond *= 0.96d;
                         TimeStepsPerSecond += 1000000d / sw.Elapsed.TotalMicroseconds * 0.04d;
                     }
-                }
-
-                if (ElapsedTimeSteps - PrevSaveTime >= AutosaveInterval && AutosaveEnabled)
-                {
-                    AutosaveEnabled = false;
-
-                    bool PrevModified = Modified;
-                    Modified = false;
-
-                    SaveSoup($@"{g_SoupAutosaveFilePath}\{Path.GetFileNameWithoutExtension(FilePath)}_{ElapsedTimeSteps}steps.soup", false);
-
-                    Modified = PrevModified;
-
-                    AutosaveEnabled = true;
                 }
             }
         }
@@ -463,10 +456,9 @@ namespace Paramecium.Engine
             SetSoupState(SoupState.Saving);
 
             Modified = false;
-            PrevSaveTime = ElapsedTimeSteps;
 
             StreamWriter streamWriter = new StreamWriter(filePath, false, Encoding.UTF8);
-            streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }));
+            streamWriter.Write(JsonSerializer.Serialize(g_Soup, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals }));
             streamWriter.Close();
 
             if (updatePath)

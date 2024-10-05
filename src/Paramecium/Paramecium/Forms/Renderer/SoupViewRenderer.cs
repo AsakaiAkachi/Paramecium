@@ -203,31 +203,57 @@ namespace Paramecium.Forms.Renderer
 
                                 if (cameraZoomLevel >= 5)
                                 {
-                                    Random tailAngleRandom = new Random((int)((targetAnimal.Id + targetAnimal.Age) % int.MaxValue));
-                                    Random tailLengthRandom = new Random((int)(targetAnimal.Id % int.MaxValue));
+                                    bool hasTail = false;
+                                    bool hasEye = false;
 
-                                    for (int j = 0; j < 3; j++)
+                                    if (targetAnimal.Brain.Nodes.Count > 0)
                                     {
-                                        DrawLine(
-                                            targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
-                                            targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d,
-                                            targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.05d * targetAnimal.BrainOutput.Acceleration + double.Max(-1d, double.Min(1d, -targetAnimal.BrainOutput.Rotation)) * 0.15d) * (0.4d + tailLengthRandom.NextDouble() * 0.2d),
-                                            Color.FromArgb(255, 255, 255)
-                                        );
+                                        for (int j = 0; j < targetAnimal.Brain.Nodes.Count; j++)
+                                        {
+                                            if (targetAnimal.Brain.Nodes[j].Type == BrainNodeType.Output_Acceleration)
+                                            {
+                                                hasTail = true;
+                                            }
+                                            else if ((int)targetAnimal.Brain.Nodes[j].Type >= (int)BrainNodeType.Input_WallAvgAngle && (int)targetAnimal.Brain.Nodes[j].Type <= (int)BrainNodeType.Input_AnimalOtherSpeciesProximity)
+                                            {
+                                                hasEye = true;
+                                            }
+
+                                            if (hasTail && hasEye) break;
+                                        }
                                     }
 
-                                    FillEllipse(
-                                        targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
-                                        targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.075d) * 0.4d,
-                                        0.05,
-                                        Color.FromArgb(0, 0, 0)
-                                    );
-                                    FillEllipse(
-                                        targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
-                                        targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle - 0.075d) * 0.4d,
-                                        0.05,
-                                        Color.FromArgb(0, 0, 0)
-                                    );
+                                    if (hasTail)
+                                    {
+                                        Random tailAngleRandom = new Random((int)((targetAnimal.Id + targetAnimal.Age) % int.MaxValue));
+                                        Random tailLengthRandom = new Random((int)(targetAnimal.Id % int.MaxValue));
+
+                                        for (int j = 0; j < 3; j++)
+                                        {
+                                            DrawLine(
+                                                targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
+                                                targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d,
+                                                targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.05d * targetAnimal.BrainOutput.Acceleration + double.Max(-1d, double.Min(1d, -targetAnimal.BrainOutput.Rotation)) * 0.15d) * (0.4d + tailLengthRandom.NextDouble() * 0.2d),
+                                                Color.FromArgb(255, 255, 255)
+                                            );
+                                        }
+                                    }
+
+                                    if (hasEye)
+                                    {
+                                        FillEllipse(
+                                            targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
+                                            targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.075d) * 0.4d,
+                                            0.05,
+                                            Color.FromArgb(0, 0, 0)
+                                        );
+                                        FillEllipse(
+                                            targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
+                                            targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle - 0.075d) * 0.4d,
+                                            0.05,
+                                            Color.FromArgb(0, 0, 0)
+                                        );
+                                    }
                                 }
                             }
                         }

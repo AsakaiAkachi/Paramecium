@@ -22,9 +22,13 @@ namespace Paramecium.Forms
 
         double FramesPerSecond;
 
+        bool ShowOverray = true;
         SoupViewOverlayRenderer.SelectedObjectType SelectedObjectType;
         int SelectedObjectIndex = -1;
         long SelectedObjectId = -1;
+
+        bool IsFullScreen = false;
+        FormWindowState PrevWindowState;
 
         public FormMain()
         {
@@ -161,8 +165,11 @@ namespace Paramecium.Forms
                         {
                             SoupViewCanvas = new Bitmap(SoupView.Width, SoupView.Height);
                             SoupViewRenderer.DrawSoupView(ref SoupViewCanvas, CameraPosition, ZoomLevel);
-                            SoupViewOverlayRenderer.DrawSoupOverlayView(ref SoupViewCanvas, CameraPosition, ZoomLevel, mousePointClient, SelectedObjectType, SelectedObjectIndex);
-
+                            if (ShowOverray)
+                            {
+                                SoupViewOverlayRenderer.DrawSoupViewOverlay(ref SoupViewCanvas, CameraPosition, ZoomLevel, mousePointClient, SelectedObjectType, SelectedObjectIndex);
+                                if (IsFullScreen) SoupViewFullScreenOverlayRenderer.DrawSoupViewFullScreenOverlay(ref SoupViewCanvas, FramesPerSecond);
+                            }
                             SoupView.Image = SoupViewCanvas;
                         }
                         catch (Exception ex) { Console.WriteLine(ex.Message); }
@@ -244,6 +251,46 @@ namespace Paramecium.Forms
                         }
                     }
                     break;
+                case Keys.F1:
+                    if (!ShowOverray) ShowOverray = true;
+                    else ShowOverray = false;
+                    break;
+                case Keys.F:
+                    if (ModifierKeys == Keys.Control)
+                    {
+                        if (!IsFullScreen)
+                        {
+                            IsFullScreen = true;
+
+                            TopMenu.Hide();
+                            BottomStat.Hide();
+
+                            SoupView.Location = new Point(0, 0);
+                            SoupView.Size = ClientSize;
+
+                            FormBorderStyle = FormBorderStyle.None;
+
+                            PrevWindowState = WindowState;
+                            WindowState = FormWindowState.Normal;
+                            WindowState = FormWindowState.Maximized;
+                        }
+                        else
+                        {
+                            IsFullScreen = false;
+
+                            TopMenu.Show();
+                            BottomStat.Show();
+
+                            SoupView.Location = new Point(0, 24);
+                            SoupView.Size = new Size(ClientSize.Width, ClientSize.Height - 46);
+
+                            FormBorderStyle = FormBorderStyle.Sizable;
+
+                            WindowState = FormWindowState.Normal;
+                            WindowState = PrevWindowState;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -304,6 +351,11 @@ namespace Paramecium.Forms
                             if (ZoomLevel < 8) ZoomLevel++;
                             break;
                         case Keys.Alt:
+                            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
+                            {
+                                g_Soup.SetSoupState(SoupState.Pause);
+                                g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Wall;
+                            }
                             break;
                         default:
                             SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.None;
@@ -403,6 +455,11 @@ namespace Paramecium.Forms
                             if (ZoomLevel > 0) ZoomLevel--;
                             break;
                         case Keys.Alt:
+                            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
+                            {
+                                g_Soup.SetSoupState(SoupState.Pause);
+                                g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Default;
+                            }
                             break;
                         default:
                             Dragging = true;
@@ -613,7 +670,7 @@ namespace Paramecium.Forms
                 }
 
                 StreamReader streamReader = new StreamReader(OpenFileDialog_LoadSoup.FileName, Encoding.UTF8);
-                Soup? loadedSoup = JsonSerializer.Deserialize<Soup>(streamReader.ReadToEnd(), new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
+                Soup? loadedSoup = JsonSerializer.Deserialize<Soup>(streamReader.ReadToEnd(), new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals });
                 if (loadedSoup is not null)
                 {
                     g_Soup = loadedSoup;
