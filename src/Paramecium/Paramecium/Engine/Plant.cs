@@ -181,6 +181,8 @@
                     g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
                 }
 
+                Element = double.Max(0d, Element);
+
                 Radius = Math.Sqrt(Element / g_Soup.Settings.PlantForkCost) / 2d;
                 Mass = Element;
 

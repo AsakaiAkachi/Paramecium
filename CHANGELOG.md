@@ -1,8 +1,19 @@
 # Changelog
 
+## [0.5.11] - 2024-10-06
+
+### Added
+- Added damage effects when animals are attacked.
+
+### Changed
+- Animals can now only prey on targets they are in contact with. (Previously, they could prey even if they were a short distance away.)
+- Animals can now attack only one target at a time.
+- Animal colors are now displayed even when zoomed out.
+- The range of angles of the animal's tail was adjusted.
+
 ## [0.5.10] - 2024-10-05
 
-## Fixed
+### Fixed
 - Fixed a bug that the angle of an animal's tail could be abnormal.
 - Fixed a bug that could cause two brain nodes to interconnect.
 - Fixed a bug that was applying drag at the wrong time.

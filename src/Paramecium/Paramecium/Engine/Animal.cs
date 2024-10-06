@@ -25,9 +25,8 @@
 
         public double Element { get; set; }
         public double CurrentStepElementCost { get; set; }
-        public double Diet { get; set; }
-        public double TotalIngestedElementAmount { get; set; }
-        public double IngestedElementOriginRatio { get; set; }
+
+        public long LastDamageTime { get; set; }
 
         public int ColorRed { get; set; }
         public int ColorGreen { get; set; }
@@ -36,6 +35,9 @@
         public Brain Brain { get; set; }
         public BrainInput BrainInput { get; set; }
         public BrainOutput BrainOutput { get; set; }
+
+        public OrganismType AttackTargetType;
+        public int AttackTargetIndex;
 
         public Animal()
         {
@@ -61,7 +63,8 @@
             Mass = 16 + element;
 
             Element = element;
-            Diet = 0;
+
+            LastDamageTime = long.MinValue;
 
             ColorRed = random.Next(0, 255 + 1);
             ColorGreen = random.Next(0, 255 + 1);
@@ -91,9 +94,8 @@
             Mass = 16 + element;
 
             Element = element;
-            Diet = parent.IngestedElementOriginRatio;
-            IngestedElementOriginRatio = parent.IngestedElementOriginRatio;
-            TotalIngestedElementAmount = g_Soup.Settings.AnimalForkCost;
+
+            LastDamageTime = long.MinValue;
 
             ColorRed = parent.ColorRed;
             ColorGreen = parent.ColorGreen;
@@ -149,6 +151,9 @@
 
             if (Initialized)
             {
+                int soupSizeX = g_Soup.Settings.SizeX;
+                int soupSizeY = g_Soup.Settings.SizeY;
+
                 BrainInput = new BrainInput()
                 {
                     VisionData = AnimalVision.Observe(Position, Angle, Id, SpeciesId, 9, 29, 0.5d, 3, 7, 0.4d),
@@ -159,6 +164,64 @@
                 };
 
                 BrainOutput = Brain.UpdateBrain(BrainInput);
+
+                AttackTargetType = OrganismType.None;
+                AttackTargetIndex = -1;
+                double attackTargetAngleAbs = 1d;
+
+                for (int x = int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX - 2)); x <= int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX + 2)); x++)
+                {
+                    for (int y = int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY - 2)); y <= int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY + 2)); y++)
+                    {
+                        Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
+
+                        if (targetTile.LocalPlantPopulation > 0)
+                        {
+                            for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
+                            {
+                                Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
+                                if (targetPlant.Exist)
+                                {
+                                    if (Double2d.DistanceSquared(Position, targetPlant.Position) < (Radius + targetPlant.Radius) * (Radius + targetPlant.Radius))
+                                    {
+                                        if (BrainOutput.Attack > 0d)
+                                        {
+                                            double angleAbs = double.Abs(Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - Position, -Angle)));
+                                            if (angleAbs < 0.125d && angleAbs < attackTargetAngleAbs)
+                                            {
+                                                AttackTargetType = OrganismType.Plant;
+                                                AttackTargetIndex = targetPlant.Index;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (targetTile.LocalAnimalPopulation > 0)
+                        {
+                            for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
+                            {
+                                Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
+                                if (targetAnimal.Exist && targetAnimal.Id != Id)
+                                {
+                                    if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius) * (Radius + targetAnimal.Radius))
+                                    {
+                                        if (BrainOutput.Attack > 0d && targetAnimal.SpeciesId != SpeciesId)
+                                        {
+                                            double angleAbs = double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle)));
+                                            if (angleAbs < 0.125d && angleAbs < attackTargetAngleAbs)
+                                            {
+                                                AttackTargetType = OrganismType.Animal;
+                                                AttackTargetIndex = targetAnimal.Index;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }
@@ -191,98 +254,22 @@
                     targetTile.PheromoneBlue += double.Min(1d, BrainOutput.PheromoneBlue) * g_Soup.Settings.PheromoneProductionRate;
                 }
 
-                for (int x = int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX - 2)); x <= int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX + 2)); x++)
+                if (AttackTargetType == OrganismType.Plant)
                 {
-                    for (int y = int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY - 2)); y <= int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY + 2)); y++)
-                    {
-                        Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
+                    Plant target = g_Soup.Plants[AttackTargetIndex];
 
-                        if (targetTile.LocalPlantPopulation > 0)
-                        {
-                            for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
-                            {
-                                Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
-                                if (targetPlant.Exist)
-                                {
-                                    if (Double2d.DistanceSquared(Position, targetPlant.Position) < (Radius + targetPlant.Radius + 0.1) * (Radius + targetPlant.Radius + 0.1))
-                                    {
-                                        if (BrainOutput.Attack > 0d)
-                                        {
-                                            if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - Position, -Angle))) < 0.167d)
-                                            {
-                                                /**
-                                                double IngestionEfficiency = 1d - Diet * 0.9d;
-                                                double ElementIngestionAmount = double.Min(targetPlant.Element, g_Soup.Settings.AnimalPlantIngestionRate * IngestionEfficiency);
-
-                                                IngestedElementOriginRatio = (TotalIngestedElementAmount * IngestedElementOriginRatio) / (TotalIngestedElementAmount + ElementIngestionAmount);
-                                                TotalIngestedElementAmount += ElementIngestionAmount;
-
-                                                Element += ElementIngestionAmount * g_Soup.ElementAmountMultiplier;
-                                                targetPlant.Element -= ElementIngestionAmount;
-                                                **/
-
-                                                double ElementMoveAmount = double.Min(targetPlant.Element, g_Soup.Settings.AnimalPlantIngestionRate);
-
-                                                Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
-                                                targetPlant.Element -= ElementMoveAmount;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (targetTile.LocalAnimalPopulation > 0)// && BrainOutput.Attack >= 1)
-                        {
-                            for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
-                            {
-                                Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
-                                if (targetAnimal.Exist && targetAnimal.Id != Id)
-                                {
-                                    if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius + 0.1) * (Radius + targetAnimal.Radius + 0.1))
-                                    {
-                                        if (BrainOutput.Attack > 0d && targetAnimal.SpeciesId != SpeciesId)
-                                        {
-                                            if (double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle))) < 0.167d)
-                                            {
-                                                /**
-                                                double IngestionEfficiency = 0.333d + (0.667d * Diet);
-                                                double ElementIngestionAmount = double.Min(targetAnimal.Element, g_Soup.Settings.AnimalAnimalIngestionRate * IngestionEfficiency);
-
-                                                IngestedElementOriginRatio = (TotalIngestedElementAmount * IngestedElementOriginRatio + ElementIngestionAmount) / (TotalIngestedElementAmount + ElementIngestionAmount);
-                                                TotalIngestedElementAmount += ElementIngestionAmount;
-
-                                                Element += ElementIngestionAmount * g_Soup.ElementAmountMultiplier;
-                                                targetAnimal.Element -= ElementIngestionAmount;
-                                                **/
-
-                                                double ElementMoveAmount = double.Min(targetAnimal.Element, g_Soup.Settings.AnimalAnimalIngestionRate);
-
-                                                Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
-                                                targetAnimal.Element -= ElementMoveAmount;
-                                            }
-                                        }
-                                        /**
-                                        else if (BrainOutput.ShareElement > 0d && targetAnimal.SpeciesId == SpeciesId)
-                                        {
-                                            double ElementMoveAmount = (Element - targetAnimal.Element) * 0.1d;
-
-                                            if (ElementMoveAmount > 0d)
-                                            {
-                                                Element -= ElementMoveAmount;
-                                                targetAnimal.Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
-                                            }
-                                        }
-                                        **/
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    Element += double.Max(0d, double.Min(target.Element, g_Soup.Settings.AnimalPlantIngestionRate)) * g_Soup.ElementAmountMultiplier;
+                    target.Element -= g_Soup.Settings.AnimalPlantIngestionRate;
                 }
+                else if (AttackTargetType == OrganismType.Animal)
+                {
+                    Animal target = g_Soup.Animals[AttackTargetIndex];
+                    
+                    Element += double.Max(0d, double.Min(target.Element, g_Soup.Settings.AnimalAnimalIngestionRate)) * g_Soup.ElementAmountMultiplier;
+                    target.Element -= g_Soup.Settings.AnimalAnimalIngestionRate;
 
-                //if (IngestedElementOriginRatio < 0) IngestedElementOriginRatio = 0;
-                //if (IngestedElementOriginRatio > 1) IngestedElementOriginRatio = 1;
+                    target.LastDamageTime = g_Soup.ElapsedTimeSteps;
+                }
             }
             else throw new InvalidOperationException("This animal is not initialized.");
         }
@@ -409,6 +396,8 @@
 
                 g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Element += CurrentStepElementCost * g_Soup.ElementAmountMultiplier;
                 Element -= CurrentStepElementCost;
+
+                Element = double.Max(0d, Element);
 
                 Radius = 0.5;
                 Mass = 16 + Element;
