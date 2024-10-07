@@ -75,7 +75,7 @@ namespace Paramecium.Engine
 
         public static Brain Mutate(Brain brain, Random random)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             Brain result = Duplicate(brain);
 

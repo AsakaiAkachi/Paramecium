@@ -6,7 +6,7 @@ namespace Paramecium.Forms.Renderer
     {
         public static void DrawSoupViewFullScreenOverlay(ref Bitmap targetBitmap, double fps)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             Graphics targetGraphics = Graphics.FromImage(targetBitmap);
 
@@ -17,7 +17,7 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawFullScreenInformation(in Bitmap targetBitmap, in Graphics targetGraphics, double fps)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             OverlayInformationRenderer overlayInformationRenderer = new OverlayInformationRenderer(targetGraphics);
 

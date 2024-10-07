@@ -191,6 +191,10 @@ namespace Paramecium.Engine
 
                 Random random = new Random(Settings.InitialSeed);
 
+                CurrentSeed = random.Next(int.MinValue, int.MaxValue);
+
+                Initialized = true;
+
                 for (int i = 0; i < Settings.InitialPlantPopulation; i++)
                 {
                     int targetTileIndex = random.Next(0, Tiles.Length);
@@ -200,6 +204,8 @@ namespace Paramecium.Engine
 
                     Plants.Add(new Plant(new Double2d(targetTile.PositionX + random.NextDouble(), targetTile.PositionY + random.NextDouble()), Settings.InitialPlantElementAmount));
                     Plants[Plants.Count - 1].Initialize(Plants.Count - 1, random);
+
+                    PopulationPlant++;
                 }
 
                 for (int i = 0; i < Settings.InitialAnimalPopulation; i++)
@@ -211,16 +217,9 @@ namespace Paramecium.Engine
 
                     Animals.Add(new Animal(new Double2d(targetTile.PositionX + random.NextDouble(), targetTile.PositionY + random.NextDouble()), random.NextDouble(), Settings.InitialAnimalElementAmount, random));
                     Animals[Animals.Count - 1].Initialize(Animals.Count - 1, random);
+
+                    PopulationAnimal++;
                 }
-
-                PopulationPlant = 0;
-                PopulationAnimal = 0;
-                for (int i = 0; i < Plants.Count; i++) if (Plants[i].Exist) PopulationPlant++;
-                for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) PopulationAnimal++;
-
-                CurrentSeed = random.Next(int.MinValue, int.MaxValue);
-
-                Initialized = true;
             }
             else throw new InvalidOperationException("This soup has already been initialized.");
         }

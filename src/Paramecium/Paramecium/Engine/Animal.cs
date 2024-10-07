@@ -8,6 +8,7 @@
         public int Index { get; set; } = -1;
         public long Id { get; set; } = -1;
         public long SpeciesId { get; set; }
+        //public long AncestorSpeciesId { get; set; }
 
         public int Generation { get; set; }
         public int Age { get; set; }
@@ -48,9 +49,10 @@
 
         public Animal(Double2d position, double angle, double element, Random random)
         {
-            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+            if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
 
             SpeciesId = random.NextInt64(0, 2176782335 + 1);
+            //AncestorSpeciesId = SpeciesId;
 
             Generation = 1;
 
@@ -77,9 +79,10 @@
 
         public Animal(Animal parent, Double2d position, double element, Random random)
         {
-            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+            if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
 
             SpeciesId = parent.SpeciesId;
+            //AncestorSpeciesId = parent.AncestorSpeciesId;
 
             Generation = parent.Generation + 1;
 
@@ -110,6 +113,7 @@
 
                     if (random.NextDouble() < g_Soup.Settings.AnimalSpeciesIdMutationRate)
                     {
+                        //AncestorSpeciesId = SpeciesId;
                         SpeciesId = random.NextInt64(0, 2176782335 + 1);
 
                         ColorRed = random.Next(0, 255 + 1);
@@ -127,7 +131,7 @@
 
         public void Initialize(int index, Random random)
         {
-            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (!Initialized)
             {
@@ -147,7 +151,7 @@
 
         public void UpdateNeuralNet()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -207,6 +211,7 @@
                                 {
                                     if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius) * (Radius + targetAnimal.Radius))
                                     {
+                                        //if (BrainOutput.Attack > 0d && (targetAnimal.SpeciesId != SpeciesId && SpeciesId != targetAnimal.AncestorSpeciesId && targetAnimal.AncestorSpeciesId != SpeciesId && targetAnimal.AncestorSpeciesId != AncestorSpeciesId))
                                         if (BrainOutput.Attack > 0d && targetAnimal.SpeciesId != SpeciesId)
                                         {
                                             double angleAbs = double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle)));
@@ -228,7 +233,7 @@
 
         public void ApplyNeuralNetOutput()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -258,15 +263,15 @@
                 {
                     Plant target = g_Soup.Plants[AttackTargetIndex];
 
-                    Element += double.Max(0d, double.Min(target.Element, g_Soup.Settings.AnimalPlantIngestionRate)) * g_Soup.ElementAmountMultiplier;
-                    target.Element -= g_Soup.Settings.AnimalPlantIngestionRate;
+                    Element += double.Min(target.Element, g_Soup.Settings.AnimalPlantIngestionRate) * g_Soup.ElementAmountMultiplier;
+                    target.Element = double.Max(0d, target.Element - g_Soup.Settings.AnimalPlantIngestionRate);
                 }
                 else if (AttackTargetType == OrganismType.Animal)
                 {
                     Animal target = g_Soup.Animals[AttackTargetIndex];
                     
-                    Element += double.Max(0d, double.Min(target.Element, g_Soup.Settings.AnimalAnimalIngestionRate)) * g_Soup.ElementAmountMultiplier;
-                    target.Element -= g_Soup.Settings.AnimalAnimalIngestionRate;
+                    Element += double.Min(target.Element, g_Soup.Settings.AnimalAnimalIngestionRate) * g_Soup.ElementAmountMultiplier;
+                    target.Element = double.Max(0d, target.Element - g_Soup.Settings.AnimalAnimalIngestionRate);
 
                     target.LastDamageTime = g_Soup.ElapsedTimeSteps;
                 }
@@ -276,7 +281,7 @@
 
         public void UpdateCollision()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -333,7 +338,7 @@
 
         public void UpdatePosition()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -394,10 +399,8 @@
                     (g_Soup.Settings.AnimalElementPheromoneProductionCost * (double.Max(0d, double.Min(1d, BrainOutput.PheromoneRed)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneGreen)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneBlue))))
                 );
 
-                g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Element += CurrentStepElementCost * g_Soup.ElementAmountMultiplier;
-                Element -= CurrentStepElementCost;
-
-                Element = double.Max(0d, Element);
+                g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Element += double.Min(Element, CurrentStepElementCost) * g_Soup.ElementAmountMultiplier;
+                Element = double.Max(0d, Element - CurrentStepElementCost);
 
                 Radius = 0.5;
                 Mass = 16 + Element;
@@ -418,7 +421,7 @@
 
         public void ApplyDrag()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -430,7 +433,7 @@
 
         public Animal? CreateOffspring(Random random)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -455,7 +458,7 @@
 
         public void OnDisable()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {

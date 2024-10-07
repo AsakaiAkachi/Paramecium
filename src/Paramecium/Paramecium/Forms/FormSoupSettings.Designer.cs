@@ -1127,9 +1127,9 @@
             label49.AutoSize = true;
             label49.Location = new Point(13, 1397);
             label49.Name = "label49";
-            label49.Size = new Size(286, 15);
+            label49.Size = new Size(264, 15);
             label49.TabIndex = 89;
-            label49.Text = "Species ID Mutation Rate Per Brain Mutation Attempt";
+            label49.Text = "Species ID Mutation Rate (Per Mutation Attempt)";
             // 
             // Input_AnimalMaximumMutationCount
             // 
@@ -1144,9 +1144,9 @@
             label50.AutoSize = true;
             label50.Location = new Point(13, 1368);
             label50.Name = "label50";
-            label50.Size = new Size(228, 15);
+            label50.Size = new Size(198, 15);
             label50.TabIndex = 87;
-            label50.Text = "Maximum Brain Mutation Attempts Count";
+            label50.Text = "Maximum Mutation Attempts Count";
             // 
             // Input_AnimalMutationRate
             // 
@@ -1163,9 +1163,9 @@
             label51.AutoSize = true;
             label51.Location = new Point(13, 1339);
             label51.Name = "label51";
-            label51.Size = new Size(112, 15);
+            label51.Size = new Size(82, 15);
             label51.TabIndex = 85;
-            label51.Text = "Brain Mutation Rate";
+            label51.Text = "Mutation Rate";
             // 
             // panel10
             // 

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.12] - 2024-10-08
+
+### Changed
+- Changed some of the notations of the setting items in the `Soup Settings` window.
+- Animals with the same Species ID as the selected animal now show a white border.
+
+### Fixed
+- Fixed a bug that caused incorrect calculation of element amount in some situations.
+
 ## [0.5.11] - 2024-10-06
 
 ### Added

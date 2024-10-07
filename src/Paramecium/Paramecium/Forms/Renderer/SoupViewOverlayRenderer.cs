@@ -1,5 +1,7 @@
 ﻿using Paramecium.Engine;
 using static Paramecium.Forms.Renderer.SoupViewDrawShape;
+using static Paramecium.Forms.Renderer.WorldPosViewPosConversion;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Paramecium.Forms.Renderer
 {
@@ -7,11 +9,12 @@ namespace Paramecium.Forms.Renderer
     {
         public static void DrawSoupViewOverlay(ref Bitmap targetBitmap, Double2d cameraPosition, int cameraZoomLevel, Point mousePointClient, SelectedObjectType selectedObjectType, int selectedObjectIndex)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             Graphics targetGraphics = Graphics.FromImage(targetBitmap);
             double cameraZoomFactor = double.Pow(2, cameraZoomLevel);
 
+            DrawObjectInformation(targetBitmap, targetGraphics, cameraPosition, cameraZoomLevel, cameraZoomFactor, selectedObjectType, selectedObjectIndex);
             DrawSelectedObjectInformation(targetBitmap, targetGraphics, cameraPosition, cameraZoomLevel, cameraZoomFactor, mousePointClient, selectedObjectType, selectedObjectIndex);
 
             targetGraphics.Dispose();
@@ -19,7 +22,7 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSelectedObjectInformation(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor, Point mousePointClient, SelectedObjectType selectedObjectType, int selectedObjectIndex)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             OverlayInformationRenderer overlayInformationRenderer = new OverlayInformationRenderer(targetGraphics);
 
@@ -126,6 +129,16 @@ namespace Paramecium.Forms.Renderer
                     targetSpecieId /= 36;
                 }
 
+                /**
+                string targetAncestorSpeciesIdString = String.Empty;
+                long targetAncestorSpeciesId = target.AncestorSpeciesId;
+                for (int i = 0; i < 6; i++)
+                {
+                    targetAncestorSpeciesIdString = chars[(int)(targetAncestorSpeciesId % 36)] + targetAncestorSpeciesIdString;
+                    targetAncestorSpeciesId /= 36;
+                }
+                **/
+
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Animal #{targetIdString}", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
@@ -133,6 +146,10 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Species ID : #{targetSpecieIdString}", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
+
+                //overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                //overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Ancestor Species ID : #{targetAncestorSpeciesIdString}", 0, 0, Color.FromArgb(255, 255, 255));
+                //overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Generation : {target.Generation}", 0, 0, Color.FromArgb(255, 255, 255));
@@ -375,6 +392,43 @@ namespace Paramecium.Forms.Renderer
                         overlayInformationRenderer.OffsetY = PrevOffsetY;
 
                         break;
+                    }
+                }
+            }
+        }
+
+        public static void DrawObjectInformation(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor, SelectedObjectType selectedObjectType, int selectedObjectIndex)
+        {
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
+            if (selectedObjectType != SelectedObjectType.Animal) return;
+
+            int soupSizeX = g_Soup.Settings.SizeX;
+            int soupSizeY = g_Soup.Settings.SizeY;
+
+            Animal selectedAnimal = g_Soup.Animals[selectedObjectIndex];
+
+            for (int x = int.Max(0, int.Min(soupSizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); x <= int.Max(0, int.Min(soupSizeX - 1, (int)ViewPosToWorldPosX(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Width) + 1)); x++)
+            {
+                for (int y = int.Max(0, int.Min(soupSizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, 0) - 1)); y <= int.Max(0, int.Min(soupSizeY - 1, (int)ViewPosToWorldPosY(targetBitmap, cameraPosition, cameraZoomFactor, targetBitmap.Height) + 1)); y++)
+                {
+                    Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
+
+                    if (targetTile.LocalAnimalPopulation > 0)
+                    {
+                        List<int> LocalAnimalIndexes = new List<int>(targetTile.LocalAnimalIndexes);
+                        for (int i = 0; i < LocalAnimalIndexes.Count; i++)
+                        {
+                            Animal targetAnimal = g_Soup.Animals[LocalAnimalIndexes[i]];
+
+                            if (targetAnimal.Exist)
+                            {
+                                //if (selectedAnimal.SpeciesId == targetAnimal.SpeciesId || selectedAnimal.SpeciesId == targetAnimal.AncestorSpeciesId || selectedAnimal.AncestorSpeciesId == targetAnimal.SpeciesId || selectedAnimal.AncestorSpeciesId == targetAnimal.AncestorSpeciesId)
+                                if (selectedAnimal.SpeciesId == targetAnimal.SpeciesId)
+                                {
+                                    DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius + 0.5d, Color.FromArgb(255, 255, 255));
+                                }
+                            }
+                        }
                     }
                 }
             }

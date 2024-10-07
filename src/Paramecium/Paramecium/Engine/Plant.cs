@@ -22,7 +22,7 @@
 
         public Plant(Double2d position, double element)
         {
-            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+            if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
 
             Position = position;
             IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
@@ -36,7 +36,7 @@
 
         public void Initialize(int index, Random random)
         {
-            if (g_Soup is null) throw new InvalidOperationException("The soup has not been created.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (!Initialized)
             {
@@ -56,7 +56,7 @@
 
         public void CollectElement()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -67,9 +67,7 @@
                     double ElementMoveAmount = targetTile.Element * g_Soup.Settings.PlantElementCollectRate;
 
                     Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
-                    targetTile.Element -= ElementMoveAmount;
-
-                    if (targetTile.Element < 0) targetTile.Element = 0;
+                    targetTile.Element = double.Max(0d, targetTile.Element - ElementMoveAmount);
                 }
             }
             else throw new InvalidOperationException("This animal is not initialized.");
@@ -77,7 +75,7 @@
 
         public void UpdateCollision()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -134,7 +132,7 @@
 
         public void UpdatePosition()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -181,8 +179,6 @@
                     g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
                 }
 
-                Element = double.Max(0d, Element);
-
                 Radius = Math.Sqrt(Element / g_Soup.Settings.PlantForkCost) / 2d;
                 Mass = Element;
 
@@ -194,7 +190,7 @@
 
         public void ApplyDrag()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -205,7 +201,7 @@
 
         public List<Plant>? CreateOffspring(in Random random)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {
@@ -230,7 +226,7 @@
 
         public void OnDisable()
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             if (Initialized)
             {

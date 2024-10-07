@@ -10,7 +10,7 @@ namespace Paramecium.Forms.Renderer
     {
         public static void DrawSoupView(ref Bitmap targetBitmap, Double2d cameraPosition, int cameraZoomLevel)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             Graphics targetGraphics = Graphics.FromImage(targetBitmap);
             double cameraZoomFactor = double.Pow(2, cameraZoomLevel);
@@ -29,7 +29,7 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupBackground(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             int soupSizeX = g_Soup.Settings.SizeX;
             int soupSizeY = g_Soup.Settings.SizeY;
@@ -116,7 +116,7 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupBorder(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, -1d), new Double2d(g_Soup.Settings.SizeX + 1, 0), Color.FromArgb(0, 0, 0));
             FillRectangle(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, new Double2d(-1d, g_Soup.Settings.SizeY), new Double2d(g_Soup.Settings.SizeX + 1, g_Soup.Settings.SizeY + 1), Color.FromArgb(0, 0, 0));
@@ -128,7 +128,7 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupWall(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             int soupSizeX = g_Soup.Settings.SizeX;
             int soupSizeY = g_Soup.Settings.SizeY;
@@ -152,7 +152,7 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupPlant(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             int soupSizeX = g_Soup.Settings.SizeX;
             int soupSizeY = g_Soup.Settings.SizeY;
@@ -183,7 +183,7 @@ namespace Paramecium.Forms.Renderer
 
         public static void DrawSoupAnimal(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, int cameraZoomLevel, double cameraZoomFactor)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new InvalidOperationException("The soup has not been created or initialized.");
+            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
 
             int soupSizeX = g_Soup.Settings.SizeX;
             int soupSizeY = g_Soup.Settings.SizeY;
