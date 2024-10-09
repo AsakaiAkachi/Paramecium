@@ -140,6 +140,8 @@ namespace Paramecium.Forms
                     MessageBoxIcon.Information,
                     MessageBoxDefaultButton.Button1
                 );
+
+                g_Soup.Modified = true;
             }
             catch (Exception ex)
             {

@@ -11,7 +11,7 @@ namespace Paramecium.Forms
         {
             InitializeComponent();
 
-            Settings = new SoupSettings();
+            Settings = new SoupSettings() { InitialSeed = new Random().Next(int.MinValue, int.MaxValue), WallNoiseX = new Random().NextDouble() * 256d, WallNoiseY = new Random().NextDouble() * 256d, WallNoiseZ = new Random().NextDouble() * 256d };
             UpdateCurrentSoupSettings(Settings);
         }
 

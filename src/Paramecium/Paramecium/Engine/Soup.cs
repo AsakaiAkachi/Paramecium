@@ -7,17 +7,8 @@ namespace Paramecium.Engine
 {
     public class Soup
     {
-        ///////////////////////////////
-        // Soup Environment Settings //
-        ///////////////////////////////
-
+        // Soup Settings
         public SoupSettings Settings { get; set; } = new SoupSettings();
-
-
-
-        ///////////////////////////////
-        // Soup Simulation Variables //
-        ///////////////////////////////
 
         // Basic Information
         public long ElapsedTimeSteps { get; set; } = 0;

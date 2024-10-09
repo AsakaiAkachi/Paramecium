@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.5.13] - 2024-10-09
+
+### Added
+- Added camera movement with `W,A,S,D` keys.
+- Added camera zoom in and out by `Z` and `X` keys.
+
+### Changed
+- When creating a new soup, the seed value and wall noise offset are now set to random values from the beginning.
+- The color of the frame indicating that the selected organism has the same species ID as the selected organism was changed from white to spring green.
+- Improved object selection operation when zoomed out.
+- The mouse wheel is now disabled when one or more of the `Shift`, `Ctrl`, or `Alt` keys are pressed.
+- The color of the plant display when zoomed out has darkened slightly.
+- Added a warning dialog that appears when a soup could not be loaded.
+
+### Fixed
+- Fixed a bug that `TopMenu` of `FormMain` may not be displayed correctly.
+- Fixed a bug where a frame indicating that the selected organism had the same species ID as the selected organism was also displayed on the selected organism itself.
+- Fixed a bug that sometimes caused an exception when creating a new soup smaller in size than the current soup while a plant or animal was selected.
+
 ## [0.5.12] - 2024-10-08
 
 ### Changed

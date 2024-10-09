@@ -420,12 +420,11 @@ namespace Paramecium.Forms.Renderer
                         {
                             Animal targetAnimal = g_Soup.Animals[LocalAnimalIndexes[i]];
 
-                            if (targetAnimal.Exist)
+                            if (targetAnimal.Exist && targetAnimal.Index != selectedObjectIndex)
                             {
-                                //if (selectedAnimal.SpeciesId == targetAnimal.SpeciesId || selectedAnimal.SpeciesId == targetAnimal.AncestorSpeciesId || selectedAnimal.AncestorSpeciesId == targetAnimal.SpeciesId || selectedAnimal.AncestorSpeciesId == targetAnimal.AncestorSpeciesId)
                                 if (selectedAnimal.SpeciesId == targetAnimal.SpeciesId)
                                 {
-                                    DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius + 0.5d, Color.FromArgb(255, 255, 255));
+                                    DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius + 0.5d, Color.FromArgb(0, 255, 128));
                                 }
                             }
                         }

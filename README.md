@@ -36,7 +36,7 @@ Elements are nutrients needed by all organisms in Paramecium. The amount of elem
 
 ### Window
 - `F1`: Show/Hide overlay
-- `Crtl + F`: Enable/Disable full screen
+- `Ctrl + F`: Enable/Disable full screen
 
 ### Simulation
 - `Space`: Run/Pause Simulation
@@ -45,19 +45,19 @@ Elements are nutrients needed by all organisms in Paramecium. The amount of elem
 - `Question Mark`: Advance the simulation by one step
 
 ### Camera
-- `Right Drag`: Move the camera
+- `Right Drag / W,A,S,D`: Move the camera
 - `C`: Reset the camera position
 - `Left Click`: Select an object
 - `T`: Make the camera follow the selected object
-- `Crtl + T`: Enables auto-tracking of the camera
-- `Crtl + Left Click / Mouse Wheel Up`: Zoom in
-- `Crtl + Right Click / Mouse Wheel Down`: Zoom out
+- `Ctrl + T`: Enables auto-tracking of the camera
+- `Ctrl + Left Click / Mouse Wheel Up / Z`: Zoom in
+- `Ctrl + Right Click / Mouse Wheel Down / X`: Zoom out
 
 ### Edit
 - `Shift + Left Drag`: Move selected objects
 - `Alt + Left Drag`: Create wall
 - `Alt + Right Drag`: Delete Wall
-- `Crtl + D`: Open Object Inspector **(WARNING: FOR ADVANCED USER FEATURE)**
+- `Ctrl + D`: Open Object Inspector **(WARNING: FOR ADVANCED USER FEATURE)**
 
 ## Requirements
 

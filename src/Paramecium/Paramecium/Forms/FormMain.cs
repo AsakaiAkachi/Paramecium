@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.IO;
 
 namespace Paramecium.Forms
 {
@@ -188,6 +189,7 @@ namespace Paramecium.Forms
                     BottomStat_Fps.Text = $"FPS : {FramesPerSecond.ToString("0.0")}";
                 }
 
+                TopMenu.Refresh();
                 BottomStat.Refresh();
 
                 await Task.Delay(1);
@@ -201,17 +203,29 @@ namespace Paramecium.Forms
             switch (e.KeyCode)
             {
                 case Keys.Space:
-                    if (g_Soup.SoupState == SoupState.Pause) g_Soup.SetSoupState(SoupState.Running);
-                    else if (g_Soup.SoupState == SoupState.Running) g_Soup.SetSoupState(SoupState.Pause);
+                    if (ModifierKeys == Keys.None)
+                    {
+                        if (g_Soup.SoupState == SoupState.Pause) g_Soup.SetSoupState(SoupState.Running);
+                        else if (g_Soup.SoupState == SoupState.Running) g_Soup.SetSoupState(SoupState.Pause);
+                    }
                     break;
                 case Keys.OemQuestion:
-                    g_Soup.SetSoupState(SoupState.StepRun);
+                    if (ModifierKeys == Keys.None)
+                    {
+                        g_Soup.SetSoupState(SoupState.StepRun);
+                    }
                     break;
                 case Keys.OemPeriod:
-                    g_Soup.SetThreadCount(g_Soup.ThreadCount + 1);
+                    if (ModifierKeys == Keys.None)
+                    {
+                        g_Soup.SetThreadCount(g_Soup.ThreadCount + 1);
+                    }
                     break;
                 case Keys.Oemcomma:
-                    g_Soup.SetThreadCount(g_Soup.ThreadCount - 1);
+                    if (ModifierKeys == Keys.None)
+                    {
+                        g_Soup.SetThreadCount(g_Soup.ThreadCount - 1);
+                    }
                     break;
                 case Keys.T:
                     if (CameraState == CameraState.Default)
@@ -226,8 +240,29 @@ namespace Paramecium.Forms
                     else CameraState = CameraState.Default;
                     break;
                 case Keys.C:
-                    CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
-                    ZoomLevel = 0;
+                    if (ModifierKeys == Keys.None)
+                    {
+                        CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
+                        ZoomLevel = 0;
+                    }
+                    break;
+                case Keys.W:
+                    if (ModifierKeys == Keys.None)
+                    {
+                        CameraPosition = new Double2d((int)CameraPosition.X + 0.5d, (int)CameraPosition.Y + 0.5d - 1d);
+                    }
+                    break;
+                case Keys.S:
+                    if (ModifierKeys == Keys.None)
+                    {
+                        CameraPosition = new Double2d((int)CameraPosition.X + 0.5d, (int)CameraPosition.Y + 0.5d + 1d);
+                    }
+                    break;
+                case Keys.A:
+                    if (ModifierKeys == Keys.None)
+                    {
+                        CameraPosition = new Double2d((int)CameraPosition.X + 0.5d - 1d, (int)CameraPosition.Y + 0.5d);
+                    }
                     break;
                 case Keys.D:
                     if (ModifierKeys == Keys.Control)
@@ -252,10 +287,29 @@ namespace Paramecium.Forms
                             FormInspector.Inspect(2, SelectedObjectIndex);
                         }
                     }
+                    else if (ModifierKeys == Keys.None)
+                    {
+                        CameraPosition = new Double2d((int)CameraPosition.X + 0.5d + 1d, (int)CameraPosition.Y + 0.5d);
+                    }
+                    break;
+                case Keys.Z:
+                    if (ModifierKeys == Keys.None)
+                    {
+                        if (ZoomLevel < 8) ZoomLevel++;
+                    }
+                    break;
+                case Keys.X:
+                    if (ModifierKeys == Keys.None)
+                    {
+                        if (ZoomLevel > 0) ZoomLevel--;
+                    }
                     break;
                 case Keys.F1:
-                    if (!ShowOverray) ShowOverray = true;
-                    else ShowOverray = false;
+                    if (ModifierKeys == Keys.None)
+                    {
+                        if (!ShowOverray) ShowOverray = true;
+                        else ShowOverray = false;
+                    }
                     break;
                 case Keys.F:
                     if (ModifierKeys == Keys.Control)
@@ -326,6 +380,8 @@ namespace Paramecium.Forms
                                 {
                                     if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
                                     {
+                                        g_Soup.SetSoupState(SoupState.Pause);
+
                                         Plant target = g_Soup.Plants[SelectedObjectIndex];
 
                                         target.Position = clickedWorldPos;
@@ -334,9 +390,13 @@ namespace Paramecium.Forms
                                         target.IntegerizedPositionX = clickedWorldPosIntegerizedX;
                                         target.IntegerizedPositionY = clickedWorldPosIntegerizedY;
                                         g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Add(target.Index);
+
+                                        g_Soup.Modified = true;
                                     }
                                     else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
                                     {
+                                        g_Soup.SetSoupState(SoupState.Pause);
+
                                         Animal target = g_Soup.Animals[SelectedObjectIndex];
 
                                         target.Position = clickedWorldPos;
@@ -345,6 +405,8 @@ namespace Paramecium.Forms
                                         target.IntegerizedPositionX = clickedWorldPosIntegerizedX;
                                         target.IntegerizedPositionY = clickedWorldPosIntegerizedY;
                                         g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Add(target.Index);
+
+                                        g_Soup.Modified = true;
                                     }
                                 }
                             }
@@ -377,53 +439,80 @@ namespace Paramecium.Forms
                                     int clickedWorldPosIntegerizedX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(clickedWorldPos.X)));
                                     int clickedWorldPosIntegerizedY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(clickedWorldPos.Y)));
 
-                                    for (int x = int.Max(0, clickedWorldPosIntegerizedX - 1); x <= int.Min(g_Soup.Settings.SizeX - 1, clickedWorldPosIntegerizedX + 1); x++)
+                                    if (ZoomLevel >= 4)
                                     {
-                                        for (int y = int.Max(0, clickedWorldPosIntegerizedY - 1); y <= int.Min(g_Soup.Settings.SizeY - 1, clickedWorldPosIntegerizedY + 1); y++)
+                                        for (int x = int.Max(0, clickedWorldPosIntegerizedX - 1); x <= int.Min(g_Soup.Settings.SizeX - 1, clickedWorldPosIntegerizedX + 1); x++)
                                         {
-                                            Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
-
-                                            if (targetTile.Type == TileType.Default)
+                                            for (int y = int.Max(0, clickedWorldPosIntegerizedY - 1); y <= int.Min(g_Soup.Settings.SizeY - 1, clickedWorldPosIntegerizedY + 1); y++)
                                             {
-                                                if (targetTile.LocalPlantPopulation > 0)
-                                                {
-                                                    for (int i = targetTile.LocalPlantPopulation - 1; i >= 0; i--)
-                                                    {
-                                                        Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
+                                                Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
 
-                                                        if (Double2d.Distance(clickedWorldPos, targetPlant.Position) < targetPlant.Radius)
+                                                if (targetTile.Type == TileType.Default)
+                                                {
+                                                    if (targetTile.LocalPlantPopulation > 0)
+                                                    {
+                                                        for (int i = targetTile.LocalPlantPopulation - 1; i >= 0; i--)
                                                         {
-                                                            SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Plant;
-                                                            SelectedObjectIndex = targetTile.LocalPlantIndexes[i];
-                                                            SelectedObjectId = targetPlant.Id;
+                                                            Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
+
+                                                            if (Double2d.Distance(clickedWorldPos, targetPlant.Position) < targetPlant.Radius)
+                                                            {
+                                                                SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Plant;
+                                                                SelectedObjectIndex = targetPlant.Index;
+                                                                SelectedObjectId = targetPlant.Id;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        for (int x = int.Max(0, clickedWorldPosIntegerizedX - 1); x <= int.Min(g_Soup.Settings.SizeX - 1, clickedWorldPosIntegerizedX + 1); x++)
+                                        {
+                                            for (int y = int.Max(0, clickedWorldPosIntegerizedY - 1); y <= int.Min(g_Soup.Settings.SizeY - 1, clickedWorldPosIntegerizedY + 1); y++)
+                                            {
+                                                Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
+
+                                                if (targetTile.Type == TileType.Default)
+                                                {
+                                                    if (targetTile.LocalAnimalPopulation > 0)
+                                                    {
+                                                        for (int i = targetTile.LocalAnimalPopulation - 1; i >= 0; i--)
+                                                        {
+                                                            Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
+
+                                                            if (Double2d.Distance(clickedWorldPos, targetAnimal.Position) < targetAnimal.Radius)
+                                                            {
+                                                                SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Animal;
+                                                                SelectedObjectIndex = targetAnimal.Index;
+                                                                SelectedObjectId = targetAnimal.Id;
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                    for (int x = int.Max(0, clickedWorldPosIntegerizedX - 1); x <= int.Min(g_Soup.Settings.SizeX - 1, clickedWorldPosIntegerizedX + 1); x++)
+                                    else
                                     {
-                                        for (int y = int.Max(0, clickedWorldPosIntegerizedY - 1); y <= int.Min(g_Soup.Settings.SizeY - 1, clickedWorldPosIntegerizedY + 1); y++)
+                                        Tile targetTile = g_Soup.Tiles[clickedWorldPosIntegerizedY * g_Soup.Settings.SizeX + clickedWorldPosIntegerizedX];
+
+                                        if (targetTile.Type == TileType.Default)
                                         {
-                                            Tile targetTile = g_Soup.Tiles[y * g_Soup.Settings.SizeX + x];
-
-                                            if (targetTile.Type == TileType.Default)
+                                            if (targetTile.LocalAnimalPopulation > 0)
                                             {
-                                                if (targetTile.LocalAnimalPopulation > 0)
-                                                {
-                                                    for (int i = targetTile.LocalAnimalPopulation - 1; i >= 0; i--)
-                                                    {
-                                                        Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
+                                                Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[targetTile.LocalAnimalPopulation - 1]];
 
-                                                        if (Double2d.Distance(clickedWorldPos, targetAnimal.Position) < targetAnimal.Radius)
-                                                        {
-                                                            SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Animal;
-                                                            SelectedObjectIndex = targetTile.LocalAnimalIndexes[i];
-                                                            SelectedObjectId = targetAnimal.Id;
-                                                        }
-                                                    }
-                                                }
+                                                SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Animal;
+                                                SelectedObjectIndex = targetAnimal.Index;
+                                                SelectedObjectId = targetAnimal.Id;
+                                            }
+                                            else if (targetTile.LocalPlantPopulation > 0)
+                                            {
+                                                Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[targetTile.LocalPlantPopulation - 1]];
+
+                                                SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.Plant;
+                                                SelectedObjectIndex = targetPlant.Index;
+                                                SelectedObjectId = targetPlant.Id;
                                             }
                                         }
                                     }
@@ -511,6 +600,8 @@ namespace Paramecium.Forms
                                     {
                                         if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
                                         {
+                                            g_Soup.SetSoupState(SoupState.Pause);
+
                                             Plant target = g_Soup.Plants[SelectedObjectIndex];
 
                                             target.Position = clickedWorldPos;
@@ -519,9 +610,13 @@ namespace Paramecium.Forms
                                             target.IntegerizedPositionX = clickedWorldPosIntegerizedX;
                                             target.IntegerizedPositionY = clickedWorldPosIntegerizedY;
                                             g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalPlantIndexes.Add(target.Index);
+
+                                            g_Soup.Modified = true;
                                         }
                                         else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
                                         {
+                                            g_Soup.SetSoupState(SoupState.Pause);
+
                                             Animal target = g_Soup.Animals[SelectedObjectIndex];
 
                                             target.Position = clickedWorldPos;
@@ -530,6 +625,8 @@ namespace Paramecium.Forms
                                             target.IntegerizedPositionX = clickedWorldPosIntegerizedX;
                                             target.IntegerizedPositionY = clickedWorldPosIntegerizedY;
                                             g_Soup.Tiles[target.IntegerizedPositionY * g_Soup.Settings.SizeX + target.IntegerizedPositionX].LocalAnimalIndexes.Add(target.Index);
+
+                                            g_Soup.Modified = true;
                                         }
                                     }
                                 }
@@ -593,8 +690,11 @@ namespace Paramecium.Forms
         {
             if (g_Soup is null || !g_Soup.Initialized) return;
 
-            if (e.Delta > 0) if (ZoomLevel < 8) ZoomLevel++;
-            if (e.Delta < 0) if (ZoomLevel > 0) ZoomLevel--;
+            if (ModifierKeys == Keys.None)
+            {
+                if (e.Delta > 0) if (ZoomLevel < 8) ZoomLevel++;
+                if (e.Delta < 0) if (ZoomLevel > 0) ZoomLevel--;
+            }
         }
 
         private void TopMenu_File_New_Click(object sender, EventArgs e)
@@ -629,6 +729,10 @@ namespace Paramecium.Forms
                     else if (result == DialogResult.Cancel) return;
                 }
             }
+
+            SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.None;
+            SelectedObjectId = -1;
+            SelectedObjectIndex = -1;
 
             new FormCreateNewSoup().ShowDialog(this);
             SaveFileDialog_SaveSoup.InitialDirectory = $"{g_SoupDefaultFilePath}";
@@ -672,21 +776,42 @@ namespace Paramecium.Forms
                 }
 
                 StreamReader streamReader = new StreamReader(OpenFileDialog_LoadSoup.FileName, Encoding.UTF8);
-                Soup? loadedSoup = JsonSerializer.Deserialize<Soup>(streamReader.ReadToEnd(), new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals });
-                if (loadedSoup is not null)
+                try
                 {
-                    g_Soup = loadedSoup;
-                    if (!g_Soup.Initialized) g_Soup.InitializeSoup();
-                    g_Soup.FilePath = OpenFileDialog_LoadSoup.FileName;
-                    g_Soup.StartSoupThread();
+                    Soup? loadedSoup = JsonSerializer.Deserialize<Soup>(streamReader.ReadToEnd(), new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals });
+                    if (loadedSoup is not null)
+                    {
+                        SelectedObjectType = SoupViewOverlayRenderer.SelectedObjectType.None;
+                        SelectedObjectId = -1;
+                        SelectedObjectIndex = -1;
 
-                    SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_Soup.FilePath)}";
+                        g_Soup = loadedSoup;
+                        if (!g_Soup.Initialized) g_Soup.InitializeSoup();
+                        g_Soup.FilePath = OpenFileDialog_LoadSoup.FileName;
+                        g_Soup.StartSoupThread();
 
-                    CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
-                    ZoomLevel = 0;
+                        SaveFileDialog_SaveSoup.FileName = $"{Path.GetFileName(g_Soup.FilePath)}";
+
+                        CameraPosition = new Double2d(g_Soup.Settings.SizeX / 2d, g_Soup.Settings.SizeY / 2d);
+                        ZoomLevel = 0;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
 
-                streamReader.Close();
+                    MessageBox.Show(
+                        $"Could not load soup.\r\nThe soup file may be malformed or corrupted.",
+                        $"{g_AppName}",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Exclamation,
+                        MessageBoxDefaultButton.Button1
+                    );
+                }
+                finally
+                {
+                    streamReader.Close();
+                }
             }
         }
 

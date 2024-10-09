@@ -69,7 +69,7 @@ namespace Paramecium.Forms.Renderer
 
                         if (cameraZoomLevel < 4)
                         {
-                            if (targetTile.LocalPlantPopulation > 0) pixelColor = Color.FromArgb(0, 255, 0);
+                            if (targetTile.LocalPlantPopulation > 0) pixelColor = Color.FromArgb(0, 216, 0);
 
                             List<int> targetTileLocalAnimalIndexes = new List<int>(targetTile.LocalAnimalIndexes);
                             if (targetTileLocalAnimalIndexes.Count > 0)
@@ -206,7 +206,7 @@ namespace Paramecium.Forms.Renderer
                                 Color targetColor;
 
                                 if (targetAnimal.LastDamageTime <= g_Soup.ElapsedTimeSteps - 25) targetColor = Color.FromArgb(targetAnimal.ColorRed, targetAnimal.ColorGreen, targetAnimal.ColorBlue);
-                                else targetColor = Lerp(Color.FromArgb(targetAnimal.ColorRed, targetAnimal.ColorGreen, targetAnimal.ColorBlue), Color.FromArgb(255, targetAnimal.ColorGreen / 2, targetAnimal.ColorBlue / 2), 1d - (g_Soup.ElapsedTimeSteps - targetAnimal.LastDamageTime) / 25d);
+                                else targetColor = Lerp(Color.FromArgb(targetAnimal.ColorRed, targetAnimal.ColorGreen, targetAnimal.ColorBlue), Color.FromArgb((int)Lerp(targetAnimal.ColorRed, 255, 0.8d), targetAnimal.ColorGreen / 2, targetAnimal.ColorBlue / 2), 1d - (g_Soup.ElapsedTimeSteps - targetAnimal.LastDamageTime) / 25d);
 
                                 FillEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius, targetColor);
                                 DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius, Color.FromArgb(255, 255, 255));
@@ -244,7 +244,7 @@ namespace Paramecium.Forms.Renderer
                                             DrawLine(
                                                 targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor,
                                                 targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d,
-                                                targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.05d * double.Max(-1d, double.Min(1d, targetAnimal.BrainOutput.Acceleration)) + double.Max(-1d, double.Min(1d, -targetAnimal.BrainOutput.Rotation)) * 0.1d) * (0.4d + tailLengthRandom.NextDouble() * 0.2d),
+                                                targetAnimal.Position + Double2d.FromAngle(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle(targetAnimal.Angle + 0.5d + (tailAngleRandom.NextDouble() * 2d - 1d) * 0.0625d * double.Max(-1d, double.Min(1d, targetAnimal.BrainOutput.Acceleration)) + double.Max(-1d, double.Min(1d, -targetAnimal.BrainOutput.Rotation)) * 0.125d) * (0.5d + tailLengthRandom.NextDouble() * 0.2d - 0.1d),
                                                 Color.FromArgb(255, 255, 255)
                                             );
                                         }
