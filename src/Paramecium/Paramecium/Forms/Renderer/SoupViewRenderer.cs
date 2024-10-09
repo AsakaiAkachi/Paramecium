@@ -205,8 +205,8 @@ namespace Paramecium.Forms.Renderer
                             {
                                 Color targetColor;
 
-                                if (targetAnimal.LastDamageTime <= g_Soup.ElapsedTimeSteps - 25) targetColor = Color.FromArgb(targetAnimal.ColorRed, targetAnimal.ColorGreen, targetAnimal.ColorBlue);
-                                else targetColor = Lerp(Color.FromArgb(targetAnimal.ColorRed, targetAnimal.ColorGreen, targetAnimal.ColorBlue), Color.FromArgb((int)Lerp(targetAnimal.ColorRed, 255, 0.8d), targetAnimal.ColorGreen / 2, targetAnimal.ColorBlue / 2), 1d - (g_Soup.ElapsedTimeSteps - targetAnimal.LastDamageTime) / 25d);
+                                if (targetAnimal.LastDamageTime <= g_Soup.ElapsedTimeSteps - g_Soup.Settings.AnimalDamageRecoveryTime) targetColor = Color.FromArgb(targetAnimal.ColorRed, targetAnimal.ColorGreen, targetAnimal.ColorBlue);
+                                else targetColor = Lerp(Color.FromArgb(targetAnimal.ColorRed, targetAnimal.ColorGreen, targetAnimal.ColorBlue), Color.FromArgb((int)Lerp(targetAnimal.ColorRed, 255, 0.8d), targetAnimal.ColorGreen / 2, targetAnimal.ColorBlue / 2), 1d - (g_Soup.ElapsedTimeSteps - targetAnimal.LastDamageTime) / (double)g_Soup.Settings.AnimalDamageRecoveryTime);
 
                                 FillEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius, targetColor);
                                 DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius, Color.FromArgb(255, 255, 255));

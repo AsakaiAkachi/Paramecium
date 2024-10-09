@@ -95,6 +95,7 @@ namespace Paramecium.Forms
                 AnimalElementPheromoneProductionCost = (double)Input_AnimalElementPheromoneProductionCost.Value,
                 AnimalPlantIngestionRate = (double)Input_AnimalPlantIngestionRate.Value,
                 AnimalAnimalIngestionRate = (double)Input_AnimalAnimalIngestionRate.Value,
+                AnimalDamageRecoveryTime = (int)Input_AnimalDamageRecoveryTime.Value,
                 AnimalMaximumAge = (int)Input_AnimalMaximumAge.Value,
 
                 AnimalMutationRate = (double)Input_AnimalMutationRate.Value,
@@ -160,6 +161,7 @@ namespace Paramecium.Forms
             Input_AnimalElementPheromoneProductionCost.Value = (decimal)soupSettings.AnimalElementPheromoneProductionCost;
             Input_AnimalPlantIngestionRate.Value = (decimal)soupSettings.AnimalPlantIngestionRate;
             Input_AnimalAnimalIngestionRate.Value = (decimal)soupSettings.AnimalAnimalIngestionRate;
+            Input_AnimalDamageRecoveryTime.Value = soupSettings.AnimalDamageRecoveryTime;
             Input_AnimalMaximumAge.Value = soupSettings.AnimalMaximumAge;
 
             Input_AnimalMutationRate.Value = (decimal)soupSettings.AnimalMutationRate;

@@ -32,6 +32,17 @@ Every animal has a neural network (called simply “brain” in Paramecium) to d
 <!-- エレメントは、Parameciumにおいてすべての生物が必要とする栄養素です。スープ全体でのエレメントの量は常に一定であり、増減することはありません。動物はエレメントを消費しますが、消費されたエレメントは消滅するのではなくタイルに放出され、植物が成長のためにそのエレメントを再び使えるようになります。また、エレメントは量が多いタイルから少ないタイルへとゆっくりと流れる性質があります。 -->
 Elements are nutrients needed by all organisms in Paramecium. The amount of elements throughout the soup is always constant and does not increase or decrease. Animals consume elements, but the consumed elements are not extinguished but released into the tiles so that plants can use them again for growth. Also, the elements have a tendency to flow slowly from tiles with higher quantities to tiles with lower quantities.
 
+## Getting Started
+
+<!-- Parameciumでスープを作成してシミュレーションを始めるためには、FileメニューからNewを選択して表示された「Create New Soup」ウィンドウのの「Create Soup」をクリックするだけです。 -->
+To create a soup in Paramecium and begin simulation, simply select New from the File menu and click “Create Soup” in the “Create New Soup” window that appears.
+
+<!-- スープを作成する前に設定を変更したい場合は、「Create New Soup」ウィンドウの「View More and Edit」をクリックすればスープのすべての設定パラメータにアクセスするための「Soup Settings」ウィンドウが開きます。このウィンドウで設定を変更して「Apply Settings」をクリックして設定を保存すれば、好きな設定でスープを作成することができます。 -->
+If you want to change the settings before creating the soup, click “View More and Edit” in the “Create New Soup” window to open the “Soup Settings” window for accessing all of the soup's configuration parameters. You can change the settings in this window and click “Apply Settings” to save the settings and create the soup with your desired settings.
+
+<!-- スープを作成したら、あとはSpaceキーを押せばシミュレーションを開始できます。 -->
+Once the soup is created, all that is left is to press the Space key to start the simulation.
+
 ## Key Binding
 
 ### Window

@@ -142,6 +142,8 @@
             Randomize_InitialSeed = new Button();
             Randomize_WallNoise = new Button();
             PanelSoupSettings = new Panel();
+            Input_AnimalDamageRecoveryTime = new NumericUpDown();
+            label53 = new Label();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)Input_InitialSeed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)Input_SizeX).BeginInit();
@@ -194,6 +196,7 @@
             ((System.ComponentModel.ISupportInitialize)Input_AnimalMutationRate).BeginInit();
             panel10.SuspendLayout();
             PanelSoupSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)Input_AnimalDamageRecoveryTime).BeginInit();
             SuspendLayout();
             // 
             // panel1
@@ -1000,7 +1003,7 @@
             // 
             // Input_AnimalMaximumAge
             // 
-            Input_AnimalMaximumAge.Location = new Point(343, 1279);
+            Input_AnimalMaximumAge.Location = new Point(343, 1308);
             Input_AnimalMaximumAge.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalMaximumAge.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalMaximumAge.Name = "Input_AnimalMaximumAge";
@@ -1011,7 +1014,7 @@
             // label43
             // 
             label43.AutoSize = true;
-            label43.Location = new Point(13, 1281);
+            label43.Location = new Point(13, 1310);
             label43.Name = "label43";
             label43.Size = new Size(84, 15);
             label43.TabIndex = 82;
@@ -1057,7 +1060,7 @@
             // 
             // Input_AnimalBrainMaximumConnectionCount
             // 
-            Input_AnimalBrainMaximumConnectionCount.Location = new Point(343, 1482);
+            Input_AnimalBrainMaximumConnectionCount.Location = new Point(343, 1511);
             Input_AnimalBrainMaximumConnectionCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalBrainMaximumConnectionCount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMaximumConnectionCount.Name = "Input_AnimalBrainMaximumConnectionCount";
@@ -1068,7 +1071,7 @@
             // label46
             // 
             label46.AutoSize = true;
-            label46.Location = new Point(13, 1484);
+            label46.Location = new Point(13, 1513);
             label46.Name = "label46";
             label46.Size = new Size(211, 15);
             label46.TabIndex = 94;
@@ -1076,7 +1079,7 @@
             // 
             // Input_AnimalBrainMaximumNodeCount
             // 
-            Input_AnimalBrainMaximumNodeCount.Location = new Point(343, 1453);
+            Input_AnimalBrainMaximumNodeCount.Location = new Point(343, 1482);
             Input_AnimalBrainMaximumNodeCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalBrainMaximumNodeCount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMaximumNodeCount.Name = "Input_AnimalBrainMaximumNodeCount";
@@ -1087,7 +1090,7 @@
             // label47
             // 
             label47.AutoSize = true;
-            label47.Location = new Point(13, 1455);
+            label47.Location = new Point(13, 1484);
             label47.Name = "label47";
             label47.Size = new Size(127, 15);
             label47.TabIndex = 92;
@@ -1097,7 +1100,7 @@
             // 
             panel9.BackColor = SystemColors.ControlDark;
             panel9.Controls.Add(label48);
-            panel9.Location = new Point(3, 1424);
+            panel9.Location = new Point(3, 1453);
             panel9.Name = "panel9";
             panel9.Size = new Size(500, 23);
             panel9.TabIndex = 91;
@@ -1116,7 +1119,7 @@
             // 
             Input_AnimalSpeciesIdMutationRate.DecimalPlaces = 3;
             Input_AnimalSpeciesIdMutationRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalSpeciesIdMutationRate.Location = new Point(343, 1395);
+            Input_AnimalSpeciesIdMutationRate.Location = new Point(343, 1424);
             Input_AnimalSpeciesIdMutationRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalSpeciesIdMutationRate.Name = "Input_AnimalSpeciesIdMutationRate";
             Input_AnimalSpeciesIdMutationRate.Size = new Size(150, 23);
@@ -1125,7 +1128,7 @@
             // label49
             // 
             label49.AutoSize = true;
-            label49.Location = new Point(13, 1397);
+            label49.Location = new Point(13, 1426);
             label49.Name = "label49";
             label49.Size = new Size(264, 15);
             label49.TabIndex = 89;
@@ -1133,7 +1136,7 @@
             // 
             // Input_AnimalMaximumMutationCount
             // 
-            Input_AnimalMaximumMutationCount.Location = new Point(343, 1366);
+            Input_AnimalMaximumMutationCount.Location = new Point(343, 1395);
             Input_AnimalMaximumMutationCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalMaximumMutationCount.Name = "Input_AnimalMaximumMutationCount";
             Input_AnimalMaximumMutationCount.Size = new Size(150, 23);
@@ -1142,7 +1145,7 @@
             // label50
             // 
             label50.AutoSize = true;
-            label50.Location = new Point(13, 1368);
+            label50.Location = new Point(13, 1397);
             label50.Name = "label50";
             label50.Size = new Size(198, 15);
             label50.TabIndex = 87;
@@ -1152,7 +1155,7 @@
             // 
             Input_AnimalMutationRate.DecimalPlaces = 3;
             Input_AnimalMutationRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalMutationRate.Location = new Point(343, 1337);
+            Input_AnimalMutationRate.Location = new Point(343, 1366);
             Input_AnimalMutationRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalMutationRate.Name = "Input_AnimalMutationRate";
             Input_AnimalMutationRate.Size = new Size(150, 23);
@@ -1161,7 +1164,7 @@
             // label51
             // 
             label51.AutoSize = true;
-            label51.Location = new Point(13, 1339);
+            label51.Location = new Point(13, 1368);
             label51.Name = "label51";
             label51.Size = new Size(82, 15);
             label51.TabIndex = 85;
@@ -1171,7 +1174,7 @@
             // 
             panel10.BackColor = SystemColors.ControlDark;
             panel10.Controls.Add(label52);
-            panel10.Location = new Point(3, 1308);
+            panel10.Location = new Point(3, 1337);
             panel10.Name = "panel10";
             panel10.Size = new Size(500, 23);
             panel10.TabIndex = 84;
@@ -1265,6 +1268,8 @@
             PanelSoupSettings.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PanelSoupSettings.AutoScroll = true;
             PanelSoupSettings.AutoScrollMargin = new Size(0, 3);
+            PanelSoupSettings.Controls.Add(Input_AnimalDamageRecoveryTime);
+            PanelSoupSettings.Controls.Add(label53);
             PanelSoupSettings.Controls.Add(panel1);
             PanelSoupSettings.Controls.Add(Randomize_WallNoise);
             PanelSoupSettings.Controls.Add(label2);
@@ -1366,6 +1371,25 @@
             PanelSoupSettings.Size = new Size(523, 600);
             PanelSoupSettings.TabIndex = 102;
             // 
+            // Input_AnimalDamageRecoveryTime
+            // 
+            Input_AnimalDamageRecoveryTime.Location = new Point(343, 1279);
+            Input_AnimalDamageRecoveryTime.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            Input_AnimalDamageRecoveryTime.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            Input_AnimalDamageRecoveryTime.Name = "Input_AnimalDamageRecoveryTime";
+            Input_AnimalDamageRecoveryTime.Size = new Size(150, 23);
+            Input_AnimalDamageRecoveryTime.TabIndex = 103;
+            Input_AnimalDamageRecoveryTime.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // label53
+            // 
+            label53.AutoSize = true;
+            label53.Location = new Point(13, 1281);
+            label53.Name = "label53";
+            label53.Size = new Size(129, 15);
+            label53.TabIndex = 102;
+            label53.Text = "Damage Recovery Time";
+            // 
             // FormSoupSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1444,6 +1468,7 @@
             panel10.PerformLayout();
             PanelSoupSettings.ResumeLayout(false);
             PanelSoupSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)Input_AnimalDamageRecoveryTime).EndInit();
             ResumeLayout(false);
         }
 
@@ -1562,5 +1587,7 @@
         private Button Randomize_InitialSeed;
         private Button Randomize_WallNoise;
         private Panel PanelSoupSettings;
+        private NumericUpDown Input_AnimalDamageRecoveryTime;
+        private Label label53;
     }
 }

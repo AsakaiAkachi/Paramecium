@@ -66,7 +66,7 @@
 
             Element = element;
 
-            LastDamageTime = long.MinValue;
+            LastDamageTime = int.MinValue;
 
             ColorRed = random.Next(0, 255 + 1);
             ColorGreen = random.Next(0, 255 + 1);
@@ -98,7 +98,7 @@
 
             Element = element;
 
-            LastDamageTime = long.MinValue;
+            LastDamageTime = int.MinValue;
 
             ColorRed = parent.ColorRed;
             ColorGreen = parent.ColorGreen;
@@ -165,6 +165,7 @@
                     Velocity = Velocity.Length / g_Soup.Settings.MaximumVelocity,
                     AngularVelocity = AngularVelocity / g_Soup.Settings.MaximumAngularVelocity,
                     Satiety = Element / g_Soup.Settings.AnimalForkCost,
+                    Damage = 1d - long.Min(g_Soup.Settings.AnimalDamageRecoveryTime, g_Soup.ElapsedTimeSteps - LastDamageTime) / (double)g_Soup.Settings.AnimalDamageRecoveryTime
                 };
 
                 BrainOutput = Brain.UpdateBrain(BrainInput);
@@ -395,7 +396,7 @@
                     g_Soup.Settings.AnimalElementBaseCost +
                     (g_Soup.Settings.AnimalElementAccelerationCost * double.Min(1d, double.Abs(BrainOutput.Acceleration))) +
                     (g_Soup.Settings.AnimalElementRotationCost * double.Min(1d, double.Abs(BrainOutput.Rotation))) +
-                    (g_Soup.Settings.AnimalElementAttackCost * double.Max(0d, double.Min(1d, BrainOutput.Attack))) +
+                    (g_Soup.Settings.AnimalElementAttackCost * double.Ceiling(double.Max(0d, double.Min(1d, BrainOutput.Attack)))) +
                     (g_Soup.Settings.AnimalElementPheromoneProductionCost * (double.Max(0d, double.Min(1d, BrainOutput.PheromoneRed)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneGreen)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneBlue))))
                 );
 

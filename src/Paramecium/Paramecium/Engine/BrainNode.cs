@@ -87,6 +87,9 @@ namespace Paramecium.Engine
                 case BrainNodeType.Input_Satiety:
                     Output = brainInput.Satiety;
                     break;
+                case BrainNodeType.Input_Damage:
+                    Output = brainInput.Damage;
+                    break;
                 case BrainNodeType.Input_PheromoneRed:
                     Output = brainInput.VisionData.PheromoneRed;
                     break;

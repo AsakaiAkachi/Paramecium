@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.14] - 2024-10-10
+
+### Added
+- Added `Damage Recovery Time` as a setting item for soup settings.
+
+### Changed
+- Updated `README.md`.
+- The default soup settings have been changed.
+
+### Fixed
+- Fixed a bug that caused animals to incorrectly consume the wrong amount of elements when attacking.
+
 ## [0.5.13] - 2024-10-09
 
 ### Added

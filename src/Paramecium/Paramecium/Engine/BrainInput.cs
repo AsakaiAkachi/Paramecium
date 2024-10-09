@@ -13,5 +13,6 @@ namespace Paramecium.Engine
         public double Velocity;
         public double AngularVelocity;
         public double Satiety;
+        public double Damage;
     }
 }

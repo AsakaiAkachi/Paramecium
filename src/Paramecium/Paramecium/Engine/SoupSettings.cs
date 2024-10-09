@@ -46,13 +46,14 @@
         public int InitialAnimalPopulation { get; set; } = 1024;
         public double InitialAnimalElementAmount { get; set; } = 64d;
         public double AnimalForkCost { get; set; } = 64d;
-        public double AnimalElementBaseCost { get; set; } = 0.02d;
-        public double AnimalElementAccelerationCost { get; set; } = 0.04d;
-        public double AnimalElementRotationCost { get; set; } = 0.02d;
-        public double AnimalElementAttackCost { get; set; } = 0.04d;
-        public double AnimalElementPheromoneProductionCost { get; set; } = 0.005d;
+        public double AnimalElementBaseCost { get; set; } = 0.01d;
+        public double AnimalElementAccelerationCost { get; set; } = 0.02d;
+        public double AnimalElementRotationCost { get; set; } = 0.01d;
+        public double AnimalElementAttackCost { get; set; } = 0.02d;
+        public double AnimalElementPheromoneProductionCost { get; set; } = 0.0025d;
         public double AnimalPlantIngestionRate { get; set; } = 0.2d;
         public double AnimalAnimalIngestionRate { get; set; } = 0.8d;
+        public int AnimalDamageRecoveryTime { get; set; } = 25;
         public int AnimalMaximumAge { get; set; } = 15000;
 
         // Animal Mutation Settings
