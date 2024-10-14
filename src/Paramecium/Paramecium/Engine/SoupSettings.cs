@@ -1,4 +1,6 @@
-﻿namespace Paramecium.Engine
+﻿using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
+
+namespace Paramecium.Engine
 {
     public class SoupSettings
     {
@@ -46,20 +48,34 @@
         public int InitialAnimalPopulation { get; set; } = 1024;
         public double InitialAnimalElementAmount { get; set; } = 64d;
         public double AnimalForkCost { get; set; } = 64d;
-        public double AnimalElementBaseCost { get; set; } = 0.01d;
-        public double AnimalElementAccelerationCost { get; set; } = 0.02d;
-        public double AnimalElementRotationCost { get; set; } = 0.01d;
-        public double AnimalElementAttackCost { get; set; } = 0.02d;
-        public double AnimalElementPheromoneProductionCost { get; set; } = 0.0025d;
+        public int AnimalMaximumAge { get; set; } = 15000;
+
+        // Animal Element Settings
+        public double AnimalElementBaseCost { get; set; } = 0.02d;
+        public double AnimalElementAccelerationCost { get; set; } = 0.04d;
+        public double AnimalElementRotationCost { get; set; } = 0.02d;
+        public double AnimalElementAttackCost { get; set; } = 0d;
+        public double AnimalElementPheromoneProductionCost { get; set; } = 0.005d;
+
+        // Animal Attack and Ingestion Settings
         public double AnimalPlantIngestionRate { get; set; } = 0.2d;
         public double AnimalAnimalIngestionRate { get; set; } = 0.8d;
         public int AnimalDamageRecoveryTime { get; set; } = 25;
-        public int AnimalMaximumAge { get; set; } = 15000;
 
         // Animal Mutation Settings
-        public double AnimalMutationRate { get; set; } = 0.25d;
         public int AnimalMaximumMutationCount { get; set; } = 8;
-        public double AnimalSpeciesIdMutationRate { get; set; } = 0.25d;
+        public double AnimalMutationCountBias { get; set; } = 0.5d;
+        public double AnimalSpeciesIdMutationRate { get; set; } = 0.05d;
+        public double AnimalBrainMutationConnectionCreationAttemptsCountBias { get; set; } = 0.5d;
+        public double AnimalBrainMutationRateAddNode { get; set; } = 0.1d;
+        public double AnimalBrainMutationRateRemoveNode { get; set; } = 0.02d;
+        public double AnimalBrainMutationRateDuplicateNode { get; set; } = 0.005d;
+        public double AnimalBrainMutationRateChangeNodeType { get; set; } = 0.02d;
+        public double AnimalBrainMutationRateAddConnection { get; set; } = 0.1d;
+        public double AnimalBrainMutationRateRemoveConnection { get; set; } = 0.02d;
+        public double AnimalBrainMutationRateChangeConnectionOrigin { get; set; } = 0.02d;
+        public double AnimalBrainMutationRateChangeConnectionTarget { get; set; } = 0.02d;
+        public double AnimalBrainMutationRateChangeConnectionWeight { get; set; } = 0.1d;
 
         // Animal Brain Settings
         public int AnimalBrainMaximumNodeCount { get; set; } = 64;

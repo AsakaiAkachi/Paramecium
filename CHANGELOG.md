@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0 indev-1] - 2024-10-15
+
+### Added
+- Mutation rates can now be set for each type of mutation.
+- Added `Mutation Attempts Count Bias` as a setting item for soup settings.
+
+### Changed
+- Changed some of the notations of the setting items in the `Soup Settings` window.
+- The default soup settings have been changed.
+- The structure of the `Brain` class and related classes was significantly changed.
+
+### Fixed
+- Fixed a bug that caused some windows to be resizable that should not be resizable.
+
 ## [0.5.14] - 2024-10-10
 
 ### Added

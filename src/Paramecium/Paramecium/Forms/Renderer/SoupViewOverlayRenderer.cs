@@ -1,4 +1,5 @@
 ﻿using Paramecium.Engine;
+using System.IO.Packaging;
 using static Paramecium.Forms.Renderer.SoupViewDrawShape;
 using static Paramecium.Forms.Renderer.WorldPosViewPosConversion;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
@@ -211,40 +212,34 @@ namespace Paramecium.Forms.Renderer
 
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Brain Diagram", 0, 0, Color.FromArgb(255, 255, 255));
 
-                for (int i = 0; i < target.Brain.Nodes.Count; i++)
+                for (int i = 0; i < target.Brain.Connections.Count; i++)
                 {
-                    BrainNode targetNode = target.Brain.Nodes[i];
+                    BrainNodeConnection targetConnection = target.Brain.Connections[i];
 
-                    Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(250, 220);
-
-                    for (int j = 0; j < targetNode.Connections.Count; j++)
+                    if (targetConnection.TargetIndex != targetConnection.OriginIndex)
                     {
-                        BrainNodeConnection targetConnection = targetNode.Connections[j];
+                        Double2d connectionOriginPos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * targetConnection.OriginIndex) * 180 + new Double2d(250, 220);
+                        Double2d connectionTargetPos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * targetConnection.TargetIndex) * 180 + new Double2d(250, 220);
 
-                        if (targetConnection.TargetIndex != i)
+                        Double2d arrowVector = (connectionTargetPos - connectionOriginPos).Normalized;
+                        Double2d arrowStartPos = connectionOriginPos + arrowVector * 7.5d;
+                        Double2d arrowEndPos = connectionOriginPos + arrowVector * ((connectionTargetPos - connectionOriginPos).Length - 7.5d);
+                        Double2d arrowLineVector1 = Double2d.Rotate(arrowVector, 0.375) * 7.5d;
+                        Double2d arrowLineVector2 = Double2d.Rotate(arrowVector, -0.375) * 7.5d;
+
+                        Color arrowColor;
+                        if (targetConnection.Weight >= 0)
                         {
-                            Double2d connectionTargetPos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * targetConnection.TargetIndex) * 180 + new Double2d(250, 220);
-
-                            Double2d arrowVector = (connectionTargetPos - nodePos).Normalized;
-                            Double2d arrowStartPos = nodePos + arrowVector * 7.5d;
-                            Double2d arrowEndPos = nodePos + arrowVector * ((connectionTargetPos - nodePos).Length - 7.5d);
-                            Double2d arrowLineVector1 = Double2d.Rotate(arrowVector, 0.375) * 7.5d;
-                            Double2d arrowLineVector2 = Double2d.Rotate(arrowVector, -0.375) * 7.5d;
-
-                            Color arrowColor;
-                            if (targetConnection.Weight >= 0)
-                            {
-                                arrowColor = Lerp(Color.FromArgb(255, 255, 255), Color.FromArgb(0, 255, 0), double.Min(1d, targetConnection.Weight));
-                            }
-                            else
-                            {
-                                arrowColor = Lerp(Color.FromArgb(255, 255, 255), Color.FromArgb(255, 0, 0), double.Min(1d, -targetConnection.Weight));
-                            }
-
-                            overlayInformationRenderer.OverlayDrawLine((int)(arrowStartPos.X), (int)(arrowStartPos.Y), (int)(arrowEndPos.X), (int)(arrowEndPos.Y), arrowColor);
-                            overlayInformationRenderer.OverlayDrawLine((int)(arrowEndPos.X), (int)(arrowEndPos.Y), (int)(arrowEndPos.X + arrowLineVector1.X), (int)(arrowEndPos.Y + arrowLineVector1.Y), arrowColor);
-                            overlayInformationRenderer.OverlayDrawLine((int)(arrowEndPos.X), (int)(arrowEndPos.Y), (int)(arrowEndPos.X + arrowLineVector2.X), (int)(arrowEndPos.Y + arrowLineVector2.Y), arrowColor);
+                            arrowColor = Lerp(Color.FromArgb(255, 255, 255), Color.FromArgb(0, 255, 0), double.Min(1d, targetConnection.Weight));
                         }
+                        else
+                        {
+                            arrowColor = Lerp(Color.FromArgb(255, 255, 255), Color.FromArgb(255, 0, 0), double.Min(1d, -targetConnection.Weight));
+                        }
+
+                        overlayInformationRenderer.OverlayDrawLine((int)(arrowStartPos.X), (int)(arrowStartPos.Y), (int)(arrowEndPos.X), (int)(arrowEndPos.Y), arrowColor);
+                        overlayInformationRenderer.OverlayDrawLine((int)(arrowEndPos.X), (int)(arrowEndPos.Y), (int)(arrowEndPos.X + arrowLineVector1.X), (int)(arrowEndPos.Y + arrowLineVector1.Y), arrowColor);
+                        overlayInformationRenderer.OverlayDrawLine((int)(arrowEndPos.X), (int)(arrowEndPos.Y), (int)(arrowEndPos.X + arrowLineVector2.X), (int)(arrowEndPos.Y + arrowLineVector2.Y), arrowColor);
                     }
                 }
 
@@ -284,6 +279,7 @@ namespace Paramecium.Forms.Renderer
                     overlayInformationRenderer.OverlayFillEllipse((int)(nodePos.X), (int)(nodePos.Y), 15, nodeColor);
                     overlayInformationRenderer.OverlayDrawEllipse((int)(nodePos.X), (int)(nodePos.Y), 15, Color.FromArgb(255, 255, 255));
 
+                    /**
                     if (BrainNode.BrainNodeTypeIsInput(targetNode.Type))
                     {
                         overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Input", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
@@ -300,6 +296,7 @@ namespace Paramecium.Forms.Renderer
                     {
                         overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Nop", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
                     }
+                    **/
                 }
 
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
@@ -361,27 +358,29 @@ namespace Paramecium.Forms.Renderer
                         overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connections : ", 0, 0, Color.FromArgb(255, 255, 255));
                         overlayInformationRenderer.OffsetY += 16;
 
-                        if (targetNode.Connections.Count == 0)
+                        List<BrainNodeConnection> targetNodeConnections = target.Brain.EnumerateOutgoingConnection(i);
+
+                        if (targetNodeConnections.Count == 0)
                         {
                             overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                             overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"No Connection", 30, 0, Color.FromArgb(255, 255, 255));
                             overlayInformationRenderer.OffsetY += 16;
                         }
-                        for (int j = 0; j < targetNode.Connections.Count; j++)
+                        for (int j = 0; j < targetNodeConnections.Count; j++)
                         {
                             overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                             overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connection #{j}", 30, 0, Color.FromArgb(255, 255, 255));
                             overlayInformationRenderer.OffsetY += 16;
 
                             overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Target Index : {targetNode.Connections[j].TargetIndex}", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Target Index : {targetNodeConnections[j].TargetIndex}", 30, 0, Color.FromArgb(255, 255, 255));
                             overlayInformationRenderer.OffsetY += 16;
 
                             overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Weight : {targetNode.Connections[j].Weight.ToString("0.000")}", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Weight : {targetNodeConnections[j].Weight.ToString("0.000")}", 30, 0, Color.FromArgb(255, 255, 255));
                             overlayInformationRenderer.OffsetY += 16;
 
-                            if (j < targetNode.Connections.Count - 1)
+                            if (j < targetNodeConnections.Count - 1)
                             {
                                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                                 overlayInformationRenderer.OffsetY += 16;
@@ -394,6 +393,9 @@ namespace Paramecium.Forms.Renderer
                         break;
                     }
                 }
+
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Node : {target.Brain.Nodes.Count}", 0, 388, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connection : {target.Brain.Connections.Count}", 0, 404, Color.FromArgb(255, 255, 255));
             }
         }
 

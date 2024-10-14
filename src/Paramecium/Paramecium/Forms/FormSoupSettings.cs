@@ -88,19 +88,32 @@ namespace Paramecium.Forms
                 InitialAnimalPopulation = (int)Input_InitialAnimalPopulation.Value,
                 InitialAnimalElementAmount = (double)Input_InitialAnimalElementAmount.Value,
                 AnimalForkCost = (double)Input_AnimalForkCost.Value,
+                AnimalMaximumAge = (int)Input_AnimalMaximumAge.Value,
+
                 AnimalElementBaseCost = (double)Input_AnimalElementBaseCost.Value,
                 AnimalElementAccelerationCost = (double)Input_AnimalElementAccelerationCost.Value,
                 AnimalElementRotationCost = (double)Input_AnimalElementRotationCost.Value,
                 AnimalElementAttackCost = (double)Input_AnimalElementAttackCost.Value,
                 AnimalElementPheromoneProductionCost = (double)Input_AnimalElementPheromoneProductionCost.Value,
+
                 AnimalPlantIngestionRate = (double)Input_AnimalPlantIngestionRate.Value,
                 AnimalAnimalIngestionRate = (double)Input_AnimalAnimalIngestionRate.Value,
                 AnimalDamageRecoveryTime = (int)Input_AnimalDamageRecoveryTime.Value,
-                AnimalMaximumAge = (int)Input_AnimalMaximumAge.Value,
 
-                AnimalMutationRate = (double)Input_AnimalMutationRate.Value,
                 AnimalMaximumMutationCount = (int)Input_AnimalMaximumMutationCount.Value,
+                AnimalMutationCountBias = (double)Input_AnimalMutationCountBias.Value,
                 AnimalSpeciesIdMutationRate = (double)Input_AnimalSpeciesIdMutationRate.Value,
+
+                AnimalBrainMutationConnectionCreationAttemptsCountBias = (double)Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.Value,
+                AnimalBrainMutationRateAddNode = (double)Input_AnimalBrainMutationRateAddNode.Value,
+                AnimalBrainMutationRateRemoveNode = (double)Input_AnimalBrainMutationRateRemoveNode.Value,
+                AnimalBrainMutationRateDuplicateNode = (double)Input_AnimalBrainMutationRateDuplicateNode.Value,
+                AnimalBrainMutationRateChangeNodeType = (double)Input_AnimalBrainMutationRateChangeNodeType.Value,
+                AnimalBrainMutationRateAddConnection = (double)Input_AnimalBrainMutationRateAddConnection.Value,
+                AnimalBrainMutationRateRemoveConnection = (double)Input_AnimalBrainMutationRateRemoveConnection.Value,
+                AnimalBrainMutationRateChangeConnectionOrigin = (double)Input_AnimalBrainMutationRateChangeConnectionOrigin.Value,
+                AnimalBrainMutationRateChangeConnectionTarget = (double)Input_AnimalBrainMutationRateChangeConnectionTarget.Value,
+                AnimalBrainMutationRateChangeConnectionWeight = (double)Input_AnimalBrainMutationRateChangeConnectionWeight.Value,
 
                 AnimalBrainMaximumNodeCount = (int)Input_AnimalBrainMaximumNodeCount.Value,
                 AnimalBrainMaximumConnectionCount = (int)Input_AnimalBrainMaximumConnectionCount.Value
@@ -154,19 +167,32 @@ namespace Paramecium.Forms
                 Input_InitialAnimalElementAmount.Value = (decimal)soupSettings.InitialAnimalElementAmount;
             }
             Input_AnimalForkCost.Value = (decimal)soupSettings.AnimalForkCost;
+            Input_AnimalMaximumAge.Value = soupSettings.AnimalMaximumAge;
+
             Input_AnimalElementBaseCost.Value = (decimal)soupSettings.AnimalElementBaseCost;
             Input_AnimalElementAccelerationCost.Value = (decimal)soupSettings.AnimalElementAccelerationCost;
             Input_AnimalElementRotationCost.Value = (decimal)soupSettings.AnimalElementRotationCost;
             Input_AnimalElementAttackCost.Value = (decimal)soupSettings.AnimalElementAttackCost;
             Input_AnimalElementPheromoneProductionCost.Value = (decimal)soupSettings.AnimalElementPheromoneProductionCost;
+
             Input_AnimalPlantIngestionRate.Value = (decimal)soupSettings.AnimalPlantIngestionRate;
             Input_AnimalAnimalIngestionRate.Value = (decimal)soupSettings.AnimalAnimalIngestionRate;
             Input_AnimalDamageRecoveryTime.Value = soupSettings.AnimalDamageRecoveryTime;
-            Input_AnimalMaximumAge.Value = soupSettings.AnimalMaximumAge;
 
-            Input_AnimalMutationRate.Value = (decimal)soupSettings.AnimalMutationRate;
             Input_AnimalMaximumMutationCount.Value = soupSettings.AnimalMaximumMutationCount;
+            Input_AnimalMutationCountBias.Value = (decimal)soupSettings.AnimalMutationCountBias;
             Input_AnimalSpeciesIdMutationRate.Value = (decimal)soupSettings.AnimalSpeciesIdMutationRate;
+
+            Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.Value = (decimal)soupSettings.AnimalBrainMutationConnectionCreationAttemptsCountBias;
+            Input_AnimalBrainMutationRateAddNode.Value = (decimal)soupSettings.AnimalBrainMutationRateAddNode;
+            Input_AnimalBrainMutationRateRemoveNode.Value = (decimal)soupSettings.AnimalBrainMutationRateRemoveNode;
+            Input_AnimalBrainMutationRateDuplicateNode.Value = (decimal)soupSettings.AnimalBrainMutationRateDuplicateNode;
+            Input_AnimalBrainMutationRateChangeNodeType.Value = (decimal)soupSettings.AnimalBrainMutationRateChangeNodeType;
+            Input_AnimalBrainMutationRateAddConnection.Value = (decimal)soupSettings.AnimalBrainMutationRateAddConnection;
+            Input_AnimalBrainMutationRateRemoveConnection.Value = (decimal)soupSettings.AnimalBrainMutationRateRemoveConnection;
+            Input_AnimalBrainMutationRateChangeConnectionOrigin.Value = (decimal)soupSettings.AnimalBrainMutationRateChangeConnectionOrigin;
+            Input_AnimalBrainMutationRateChangeConnectionTarget.Value = (decimal)soupSettings.AnimalBrainMutationRateChangeConnectionTarget;
+            Input_AnimalBrainMutationRateChangeConnectionWeight.Value = (decimal)soupSettings.AnimalBrainMutationRateChangeConnectionWeight;
 
             Input_AnimalBrainMaximumNodeCount.Value = soupSettings.AnimalBrainMaximumNodeCount;
             Input_AnimalBrainMaximumConnectionCount.Value = soupSettings.AnimalBrainMaximumConnectionCount;

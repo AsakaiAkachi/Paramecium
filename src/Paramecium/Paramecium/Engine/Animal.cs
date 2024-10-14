@@ -104,25 +104,22 @@
             ColorGreen = parent.ColorGreen;
             ColorBlue = parent.ColorBlue;
 
-            Brain = Brain.Duplicate(parent.Brain);
-            if (random.NextDouble() < g_Soup.Settings.AnimalMutationRate)
+            Brain = parent.Brain.Duplicate();
+            for (int i = 0; i < g_Soup.Settings.AnimalMaximumMutationCount; i++)
             {
-                for (int i = 0; i < g_Soup.Settings.AnimalMaximumMutationCount; i++)
+                Brain = Brain.ApplyMutation(Brain, random);
+
+                if (random.NextDouble() < g_Soup.Settings.AnimalSpeciesIdMutationRate)
                 {
-                    Brain = Brain.Mutate(Brain, random);
+                    //AncestorSpeciesId = SpeciesId;
+                    SpeciesId = random.NextInt64(0, 2176782335 + 1);
 
-                    if (random.NextDouble() < g_Soup.Settings.AnimalSpeciesIdMutationRate)
-                    {
-                        //AncestorSpeciesId = SpeciesId;
-                        SpeciesId = random.NextInt64(0, 2176782335 + 1);
-
-                        ColorRed = random.Next(0, 255 + 1);
-                        ColorGreen = random.Next(0, 255 + 1);
-                        ColorBlue = random.Next(0, 255 + 1);
-                    }
-
-                    if (random.NextDouble() < 0.5d) break;
+                    ColorRed = random.Next(0, 255 + 1);
+                    ColorGreen = random.Next(0, 255 + 1);
+                    ColorBlue = random.Next(0, 255 + 1);
                 }
+
+                if (random.NextDouble() < g_Soup.Settings.AnimalMutationCountBias) break;
             }
 
             BrainInput = new BrainInput();
@@ -212,7 +209,6 @@
                                 {
                                     if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius) * (Radius + targetAnimal.Radius))
                                     {
-                                        //if (BrainOutput.Attack > 0d && (targetAnimal.SpeciesId != SpeciesId && SpeciesId != targetAnimal.AncestorSpeciesId && targetAnimal.AncestorSpeciesId != SpeciesId && targetAnimal.AncestorSpeciesId != AncestorSpeciesId))
                                         if (BrainOutput.Attack > 0d && targetAnimal.SpeciesId != SpeciesId)
                                         {
                                             double angleAbs = double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle)));

@@ -14,7 +14,6 @@ namespace Paramecium.Engine
         public double PheromoneRed { get; set; }
         public double PheromoneGreen { get; set; }
         public double PheromoneBlue { get; set; }
-        //public double ShareElement { get; set; }
         public double Memory0 { get; set; }
         public double Memory1 { get; set; }
         public double Memory2 { get; set; }

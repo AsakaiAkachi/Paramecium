@@ -194,7 +194,10 @@
             Controls.Add(GroupBoxCurrentSoupSettings);
             Controls.Add(ButtonCancel);
             Controls.Add(ButtonCreateSoup);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "FormCreateNewSoup";
             Text = "Create New Soup";
             GroupBoxCurrentSoupSettings.ResumeLayout(false);

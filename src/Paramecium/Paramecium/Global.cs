@@ -1,7 +1,5 @@
 ﻿global using static Paramecium.Global;
 using Paramecium.Engine;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Paramecium
 {
@@ -23,7 +21,7 @@ namespace Paramecium
         static Global()
         {
             g_AppName = "Paramecium";
-            g_AppVersion = "0.5.14";
+            g_AppVersion = "0.6.0";
 
             g_SoupDefaultFilePath = @$"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations";
             g_SoupDefaultFileName = @$"Untitled.soup";

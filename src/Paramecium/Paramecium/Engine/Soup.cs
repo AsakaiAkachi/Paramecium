@@ -394,6 +394,7 @@ namespace Paramecium.Engine
                             }
                         }
 
+                        LatestGeneration = 0;
                         for (int i = 0; i < Animals.Count; i++) if (Animals[i].Exist) LatestGeneration = long.Max(LatestGeneration, Animals[i].Generation);
 
                         PopulationPlant = 0;

@@ -108,7 +108,10 @@
             Controls.Add(label1);
             Controls.Add(NumericUpDownAutosaveInterval);
             Controls.Add(CheckBoxAutosaveEnable);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "FormAutosaveSettings";
             Text = "Autosave Settings";
             Shown += FormAutosaveSettings_Shown;

@@ -96,6 +96,7 @@
             Controls.Add(ComboBoxObjectType);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
+            MinimizeBox = false;
             Name = "FormInspector";
             Shown += FormInspector_Shown;
             ((System.ComponentModel.ISupportInitialize)NumericUpDownObjectIndex).EndInit();

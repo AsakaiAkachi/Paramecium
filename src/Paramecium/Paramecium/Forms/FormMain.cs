@@ -417,8 +417,13 @@ namespace Paramecium.Forms
                         case Keys.Alt:
                             if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
                             {
-                                g_Soup.SetSoupState(SoupState.Pause);
-                                g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Wall;
+                                if (g_Soup.Tiles[SelectedObjectIndex].Type == TileType.Default)
+                                {
+                                    g_Soup.SetSoupState(SoupState.Pause);
+                                    g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Wall;
+
+                                    g_Soup.Modified = true;
+                                }
                             }
                             break;
                         default:
@@ -548,8 +553,13 @@ namespace Paramecium.Forms
                         case Keys.Alt:
                             if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
                             {
-                                g_Soup.SetSoupState(SoupState.Pause);
-                                g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Default;
+                                if (g_Soup.Tiles[SelectedObjectIndex].Type == TileType.Wall)
+                                {
+                                    g_Soup.SetSoupState(SoupState.Pause);
+                                    g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Default;
+
+                                    g_Soup.Modified = true;
+                                }
                             }
                             break;
                         default:
@@ -636,8 +646,13 @@ namespace Paramecium.Forms
                             case Keys.Alt:
                                 if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
                                 {
-                                    g_Soup.SetSoupState(SoupState.Pause);
-                                    g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Wall;
+                                    if (g_Soup.Tiles[SelectedObjectIndex].Type == TileType.Default)
+                                    {
+                                        g_Soup.SetSoupState(SoupState.Pause);
+                                        g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Wall;
+
+                                        g_Soup.Modified = true;
+                                    }
                                 }
                                 break;
                             default:
@@ -666,8 +681,13 @@ namespace Paramecium.Forms
                             case Keys.Alt:
                                 if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Tile)
                                 {
-                                    g_Soup.SetSoupState(SoupState.Pause);
-                                    g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Default;
+                                    if (g_Soup.Tiles[SelectedObjectIndex].Type == TileType.Wall)
+                                    {
+                                        g_Soup.SetSoupState(SoupState.Pause);
+                                        g_Soup.Tiles[SelectedObjectIndex].Type = TileType.Default;
+
+                                        g_Soup.Modified = true;
+                                    }
                                 }
                                 break;
                             default:
