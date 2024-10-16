@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0 indev-2] - 2024-10-16
+
+### Added
+- Added `Allow Attacks on Same Species` as a setting item for soup settings.
+- Added 2 new brain node types. (`Hidden_Tanh` `Hidden_Gaussian`)
+
+### Changed
+- Both incoming and outgoing connections are now displayed when hovering the cursor over a node displayed in the Brain Diagram.
+
 ## [0.6.0 indev-1] - 2024-10-15
 
 ### Added

@@ -558,7 +558,13 @@ namespace Paramecium.Engine
                         else target.Output = 0;
                         break;
                     case BrainNodeType.Hidden_Sigmoid:
+                        target.Output = (Math.Tanh(target.Input / 2d) + 1d) / 2d;
+                        break;
+                    case BrainNodeType.Hidden_Tanh:
                         target.Output = Math.Tanh(target.Input);
+                        break;
+                    case BrainNodeType.Hidden_Gaussian:
+                        target.Output = Math.Exp(-(target.Input * target.Input));
                         break;
                     case BrainNodeType.Hidden_Identity:
                         target.Output = target.Input;

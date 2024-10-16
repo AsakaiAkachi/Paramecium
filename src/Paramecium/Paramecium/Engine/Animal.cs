@@ -209,7 +209,7 @@
                                 {
                                     if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius) * (Radius + targetAnimal.Radius))
                                     {
-                                        if (BrainOutput.Attack > 0d && targetAnimal.SpeciesId != SpeciesId)
+                                        if (BrainOutput.Attack > 0d && (g_Soup.Settings.AnimalAllowAttacksOnSameSpecies || targetAnimal.SpeciesId != SpeciesId))
                                         {
                                             double angleAbs = double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle)));
                                             if (angleAbs < 0.125d && angleAbs < attackTargetAngleAbs)
@@ -260,13 +260,29 @@
                 {
                     Plant target = g_Soup.Plants[AttackTargetIndex];
 
+                    /**
+                    double elementMoveAmount = g_Soup.Settings.AnimalPlantIngestionRate / double.Max(1d, BrainOutput.Attack);
+
+                    Element += double.Min(target.Element, elementMoveAmount) * g_Soup.ElementAmountMultiplier;
+                    target.Element = double.Max(0d, target.Element - elementMoveAmount);
+                    **/
+
                     Element += double.Min(target.Element, g_Soup.Settings.AnimalPlantIngestionRate) * g_Soup.ElementAmountMultiplier;
                     target.Element = double.Max(0d, target.Element - g_Soup.Settings.AnimalPlantIngestionRate);
                 }
                 else if (AttackTargetType == OrganismType.Animal)
                 {
                     Animal target = g_Soup.Animals[AttackTargetIndex];
-                    
+
+                    double elementMoveAmount = g_Soup.Settings.AnimalAnimalIngestionRate / double.Max(1d, target.BrainOutput.Attack - BrainOutput.Attack + 1d);
+
+                    /**
+                    Element += double.Min(target.Element, elementMoveAmount) * g_Soup.ElementAmountMultiplier;
+                    target.Element = double.Max(0d, target.Element - elementMoveAmount);
+
+                    target.LastDamageTime = g_Soup.ElapsedTimeSteps;
+                    **/
+
                     Element += double.Min(target.Element, g_Soup.Settings.AnimalAnimalIngestionRate) * g_Soup.ElementAmountMultiplier;
                     target.Element = double.Max(0d, target.Element - g_Soup.Settings.AnimalAnimalIngestionRate);
 

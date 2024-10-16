@@ -322,6 +322,9 @@ namespace Paramecium.Forms.Renderer
                     }
                 }
 
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Node : {target.Brain.Nodes.Count}", 0, 388, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connection : {target.Brain.Connections.Count}", 0, 404, Color.FromArgb(255, 255, 255));
+
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
                 {
                     Double2d nodePos = Double2d.FromAngle(-0.5 + 1d / target.Brain.Nodes.Count * i) * 180 + new Double2d(250, 220);
@@ -358,29 +361,71 @@ namespace Paramecium.Forms.Renderer
                         overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connections : ", 0, 0, Color.FromArgb(255, 255, 255));
                         overlayInformationRenderer.OffsetY += 16;
 
-                        List<BrainNodeConnection> targetNodeConnections = target.Brain.EnumerateOutgoingConnection(i);
+                        List<BrainNodeConnection> targetNodeIncomingConnections = target.Brain.EnumerateIncomingConnection(i);
+                        List<BrainNodeConnection> targetNodeOutgoingConnections = target.Brain.EnumerateOutgoingConnection(i);
 
-                        if (targetNodeConnections.Count == 0)
+                        List<int> targetNodeIncomingConnectionIndexes = target.Brain.EnumerateIncomingConnectionIndex(i);
+                        List<int> targetNodeOutgoingConnectionsIndexes = target.Brain.EnumerateOutgoingConnectionIndex(i);
+
+                        overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Incoming :", 15, 0, Color.FromArgb(255, 255, 255));
+                        overlayInformationRenderer.OffsetY += 16;
+
+                        if (targetNodeIncomingConnections.Count == 0)
                         {
                             overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"No Connection", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"No Incoming Connection", 30, 0, Color.FromArgb(255, 255, 255));
                             overlayInformationRenderer.OffsetY += 16;
                         }
-                        for (int j = 0; j < targetNodeConnections.Count; j++)
+                        for (int j = 0; j < targetNodeIncomingConnections.Count; j++)
                         {
                             overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connection #{j}", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connection #{targetNodeIncomingConnectionIndexes[j]}", 30, 0, Color.FromArgb(255, 255, 255));
                             overlayInformationRenderer.OffsetY += 16;
 
                             overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Target Index : {targetNodeConnections[j].TargetIndex}", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Origin Index : {targetNodeIncomingConnections[j].OriginIndex}", 30, 0, Color.FromArgb(255, 255, 255));
                             overlayInformationRenderer.OffsetY += 16;
 
                             overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Weight : {targetNodeConnections[j].Weight.ToString("0.000")}", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Weight : {targetNodeIncomingConnections[j].Weight.ToString("0.000")}", 30, 0, Color.FromArgb(255, 255, 255));
                             overlayInformationRenderer.OffsetY += 16;
 
-                            if (j < targetNodeConnections.Count - 1)
+                            if (j < targetNodeIncomingConnections.Count - 1)
+                            {
+                                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                                overlayInformationRenderer.OffsetY += 16;
+                            }
+                        }
+
+                        overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                        overlayInformationRenderer.OffsetY += 16;
+
+                        overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Outgoing :", 15, 0, Color.FromArgb(255, 255, 255));
+                        overlayInformationRenderer.OffsetY += 16;
+
+                        if (targetNodeOutgoingConnections.Count == 0)
+                        {
+                            overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"No Outgoing Connection", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OffsetY += 16;
+                        }
+                        for (int j = 0; j < targetNodeOutgoingConnections.Count; j++)
+                        {
+                            overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connection #{targetNodeOutgoingConnectionsIndexes[j]}", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OffsetY += 16;
+
+                            overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Target Index : {targetNodeOutgoingConnections[j].TargetIndex}", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OffsetY += 16;
+
+                            overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
+                            overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Weight : {targetNodeOutgoingConnections[j].Weight.ToString("0.000")}", 30, 0, Color.FromArgb(255, 255, 255));
+                            overlayInformationRenderer.OffsetY += 16;
+
+                            if (j < targetNodeOutgoingConnections.Count - 1)
                             {
                                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                                 overlayInformationRenderer.OffsetY += 16;
@@ -393,9 +438,6 @@ namespace Paramecium.Forms.Renderer
                         break;
                     }
                 }
-
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Node : {target.Brain.Nodes.Count}", 0, 388, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Connection : {target.Brain.Connections.Count}", 0, 404, Color.FromArgb(255, 255, 255));
             }
         }
 

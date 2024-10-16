@@ -40,6 +40,8 @@ namespace Paramecium.Engine
         Hidden_LimitedReLU,
         Hidden_Step,
         Hidden_Sigmoid,
+        Hidden_Tanh,
+        Hidden_Gaussian,
         Hidden_Identity,
         Hidden_Absolute,
         Hidden_Sine,

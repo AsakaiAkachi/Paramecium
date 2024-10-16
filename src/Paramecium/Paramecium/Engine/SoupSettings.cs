@@ -60,6 +60,7 @@ namespace Paramecium.Engine
         // Animal Attack and Ingestion Settings
         public double AnimalPlantIngestionRate { get; set; } = 0.2d;
         public double AnimalAnimalIngestionRate { get; set; } = 0.8d;
+        public bool AnimalAllowAttacksOnSameSpecies { get; set; } = true;
         public int AnimalDamageRecoveryTime { get; set; } = 25;
 
         // Animal Mutation Settings

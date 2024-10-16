@@ -98,6 +98,7 @@ namespace Paramecium.Forms
 
                 AnimalPlantIngestionRate = (double)Input_AnimalPlantIngestionRate.Value,
                 AnimalAnimalIngestionRate = (double)Input_AnimalAnimalIngestionRate.Value,
+                AnimalAllowAttacksOnSameSpecies = Input_AnimalAllowAttacksOnSameSpecies.Checked,
                 AnimalDamageRecoveryTime = (int)Input_AnimalDamageRecoveryTime.Value,
 
                 AnimalMaximumMutationCount = (int)Input_AnimalMaximumMutationCount.Value,
@@ -177,6 +178,7 @@ namespace Paramecium.Forms
 
             Input_AnimalPlantIngestionRate.Value = (decimal)soupSettings.AnimalPlantIngestionRate;
             Input_AnimalAnimalIngestionRate.Value = (decimal)soupSettings.AnimalAnimalIngestionRate;
+            Input_AnimalAllowAttacksOnSameSpecies.Checked = soupSettings.AnimalAllowAttacksOnSameSpecies;
             Input_AnimalDamageRecoveryTime.Value = soupSettings.AnimalDamageRecoveryTime;
 
             Input_AnimalMaximumMutationCount.Value = soupSettings.AnimalMaximumMutationCount;

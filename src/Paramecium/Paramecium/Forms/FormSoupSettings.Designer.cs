@@ -138,6 +138,8 @@
             Randomize_InitialSeed = new Button();
             Randomize_WallNoise = new Button();
             PanelSoupSettings = new Panel();
+            Input_AnimalAllowAttacksOnSameSpecies = new CheckBox();
+            label66 = new Label();
             Input_AnimalBrainMutationConnectionCreationAttemptsCountBias = new NumericUpDown();
             label65 = new Label();
             Input_AnimalBrainMutationRateDuplicateNode = new NumericUpDown();
@@ -378,8 +380,6 @@
             // Input_WallEnabled
             // 
             Input_WallEnabled.AutoSize = true;
-            Input_WallEnabled.Checked = true;
-            Input_WallEnabled.CheckState = CheckState.Checked;
             Input_WallEnabled.Location = new Point(480, 180);
             Input_WallEnabled.Name = "Input_WallEnabled";
             Input_WallEnabled.Size = new Size(15, 14);
@@ -1077,7 +1077,7 @@
             // 
             // Input_AnimalBrainMaximumConnectionCount
             // 
-            Input_AnimalBrainMaximumConnectionCount.Location = new Point(345, 1859);
+            Input_AnimalBrainMaximumConnectionCount.Location = new Point(345, 1888);
             Input_AnimalBrainMaximumConnectionCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalBrainMaximumConnectionCount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMaximumConnectionCount.Name = "Input_AnimalBrainMaximumConnectionCount";
@@ -1088,7 +1088,7 @@
             // label46
             // 
             label46.AutoSize = true;
-            label46.Location = new Point(13, 1861);
+            label46.Location = new Point(13, 1890);
             label46.Name = "label46";
             label46.Size = new Size(211, 15);
             label46.TabIndex = 94;
@@ -1096,7 +1096,7 @@
             // 
             // Input_AnimalBrainMaximumNodeCount
             // 
-            Input_AnimalBrainMaximumNodeCount.Location = new Point(345, 1830);
+            Input_AnimalBrainMaximumNodeCount.Location = new Point(345, 1859);
             Input_AnimalBrainMaximumNodeCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalBrainMaximumNodeCount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMaximumNodeCount.Name = "Input_AnimalBrainMaximumNodeCount";
@@ -1107,7 +1107,7 @@
             // label47
             // 
             label47.AutoSize = true;
-            label47.Location = new Point(13, 1832);
+            label47.Location = new Point(13, 1861);
             label47.Name = "label47";
             label47.Size = new Size(127, 15);
             label47.TabIndex = 92;
@@ -1117,7 +1117,7 @@
             // 
             panel9.BackColor = SystemColors.ControlDark;
             panel9.Controls.Add(label48);
-            panel9.Location = new Point(3, 1801);
+            panel9.Location = new Point(3, 1830);
             panel9.Name = "panel9";
             panel9.Size = new Size(502, 23);
             panel9.TabIndex = 91;
@@ -1136,7 +1136,7 @@
             // 
             Input_AnimalSpeciesIdMutationRate.DecimalPlaces = 6;
             Input_AnimalSpeciesIdMutationRate.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalSpeciesIdMutationRate.Location = new Point(345, 1482);
+            Input_AnimalSpeciesIdMutationRate.Location = new Point(345, 1511);
             Input_AnimalSpeciesIdMutationRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalSpeciesIdMutationRate.Name = "Input_AnimalSpeciesIdMutationRate";
             Input_AnimalSpeciesIdMutationRate.Size = new Size(150, 23);
@@ -1145,7 +1145,7 @@
             // label49
             // 
             label49.AutoSize = true;
-            label49.Location = new Point(13, 1484);
+            label49.Location = new Point(13, 1513);
             label49.Name = "label49";
             label49.Size = new Size(138, 15);
             label49.TabIndex = 89;
@@ -1153,7 +1153,7 @@
             // 
             // Input_AnimalMaximumMutationCount
             // 
-            Input_AnimalMaximumMutationCount.Location = new Point(345, 1424);
+            Input_AnimalMaximumMutationCount.Location = new Point(345, 1453);
             Input_AnimalMaximumMutationCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalMaximumMutationCount.Name = "Input_AnimalMaximumMutationCount";
             Input_AnimalMaximumMutationCount.Size = new Size(150, 23);
@@ -1162,7 +1162,7 @@
             // label50
             // 
             label50.AutoSize = true;
-            label50.Location = new Point(13, 1426);
+            label50.Location = new Point(13, 1455);
             label50.Name = "label50";
             label50.Size = new Size(198, 15);
             label50.TabIndex = 87;
@@ -1172,7 +1172,7 @@
             // 
             panel10.BackColor = SystemColors.ControlDark;
             panel10.Controls.Add(label52);
-            panel10.Location = new Point(3, 1395);
+            panel10.Location = new Point(3, 1424);
             panel10.Name = "panel10";
             panel10.Size = new Size(502, 23);
             panel10.TabIndex = 84;
@@ -1266,6 +1266,8 @@
             PanelSoupSettings.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PanelSoupSettings.AutoScroll = true;
             PanelSoupSettings.AutoScrollMargin = new Size(0, 3);
+            PanelSoupSettings.Controls.Add(Input_AnimalAllowAttacksOnSameSpecies);
+            PanelSoupSettings.Controls.Add(label66);
             PanelSoupSettings.Controls.Add(Input_AnimalBrainMutationConnectionCreationAttemptsCountBias);
             PanelSoupSettings.Controls.Add(label65);
             PanelSoupSettings.Controls.Add(Input_AnimalBrainMutationRateDuplicateNode);
@@ -1391,11 +1393,29 @@
             PanelSoupSettings.Size = new Size(525, 600);
             PanelSoupSettings.TabIndex = 102;
             // 
+            // Input_AnimalAllowAttacksOnSameSpecies
+            // 
+            Input_AnimalAllowAttacksOnSameSpecies.AutoSize = true;
+            Input_AnimalAllowAttacksOnSameSpecies.Location = new Point(480, 1369);
+            Input_AnimalAllowAttacksOnSameSpecies.Name = "Input_AnimalAllowAttacksOnSameSpecies";
+            Input_AnimalAllowAttacksOnSameSpecies.Size = new Size(15, 14);
+            Input_AnimalAllowAttacksOnSameSpecies.TabIndex = 129;
+            Input_AnimalAllowAttacksOnSameSpecies.UseVisualStyleBackColor = true;
+            // 
+            // label66
+            // 
+            label66.AutoSize = true;
+            label66.Location = new Point(13, 1368);
+            label66.Name = "label66";
+            label66.Size = new Size(169, 15);
+            label66.TabIndex = 128;
+            label66.Text = "Allow Attacks on Same Species";
+            // 
             // Input_AnimalBrainMutationConnectionCreationAttemptsCountBias
             // 
             Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.DecimalPlaces = 6;
             Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.Location = new Point(345, 1511);
+            Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.Location = new Point(345, 1540);
             Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.Name = "Input_AnimalBrainMutationConnectionCreationAttemptsCountBias";
             Input_AnimalBrainMutationConnectionCreationAttemptsCountBias.Size = new Size(150, 23);
@@ -1404,7 +1424,7 @@
             // label65
             // 
             label65.AutoSize = true;
-            label65.Location = new Point(13, 1513);
+            label65.Location = new Point(13, 1542);
             label65.Name = "label65";
             label65.Size = new Size(313, 15);
             label65.TabIndex = 126;
@@ -1414,7 +1434,7 @@
             // 
             Input_AnimalBrainMutationRateDuplicateNode.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateDuplicateNode.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateDuplicateNode.Location = new Point(345, 1598);
+            Input_AnimalBrainMutationRateDuplicateNode.Location = new Point(345, 1627);
             Input_AnimalBrainMutationRateDuplicateNode.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateDuplicateNode.Name = "Input_AnimalBrainMutationRateDuplicateNode";
             Input_AnimalBrainMutationRateDuplicateNode.Size = new Size(150, 23);
@@ -1423,7 +1443,7 @@
             // label64
             // 
             label64.AutoSize = true;
-            label64.Location = new Point(13, 1600);
+            label64.Location = new Point(13, 1629);
             label64.Name = "label64";
             label64.Size = new Size(203, 15);
             label64.TabIndex = 124;
@@ -1471,7 +1491,7 @@
             // 
             Input_AnimalMutationCountBias.DecimalPlaces = 6;
             Input_AnimalMutationCountBias.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalMutationCountBias.Location = new Point(345, 1453);
+            Input_AnimalMutationCountBias.Location = new Point(345, 1482);
             Input_AnimalMutationCountBias.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalMutationCountBias.Name = "Input_AnimalMutationCountBias";
             Input_AnimalMutationCountBias.Size = new Size(150, 23);
@@ -1480,7 +1500,7 @@
             // label51
             // 
             label51.AutoSize = true;
-            label51.Location = new Point(13, 1455);
+            label51.Location = new Point(13, 1484);
             label51.Name = "label51";
             label51.Size = new Size(166, 15);
             label51.TabIndex = 122;
@@ -1490,7 +1510,7 @@
             // 
             Input_AnimalBrainMutationRateChangeConnectionWeight.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateChangeConnectionWeight.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateChangeConnectionWeight.Location = new Point(345, 1772);
+            Input_AnimalBrainMutationRateChangeConnectionWeight.Location = new Point(345, 1801);
             Input_AnimalBrainMutationRateChangeConnectionWeight.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateChangeConnectionWeight.Name = "Input_AnimalBrainMutationRateChangeConnectionWeight";
             Input_AnimalBrainMutationRateChangeConnectionWeight.Size = new Size(150, 23);
@@ -1499,7 +1519,7 @@
             // label58
             // 
             label58.AutoSize = true;
-            label58.Location = new Point(13, 1774);
+            label58.Location = new Point(13, 1803);
             label58.Name = "label58";
             label58.Size = new Size(266, 15);
             label58.TabIndex = 120;
@@ -1509,7 +1529,7 @@
             // 
             Input_AnimalBrainMutationRateChangeConnectionTarget.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateChangeConnectionTarget.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateChangeConnectionTarget.Location = new Point(345, 1743);
+            Input_AnimalBrainMutationRateChangeConnectionTarget.Location = new Point(345, 1772);
             Input_AnimalBrainMutationRateChangeConnectionTarget.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateChangeConnectionTarget.Name = "Input_AnimalBrainMutationRateChangeConnectionTarget";
             Input_AnimalBrainMutationRateChangeConnectionTarget.Size = new Size(150, 23);
@@ -1518,7 +1538,7 @@
             // label59
             // 
             label59.AutoSize = true;
-            label59.Location = new Point(13, 1745);
+            label59.Location = new Point(13, 1774);
             label59.Name = "label59";
             label59.Size = new Size(260, 15);
             label59.TabIndex = 118;
@@ -1528,7 +1548,7 @@
             // 
             Input_AnimalBrainMutationRateChangeConnectionOrigin.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateChangeConnectionOrigin.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateChangeConnectionOrigin.Location = new Point(345, 1714);
+            Input_AnimalBrainMutationRateChangeConnectionOrigin.Location = new Point(345, 1743);
             Input_AnimalBrainMutationRateChangeConnectionOrigin.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateChangeConnectionOrigin.Name = "Input_AnimalBrainMutationRateChangeConnectionOrigin";
             Input_AnimalBrainMutationRateChangeConnectionOrigin.Size = new Size(150, 23);
@@ -1537,7 +1557,7 @@
             // label60
             // 
             label60.AutoSize = true;
-            label60.Location = new Point(13, 1716);
+            label60.Location = new Point(13, 1745);
             label60.Name = "label60";
             label60.Size = new Size(261, 15);
             label60.TabIndex = 116;
@@ -1547,7 +1567,7 @@
             // 
             Input_AnimalBrainMutationRateRemoveConnection.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateRemoveConnection.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateRemoveConnection.Location = new Point(345, 1685);
+            Input_AnimalBrainMutationRateRemoveConnection.Location = new Point(345, 1714);
             Input_AnimalBrainMutationRateRemoveConnection.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateRemoveConnection.Name = "Input_AnimalBrainMutationRateRemoveConnection";
             Input_AnimalBrainMutationRateRemoveConnection.Size = new Size(150, 23);
@@ -1556,7 +1576,7 @@
             // label61
             // 
             label61.AutoSize = true;
-            label61.Location = new Point(13, 1687);
+            label61.Location = new Point(13, 1716);
             label61.Name = "label61";
             label61.Size = new Size(227, 15);
             label61.TabIndex = 114;
@@ -1566,7 +1586,7 @@
             // 
             Input_AnimalBrainMutationRateAddConnection.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateAddConnection.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateAddConnection.Location = new Point(345, 1656);
+            Input_AnimalBrainMutationRateAddConnection.Location = new Point(345, 1685);
             Input_AnimalBrainMutationRateAddConnection.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateAddConnection.Name = "Input_AnimalBrainMutationRateAddConnection";
             Input_AnimalBrainMutationRateAddConnection.Size = new Size(150, 23);
@@ -1575,7 +1595,7 @@
             // label56
             // 
             label56.AutoSize = true;
-            label56.Location = new Point(13, 1658);
+            label56.Location = new Point(13, 1687);
             label56.Name = "label56";
             label56.Size = new Size(207, 15);
             label56.TabIndex = 112;
@@ -1585,7 +1605,7 @@
             // 
             Input_AnimalBrainMutationRateChangeNodeType.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateChangeNodeType.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateChangeNodeType.Location = new Point(345, 1627);
+            Input_AnimalBrainMutationRateChangeNodeType.Location = new Point(345, 1656);
             Input_AnimalBrainMutationRateChangeNodeType.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateChangeNodeType.Name = "Input_AnimalBrainMutationRateChangeNodeType";
             Input_AnimalBrainMutationRateChangeNodeType.Size = new Size(150, 23);
@@ -1594,7 +1614,7 @@
             // label57
             // 
             label57.AutoSize = true;
-            label57.Location = new Point(13, 1629);
+            label57.Location = new Point(13, 1658);
             label57.Name = "label57";
             label57.Size = new Size(220, 15);
             label57.TabIndex = 110;
@@ -1604,7 +1624,7 @@
             // 
             Input_AnimalBrainMutationRateRemoveNode.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateRemoveNode.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateRemoveNode.Location = new Point(345, 1569);
+            Input_AnimalBrainMutationRateRemoveNode.Location = new Point(345, 1598);
             Input_AnimalBrainMutationRateRemoveNode.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateRemoveNode.Name = "Input_AnimalBrainMutationRateRemoveNode";
             Input_AnimalBrainMutationRateRemoveNode.Size = new Size(150, 23);
@@ -1613,7 +1633,7 @@
             // label55
             // 
             label55.AutoSize = true;
-            label55.Location = new Point(13, 1571);
+            label55.Location = new Point(13, 1600);
             label55.Name = "label55";
             label55.Size = new Size(195, 15);
             label55.TabIndex = 108;
@@ -1623,7 +1643,7 @@
             // 
             Input_AnimalBrainMutationRateAddNode.DecimalPlaces = 6;
             Input_AnimalBrainMutationRateAddNode.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            Input_AnimalBrainMutationRateAddNode.Location = new Point(345, 1540);
+            Input_AnimalBrainMutationRateAddNode.Location = new Point(345, 1569);
             Input_AnimalBrainMutationRateAddNode.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalBrainMutationRateAddNode.Name = "Input_AnimalBrainMutationRateAddNode";
             Input_AnimalBrainMutationRateAddNode.Size = new Size(150, 23);
@@ -1632,7 +1652,7 @@
             // label41
             // 
             label41.AutoSize = true;
-            label41.Location = new Point(13, 1542);
+            label41.Location = new Point(13, 1571);
             label41.Name = "label41";
             label41.Size = new Size(175, 15);
             label41.TabIndex = 106;
@@ -1659,7 +1679,7 @@
             // 
             // Input_AnimalDamageRecoveryTime
             // 
-            Input_AnimalDamageRecoveryTime.Location = new Point(345, 1366);
+            Input_AnimalDamageRecoveryTime.Location = new Point(345, 1395);
             Input_AnimalDamageRecoveryTime.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
             Input_AnimalDamageRecoveryTime.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             Input_AnimalDamageRecoveryTime.Name = "Input_AnimalDamageRecoveryTime";
@@ -1670,7 +1690,7 @@
             // label53
             // 
             label53.AutoSize = true;
-            label53.Location = new Point(13, 1368);
+            label53.Location = new Point(13, 1397);
             label53.Name = "label53";
             label53.Size = new Size(129, 15);
             label53.TabIndex = 102;
@@ -1914,5 +1934,7 @@
         private Label label64;
         private NumericUpDown Input_AnimalBrainMutationConnectionCreationAttemptsCountBias;
         private Label label65;
+        private CheckBox Input_AnimalAllowAttacksOnSameSpecies;
+        private Label label66;
     }
 }

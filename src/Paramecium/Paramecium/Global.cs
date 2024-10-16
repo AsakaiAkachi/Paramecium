@@ -21,7 +21,7 @@ namespace Paramecium
         static Global()
         {
             g_AppName = "Paramecium";
-            g_AppVersion = "0.6.0";
+            g_AppVersion = "0.6.0 indev-2";
 
             g_SoupDefaultFilePath = @$"{Path.GetDirectoryName(Application.ExecutablePath)}\simulations";
             g_SoupDefaultFileName = @$"Untitled.soup";
