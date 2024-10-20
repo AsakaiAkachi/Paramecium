@@ -80,17 +80,8 @@ namespace Paramecium.Forms.Renderer
 
                 DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, target.Position, target.Radius + 0.5d, Color.FromArgb(255, 255, 0));
 
-                string targetIdString = String.Empty;
-                long targetId = target.Id;
-                string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
-                for (int i = 0; i < 12; i++)
-                {
-                    targetIdString = chars[(int)(targetId % 36)] + targetIdString;
-                    targetId /= 36;
-                }
-
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Plant #{targetIdString}", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Plant #{RawIdToString(target.Id, 12)}", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
@@ -113,44 +104,13 @@ namespace Paramecium.Forms.Renderer
 
                 DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, target.Position, target.Radius + 0.5d, Color.FromArgb(255, 255, 0));
 
-                string targetIdString = String.Empty;
-                long targetId = target.Id;
-                string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
-                for (int i = 0; i < 12; i++)
-                {
-                    targetIdString = chars[(int)(targetId % 36)] + targetIdString;
-                    targetId /= 36;
-                }
-
-                string targetSpecieIdString = String.Empty;
-                long targetSpecieId = target.SpeciesId;
-                for (int i = 0; i < 6; i++)
-                {
-                    targetSpecieIdString = chars[(int)(targetSpecieId % 36)] + targetSpecieIdString;
-                    targetSpecieId /= 36;
-                }
-
-                /**
-                string targetAncestorSpeciesIdString = String.Empty;
-                long targetAncestorSpeciesId = target.AncestorSpeciesId;
-                for (int i = 0; i < 6; i++)
-                {
-                    targetAncestorSpeciesIdString = chars[(int)(targetAncestorSpeciesId % 36)] + targetAncestorSpeciesIdString;
-                    targetAncestorSpeciesId /= 36;
-                }
-                **/
-
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Animal #{targetIdString}", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Animal #{RawIdToString(target.Id, 12)}", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Species ID : #{targetSpecieIdString}", 0, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Species ID : #{RawIdToString(target.SpeciesId, 6)}", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
-
-                //overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
-                //overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Ancestor Species ID : #{targetAncestorSpeciesIdString}", 0, 0, Color.FromArgb(255, 255, 255));
-                //overlayInformationRenderer.OffsetY += 16;
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(128, 64, 64, 64));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Generation : {target.Generation}", 0, 0, Color.FromArgb(255, 255, 255));
@@ -189,17 +149,6 @@ namespace Paramecium.Forms.Renderer
                 overlayInformationRenderer.OverlayFillRectangle(0, 12, (int)(300 * double.Min(1d, target.CurrentStepElementCost / (g_Soup.Settings.AnimalElementBaseCost + g_Soup.Settings.AnimalElementAccelerationCost + g_Soup.Settings.AnimalElementRotationCost + g_Soup.Settings.AnimalElementAttackCost + (g_Soup.Settings.AnimalElementPheromoneProductionCost * 3d)))), 16, Color.FromArgb(255, 192, 192, 192));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Element : {target.Element.ToString("0.000")} elm (-{target.CurrentStepElementCost.ToString("0.000")} elm/step)", 0, 0, Color.FromArgb(255, 255, 255));
                 overlayInformationRenderer.OffsetY += 16;
-
-                /**
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, 192, 0, 0));
-                overlayInformationRenderer.OverlayFillRectangle(0, 0, (int)(300 * (1d - target.Diet)), 16, Color.FromArgb(255, 0, 192, 0));
-                if (target.Diet <= 0.1d) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Fully Herbivorous)", 0, 0, Color.FromArgb(255, 255, 255));
-                else if (target.Diet <= 0.333d) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Herbivorous)", 0, 0, Color.FromArgb(255, 255, 255));
-                else if (target.Diet <= 0.5d) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Omnivorous)", 0, 0, Color.FromArgb(255, 255, 255));
-                else if (target.Diet <= 0.9d) overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Carnivorous)", 0, 0, Color.FromArgb(255, 255, 255));
-                else overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Diet : {target.Diet.ToString("0.000")} (Fully Carnivorous)", 0, 0, Color.FromArgb(255, 255, 255));
-                overlayInformationRenderer.OffsetY += 16;
-                **/
 
                 overlayInformationRenderer.OverlayFillRectangle(0, 0, 300, 16, Color.FromArgb(255, target.ColorRed, target.ColorGreen, target.ColorBlue));
                 overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Color : ({target.ColorRed}, {target.ColorGreen}, {target.ColorBlue})", 0, 0, Color.FromArgb(255, 255, 255));
@@ -278,25 +227,6 @@ namespace Paramecium.Forms.Renderer
 
                     overlayInformationRenderer.OverlayFillEllipse((int)(nodePos.X), (int)(nodePos.Y), 15, nodeColor);
                     overlayInformationRenderer.OverlayDrawEllipse((int)(nodePos.X), (int)(nodePos.Y), 15, Color.FromArgb(255, 255, 255));
-
-                    /**
-                    if (BrainNode.BrainNodeTypeIsInput(targetNode.Type))
-                    {
-                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Input", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
-                    }
-                    else if (BrainNode.BrainNodeTypeIsHidden(targetNode.Type))
-                    {
-                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Hidden", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
-                    }
-                    else if (BrainNode.BrainNodeTypeIsOutput(targetNode.Type))
-                    {
-                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Output", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
-                    }
-                    else if (targetNode.Type == BrainNodeType.NonOperation)
-                    {
-                        overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"#{i} Nop", (int)(nodePos.X + 7.5), (int)(nodePos.Y + 7.5), Color.FromArgb(255, 255, 255));
-                    }
-                    **/
                 }
 
                 for (int i = 0; i < target.Brain.Nodes.Count; i++)
@@ -438,6 +368,262 @@ namespace Paramecium.Forms.Renderer
                         break;
                     }
                 }
+
+                /**
+                overlayInformationRenderer.OffsetY = 0;
+                overlayInformationRenderer.OffsetX += 500;
+
+                overlayInformationRenderer.OverlayFillRectangle(0, 0, 460, 420, Color.FromArgb(128, 64, 64, 64));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 12, $"Brain I/O Information", 0, 0, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(1));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Bias}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{1d.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.WallAvgAngle));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_WallAvgAngle}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.WallAvgAngle.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.WallProximity));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_WallProximity}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.WallProximity.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.PlantAvgAngle));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_PlantAvgAngle}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.PlantAvgAngle.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.PlantProximity));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_PlantProximity}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.PlantProximity.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.AnimalSameSpeciesAvgAngle));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_AnimalSameSpeciesAvgAngle}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.AnimalSameSpeciesAvgAngle.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.AnimalSameSpeciesProximity));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_AnimalSameSpeciesProximity}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.AnimalSameSpeciesProximity.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.AnimalOtherSpeciesAvgAngle));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_AnimalOtherSpeciesAvgAngle}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.AnimalOtherSpeciesAvgAngle.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.AnimalOtherSpeciesProximity));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_AnimalOtherSpeciesProximity}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.AnimalOtherSpeciesProximity.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.Velocity));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Velocity}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.Velocity.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.AngularVelocity));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_AngularVelocity}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.AngularVelocity.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.Satiety));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Satiety}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.Satiety.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.Damage));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Damage}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.Damage.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.PheromoneRed));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_PheromoneRed}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.PheromoneRed.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.PheromoneGreen));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_PheromoneGreen}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.PheromoneGreen.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.PheromoneBlue));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_PheromoneBlue}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.PheromoneBlue.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.PheromoneRedAvgAngle));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_PheromoneRedAvgAngle}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.PheromoneRedAvgAngle.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.PheromoneGreenAvgAngle));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_PheromoneGreenAvgAngle}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.PheromoneGreenAvgAngle.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.VisionData.PheromoneBlueAvgAngle));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_PheromoneBlueAvgAngle}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.VisionData.PheromoneBlueAvgAngle.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetX += 200;
+                overlayInformationRenderer.OffsetY = 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.PrevStepOutput.Memory0));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Memory0}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.PrevStepOutput.Memory0.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.PrevStepOutput.Memory1));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Memory1}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.PrevStepOutput.Memory1.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.PrevStepOutput.Memory2));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Memory2}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.PrevStepOutput.Memory2.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.PrevStepOutput.Memory3));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Memory3}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.PrevStepOutput.Memory3.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.PrevStepOutput.Memory4));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Memory4}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.PrevStepOutput.Memory4.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.PrevStepOutput.Memory5));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Memory5}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.PrevStepOutput.Memory5.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.PrevStepOutput.Memory6));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Memory6}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.PrevStepOutput.Memory6.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainInput.PrevStepOutput.Memory7));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Input_Memory7}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainInput.PrevStepOutput.Memory7.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetX += 110;
+                overlayInformationRenderer.OffsetY = 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Acceleration));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Acceleration}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Acceleration.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Rotation));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Rotation}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Rotation.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Attack));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Attack}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Attack.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.PheromoneRed));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_PheromoneRed}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.PheromoneRed.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.PheromoneGreen));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_PheromoneGreen}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.PheromoneGreen.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.PheromoneBlue));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_PheromoneBlue}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.PheromoneBlue.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Memory0));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Memory0}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Memory0.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Memory1));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Memory1}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Memory1.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Memory2));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Memory2}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Memory2.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Memory3));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Memory3}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Memory3.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Memory4));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Memory4}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Memory4.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Memory5));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Memory5}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Memory5.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Memory6));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Memory6}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Memory6.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+
+                overlayInformationRenderer.OffsetY += 20;
+                overlayInformationRenderer.OverlayFillEllipse(7, 9, 15, GetColorFromBrainNodeValue(target.BrainOutput.Memory7));
+                overlayInformationRenderer.OverlayDrawEllipse(7, 9, 15, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{BrainNodeType.Output_Memory7}", 18, 0, Color.FromArgb(255, 255, 255));
+                overlayInformationRenderer.OverlayDrawString("MS UI Gothic", 8, $"{target.BrainOutput.Memory7.ToString("0.000")}", 18, 10, Color.FromArgb(255, 255, 255));
+                **/
             }
         }
 
@@ -468,12 +654,41 @@ namespace Paramecium.Forms.Renderer
                             {
                                 if (selectedAnimal.SpeciesId == targetAnimal.SpeciesId)
                                 {
-                                    DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius + 0.5d, Color.FromArgb(0, 255, 128));
+                                    DrawEllipse(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius + 0.5d, Color.FromArgb(128, 0, 255, 128));
+                                    //DrawArc(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius + 0.5d, -30d, 60d, Color.FromArgb(0, 255, 128));
+                                    //DrawArc(targetBitmap, targetGraphics, cameraPosition, cameraZoomFactor, targetAnimal.Position, targetAnimal.Radius + 0.5d, 150d, 60d, Color.FromArgb(0, 255, 128));
                                 }
                             }
                         }
                     }
                 }
+            }
+        }
+
+        private static string RawIdToString(long rawId, int length)
+        {
+            string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+            string result = string.Empty;
+
+            for (int i = 0; i < length; i++)
+            {
+                result = chars[(int)(rawId % 36)] + result;
+                rawId /= 36;
+            }
+
+            return result;
+        }
+
+        private static Color GetColorFromBrainNodeValue(double value)
+        {
+            if (value >= 0)
+            {
+                return Lerp(Color.FromArgb(0, 0, 0), Color.FromArgb(0, 255, 0), double.Min(1d, value));
+            }
+            else
+            {
+                return Lerp(Color.FromArgb(0, 0, 0), Color.FromArgb(255, 0, 0), double.Min(1d, -value));
             }
         }
 

@@ -13,6 +13,7 @@
 
             result.OriginIndex = OriginIndex;
             result.TargetIndex = TargetIndex;
+
             result.Weight = Weight;
 
             return result;

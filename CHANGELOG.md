@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.0 indev-3] - 2024-10-21
+
+### Added
+- Added the ability to cut, copy, paste and delete objects.
+- Added 2 new brain node types. (`Input_AnimalAvgAngle` `Input_AnimalProximity`)
+
+### Changed
+- Reduced the opacity of the frame displayed for animals of the same species as the selected animal.
+- Animals can no longer see backwards. (Previously, they could see backward for short distances.)
+
 ## [0.6.0 indev-2] - 2024-10-16
 
 ### Added

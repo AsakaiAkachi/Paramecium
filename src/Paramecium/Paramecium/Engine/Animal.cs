@@ -8,7 +8,6 @@
         public int Index { get; set; } = -1;
         public long Id { get; set; } = -1;
         public long SpeciesId { get; set; }
-        //public long AncestorSpeciesId { get; set; }
 
         public int Generation { get; set; }
         public int Age { get; set; }
@@ -51,15 +50,12 @@
         {
             if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
 
-            SpeciesId = random.NextInt64(0, 2176782335 + 1);
-            //AncestorSpeciesId = SpeciesId;
+            SpeciesId = random.NextInt64(0, 2176782336);
 
             Generation = 1;
 
             Position = position;
             Angle = angle;
-            IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
-            IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
 
             Radius = 0.5;
             Mass = 16 + element;
@@ -82,7 +78,6 @@
             if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
 
             SpeciesId = parent.SpeciesId;
-            //AncestorSpeciesId = parent.AncestorSpeciesId;
 
             Generation = parent.Generation + 1;
 
@@ -90,8 +85,6 @@
             Angle = parent.Angle + 0.5;
             if (Angle < -0.5) Angle += 1;
             if (Angle > 0.5) Angle -= 1;
-            IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
-            IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
 
             Radius = 0.5;
             Mass = 16 + element;
@@ -111,8 +104,7 @@
 
                 if (random.NextDouble() < g_Soup.Settings.AnimalSpeciesIdMutationRate)
                 {
-                    //AncestorSpeciesId = SpeciesId;
-                    SpeciesId = random.NextInt64(0, 2176782335 + 1);
+                    SpeciesId = random.NextInt64(0, 2176782336);
 
                     ColorRed = random.Next(0, 255 + 1);
                     ColorGreen = random.Next(0, 255 + 1);
@@ -121,7 +113,6 @@
 
                 if (random.NextDouble() < g_Soup.Settings.AnimalMutationCountBias) break;
             }
-
             BrainInput = new BrainInput();
             BrainOutput = new BrainOutput();
         }
@@ -137,6 +128,8 @@
                 Index = index;
                 Id = random.NextInt64(0, 4738381338321616896);
 
+                IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
+                IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
                 g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalAnimalIndexes.Add(Index);
 
                 Initialized = true;
@@ -157,7 +150,7 @@
 
                 BrainInput = new BrainInput()
                 {
-                    VisionData = AnimalVision.Observe(Position, Angle, Id, SpeciesId, 9, 29, 0.5d, 3, 7, 0.4d),
+                    VisionData = AnimalVision.Observe(Position, Angle, Id, SpeciesId, 9, 29, 0.5d),
                     PrevStepOutput = BrainOutput,
                     Velocity = Velocity.Length / g_Soup.Settings.MaximumVelocity,
                     AngularVelocity = AngularVelocity / g_Soup.Settings.MaximumAngularVelocity,

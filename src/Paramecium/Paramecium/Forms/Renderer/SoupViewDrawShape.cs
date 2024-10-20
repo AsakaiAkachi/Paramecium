@@ -56,6 +56,21 @@ namespace Paramecium.Forms.Renderer
             colorBrush.Dispose();
         }
 
+        public static void DrawArc(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor, Double2d centerPosition, double radius, double startAngle, double sweepAngle, Color color)
+        {
+            Pen colorPen = new Pen(color);
+            targetGraphics.DrawArc(
+                colorPen,
+                (float)WorldPosToViewPosX(targetBitmap, cameraPosition, cameraZoomFactor, centerPosition.X - radius),
+                (float)WorldPosToViewPosY(targetBitmap, cameraPosition, cameraZoomFactor, centerPosition.Y - radius),
+                (float)(radius * 2d * cameraZoomFactor),
+                (float)(radius * 2d * cameraZoomFactor),
+                (float)startAngle,
+                (float)sweepAngle
+            );
+            colorPen.Dispose();
+        }
+
         public static void DrawLine(in Bitmap targetBitmap, in Graphics targetGraphics, Double2d cameraPosition, double cameraZoomFactor, Double2d startPosition, Double2d endPosition, Color color)
         {
             Pen colorPen = new Pen(color);

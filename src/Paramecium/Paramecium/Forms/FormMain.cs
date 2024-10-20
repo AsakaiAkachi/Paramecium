@@ -1,10 +1,9 @@
-﻿using Paramecium.Forms.Renderer;
-using Paramecium.Engine;
+﻿using Paramecium.Engine;
+using Paramecium.Forms.Renderer;
 using System.Diagnostics;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.IO;
 
 namespace Paramecium.Forms
 {
@@ -20,6 +19,7 @@ namespace Paramecium.Forms
         long AutoTrackingTime;
 
         Point mousePointClient;
+        Point selectedObjectOperationMousePointClient;
 
         double FramesPerSecond;
 
@@ -205,7 +205,7 @@ namespace Paramecium.Forms
                 case Keys.Space:
                     if (ModifierKeys == Keys.None)
                     {
-                        if (g_Soup.SoupState == SoupState.Pause) g_Soup.SetSoupState(SoupState.Running);
+                        if (g_Soup.SoupState == SoupState.Pause) { g_Soup.SetSoupState(SoupState.Running); SelectedObjectOperation.Hide(); }
                         else if (g_Soup.SoupState == SoupState.Running) g_Soup.SetSoupState(SoupState.Pause);
                     }
                     break;
@@ -546,6 +546,24 @@ namespace Paramecium.Forms
                     switch (ModifierKeys)
                     {
                         case Keys.Shift:
+                            selectedObjectOperationMousePointClient = SoupView.PointToClient(Cursor.Position);
+
+                            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant || SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
+                            {
+                                SelectedObjectOperation_Copy.Enabled = true;
+                                SelectedObjectOperation_Cut.Enabled = true;
+                                SelectedObjectOperation_Delete.Enabled = true;
+                            }
+                            else
+                            {
+                                SelectedObjectOperation_Copy.Enabled = false;
+                                SelectedObjectOperation_Cut.Enabled = false;
+                                SelectedObjectOperation_Delete.Enabled = false;
+                            }
+
+                            g_Soup.SetSoupState(SoupState.Pause);
+
+                            SelectedObjectOperation.Show(SoupView, e.X, e.Y);
                             break;
                         case Keys.Control:
                             if (ZoomLevel > 0) ZoomLevel--;
@@ -950,6 +968,124 @@ namespace Paramecium.Forms
                     }
                 }
                 else if (result == DialogResult.Cancel) e.Cancel = true;
+            }
+        }
+
+        private void SelectedObjectOperation_Cut_Click(object sender, EventArgs e)
+        {
+            if (g_Soup is null || !g_Soup.Initialized) return;
+
+            string result = "";
+
+            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
+            {
+                result = $"$Plant{JsonSerializer.Serialize(g_Soup.Plants[SelectedObjectIndex], new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals })}";
+                g_Soup.Plants[SelectedObjectIndex].OnDisable();
+            }
+            else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
+            {
+                result = $"$Animal{JsonSerializer.Serialize(g_Soup.Animals[SelectedObjectIndex], new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals })}";
+                g_Soup.Animals[SelectedObjectIndex].OnDisable();
+            }
+
+            Clipboard.SetText(result);
+        }
+
+        private void SelectedObjectOperation_Copy_Click(object sender, EventArgs e)
+        {
+            if (g_Soup is null || !g_Soup.Initialized) return;
+
+            string result = "";
+
+            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
+            {
+                result = $"$Plant{JsonSerializer.Serialize(g_Soup.Plants[SelectedObjectIndex], new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals })}";
+            }
+            else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
+            {
+                result = $"$Animal{JsonSerializer.Serialize(g_Soup.Animals[SelectedObjectIndex], new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals })}";
+            }
+
+            Clipboard.SetText(result);
+        }
+
+        private void SelectedObjectOperation_Paste_Click(object sender, EventArgs e)
+        {
+            if (g_Soup is null || !g_Soup.Initialized) return;
+
+            string importedText = Clipboard.GetText();
+
+            if (importedText.StartsWith("$Plant"))
+            {
+                importedText = importedText.Replace("$Plant", "");
+
+                Plant? importedObject = JsonSerializer.Deserialize<Plant>(importedText, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals });
+
+                if (importedObject is not null)
+                {
+                    Random random = new Random();
+
+                    importedObject.Id = random.NextInt64(0, 4738381338321616896);
+
+                    importedObject.Position = new Double2d(WorldPosViewPosConversion.ViewPosToWorldPosX(SoupView.Width, CameraPosition, double.Pow(2, ZoomLevel), selectedObjectOperationMousePointClient.X), WorldPosViewPosConversion.ViewPosToWorldPosY(SoupView.Height, CameraPosition, double.Pow(2, ZoomLevel), selectedObjectOperationMousePointClient.Y));
+
+                    importedObject.Initialized = false;
+
+                    if (g_Soup.PlantUnusedIndexes.Count > 0)
+                    {
+                        g_Soup.Plants[g_Soup.PlantUnusedIndexes[g_Soup.PlantUnusedIndexes.Count - 1]] = importedObject;
+                        g_Soup.Plants[g_Soup.PlantUnusedIndexes[g_Soup.PlantUnusedIndexes.Count - 1]].Initialize(g_Soup.PlantUnusedIndexes[g_Soup.PlantUnusedIndexes.Count - 1], random);
+                        g_Soup.PlantUnusedIndexes.RemoveAt(g_Soup.PlantUnusedIndexes.Count - 1);
+                    }
+                    else
+                    {
+                        g_Soup.Plants.Add(importedObject);
+                        g_Soup.Plants[g_Soup.Plants.Count - 1].Initialize(g_Soup.Plants.Count - 1, random);
+                    }
+                }
+            }
+            else if (importedText.StartsWith("$Animal"))
+            {
+                importedText = importedText.Replace("$Animal", "");
+
+                Animal? importedObject = JsonSerializer.Deserialize<Animal>(importedText, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals });
+
+                if (importedObject is not null)
+                {
+                    Random random = new Random();
+
+                    importedObject.Id = random.NextInt64(0, 4738381338321616896);
+
+                    importedObject.Position = new Double2d(WorldPosViewPosConversion.ViewPosToWorldPosX(SoupView.Width, CameraPosition, double.Pow(2, ZoomLevel), selectedObjectOperationMousePointClient.X), WorldPosViewPosConversion.ViewPosToWorldPosY(SoupView.Height, CameraPosition, double.Pow(2, ZoomLevel), selectedObjectOperationMousePointClient.Y));
+
+                    importedObject.Initialized = false;
+
+                    if (g_Soup.AnimalUnusedIndexes.Count > 0)
+                    {
+                        g_Soup.Animals[g_Soup.AnimalUnusedIndexes[g_Soup.AnimalUnusedIndexes.Count - 1]] = importedObject;
+                        g_Soup.Animals[g_Soup.AnimalUnusedIndexes[g_Soup.AnimalUnusedIndexes.Count - 1]].Initialize(g_Soup.AnimalUnusedIndexes[g_Soup.AnimalUnusedIndexes.Count - 1], random);
+                        g_Soup.AnimalUnusedIndexes.RemoveAt(g_Soup.AnimalUnusedIndexes.Count - 1);
+                    }
+                    else
+                    {
+                        g_Soup.Animals.Add(importedObject);
+                        g_Soup.Animals[g_Soup.Animals.Count - 1].Initialize(g_Soup.Animals.Count - 1, random);
+                    }
+                }
+            }
+        }
+
+        private void SelectedObjectOperation_Delete_Click(object sender, EventArgs e)
+        {
+            if (g_Soup is null || !g_Soup.Initialized) return;
+
+            if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Plant)
+            {
+                g_Soup.Plants[SelectedObjectIndex].OnDisable();
+            }
+            else if (SelectedObjectType == SoupViewOverlayRenderer.SelectedObjectType.Animal)
+            {
+                g_Soup.Animals[SelectedObjectIndex].OnDisable();
             }
         }
     }

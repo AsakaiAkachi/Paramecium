@@ -12,6 +12,8 @@ namespace Paramecium.Engine
         public double WallProximity { get; set; }
         public double PlantAvgAngle { get; set; }
         public double PlantProximity { get; set; }
+        public double AnimalAvgAngle { get; set; }
+        public double AnimalProximity { get; set; }
         public double AnimalSameSpeciesAvgAngle { get; set; }
         public double AnimalSameSpeciesProximity { get; set; }
         public double AnimalOtherSpeciesAvgAngle { get; set; }

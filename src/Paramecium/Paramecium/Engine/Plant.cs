@@ -25,8 +25,6 @@
             if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
 
             Position = position;
-            IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
-            IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
 
             Radius = Math.Sqrt(element / g_Soup.Settings.PlantForkCost) * 0.5d;
             Mass = element;
@@ -47,6 +45,8 @@
 
                 //Velocity = Double2d.FromAngle(random.NextDouble()) * g_Soup.Settings.MaximumVelocity;
 
+                IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
+                IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
                 g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
 
                 Initialized = true;

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             TopMenu = new MenuStrip();
             TopMenu_File = new ToolStripMenuItem();
@@ -53,9 +54,15 @@
             SoupView = new PictureBox();
             SaveFileDialog_SaveSoup = new SaveFileDialog();
             OpenFileDialog_LoadSoup = new OpenFileDialog();
+            SelectedObjectOperation = new ContextMenuStrip(components);
+            SelectedObjectOperation_Cut = new ToolStripMenuItem();
+            SelectedObjectOperation_Copy = new ToolStripMenuItem();
+            SelectedObjectOperation_Paste = new ToolStripMenuItem();
+            SelectedObjectOperation_Delete = new ToolStripMenuItem();
             TopMenu.SuspendLayout();
             BottomStat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SoupView).BeginInit();
+            SelectedObjectOperation.SuspendLayout();
             SuspendLayout();
             // 
             // TopMenu
@@ -124,14 +131,14 @@
             // TopMenu_Soup_EditSoupSettings
             // 
             TopMenu_Soup_EditSoupSettings.Name = "TopMenu_Soup_EditSoupSettings";
-            TopMenu_Soup_EditSoupSettings.Size = new Size(178, 22);
+            TopMenu_Soup_EditSoupSettings.Size = new Size(180, 22);
             TopMenu_Soup_EditSoupSettings.Text = "Edit Soup Settings...";
             TopMenu_Soup_EditSoupSettings.Click += TopMenu_Soup_EditSoupSettings_Click;
             // 
             // TopMenuBar_Soup_EditAutosaveSettings
             // 
             TopMenuBar_Soup_EditAutosaveSettings.Name = "TopMenuBar_Soup_EditAutosaveSettings";
-            TopMenuBar_Soup_EditAutosaveSettings.Size = new Size(178, 22);
+            TopMenuBar_Soup_EditAutosaveSettings.Size = new Size(180, 22);
             TopMenuBar_Soup_EditAutosaveSettings.Text = "Autosave Settings...";
             TopMenuBar_Soup_EditAutosaveSettings.Click += TopMenuBar_Soup_EditAutosaveSettings_Click;
             // 
@@ -229,6 +236,40 @@
             OpenFileDialog_LoadSoup.Filter = "Paramecium Soup File|*.soup|All Files|*.*";
             OpenFileDialog_LoadSoup.Title = "Open";
             // 
+            // SelectedObjectOperation
+            // 
+            SelectedObjectOperation.Items.AddRange(new ToolStripItem[] { SelectedObjectOperation_Cut, SelectedObjectOperation_Copy, SelectedObjectOperation_Paste, SelectedObjectOperation_Delete });
+            SelectedObjectOperation.Name = "SelectedObjectOperation";
+            SelectedObjectOperation.Size = new Size(181, 114);
+            // 
+            // SelectedObjectOperation_Cut
+            // 
+            SelectedObjectOperation_Cut.Name = "SelectedObjectOperation_Cut";
+            SelectedObjectOperation_Cut.Size = new Size(180, 22);
+            SelectedObjectOperation_Cut.Text = "Cut";
+            SelectedObjectOperation_Cut.Click += SelectedObjectOperation_Cut_Click;
+            // 
+            // SelectedObjectOperation_Copy
+            // 
+            SelectedObjectOperation_Copy.Name = "SelectedObjectOperation_Copy";
+            SelectedObjectOperation_Copy.Size = new Size(180, 22);
+            SelectedObjectOperation_Copy.Text = "Copy";
+            SelectedObjectOperation_Copy.Click += SelectedObjectOperation_Copy_Click;
+            // 
+            // SelectedObjectOperation_Paste
+            // 
+            SelectedObjectOperation_Paste.Name = "SelectedObjectOperation_Paste";
+            SelectedObjectOperation_Paste.Size = new Size(180, 22);
+            SelectedObjectOperation_Paste.Text = "Paste";
+            SelectedObjectOperation_Paste.Click += SelectedObjectOperation_Paste_Click;
+            // 
+            // SelectedObjectOperation_Delete
+            // 
+            SelectedObjectOperation_Delete.Name = "SelectedObjectOperation_Delete";
+            SelectedObjectOperation_Delete.Size = new Size(180, 22);
+            SelectedObjectOperation_Delete.Text = "Delete";
+            SelectedObjectOperation_Delete.Click += SelectedObjectOperation_Delete_Click;
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -249,6 +290,7 @@
             BottomStat.ResumeLayout(false);
             BottomStat.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)SoupView).EndInit();
+            SelectedObjectOperation.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -279,5 +321,10 @@
         private ToolStripMenuItem TopMenu_Help;
         private ToolStripMenuItem TopMenu_Help_AboutParamecium;
         private ToolStripMenuItem TopMenuBar_Soup_EditAutosaveSettings;
+        private ContextMenuStrip SelectedObjectOperation;
+        private ToolStripMenuItem SelectedObjectOperation_Delete;
+        private ToolStripMenuItem SelectedObjectOperation_Cut;
+        private ToolStripMenuItem SelectedObjectOperation_Copy;
+        private ToolStripMenuItem SelectedObjectOperation_Paste;
     }
 }

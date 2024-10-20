@@ -14,6 +14,8 @@ namespace Paramecium.Engine
         Input_WallProximity,
         Input_PlantAvgAngle,
         Input_PlantProximity,
+        Input_AnimalAvgAngle,
+        Input_AnimalProximity,
         Input_AnimalSameSpeciesAvgAngle,
         Input_AnimalSameSpeciesProximity,
         Input_AnimalOtherSpeciesAvgAngle,

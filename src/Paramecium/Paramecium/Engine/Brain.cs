@@ -463,6 +463,12 @@ namespace Paramecium.Engine
                     case BrainNodeType.Input_PlantProximity:
                         target.Output = brainInput.VisionData.PlantProximity;
                         break;
+                    case BrainNodeType.Input_AnimalAvgAngle:
+                        target.Output = brainInput.VisionData.AnimalAvgAngle;
+                        break;
+                    case BrainNodeType.Input_AnimalProximity:
+                        target.Output = brainInput.VisionData.AnimalProximity;
+                        break;
                     case BrainNodeType.Input_AnimalSameSpeciesAvgAngle:
                         target.Output = brainInput.VisionData.AnimalSameSpeciesAvgAngle;
                         break;
