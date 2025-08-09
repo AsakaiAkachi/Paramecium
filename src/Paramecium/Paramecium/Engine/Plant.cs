@@ -1,241 +1,290 @@
-﻿namespace Paramecium.Engine
+﻿using Paramecium.Variables;
+
+namespace Paramecium.Engine
 {
+    // 植物のデータを保存する用のクラス
     public class Plant
     {
-        public bool Exist { get; set; } = false;
-        public bool Initialized { get; set; } = false;
+        public bool IsAlive { get; set; } = false;                  // セルが生きているかどうか
 
-        public int Index { get; set; } = -1;
-        public long Id { get; set; } = -1;
+        public int Index { get; set; } = -1;                        // セルのインデックス
+        public long Id { get; set; } = -1;                          // セルのID
 
-        public Double2d Position { get; set; }
-        public Double2d Velocity { get; set; }
-        public int IntegerizedPositionX { get; set; }
-        public int IntegerizedPositionY { get; set; }
+        public int Generation { get; set; } = 1;                    // セルの世代数
+        public int Age { get; set; } = 0;                           // セルの年齢
 
-        public double Radius { get; set; }
-        public double Mass { get; set; }
+        public Double2d Position { get; set; } = Double2d.Zero;     // セルの位置
+        public int TileIndex { get; set; } = 0;                     // セルが属しているタイルのインデックス
+        public Double2d Velocity { get; set; } = Double2d.Zero;     // セルの速度
+        public double Radius { get; set; } = 0;                     // セルの半径
+        public double Element { get; set; } = 0;                    // セルのエレメント量
+        public double Mass { get; set; } = 0;                       // セルの質量
 
-        public double Element { get; set; }
+        public object LockObject = new object();                    // セルのパラメーターを複数スレッドから操作する際の排他制御用オブジェクト
 
         public Plant() { }
-
-        public Plant(Double2d position, double element)
+        public Plant(SoupSettings settings, Double2d position, double element)
         {
-            if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
+            Random rand = new Random();
+
+            IsAlive = true;
+
+            Id = rand.NextInt64(0, 4738381338321616896);
 
             Position = position;
-
-            Radius = Math.Sqrt(element / g_Soup.Settings.PlantForkCost) * 0.5d;
-            Mass = element;
-
+            Radius = CalcRadius(settings, element);
             Element = element;
+            Mass = element;
+        }
+        public Plant(SoupSettings settings, Double2d position, double element, Plant parent)
+        {
+            Random rand = new Random();
+
+            IsAlive = true;
+
+            Id = rand.NextInt64(0, 4738381338321616896);
+
+            Generation = parent.Generation + 1;
+
+            Position = position;
+            Radius = CalcRadius(settings, element);
+            Element = element;
+            Mass = element;
         }
 
-        public void Initialize(int index, Random random)
+        public void UpdateAge(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (!Initialized)
+            if (IsAlive)
             {
-                Exist = true;
-
-                Index = index;
-                Id = random.NextInt64(0, 4738381338321616896);
-
-                //Velocity = Double2d.FromAngle(random.NextDouble()) * g_Soup.Settings.MaximumVelocity;
-
-                IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
-                IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
-
-                Initialized = true;
+                Age += 1;
             }
-            else throw new InvalidOperationException("This animal has already been initialized.");
         }
 
-        public void CollectElement()
+        // 速度に対する抵抗を適用する
+        public void ApplyDrag(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
+            if (IsAlive && Age >= settings.PlantSpreadingTime)
             {
-                Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX];
-
-                if (targetTile.Element > 0)
-                {
-                    double ElementMoveAmount = targetTile.Element * g_Soup.Settings.PlantElementCollectRate;
-
-                    Element += ElementMoveAmount * g_Soup.ElementAmountMultiplier;
-                    targetTile.Element = double.Max(0d, targetTile.Element - ElementMoveAmount);
-                }
+                Velocity *= 1d - settings.Drag;
             }
-            else throw new InvalidOperationException("This animal is not initialized.");
         }
 
-        public void UpdateCollision()
+        // 衝突判定の処理
+        public void UpdateCollision(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
+            if (IsAlive)
             {
-                int soupSizeX = g_Soup.Settings.SizeX;
-                int soupSizeY = g_Soup.Settings.SizeY;
+                // セルが属しているタイルの位置を取得
+                Int2d tilePosition = soup.GetTilePositionFromTileIndex(TileIndex);
 
-                for (int x = int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX + 1)); x++)
+                double WallRestitutionCoefficientMultiplier = 1d;
+                if (Velocity.MagnitudeSquared > settings.MaximumEffectiveVelocity * settings.MaximumEffectiveVelocity) WallRestitutionCoefficientMultiplier = double.Max(1d, Velocity.Magnitude / settings.MaximumEffectiveVelocity);
+
+                // セルが属しているタイルを中心とした3x3タイルにある植物に対して衝突判定の処理を行う
+                for (int x = -1; x <= 1; x++)
                 {
-                    for (int y = int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY + 1)); y++)
+                    for (int y = -1; y <= 1; y++)
                     {
-                        Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
+                        // 現在処理の対象になっているタイルの位置を取得
+                        Int2d targetTilePosition = tilePosition + new Int2d(x, y);
 
-                        if (targetTile.Type == TileType.Wall)
+                        // 処理対象のタイルの位置がスープの内かどうかをチェックしてスープの外だったらスキップする
+                        if (targetTilePosition.X >= 0 && targetTilePosition.X < settings.SizeX && targetTilePosition.Y >= 0 && targetTilePosition.Y < settings.SizeY)
                         {
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.25d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.25d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.75d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.75d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.5d, y + 0.5d), 0.5d) * g_Soup.Settings.RestitutionCoefficient;
-                        }
+                            // 処理対象のタイルのインデックスを取得
+                            int targetTileIndex = soup.GetTileIndexFromTilePosition(targetTilePosition);
 
-                        if (targetTile.LocalPlantPopulation > 0)
-                        {
-                            for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
+                            Tile targetTile = soup.Tiles[targetTileIndex];
+
+                            if (targetTile.Type == TileType.Wall)
                             {
-                                Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
-                                if (targetPlant.Exist && targetPlant.Id != Id) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetPlant.Position, targetPlant.Radius, targetPlant.Mass) * g_Soup.Settings.RestitutionCoefficient;
+                                // 壁に対する衝突判定の計算
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.25d, targetTilePosition.Y + 0.25d), 0.356d) * WallRestitutionCoefficientMultiplier;
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.75d, targetTilePosition.Y + 0.25d), 0.356d) * WallRestitutionCoefficientMultiplier;
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.25d, targetTilePosition.Y + 0.75d), 0.356d) * WallRestitutionCoefficientMultiplier;
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.75d, targetTilePosition.Y + 0.75d), 0.356d) * WallRestitutionCoefficientMultiplier;
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.5d, targetTilePosition.Y + 0.5d), 0.5d) * WallRestitutionCoefficientMultiplier;
                             }
-                        }
-
-                        if (targetTile.LocalAnimalPopulation > 0)
-                        {
-                            for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
+                            else
                             {
-                                Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
-                                if (targetAnimal.Exist) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetAnimal.Position, targetAnimal.Radius, targetAnimal.Mass) * g_Soup.Settings.RestitutionCoefficient;
+                                // 植物に対する衝突判定の計算
+                                for (int i = 0; i < soup.Tiles[targetTileIndex].PlantPopulation; i++)
+                                {
+                                    // 衝突判定の処理の相手になる植物を取得
+                                    int targetIndex = targetTile.PlantIndexes[i];
+
+                                    // 自分自身に対しては衝突判定の処理は行わない
+                                    if (targetIndex != Index)
+                                    {
+                                        // 衝突判定の処理の本体
+                                        Plant? targetPlant = soup.Plants[targetIndex];
+                                        if (targetPlant is not null)
+                                        {
+                                            double targetRadius = targetPlant.Radius;
+                                            Double2d targetPosition = targetPlant.Position;
+                                            double targetMass = targetPlant.Mass;
+
+                                            Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
+                                        }
+                                    }
+                                }
+
+                                // 動物に対する衝突判定の計算
+                                for (int i = 0; i < soup.Tiles[targetTileIndex].AnimalPopulation; i++)
+                                {
+                                    // 衝突判定の処理の相手になる植物を取得
+                                    int targetIndex = targetTile.AnimalIndexes[i];
+
+                                    // 衝突判定の処理の本体
+                                    Animal? targetAnimal = soup.Animals[targetIndex];
+                                    if (targetAnimal is not null)
+                                    {
+                                        double targetRadius = targetAnimal.Radius;
+                                        Double2d targetPosition = targetAnimal.Position;
+                                        double targetMass = targetAnimal.Mass;
+
+                                        Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-            else throw new InvalidOperationException("This animal is not initialized.");
-        }
-        public Double2d CalculateCollisionTwoObjects(Double2d obj1Pos, double obj1Radius, double obj1Mass, Double2d obj2Pos, double obj2Radius, double obj2Mass)
-        {
-            if (Double2d.DistanceSquared(obj1Pos, obj2Pos) < (obj1Radius + obj2Radius) * (obj1Radius + obj2Radius)) return (obj1Pos - obj2Pos).Normalized * (1d - Double2d.Distance(obj1Pos, obj2Pos) / (obj1Radius + obj2Radius)) * Math.Min(1d, obj2Mass / obj1Mass);
-            else return Double2d.Zero;
-        }
-        public Double2d CalculateCollisionTwoObjects(Double2d obj1Pos, double obj1Radius, Double2d obj2Pos, double obj2Radius)
-        {
-            if (Double2d.DistanceSquared(obj1Pos, obj2Pos) < (obj1Radius + obj2Radius) * (obj1Radius + obj2Radius)) return (obj1Pos - obj2Pos).Normalized * (1d - Double2d.Distance(obj1Pos, obj2Pos) / (obj1Radius + obj2Radius));
-            else return Double2d.Zero;
         }
 
-        public void UpdatePosition()
+        // 位置の更新
+        public void UpdatePosition(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
+            if (IsAlive)
             {
-                int soupSizeX = g_Soup.Settings.SizeX;
-                int soupSizeY = g_Soup.Settings.SizeY;
+                // effectiveVelocityをMaximumEffectiveVelocity以下に制限する
+                Double2d effectiveVelocity = Velocity;
+                if (effectiveVelocity.Magnitude > settings.MaximumEffectiveVelocity) effectiveVelocity *= settings.MaximumEffectiveVelocity / effectiveVelocity.Magnitude;
 
-                if (Velocity.LengthSquared > g_Soup.Settings.MaximumVelocity * g_Soup.Settings.MaximumVelocity)
-                {
-                    Velocity /= Velocity.Length / g_Soup.Settings.MaximumVelocity;
-                }
+                // 位置を更新する
+                Position += effectiveVelocity;
 
-                //Velocity /= Velocity.Length / g_Soup.Settings.MaximumVelocity;
-
-                Position += Velocity;
-
+                // 位置がスープの外側だったらスープの中になるようにする
                 if (Position.X < Radius)
                 {
-                    Position = new Double2d(0 + Radius, Position.Y);
-                    Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
+                    Position = new Double2d(Radius, Position.Y);
+                    Velocity = new Double2d(-Velocity.X, Velocity.Y);
                 }
-                if (Position.X > soupSizeX - Radius)
+                if (Position.X > settings.SizeX - Radius)
                 {
-                    Position = new Double2d(soupSizeX - Radius, Position.Y);
-                    Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
+                    Position = new Double2d(settings.SizeX - Radius, Position.Y);
+                    Velocity = new Double2d(-Velocity.X, Velocity.Y);
                 }
                 if (Position.Y < Radius)
                 {
                     Position = new Double2d(Position.X, Radius);
-                    Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
+                    Velocity = new Double2d(Velocity.X, -Velocity.Y);
                 }
-                if (Position.Y > soupSizeY - Radius)
+                if (Position.Y > settings.SizeY - Radius)
                 {
-                    Position = new Double2d(Position.X, soupSizeY - Radius);
-                    Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
+                    Position = new Double2d(Position.X, settings.SizeY - Radius);
+                    Velocity = new Double2d(Velocity.X, -Velocity.Y);
                 }
 
-                if (int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(Position.X))) != IntegerizedPositionX || int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(Position.Y))) != IntegerizedPositionY)
+                // 位置を更新した後の自身が属しているタイルのインデックスを取得する
+                int currentTileIndex = soup.GetTileIndexFromPosition(Position);
+
+                // 位置を更新する前とした後で属するタイルのインデックスが変わっていたらタイル側のインデックス情報を更新する
+                if (TileIndex != currentTileIndex)
                 {
-                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalPlantIndexes.Remove(Index);
+                    lock (soup.Tiles[TileIndex].LockObject)
+                    {
+                        soup.Tiles[TileIndex].PlantIndexes.Remove(Index);
+                    }
+                    lock (soup.Tiles[currentTileIndex].LockObject)
+                    {
+                        soup.Tiles[currentTileIndex].PlantIndexes.Add(Index);
+                    }
 
-                    IntegerizedPositionX = int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(Position.X)));
-                    IntegerizedPositionY = int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(Position.Y)));
+                    TileIndex = currentTileIndex;
+                }
+            }
+        }
 
-                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalPlantIndexes.Add(Index);
+        // タイルのエレメントの収集
+        public void CollectElement(Soup soup, SoupSettings settings)
+        {
+            if (IsAlive)
+            {
+                Tile targetTile = soup.Tiles[TileIndex];
+
+                double elementBuffer = 0;
+                lock (targetTile.LockObject)
+                {
+                    elementBuffer = targetTile.Element * settings.PlantElementCollectRate;
+                    targetTile.Element -= elementBuffer;
+
+                    if (targetTile.Element < 0) targetTile.Element = 0;
                 }
 
-                Radius = Math.Sqrt(Element / g_Soup.Settings.PlantForkCost) / 2d;
+                Element += elementBuffer * soup.ElementAmountMultiplier;
+
+                Radius = CalcRadius(settings, Element);
                 Mass = Element;
-
-                if (Element <= 0) OnDisable();
-                else if (g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
             }
-            else throw new InvalidOperationException("This animal is not initialized.");
         }
 
-        public void ApplyDrag()
+        // 子孫の生成
+        public List<Plant>? CreateOffspring(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
+            if (IsAlive)
             {
-                Velocity *= 1d - g_Soup.Settings.Drag;
-            }
-            else throw new InvalidOperationException("This animal is not initialized.");
-        }
-
-        public List<Plant>? CreateOffspring(in Random random)
-        {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
-            {
-                if (Element >= g_Soup.Settings.PlantForkCost)
+                // エレメントの量がPlantMaximumElementAmount以上であれば子孫を生成して自身は死滅する
+                if (Element >= settings.PlantMaximumElementAmount)
                 {
-                    List<Plant> result = new List<Plant>();
-                    int offspringCount = random.Next(g_Soup.Settings.PlantForkOffspringCountMin, g_Soup.Settings.PlantForkOffspringCountMax + 1);
-                    double[] offspringElementAmount = new double[offspringCount];
-                    for (int i = 0; i < offspringCount; i++) offspringElementAmount[i] = random.NextDouble() * 0.9d + 0.1d;
-                    double offspringElementAmountTotal = 0;
-                    for (int i = 0; i < offspringCount; i++) offspringElementAmountTotal += offspringElementAmount[i];
-                    for (int i = 0; i < offspringCount; i++) offspringElementAmount[i] = offspringElementAmount[i] / offspringElementAmountTotal * Element;
-                    for (int i = 0; i < offspringCount; i++) result.Add(new Plant(Position + Double2d.FromAngle(random.NextDouble()) * 0.1d, offspringElementAmount[i] * g_Soup.ElementAmountMultiplier));
+                    Random rand = new Random();
 
-                    OnDisable();
+                    List<Plant> result = new List<Plant>();
+                    int offspringCount = rand.Next(settings.PlantForkOffspringCountMin, settings.PlantForkOffspringCountMax + 1);
+
+                    double[] offspringElementAmount = new double[offspringCount];
+                    double offspringElementAmountTotal = 0d;
+
+                    for (int i = 0; i < offspringCount; i++)
+                    {
+                        offspringElementAmount[i] = rand.NextDouble();
+                        offspringElementAmountTotal += offspringElementAmount[i];
+                    }
+                    for (int i = 0; i < offspringCount; i++) offspringElementAmount[i] *= (1d / offspringElementAmountTotal) * Element;
+
+                    for (int i = 0; i < offspringCount; i++) result.Add(new Plant(settings, Position + Double2d.FromAngle01(rand.NextDouble()) * Radius * 0.1d, offspringElementAmount[i], this));
+
+                    Element = 0;
+                    IsAlive = false;
+
                     return result;
                 }
-                else return null;
             }
-            else throw new InvalidOperationException("This animal is not initialized.");
+            return null;
         }
 
-        public void OnDisable()
+        // セルが生きていない時の処理
+        public void IsNotAlive(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
+            Tile targetTile = soup.Tiles[TileIndex];
 
-            if (Initialized)
+            // エレメント量が0以下であるかセルが壁の中に埋まっているならそのセルは死んでいるものとして扱う
+            if (Element <= 0) IsAlive = false;
+            if (targetTile.Type == TileType.Wall) IsAlive = false;
+
+            if (!IsAlive)
             {
-                Exist = false;
-
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalPlantIndexes.Remove(Index);
-                g_Soup.PlantUnusedIndexes.Add(Index);
+                // タイル側のインデックス情報から自身のインデックスを削除し、タイルが壁でなければ残っているエレメントをタイルに追加する
+                soup.Tiles[TileIndex].PlantIndexes.Remove(Index);
+                if (targetTile.Type == TileType.Default) targetTile.Element += double.Max(0d, Element);
             }
-            else throw new InvalidOperationException("This animal is not initialized.");
+        }
+
+        // 半径の計算
+        public static double CalcRadius(SoupSettings settings, double element)
+        {
+            return Math.Min(0.5d, Math.Sqrt(element / settings.PlantMaximumElementAmount) * 0.5d);
         }
     }
 }

@@ -1,135 +1,116 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Paramecium.Variables;
 
 namespace Paramecium.Engine
 {
     public static class AnimalVision
     {
-        public static AnimalVisionOutput Observe(Double2d originPosition, double angle, long originId, long originSpeciesId, int frontViewRange, int frontViewRayCount, double frontViewAngleRange)
+        // 動物の周辺状況の認識(視覚)の処理
+        public static AnimalVisionOutput Observe(Soup soup, SoupSettings settings, Double2d position, double angle, int index, Double4d speciesSignature, int rayCount, int raySamplingCount, double rayLength, double viewingAngle)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            int soupSizeX = g_Soup.Settings.SizeX;
-            int soupSizeY = g_Soup.Settings.SizeY;
-
             AnimalVisionOutput result = new AnimalVisionOutput();
 
-            double WallAvgAngleDenominator = 0;
-            double PlantAvgAngleDenominator = 0;
-            double AnimalAvgAngleDenominator = 0;
-            double AnimalSameSpeciesAvgAngleDenominator = 0;
-            double AnimalOtherSpeciesAvgAngleDenominator = 0;
+            Double2d frontVector = Double2d.FromAngle01(angle);
+            double raySamplingRadius = rayLength / raySamplingCount / 2d;
 
-            double frontViewRangeDouble = frontViewRange;
+            double wallTotalWeight = 0d;
+            double plantTotalWeight = 0d;
+            double animalTotalWeight = 0d;
 
-            for (int i = 0; i < frontViewRayCount; i++)
+            for (int i = 0; i < rayCount; i++)
             {
-                double rayAngle = -(frontViewAngleRange / 2d) + frontViewAngleRange / (frontViewRayCount - 1) * i;
-                if (rayAngle > 0.5d) rayAngle -= 1;
-                if (rayAngle < -0.5d) rayAngle += 1;
-                Double2d rayVector = Double2d.FromAngle(angle + rayAngle);
+                double rayAngle = double.Lerp(-(viewingAngle / 2d), viewingAngle / 2d, 1d / (rayCount - 1) * i);
+                Double2d rayVector = Double2d.Rotate01(frontVector, rayAngle);
 
-                for (int j = 0; j < frontViewRange; j++)
+                double unweightedAngle = rayAngle / (viewingAngle / 2d);
+
+                Double2d prevSamplingPosition = position;
+
+                for (int j = 1; j <= raySamplingCount; j++)
                 {
-                    Double2d rayPosition = originPosition + rayVector * (j + 1);
-                    bool WallHitFlag = false;
+                    Double2d samplingPosition = Double2d.Lerp(position, position + rayVector * rayLength, (double)j / raySamplingCount);
 
-                    for (int x = 0; x <= 1; x++)
+                    double weight = 1d / (j * j);
+
+                    double proximity = (1d - (double)j / raySamplingCount) * weight;
+                    double distance = (double)j / raySamplingCount * weight;
+
+                    if (samplingPosition.X < 0d || samplingPosition.X > settings.SizeX || samplingPosition.Y < 0d || samplingPosition.Y > settings.SizeY)
                     {
-                        for (int y = 0; y <= 1; y++)
-                        {
-                            Double2d rayScanPosition = rayPosition + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
+                        wallTotalWeight += weight;
+                        result.WallWAvgAngle = unweightedAngle * weight;
+                        result.WallWAvgProximity += proximity;
+                        result.WallWAvgDistance += distance;
 
-                            if (rayScanPosition.X < 0d || rayScanPosition.X > soupSizeX || rayScanPosition.Y < 0d || rayScanPosition.Y > soupSizeY)
-                            {
-                                result.WallAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
-                                result.WallProximity = double.Max(result.WallProximity, ((frontViewRange - j) / frontViewRangeDouble));
-                                WallAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
-                                WallHitFlag = true;
-                            }
-                            else
-                            {
-                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(rayScanPosition.X)));
-                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(rayScanPosition.Y)));
+                        break;
+                    }
+                    if (soup.Tiles[soup.GetTileIndexFromPosition(samplingPosition)].Type == TileType.Wall)
+                    {
+                        wallTotalWeight += weight;
+                        result.WallWAvgAngle = unweightedAngle * weight;
+                        result.WallWAvgProximity += proximity;
+                        result.WallWAvgDistance += distance;
 
-                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * soupSizeX + rayScanPositionIntegerizedX];
-
-                                if (targetTile.Type == TileType.Wall)
-                                {
-                                    result.WallAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
-                                    result.WallProximity = double.Max(result.WallProximity, ((frontViewRange - j) / frontViewRangeDouble));
-                                    WallAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
-                                    WallHitFlag = true;
-                                }
-                            }
-                        }
+                        break;
                     }
 
+                    bool wallHitFlag = false;
+
                     for (int x = 0; x <= 1; x++)
                     {
                         for (int y = 0; y <= 1; y++)
                         {
-                            if (
-                                !WallHitFlag ||
-                                (rayPosition.X >= originPosition.X && rayPosition.Y >= originPosition.Y && x == 0 && y == 0) ||
-                                (rayPosition.X >= originPosition.X && rayPosition.Y < originPosition.Y && x == 0 && y == 1) ||
-                                (rayPosition.X < originPosition.X && rayPosition.Y >= originPosition.Y && x == 1 && y == 0) ||
-                                (rayPosition.X < originPosition.X && rayPosition.Y < originPosition.Y && x == 1 && y == 1)
-                            )
+                            int samplingTileIndex = soup.GetTileIndexFromPosition(samplingPosition + new Double2d(-raySamplingRadius, -raySamplingRadius) + new Double2d(raySamplingRadius * 2d * x, raySamplingRadius * 2d * y));
+                            Tile targetTile = soup.Tiles[samplingTileIndex];
+
+                            if (targetTile.Type == TileType.Wall)
                             {
-                                Double2d rayScanPosition = rayPosition + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
+                                wallHitFlag = true;
 
-                                int rayScanPositionIntegerizedX = int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(rayScanPosition.X)));
-                                int rayScanPositionIntegerizedY = int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(rayScanPosition.Y)));
+                                wallTotalWeight += weight;
+                                result.WallWAvgAngle = unweightedAngle * weight;
+                                result.WallWAvgProximity += proximity;
+                                result.WallWAvgDistance += distance;
 
-                                Tile targetTile = g_Soup.Tiles[rayScanPositionIntegerizedY * soupSizeX + rayScanPositionIntegerizedX];
+                                continue;
+                            }
 
-                                if (targetTile.LocalPlantPopulation > 0)
+                            for (int k = 0; k < targetTile.PlantPopulation; k++)
+                            {
+                                Plant? targetPlant = soup.Plants[targetTile.PlantIndexes[k]];
+
+                                if (targetPlant is not null)
                                 {
-                                    for (int k = 0; k < targetTile.LocalPlantPopulation; k++)
+                                    if (Double2d.DistanceSquared(samplingPosition, targetPlant.Position) < Math.Min(raySamplingRadius * raySamplingRadius, targetPlant.Radius * targetPlant.Radius))
                                     {
-                                        Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[k]];
-
-                                        if (Double2d.DistanceSquared(rayPosition, targetPlant.Position) < 0.5d * 0.5d)
-                                        {
-                                            result.PlantAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
-                                            result.PlantProximity = double.Max(result.PlantProximity, ((frontViewRange - j) / frontViewRangeDouble));
-                                            PlantAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
-                                        }
+                                        plantTotalWeight += weight;
+                                        result.PlantWAvgAngle += unweightedAngle * weight;
+                                        result.PlantWAvgProximity += proximity;
+                                        result.PlantWAvgDistance += distance;
                                     }
                                 }
-                                if (targetTile.LocalAnimalPopulation > 0)
+                            }
+                            for (int k = 0; k < targetTile.AnimalPopulation; k++)
+                            {
+                                Animal? targetAnimal = soup.Animals[targetTile.AnimalIndexes[k]];
+
+                                if (targetAnimal is not null)
                                 {
-                                    for (int k = 0; k < targetTile.LocalAnimalPopulation; k++)
+                                    if (targetAnimal.Age >= 0)
                                     {
-                                        Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[k]];
-
-                                        if (targetAnimal.Id != originId)
+                                        if (Double2d.DistanceSquared(samplingPosition, targetAnimal.Position) < Math.Min(raySamplingRadius * raySamplingRadius, targetAnimal.Radius * targetAnimal.Radius))
                                         {
-                                            result.AnimalAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
-                                            result.AnimalProximity = double.Max(result.AnimalSameSpeciesProximity, ((frontViewRange - j) / frontViewRangeDouble));
-                                            AnimalAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
+                                            animalTotalWeight += weight;
+                                            result.AnimalWAvgAngle += unweightedAngle * weight;
+                                            result.AnimalWAvgProximity += proximity;
+                                            result.AnimalWAvgDistance += distance;
 
-                                            if (targetAnimal.SpeciesId == originSpeciesId)
+                                            if (targetAnimal.SpeciesSignature == speciesSignature)
                                             {
-                                                if (Double2d.DistanceSquared(rayPosition, targetAnimal.Position) < 0.5d * 0.5d)
-                                                {
-                                                    result.AnimalSameSpeciesAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
-                                                    result.AnimalSameSpeciesProximity = double.Max(result.AnimalSameSpeciesProximity, ((frontViewRange - j) / frontViewRangeDouble));
-                                                    AnimalSameSpeciesAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
-                                                }
+                                                result.AnimalWAvgSpeciesSigDiff += 0d * weight;
                                             }
                                             else
                                             {
-                                                if (Double2d.DistanceSquared(rayPosition, targetAnimal.Position) < 0.5d * 0.5d)
-                                                {
-                                                    result.AnimalOtherSpeciesAvgAngle += rayAngle * 2d * ((frontViewRange - j) / frontViewRangeDouble);
-                                                    result.AnimalOtherSpeciesProximity = double.Max(result.AnimalOtherSpeciesProximity, ((frontViewRange - j) / frontViewRangeDouble));
-                                                    AnimalOtherSpeciesAvgAngleDenominator += ((frontViewRange - j) / frontViewRangeDouble);
-                                                }
+                                                result.AnimalWAvgSpeciesSigDiff += 1d * weight;
                                             }
                                         }
                                     }
@@ -138,76 +119,86 @@ namespace Paramecium.Engine
                         }
                     }
 
-                    if (WallHitFlag) break;
+                    if (wallHitFlag) break;
                 }
             }
 
-            if (WallAvgAngleDenominator > 0) result.WallAvgAngle /= WallAvgAngleDenominator;
-            if (PlantAvgAngleDenominator > 0) result.PlantAvgAngle /= PlantAvgAngleDenominator;
-            if (AnimalAvgAngleDenominator > 0) result.AnimalAvgAngle /= AnimalAvgAngleDenominator;
-            if (AnimalSameSpeciesAvgAngleDenominator > 0) result.AnimalSameSpeciesAvgAngle /= AnimalSameSpeciesAvgAngleDenominator;
-            if (AnimalOtherSpeciesAvgAngleDenominator > 0) result.AnimalOtherSpeciesAvgAngle /= AnimalOtherSpeciesAvgAngleDenominator;
+            if (wallTotalWeight > 0)
+            {
+                result.WallWAvgAngle /= wallTotalWeight;
+                result.WallWAvgProximity /= wallTotalWeight;
+                result.WallWAvgDistance /= wallTotalWeight;
+            }
+            else
+            {
+                result.WallWAvgAngle = 0d;
+                result.WallWAvgProximity = 0d;
+                result.WallWAvgDistance = 1d;
+            }
 
-            double pheromoneRed = 0;
-            double pheromoneGreen = 0;
-            double pheromoneBlue = 0;
-            Double2d pheromoneRedAvgVector = Double2d.Zero;
-            Double2d pheromoneGreenAvgVector = Double2d.Zero;
-            Double2d pheromoneBlueAvgVector = Double2d.Zero;
+            if (plantTotalWeight > 0)
+            {
+                result.PlantWAvgAngle /= plantTotalWeight;
+                result.PlantWAvgProximity /= plantTotalWeight;
+                result.PlantWAvgDistance /= plantTotalWeight;
+            }
+            else
+            {
+                result.PlantWAvgAngle = 0d;
+                result.PlantWAvgProximity = 0d;
+                result.PlantWAvgDistance = 1d;
+            }
+
+            if (animalTotalWeight > 0)
+            {
+                result.AnimalWAvgAngle /= animalTotalWeight;
+                result.AnimalWAvgProximity /= animalTotalWeight;
+                result.AnimalWAvgDistance /= animalTotalWeight;
+                result.AnimalWAvgSpeciesSigDiff /= animalTotalWeight;
+            }
+            else
+            {
+                result.AnimalWAvgAngle = 0d;
+                result.AnimalWAvgProximity = 0d;
+                result.AnimalWAvgDistance = 1d;
+                result.AnimalWAvgSpeciesSigDiff = 0d;
+            }
+
+            double pheromoneRedConcentration = 0d;
+            double pheromoneGreenConcentration = 0d;
+            double pheromoneBlueConcentration = 0d;
+            Double2d pheromoneRedGradAngleVector = Double2d.Zero;
+            Double2d pheromoneGreenGradAngleVector = Double2d.Zero;
+            Double2d pheromoneBlueGradAngleVector = Double2d.Zero;
+
+            double maximumEffectivePheromoneAmount = settings.MaximumEffectivePheromoneAmount;
 
             for (int x = 0; x <= 1; x++)
             {
                 for (int y = 0; y <= 1; y++)
                 {
-                    Double2d pheromoneScanPosition = originPosition + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
-                    pheromoneScanPosition = new Double2d(double.Max(0, double.Min(soupSizeX, pheromoneScanPosition.X)), double.Max(0, double.Min(soupSizeY, pheromoneScanPosition.Y)));
+                    Double2d pheromoneSamplingPosition = position + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
 
-                    int pheromoneScanPositionIntegerizedX = int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(pheromoneScanPosition.X)));
-                    int pheromoneScanPositionIntegerizedY = int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(pheromoneScanPosition.Y)));
+                    if (pheromoneSamplingPosition.X >= 0d && pheromoneSamplingPosition.X <= settings.SizeX && pheromoneSamplingPosition.Y >= 0d && pheromoneSamplingPosition.Y <= settings.SizeY)
+                    {
+                        Tile targetTile = soup.Tiles[soup.GetTileIndexFromPosition(pheromoneSamplingPosition)];
 
-                    double tileRedPheromoneAmount = g_Soup.Tiles[pheromoneScanPositionIntegerizedY * soupSizeX + pheromoneScanPositionIntegerizedX].PheromoneRed;
-                    double tileGreenPheromoneAmount = g_Soup.Tiles[pheromoneScanPositionIntegerizedY * soupSizeX + pheromoneScanPositionIntegerizedX].PheromoneGreen;
-                    double tileBluePheromoneAmount = g_Soup.Tiles[pheromoneScanPositionIntegerizedY * soupSizeX + pheromoneScanPositionIntegerizedX].PheromoneBlue;
-
-                    if (tileRedPheromoneAmount >= 0.0005d)
-                    {
-                        pheromoneRed += tileRedPheromoneAmount;
-                        pheromoneRedAvgVector += (new Double2d(-0.5d, -0.5d) + new Double2d(x, y)) * tileRedPheromoneAmount;
-                    }
-                    if (tileGreenPheromoneAmount >= 0.0005d)
-                    {
-                        pheromoneGreen += tileGreenPheromoneAmount;
-                        pheromoneGreenAvgVector += (new Double2d(-0.5d, -0.5d) + new Double2d(x, y)) * tileGreenPheromoneAmount;
-                    }
-                    if (tileBluePheromoneAmount >= 0.0005d)
-                    {
-                        pheromoneBlue += tileBluePheromoneAmount;
-                        pheromoneBlueAvgVector += (new Double2d(-0.5d, -0.5d) + new Double2d(x, y)) * tileBluePheromoneAmount;
+                        pheromoneRedConcentration += double.Min(1d, Math.Sqrt(targetTile.PheromoneRed / maximumEffectivePheromoneAmount));
+                        pheromoneRedGradAngleVector += new Double2d(x, y) * targetTile.PheromoneRed;
+                        pheromoneGreenConcentration += double.Min(1d, Math.Sqrt(targetTile.PheromoneGreen / maximumEffectivePheromoneAmount));
+                        pheromoneGreenGradAngleVector += new Double2d(x, y) * targetTile.PheromoneGreen;
+                        pheromoneBlueConcentration += double.Min(1d, Math.Sqrt(targetTile.PheromoneBlue / maximumEffectivePheromoneAmount));
+                        pheromoneBlueGradAngleVector += new Double2d(x, y) * targetTile.PheromoneBlue;
                     }
                 }
             }
 
-            result.PheromoneRed = pheromoneRed / 4d;
-            result.PheromoneGreen = pheromoneGreen / 4d;
-            result.PheromoneBlue = pheromoneBlue / 4d;
-            if (pheromoneRed > 0)
-            {
-                result.PheromoneRedAvgAngle = Double2d.ToAngle(pheromoneRedAvgVector) - angle;
-                if (result.PheromoneRedAvgAngle < -0.5d) result.PheromoneRedAvgAngle += 1d;
-                if (result.PheromoneRedAvgAngle > 0.5d) result.PheromoneRedAvgAngle -= 1d;
-            }
-            if (pheromoneGreen > 0)
-            {
-                result.PheromoneGreenAvgAngle = Double2d.ToAngle(pheromoneGreenAvgVector) - angle;
-                if (result.PheromoneGreenAvgAngle < -0.5d) result.PheromoneGreenAvgAngle += 1d;
-                if (result.PheromoneGreenAvgAngle > 0.5d) result.PheromoneGreenAvgAngle -= 1d;
-            }
-            if (pheromoneBlue > 0)
-            {
-                result.PheromoneBlueAvgAngle = Double2d.ToAngle(pheromoneBlueAvgVector) - angle;
-                if (result.PheromoneBlueAvgAngle < -0.5d) result.PheromoneBlueAvgAngle += 1d;
-                if (result.PheromoneBlueAvgAngle > 0.5d) result.PheromoneBlueAvgAngle -= 1d;
-            }
+            result.PheromoneRedConcentration = pheromoneRedConcentration / 4d;
+            result.PheromoneGreenConcentration = pheromoneGreenConcentration / 4d;
+            result.PheromoneBlueConcentration = pheromoneBlueConcentration / 4d;
+            if (result.PheromoneRedConcentration > 0d) result.PheromoneRedGradAngle = Double2d.ToAngle01(Double2d.Rotate01(pheromoneRedGradAngleVector.Normalized, -angle)) * result.PheromoneRedConcentration;
+            if (result.PheromoneGreenConcentration > 0d) result.PheromoneGreenGradAngle = Double2d.ToAngle01(Double2d.Rotate01(pheromoneGreenGradAngleVector.Normalized, -angle)) * result.PheromoneGreenConcentration;
+            if (result.PheromoneBlueConcentration > 0d) result.PheromoneBlueGradAngle = Double2d.ToAngle01(Double2d.Rotate01(pheromoneBlueGradAngleVector.Normalized, -angle)) * result.PheromoneBlueConcentration;
 
             return result;
         }

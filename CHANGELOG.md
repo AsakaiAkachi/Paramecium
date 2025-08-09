@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0 indev-1] - 2025-08-10
+
+### Added
+- 2 types of brain node functions have been added. (`Input_AnimalWAvgDistance` `Input_AnimalWAvgSpeciesSigDiff`)
+
+### Deleted
+- 4 types of brain node function have been deleted. (`Input_AnimalSameSpeciesAvgAngle` `Input_AnimalSameSpeciesProximity` `Input_AnimalOtherSpeciesAvgAngle` `Input_AnimalOtherSpeciesProximity`)
+
+### Changed
+- Rebuilt the project and rewrote most of the code.
+- After the project was rebuilt, some features have not yet been reimplemented.
+- `BrainNodeType` has been renamed to `BrainNodeFunction`.
+- The names of several brain node functions have been changed.
+- The names of some items have been changed.
+- Version 0.6 has been canceled.
+
 ## [0.6.0 indev-3] - 2024-10-21
 
 ### Added

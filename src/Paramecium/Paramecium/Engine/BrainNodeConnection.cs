@@ -4,19 +4,11 @@
     {
         public int OriginIndex { get; set; }
         public int TargetIndex { get; set; }
-
         public double Weight { get; set; }
 
-        public BrainNodeConnection Duplicate()
+        public void UpdateConnection(List<BrainNode> brainNodes)
         {
-            BrainNodeConnection result = new BrainNodeConnection();
-
-            result.OriginIndex = OriginIndex;
-            result.TargetIndex = TargetIndex;
-
-            result.Weight = Weight;
-
-            return result;
+            brainNodes[TargetIndex].Input += brainNodes[OriginIndex].Output * Weight;
         }
     }
 }

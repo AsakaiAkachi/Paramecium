@@ -4,41 +4,279 @@ namespace Paramecium.Engine
 {
     public class BrainNode
     {
-        public BrainNodeType Type { get; set; }
-
+        public BrainNodeFunction Function { get; set; }
         public double Input { get; set; }
         public double Output { get; set; }
 
         [JsonIgnore]
-        public bool IsInput { get { return (int)Type >= (int)BrainNodeType.Input_Bias && (int)Type <= (int)BrainNodeType.Input_Memory7; } }
+        public bool IsInput { get { return (int)Function >= (int)BrainNodeFunction.Input_Bias && (int)Function <= (int)BrainNodeFunction.Input_PheromoneBlueGradAngle; } }
         [JsonIgnore]
-        public bool IsHidden { get { return (int)Type >= (int)BrainNodeType.Hidden_ReLU && (int)Type <= (int)BrainNodeType.Hidden_LimitedTangent; } }
+        public bool IsHidden { get { return (int)Function >= (int)BrainNodeFunction.Hidden_ReLU && (int)Function <= (int)BrainNodeFunction.Hidden_Frac; } }
         [JsonIgnore]
-        public bool IsOutput { get { return (int)Type >= (int)BrainNodeType.Output_Acceleration && (int)Type <= (int)BrainNodeType.Output_Memory7; } }
+        public bool IsOutput { get { return (int)Function >= (int)BrainNodeFunction.Output_Acceleration && (int)Function <= (int)BrainNodeFunction.Output_PheromoneBlueProduction; } }
 
-        public static bool BrainNodeTypeIsInput(BrainNodeType type)
+        public void ApplyBrainInput(Brain brain, BrainInput brainInput)
         {
-            if ((int)type >= (int)BrainNodeType.Input_Bias && (int)type <= (int)BrainNodeType.Input_Memory7) return true;
-            else return false;
+            if (IsInput)
+            {
+                switch (Function)
+                {
+                    case BrainNodeFunction.Input_Bias:
+                        Output = 1d;
+                        break;
+
+                    case BrainNodeFunction.Input_Velocity:
+                        Output = brainInput.Velocity;
+                        break;
+                    case BrainNodeFunction.Input_AngularVelocity:
+                        Output = brainInput.AngularVelocity;
+                        break;
+                    case BrainNodeFunction.Input_Satiety:
+                        Output = brainInput.Satiety;
+                        break;
+                    case BrainNodeFunction.Input_Attacked:
+                        Output = brainInput.Attacked;
+                        break;
+
+                    case BrainNodeFunction.Input_WallWAvgAngle:
+                        Output = brainInput.VisionData.WallWAvgAngle;
+                        break;
+                    case BrainNodeFunction.Input_WallWAvgProximity:
+                        Output = brainInput.VisionData.WallWAvgProximity;
+                        break;
+                    case BrainNodeFunction.Input_WallWAvgDistance:
+                        Output = brainInput.VisionData.WallWAvgDistance;
+                        break;
+                    case BrainNodeFunction.Input_PlantWAvgAngle:
+                        Output = brainInput.VisionData.PlantWAvgAngle;
+                        break;
+                    case BrainNodeFunction.Input_PlantWAvgProximity:
+                        Output = brainInput.VisionData.PlantWAvgProximity;
+                        break;
+                    case BrainNodeFunction.Input_PlantWAvgDistance:
+                        Output = brainInput.VisionData.PlantWAvgDistance;
+                        break;
+                    case BrainNodeFunction.Input_AnimalWAvgAngle:
+                        Output = brainInput.VisionData.AnimalWAvgAngle;
+                        break;
+                    case BrainNodeFunction.Input_AnimalWAvgProximity:
+                        Output = brainInput.VisionData.AnimalWAvgProximity;
+                        break;
+                    case BrainNodeFunction.Input_AnimalWAvgDistance:
+                        Output = brainInput.VisionData.AnimalWAvgDistance;
+                        break;
+                    case BrainNodeFunction.Input_AnimalWAvgSpeciesSigDiff:
+                        Output = brainInput.VisionData.AnimalWAvgSpeciesSigDiff;
+                        break;
+
+                    case BrainNodeFunction.Input_PheromoneRedConcentration:
+                        Output = brainInput.VisionData.PheromoneRedConcentration;
+                        break;
+                    case BrainNodeFunction.Input_PheromoneRedGradAngle:
+                        Output = brainInput.VisionData.PheromoneRedGradAngle;
+                        break;
+                    case BrainNodeFunction.Input_PheromoneGreenConcentration:
+                        Output = brainInput.VisionData.PheromoneGreenConcentration;
+                        break;
+                    case BrainNodeFunction.Input_PheromoneGreenGradAngle:
+                        Output = brainInput.VisionData.PheromoneGreenGradAngle;
+                        break;
+                    case BrainNodeFunction.Input_PheromoneBlueConcentration:
+                        Output = brainInput.VisionData.PheromoneBlueConcentration;
+                        break;
+                    case BrainNodeFunction.Input_PheromoneBlueGradAngle:
+                        Output = brainInput.VisionData.PheromoneBlueGradAngle;
+                        break;
+
+                    /**
+                    case BrainNodeFunction.Input_Memory0:
+                        Output = brainInput.PrevStepOutput.Memory0;
+                        break;
+                    case BrainNodeFunction.Input_Memory1:
+                        Output = brainInput.PrevStepOutput.Memory1;
+                        break;
+                    case BrainNodeFunction.Input_Memory2:
+                        Output = brainInput.PrevStepOutput.Memory2;
+                        break;
+                    case BrainNodeFunction.Input_Memory3:
+                        Output = brainInput.PrevStepOutput.Memory3;
+                        break;
+                    case BrainNodeFunction.Input_Memory4:
+                        Output = brainInput.PrevStepOutput.Memory4;
+                        break;
+                    case BrainNodeFunction.Input_Memory5:
+                        Output = brainInput.PrevStepOutput.Memory5;
+                        break;
+                    case BrainNodeFunction.Input_Memory6:
+                        Output = brainInput.PrevStepOutput.Memory6;
+                        break;
+                    case BrainNodeFunction.Input_Memory7:
+                        Output = brainInput.PrevStepOutput.Memory7;
+                        break;
+
+                    case BrainNodeFunction.Input_InheritedMemory0:
+                        Output = brain.InheritedMemory0;
+                        break;
+                    case BrainNodeFunction.Input_InheritedMemory1:
+                        Output = brain.InheritedMemory1;
+                        break;
+                    case BrainNodeFunction.Input_InheritedMemory2:
+                        Output = brain.InheritedMemory2;
+                        break;
+                    case BrainNodeFunction.Input_InheritedMemory3:
+                        Output = brain.InheritedMemory3;
+                        break;
+                    case BrainNodeFunction.Input_InheritedMemory4:
+                        Output = brain.InheritedMemory4;
+                        break;
+                    case BrainNodeFunction.Input_InheritedMemory5:
+                        Output = brain.InheritedMemory5;
+                        break;
+                    case BrainNodeFunction.Input_InheritedMemory6:
+                        Output = brain.InheritedMemory6;
+                        break;
+                    case BrainNodeFunction.Input_InheritedMemory7:
+                        Output = brain.InheritedMemory7;
+                        break;
+                    **/
+                }
+            }
         }
-        public static bool BrainNodeTypeIsHidden(BrainNodeType type)
+
+        public void CalculateNodeOutput()
         {
-            if ((int)type >= (int)BrainNodeType.Hidden_ReLU && (int)type <= (int)BrainNodeType.Hidden_LimitedTangent) return true;
-            else return false;
+            if (IsHidden)
+            {
+                switch (Function)
+                {
+                    case BrainNodeFunction.Hidden_ReLU:
+                        Output = double.Max(0d, Input);
+                        break;
+                    case BrainNodeFunction.Hidden_LimitedReLU:
+                        Output = double.Max(0d, double.Min(1d, Input));
+                        break;
+                    case BrainNodeFunction.Hidden_Step:
+                        if (Input > 0) Output = 1;
+                        else Output = 0;
+                        break;
+                    case BrainNodeFunction.Hidden_Sigmoid:
+                        Output = Math.Tanh(Input);
+                        break;
+                    case BrainNodeFunction.Hidden_Identity:
+                        Output = Input;
+                        break;
+                    case BrainNodeFunction.Hidden_Absolute:
+                        Output = double.Abs(Input);
+                        break;
+                    case BrainNodeFunction.Hidden_Sine:
+                        Output = Math.Sin(Input * Math.PI / 2d);
+                        break;
+                    case BrainNodeFunction.Hidden_Cosine:
+                        Output = Math.Cos(Input * Math.PI / 2d);
+                        break;
+                    case BrainNodeFunction.Hidden_Tangent:
+                        Output = Math.Tan(Input / Math.PI / 2d);
+                        if (double.IsInfinity(Output) || double.IsNaN(Output)) Output = 100;
+                        break;
+                    case BrainNodeFunction.Hidden_LimitedTangent:
+                        Output = Math.Tan(Input / Math.PI / 2d);
+                        if (double.IsInfinity(Output) || double.IsNaN(Output)) Output = 1;
+                        Output = double.Max(-1d, double.Min(1d, Output));
+                        break;
+                    case BrainNodeFunction.Hidden_Frac:
+                        Output = Input - double.Floor(Input);
+                        break;
+                }
+            }
+
+            Input = 0d;
+
+            if (double.IsInfinity(Output) || double.IsNaN(Output)) Output = 0;
+            Output = double.Max(-100d, double.Min(100d, Output));
         }
-        public static bool BrainNodeTypeIsOutput(BrainNodeType type)
+
+        public void ApplyBrainOutput(ref BrainOutput brainOutput)
         {
-            if ((int)type >= (int)BrainNodeType.Output_Acceleration && (int)type <= (int)BrainNodeType.Output_Memory7) return true;
-            else return false;
-        }
+            if (IsOutput)
+            {
+                switch (Function)
+                {
+                    case BrainNodeFunction.Output_Acceleration:
+                        brainOutput.Acceleration += Input;
+                        break;
+                    case BrainNodeFunction.Output_Rotation:
+                        brainOutput.Rotation += Input;
+                        break;
+                    case BrainNodeFunction.Output_Eat:
+                        brainOutput.Eat += Input;
+                        break;
+                    case BrainNodeFunction.Output_Attack:
+                        brainOutput.Attack += Input;
+                        break;
 
-        public BrainNode Duplicate()
-        {
-            BrainNode result = new BrainNode();
+                    case BrainNodeFunction.Output_PheromoneRedProduction:
+                        brainOutput.PheromoneRedProduction += Input;
+                        break;
+                    case BrainNodeFunction.Output_PheromoneGreenProduction:
+                        brainOutput.PheromoneGreenProduction += Input;
+                        break;
+                    case BrainNodeFunction.Output_PheromoneBlueProduction:
+                        brainOutput.PheromoneBlueProduction += Input;
+                        break;
 
-            result.Type = Type;
+                    /**
+                    case BrainNodeFunction.Output_Memory0:
+                        brainOutput.Memory0 += Input;
+                        break;
+                    case BrainNodeFunction.Output_Memory1:
+                        brainOutput.Memory1 += Input;
+                        break;
+                    case BrainNodeFunction.Output_Memory2:
+                        brainOutput.Memory2 += Input;
+                        break;
+                    case BrainNodeFunction.Output_Memory3:
+                        brainOutput.Memory3 += Input;
+                        break;
+                    case BrainNodeFunction.Output_Memory4:
+                        brainOutput.Memory4 += Input;
+                        break;
+                    case BrainNodeFunction.Output_Memory5:
+                        brainOutput.Memory5 += Input;
+                        break;
+                    case BrainNodeFunction.Output_Memory6:
+                        brainOutput.Memory6 += Input;
+                        break;
+                    case BrainNodeFunction.Output_Memory7:
+                        brainOutput.Memory7 += Input;
+                        break;
 
-            return result;
+                    case BrainNodeFunction.Output_InheritedMemory0:
+                        brainOutput.InheritedMemory0 += Input;
+                        break;
+                    case BrainNodeFunction.Output_InheritedMemory1:
+                        brainOutput.InheritedMemory1 += Input;
+                        break;
+                    case BrainNodeFunction.Output_InheritedMemory2:
+                        brainOutput.InheritedMemory2 += Input;
+                        break;
+                    case BrainNodeFunction.Output_InheritedMemory3:
+                        brainOutput.InheritedMemory3 += Input;
+                        break;
+                    case BrainNodeFunction.Output_InheritedMemory4:
+                        brainOutput.InheritedMemory4 += Input;
+                        break;
+                    case BrainNodeFunction.Output_InheritedMemory5:
+                        brainOutput.InheritedMemory5 += Input;
+                        break;
+                    case BrainNodeFunction.Output_InheritedMemory6:
+                        brainOutput.InheritedMemory6 += Input;
+                        break;
+                    case BrainNodeFunction.Output_InheritedMemory7:
+                        brainOutput.InheritedMemory7 += Input;
+                        break;
+                    **/
+                }
+            }
         }
     }
 }

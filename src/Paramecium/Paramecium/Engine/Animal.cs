@@ -1,214 +1,257 @@
-﻿namespace Paramecium.Engine
+﻿using Paramecium.Variables;
+
+namespace Paramecium.Engine
 {
+    // 動物のデータを保存する用のクラス
     public class Animal
     {
-        public bool Exist { get; set; } = false;
-        public bool Initialized { get; set; } = false;
+        public bool IsAlive { get; set; } = false;                  // セルが生きているかどうか
 
-        public int Index { get; set; } = -1;
-        public long Id { get; set; } = -1;
-        public long SpeciesId { get; set; }
+        public int Index { get; set; } = -1;                        // セルのインデックス
+        public long Id { get; set; } = -1;                          // セルのID
 
-        public int Generation { get; set; }
-        public int Age { get; set; }
-        public int OffspringCount { get; set; }
+        public int Generation { get; set; } = 1;                    // セルの世代数
+        public int Age { get; set; } = 0;                           // セルの年齢
+        public int OffspringCount { get; set; } = 0;                // 子孫の数
 
-        public Double2d Position { get; set; }
-        public Double2d Velocity { get; set; }
-        public double Angle { get; set; }
-        public double AngularVelocity { get; set; }
-        public int IntegerizedPositionX { get; set; }
-        public int IntegerizedPositionY { get; set; }
+        public Double2d Position { get; set; } = Double2d.Zero;     // セルの位置
+        public int TileIndex { get; set; } = 0;                     // セルが属しているタイルのインデックス
+        public Double2d Velocity { get; set; } = Double2d.Zero;     // セルの速度
+        public double Angle { get; set; } = 0;                      // セルの角度
+        public double AngularVelocity { get; set; } = 0;            // セルの角速度
+        public double Radius { get; set; } = 0;                     // セルの半径
+        public double Element { get; set; } = 0;                    // セルのエレメント量
+        public double ReproductionProgress { get; set; } = 0;       // 繁殖の進捗
+        public double Mass { get; set; } = 0;                       // セルの質量
 
-        public double Radius { get; set; }
-        public double Mass { get; set; }
+        public double ElementLossRate { get; set; } = 0;            // エレメントの消費速度
 
-        public double Element { get; set; }
-        public double CurrentStepElementCost { get; set; }
+        public int TimeSinceLastAttacked { get; set; } = 0;         // セルが最後に攻撃されてからの経過時間
 
-        public long LastDamageTime { get; set; }
+        public Double4d SpeciesSignature { get; set; } = new Double4d(1d, 1d, 1d, 1d);      // セルの種族シグネチャ
+        public long MutationCount { get; set; } = 0;                // セルの累計突然変異数
 
-        public int ColorRed { get; set; }
-        public int ColorGreen { get; set; }
-        public int ColorBlue { get; set; }
+        public Brain Brain { get; set; } = new Brain();             // セルのニューラルネット
 
-        public Brain Brain { get; set; }
-        public BrainInput BrainInput { get; set; }
-        public BrainOutput BrainOutput { get; set; }
+        public object LockObject = new object();                    // セルのパラメーターを複数スレッドから操作する際の排他制御用オブジェクト
 
-        public OrganismType AttackTargetType;
-        public int AttackTargetIndex;
-
-        public Animal()
+        public Animal() { }
+        public Animal(SoupSettings settings, Double2d position, double angle, double element)
         {
-            Brain = Brain.GetDefaultBrain;
-            BrainInput = new BrainInput();
-            BrainOutput = new BrainOutput();
-        }
+            Random rand = new Random();
 
-        public Animal(Double2d position, double angle, double element, Random random)
-        {
-            if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
+            IsAlive = true;
 
-            SpeciesId = random.NextInt64(0, 2176782336);
-
-            Generation = 1;
+            Id = rand.NextInt64(0, 4738381338321616896);
 
             Position = position;
             Angle = angle;
-
-            Radius = 0.5;
-            Mass = 16 + element;
-
+            Radius = 0.5d;
             Element = element;
+            Mass = element;
 
-            LastDamageTime = int.MinValue;
+            TimeSinceLastAttacked = settings.AnimalUnderAttackTime;
 
-            ColorRed = random.Next(0, 255 + 1);
-            ColorGreen = random.Next(0, 255 + 1);
-            ColorBlue = random.Next(0, 255 + 1);
+            SpeciesSignature = new Double4d(rand.NextDouble(), rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
 
-            Brain = Brain.GetDefaultBrain;
-            BrainInput = new BrainInput();
-            BrainOutput = new BrainOutput();
+            Brain = Brain.DefaultBrain;
         }
-
-        public Animal(Animal parent, Double2d position, double element, Random random)
+        public Animal(SoupSettings settings, Double2d position, double angle, double element, Animal parent)
         {
-            if (g_Soup is null) throw new SoupNotCreatedOrInitializedException();
+            Random rand = new Random();
 
-            SpeciesId = parent.SpeciesId;
+            IsAlive = true;
+
+            Id = rand.NextInt64(0, 4738381338321616896);
 
             Generation = parent.Generation + 1;
+            Age = -settings.AnimalEggHatchingTime;
 
             Position = position;
-            Angle = parent.Angle + 0.5;
-            if (Angle < -0.5) Angle += 1;
-            if (Angle > 0.5) Angle -= 1;
-
-            Radius = 0.5;
-            Mass = 16 + element;
-
+            Angle = angle;
+            Radius = 0.5d * settings.AnimalEggRadiusRatio;
             Element = element;
+            Mass = element;
 
-            LastDamageTime = int.MinValue;
+            TimeSinceLastAttacked = settings.AnimalUnderAttackTime;
 
-            ColorRed = parent.ColorRed;
-            ColorGreen = parent.ColorGreen;
-            ColorBlue = parent.ColorBlue;
+            SpeciesSignature = parent.SpeciesSignature;
+            MutationCount = parent.MutationCount;
 
-            Brain = parent.Brain.Duplicate();
-            for (int i = 0; i < g_Soup.Settings.AnimalMaximumMutationCount; i++)
+            Brain = new Brain(parent.Brain);
+
+            if (rand.NextDouble() < settings.AnimalMutationRate)
             {
-                Brain = Brain.ApplyMutation(Brain, random);
-
-                if (random.NextDouble() < g_Soup.Settings.AnimalSpeciesIdMutationRate)
+                for (int i = 0; i < settings.AnimalMaximumMutationCount; i++)
                 {
-                    SpeciesId = random.NextInt64(0, 2176782336);
+                    bool mutationSuccessful = Brain.Mutate(settings);
+                    if (mutationSuccessful)
+                    {
+                        MutationCount++;
 
-                    ColorRed = random.Next(0, 255 + 1);
-                    ColorGreen = random.Next(0, 255 + 1);
-                    ColorBlue = random.Next(0, 255 + 1);
+                        SpeciesSignature = new Double4d(rand.NextDouble(), rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
+                    }
+                    if (rand.NextDouble() > settings.AnimalMutationCountFactor) break;
+                }
+            }
+        }
+
+        public void UpdateAge(Soup soup, SoupSettings settings)
+        {
+            if (IsAlive)
+            {
+                Age += 1;
+                if (Age < 0)
+                {
+                    Radius = double.Lerp(0.5d, 0.5d * settings.AnimalEggRadiusRatio, -Age / (double)settings.AnimalEggHatchingTime);
                 }
 
-                if (random.NextDouble() < g_Soup.Settings.AnimalMutationCountBias) break;
+                TimeSinceLastAttacked++;
             }
-            BrainInput = new BrainInput();
-            BrainOutput = new BrainOutput();
         }
 
-        public void Initialize(int index, Random random)
+        // 速度に対する抵抗を適用する
+        public void ApplyDrag(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (!Initialized)
+            if (IsAlive)
             {
-                Exist = true;
-
-                Index = index;
-                Id = random.NextInt64(0, 4738381338321616896);
-
-                IntegerizedPositionX = int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(Position.X)));
-                IntegerizedPositionY = int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(Position.Y)));
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalAnimalIndexes.Add(Index);
-
-                Initialized = true;
-
-                g_Soup.TotalBornCount++;
+                Velocity *= 1d - settings.Drag;
+                AngularVelocity *= 1d - settings.AngularVelocityDrag;
             }
-            else throw new InvalidOperationException("This animal has already been initialized.");
         }
 
-        public void UpdateNeuralNet()
+        // ニューラルネットの更新処理
+        public void UpdateBrain(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
+            if (IsAlive && Age >= 0)
             {
-                int soupSizeX = g_Soup.Settings.SizeX;
-                int soupSizeY = g_Soup.Settings.SizeY;
-
-                BrainInput = new BrainInput()
+                AnimalVisionOutput animalVisionOutput = AnimalVision.Observe(soup, settings, Position, Angle, Index, SpeciesSignature, 25, 32, 8d, 0.5d);
+                BrainInput brainInput = new BrainInput()
                 {
-                    VisionData = AnimalVision.Observe(Position, Angle, Id, SpeciesId, 9, 29, 0.5d),
-                    PrevStepOutput = BrainOutput,
-                    Velocity = Velocity.Length / g_Soup.Settings.MaximumVelocity,
-                    AngularVelocity = AngularVelocity / g_Soup.Settings.MaximumAngularVelocity,
-                    Satiety = Element / g_Soup.Settings.AnimalForkCost,
-                    Damage = 1d - long.Min(g_Soup.Settings.AnimalDamageRecoveryTime, g_Soup.ElapsedTimeSteps - LastDamageTime) / (double)g_Soup.Settings.AnimalDamageRecoveryTime
+                    VisionData = animalVisionOutput,
+                    Velocity = double.Min(1d, Velocity.Magnitude / settings.MaximumEffectiveVelocity),
+                    AngularVelocity = double.Min(1d, AngularVelocity / settings.MaximumEffectiveAngularVelocity),
+                    Satiety = Element / settings.AnimalForkCost,
+                    Attacked = Math.Ceiling(double.Max(0d, settings.AnimalUnderAttackTime - TimeSinceLastAttacked) / (double)settings.AnimalUnderAttackTime)
                 };
 
-                BrainOutput = Brain.UpdateBrain(BrainInput);
+                Brain.UpdateBrain(brainInput);
 
-                AttackTargetType = OrganismType.None;
-                AttackTargetIndex = -1;
-                double attackTargetAngleAbs = 1d;
+                Velocity += Double2d.FromAngle01(Angle) * double.Max(-1d, double.Min(1d, Brain.Output.Acceleration)) * settings.AnimalMaximumAcceleration;
+                AngularVelocity += double.Max(-1d, double.Min(1d, Brain.Output.Rotation)) * settings.AnimalMaximumAngularAcceleration;
+            }
+        }
 
-                for (int x = int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX - 2)); x <= int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX + 2)); x++)
+        // 衝突判定の処理
+        public void UpdateCollision(Soup soup, SoupSettings settings)
+        {
+            if (IsAlive)
+            {
+                // セルが属しているタイルの位置を取得
+                Int2d tilePosition = soup.GetTilePositionFromTileIndex(TileIndex);
+
+                int attackTargetIndex = -1;
+                SoupObjectType attackTargetType = SoupObjectType.None;
+                double attackTargetAngleAbs = 2;
+
+                // セルが属しているタイルを中心とした3x3タイルにある植物に対して衝突判定の処理を行う
+                for (int x = -1; x <= 1; x++)
                 {
-                    for (int y = int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY - 2)); y <= int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY + 2)); y++)
+                    for (int y = -1; y <= 1; y++)
                     {
-                        Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
+                        // 現在処理の対象になっているタイルの位置を取得
+                        Int2d targetTilePosition = tilePosition + new Int2d(x, y);
 
-                        if (targetTile.LocalPlantPopulation > 0)
+                        // 処理対象のタイルの位置がスープの内かどうかをチェックしてスープの外だったらスキップする
+                        if (targetTilePosition.X >= 0 && targetTilePosition.X < settings.SizeX && targetTilePosition.Y >= 0 && targetTilePosition.Y < settings.SizeY)
                         {
-                            for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
+                            // 処理対象のタイルのインデックスを取得
+                            int targetTileIndex = soup.GetTileIndexFromTilePosition(targetTilePosition);
+
+                            Tile targetTile = soup.Tiles[targetTileIndex];
+
+                            if (targetTile.Type == TileType.Wall)
                             {
-                                Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
-                                if (targetPlant.Exist)
+                                // 壁に対する衝突判定の計算
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.25d, targetTilePosition.Y + 0.25d), 0.356d);
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.75d, targetTilePosition.Y + 0.25d), 0.356d);
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.25d, targetTilePosition.Y + 0.75d), 0.356d);
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.75d, targetTilePosition.Y + 0.75d), 0.356d);
+                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.5d, targetTilePosition.Y + 0.5d), 0.5d);
+                            }
+                            else
+                            {
+                                // 植物に対する衝突判定の計算
+                                for (int i = 0; i < soup.Tiles[targetTileIndex].PlantPopulation; i++)
                                 {
-                                    if (Double2d.DistanceSquared(Position, targetPlant.Position) < (Radius + targetPlant.Radius) * (Radius + targetPlant.Radius))
+                                    // 衝突判定の処理の相手になる植物を取得
+                                    int targetIndex = targetTile.PlantIndexes[i];
+
+                                    // 衝突判定の処理の本体
+                                    Plant? targetPlant = soup.Plants[targetIndex];
+                                    if (targetPlant is not null)
                                     {
-                                        if (BrainOutput.Attack > 0d)
+                                        double targetRadius = targetPlant.Radius;
+                                        Double2d targetPosition = targetPlant.Position;
+                                        double targetMass = targetPlant.Mass;
+
+                                        double distance = Double2d.Distance(Position, targetPosition);
+
+                                        Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
+
+                                        // ニューラルネットのEat出力の値が0より大きくかつEat出力の値がAttack出力の値より大きい場合、正面にある植物をターゲットとしてマークする
+                                        if (Age >= 0 && Brain.Output.Eat > 0 && Brain.Output.Eat > Brain.Output.Attack)
                                         {
-                                            double angleAbs = double.Abs(Double2d.ToAngle(Double2d.Rotate(targetPlant.Position - Position, -Angle)));
-                                            if (angleAbs < 0.125d && angleAbs < attackTargetAngleAbs)
+                                            double targetAngleAbs = double.Abs(Double2d.ToAngle01(Double2d.Rotate01(targetPosition - Position, -Angle)));
+
+                                            if (targetAngleAbs < 0.125d && Double2d.DistanceSquared(Position, targetPosition) < (Radius + targetRadius + 0.1d) * (Radius + targetRadius + 0.1d))
                                             {
-                                                AttackTargetType = OrganismType.Plant;
-                                                AttackTargetIndex = targetPlant.Index;
+                                                if (targetAngleAbs < attackTargetAngleAbs)
+                                                {
+                                                    attackTargetIndex = targetIndex;
+                                                    attackTargetType = SoupObjectType.Plant;
+                                                    attackTargetAngleAbs = targetAngleAbs;
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        }
 
-                        if (targetTile.LocalAnimalPopulation > 0)
-                        {
-                            for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
-                            {
-                                Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
-                                if (targetAnimal.Exist && targetAnimal.Id != Id)
+                                // 動物に対する衝突判定の計算
+                                for (int i = 0; i < soup.Tiles[targetTileIndex].AnimalPopulation; i++)
                                 {
-                                    if (Double2d.DistanceSquared(Position, targetAnimal.Position) < (Radius + targetAnimal.Radius) * (Radius + targetAnimal.Radius))
+                                    // 衝突判定の処理の相手になる植物を取得
+                                    int targetIndex = targetTile.AnimalIndexes[i];
+
+                                    // 自分自身に対しては衝突判定の処理は行わない
+                                    if (targetIndex != Index)
                                     {
-                                        if (BrainOutput.Attack > 0d && (g_Soup.Settings.AnimalAllowAttacksOnSameSpecies || targetAnimal.SpeciesId != SpeciesId))
+                                        // 衝突判定の処理の本体
+                                        Animal? targetAnimal = soup.Animals[targetIndex];
+                                        if (targetAnimal is not null)
                                         {
-                                            double angleAbs = double.Abs(Double2d.ToAngle(Double2d.Rotate(targetAnimal.Position - Position, -Angle)));
-                                            if (angleAbs < 0.125d && angleAbs < attackTargetAngleAbs)
+                                            double targetRadius = targetAnimal.Radius;
+                                            Double2d targetPosition = targetAnimal.Position;
+                                            double targetMass = targetAnimal.Mass;
+
+                                            double distance = Double2d.Distance(Position, targetPosition);
+
+                                            Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
+
+                                            // ニューラルネットのAttack出力の値が0より大きくかつAttack出力の値がEat出力の値より大きい場合、正面にある動物をターゲットとしてマークする
+                                            if (Age >= 0 && Brain.Output.Attack > 0 && Brain.Output.Attack > Brain.Output.Eat && (SpeciesSignature != targetAnimal.SpeciesSignature || !settings.AnimalDisableSameSpeciesAttack) && targetAnimal.Age >= 0)
                                             {
-                                                AttackTargetType = OrganismType.Animal;
-                                                AttackTargetIndex = targetAnimal.Index;
+                                                double targetAngleAbs = double.Abs(Double2d.ToAngle01(Double2d.Rotate01(targetPosition - Position, -Angle)));
+
+                                                if (targetAngleAbs < 0.125d && Double2d.DistanceSquared(Position, targetPosition) < (Radius + targetRadius + 0.1d) * (Radius + targetRadius + 0.1d))
+                                                {
+                                                    if (targetAngleAbs < attackTargetAngleAbs)
+                                                    {
+                                                        attackTargetIndex = targetIndex;
+                                                        attackTargetType = SoupObjectType.Animal;
+                                                        attackTargetAngleAbs = targetAngleAbs;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -217,265 +260,193 @@
                         }
                     }
                 }
-            }
-            else throw new InvalidOperationException("This animal is not initialized.");
-        }
 
-        public void ApplyNeuralNetOutput()
-        {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
-            {
-                int soupSizeX = g_Soup.Settings.SizeX;
-                int soupSizeY = g_Soup.Settings.SizeY;
-
-                Velocity += Double2d.FromAngle(Angle) * double.Max(-1d, double.Min(1d, BrainOutput.Acceleration)) * g_Soup.Settings.MaximumVelocity * g_Soup.Settings.Drag;
-                AngularVelocity += double.Max(-1d, double.Min(1d, BrainOutput.Rotation)) * g_Soup.Settings.MaximumAngularVelocity * g_Soup.Settings.AngularVelocityDrag;
-
-                if (BrainOutput.PheromoneRed > 0)
+                if (attackTargetType == SoupObjectType.Plant)
                 {
-                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX];
-                    targetTile.PheromoneRed += double.Min(1d, BrainOutput.PheromoneRed) * g_Soup.Settings.PheromoneProductionRate;
-                }
-                if (BrainOutput.PheromoneGreen > 0)
-                {
-                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX];
-                    targetTile.PheromoneGreen += double.Min(1d, BrainOutput.PheromoneGreen) * g_Soup.Settings.PheromoneProductionRate;
-                }
-                if (BrainOutput.PheromoneBlue > 0)
-                {
-                    Tile targetTile = g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX];
-                    targetTile.PheromoneBlue += double.Min(1d, BrainOutput.PheromoneBlue) * g_Soup.Settings.PheromoneProductionRate;
-                }
+                    Plant? targetPlant = soup.Plants[attackTargetIndex];
 
-                if (AttackTargetType == OrganismType.Plant)
-                {
-                    Plant target = g_Soup.Plants[AttackTargetIndex];
-
-                    /**
-                    double elementMoveAmount = g_Soup.Settings.AnimalPlantIngestionRate / double.Max(1d, BrainOutput.Attack);
-
-                    Element += double.Min(target.Element, elementMoveAmount) * g_Soup.ElementAmountMultiplier;
-                    target.Element = double.Max(0d, target.Element - elementMoveAmount);
-                    **/
-
-                    Element += double.Min(target.Element, g_Soup.Settings.AnimalPlantIngestionRate) * g_Soup.ElementAmountMultiplier;
-                    target.Element = double.Max(0d, target.Element - g_Soup.Settings.AnimalPlantIngestionRate);
-                }
-                else if (AttackTargetType == OrganismType.Animal)
-                {
-                    Animal target = g_Soup.Animals[AttackTargetIndex];
-
-                    double elementMoveAmount = g_Soup.Settings.AnimalAnimalIngestionRate / double.Max(1d, target.BrainOutput.Attack - BrainOutput.Attack + 1d);
-
-                    /**
-                    Element += double.Min(target.Element, elementMoveAmount) * g_Soup.ElementAmountMultiplier;
-                    target.Element = double.Max(0d, target.Element - elementMoveAmount);
-
-                    target.LastDamageTime = g_Soup.ElapsedTimeSteps;
-                    **/
-
-                    Element += double.Min(target.Element, g_Soup.Settings.AnimalAnimalIngestionRate) * g_Soup.ElementAmountMultiplier;
-                    target.Element = double.Max(0d, target.Element - g_Soup.Settings.AnimalAnimalIngestionRate);
-
-                    target.LastDamageTime = g_Soup.ElapsedTimeSteps;
-                }
-            }
-            else throw new InvalidOperationException("This animal is not initialized.");
-        }
-
-        public void UpdateCollision()
-        {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
-            {
-                int soupSizeX = g_Soup.Settings.SizeX;
-                int soupSizeY = g_Soup.Settings.SizeY;
-
-                for (int x = int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX - 1)); x <= int.Max(0, int.Min(soupSizeX - 1, IntegerizedPositionX + 1)); x++)
-                {
-                    for (int y = int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY - 1)); y <= int.Max(0, int.Min(soupSizeY - 1, IntegerizedPositionY + 1)); y++)
+                    if (targetPlant is not null)
                     {
-                        Tile targetTile = g_Soup.Tiles[y * soupSizeX + x];
-
-                        if (targetTile.Type == TileType.Wall)
+                        double elementBuffer = 0d;
+                        lock (targetPlant.LockObject)
                         {
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.25d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.25d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.25d, y + 0.75d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.75d, y + 0.75d), 0.356d) * g_Soup.Settings.RestitutionCoefficient;
-                            Velocity += CalculateCollisionTwoObjects(Position, Radius, new Double2d(x + 0.5d, y + 0.5d), 0.5d) * g_Soup.Settings.RestitutionCoefficient;
+                            elementBuffer += double.Min(settings.AnimalPlantIngestionRate, targetPlant.Element);
+                            targetPlant.Element -= elementBuffer;
                         }
 
-                        if(targetTile.LocalPlantPopulation > 0)
+                        lock (LockObject)
                         {
-                            for (int i = 0; i < targetTile.LocalPlantPopulation; i++)
-                            {
-                                Plant targetPlant = g_Soup.Plants[targetTile.LocalPlantIndexes[i]];
-                                if (targetPlant.Exist) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetPlant.Position, targetPlant.Radius, targetPlant.Mass) * g_Soup.Settings.RestitutionCoefficient;
-                            }
+                            Element += elementBuffer * soup.ElementAmountMultiplier;
+                        }
+                    }
+                }
+                if (attackTargetType == SoupObjectType.Animal)
+                {
+                    Animal? targetAnimal = soup.Animals[attackTargetIndex];
+
+                    if (targetAnimal is not null)
+                    {
+                        double elementBuffer = 0d;
+                        lock (targetAnimal.LockObject)
+                        {
+                            elementBuffer += double.Min(settings.AnimalAnimalIngestionRate, targetAnimal.Element);
+                            targetAnimal.Element -= elementBuffer;
+
+                            targetAnimal.TimeSinceLastAttacked = 0;
                         }
 
-                        if (targetTile.LocalAnimalPopulation > 0)
+                        lock (LockObject)
                         {
-                            for (int i = 0; i < targetTile.LocalAnimalPopulation; i++)
-                            {
-                                Animal targetAnimal = g_Soup.Animals[targetTile.LocalAnimalIndexes[i]];
-                                if (targetAnimal.Exist && targetAnimal.Id != Id) Velocity += CalculateCollisionTwoObjects(Position, Radius, Mass, targetAnimal.Position, targetAnimal.Radius, targetAnimal.Mass) * g_Soup.Settings.RestitutionCoefficient;
-                            }
+                            Element += elementBuffer * soup.ElementAmountMultiplier;
                         }
                     }
                 }
             }
-            else throw new InvalidOperationException("This animal is not initialized.");
-        }
-        public Double2d CalculateCollisionTwoObjects(Double2d obj1Pos, double obj1Radius, double obj1Mass, Double2d obj2Pos, double obj2Radius, double obj2Mass)
-        {
-            if (Double2d.DistanceSquared(obj1Pos, obj2Pos) < (obj1Radius + obj2Radius) * (obj1Radius + obj2Radius)) return (obj1Pos - obj2Pos).Normalized * (1d - Double2d.Distance(obj1Pos, obj2Pos) / (obj1Radius + obj2Radius)) * Math.Min(1d, obj2Mass / obj1Mass);
-            else return Double2d.Zero;
-        }
-        public Double2d CalculateCollisionTwoObjects(Double2d obj1Pos, double obj1Radius, Double2d obj2Pos, double obj2Radius)
-        {
-            if (Double2d.DistanceSquared(obj1Pos, obj2Pos) < (obj1Radius + obj2Radius) * (obj1Radius + obj2Radius)) return (obj1Pos - obj2Pos).Normalized * (1d - Double2d.Distance(obj1Pos, obj2Pos) / (obj1Radius + obj2Radius));
-            else return Double2d.Zero;
         }
 
-        public void UpdatePosition()
+        // 位置の更新
+        public void UpdatePosition(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
+            if (IsAlive)
             {
-                int soupSizeX = g_Soup.Settings.SizeX;
-                int soupSizeY = g_Soup.Settings.SizeY;
+                // effectiveVelocityをMaximumEffectiveVelocity以下に制限する
+                Double2d effectiveVelocity = Velocity;
+                if (effectiveVelocity.Magnitude > settings.MaximumEffectiveVelocity) effectiveVelocity *= settings.MaximumEffectiveVelocity / effectiveVelocity.Magnitude;
 
-                if (Velocity.LengthSquared > g_Soup.Settings.MaximumVelocity * g_Soup.Settings.MaximumVelocity)
-                {
-                    Velocity /= Velocity.Length / g_Soup.Settings.MaximumVelocity;
-                }
-                Position += Velocity;
+                // 位置を更新する
+                Position += effectiveVelocity;
 
+                // 位置がスープの外側だったらスープの中になるようにする
                 if (Position.X < Radius)
                 {
-                    Position = new Double2d(0 + Radius, Position.Y);
-                    Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
+                    Position = new Double2d(Radius, Position.Y);
+                    Velocity = new Double2d(-Velocity.X, Velocity.Y);
                 }
-                if (Position.X > soupSizeX - Radius)
+                if (Position.X > settings.SizeX - Radius)
                 {
-                    Position = new Double2d(soupSizeX - Radius, Position.Y);
-                    Velocity = new Double2d(Velocity.X * -1d, Velocity.Y);
+                    Position = new Double2d(settings.SizeX - Radius, Position.Y);
+                    Velocity = new Double2d(-Velocity.X, Velocity.Y);
                 }
                 if (Position.Y < Radius)
                 {
                     Position = new Double2d(Position.X, Radius);
-                    Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
+                    Velocity = new Double2d(Velocity.X, -Velocity.Y);
                 }
-                if (Position.Y > soupSizeY - Radius)
+                if (Position.Y > settings.SizeY - Radius)
                 {
-                    Position = new Double2d(Position.X, soupSizeY - Radius);
-                    Velocity = new Double2d(Velocity.X, Velocity.Y * -1d);
-                }
-
-                if (double.Abs(AngularVelocity) > g_Soup.Settings.MaximumAngularVelocity)
-                {
-                    AngularVelocity /= AngularVelocity / g_Soup.Settings.MaximumAngularVelocity;
-                }
-                Angle += AngularVelocity;
-
-                if (Angle < -0.5) Angle += 1;
-                if (Angle > 0.5) Angle -= 1;
-
-                if (int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(Position.X))) != IntegerizedPositionX || int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(Position.Y))) != IntegerizedPositionY)
-                {
-                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalAnimalIndexes.Remove(Index);
-
-                    IntegerizedPositionX = int.Max(0, int.Min(soupSizeX - 1, (int)double.Floor(Position.X)));
-                    IntegerizedPositionY = int.Max(0, int.Min(soupSizeY - 1, (int)double.Floor(Position.Y)));
-
-                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].LocalAnimalIndexes.Add(Index);
+                    Position = new Double2d(Position.X, settings.SizeY - Radius);
+                    Velocity = new Double2d(Velocity.X, -Velocity.Y);
                 }
 
-                CurrentStepElementCost = double.Min(Element,
-                    g_Soup.Settings.AnimalElementBaseCost +
-                    (g_Soup.Settings.AnimalElementAccelerationCost * double.Min(1d, double.Abs(BrainOutput.Acceleration))) +
-                    (g_Soup.Settings.AnimalElementRotationCost * double.Min(1d, double.Abs(BrainOutput.Rotation))) +
-                    (g_Soup.Settings.AnimalElementAttackCost * double.Ceiling(double.Max(0d, double.Min(1d, BrainOutput.Attack)))) +
-                    (g_Soup.Settings.AnimalElementPheromoneProductionCost * (double.Max(0d, double.Min(1d, BrainOutput.PheromoneRed)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneGreen)) + double.Max(0d, double.Min(1d, BrainOutput.PheromoneBlue))))
-                );
+                // 位置を更新した後の自身が属しているタイルのインデックスを取得する
+                int currentTileIndex = soup.GetTileIndexFromPosition(Position);
 
-                g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Element += double.Min(Element, CurrentStepElementCost) * g_Soup.ElementAmountMultiplier;
-                Element = double.Max(0d, Element - CurrentStepElementCost);
-
-                Radius = 0.5;
-                Mass = 16 + Element;
-
-                if (Element <= 0) OnDisable();
-                else if (g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Type == TileType.Wall) OnDisable();
-                else if (Age >= g_Soup.Settings.AnimalMaximumAge)
+                // 位置を更新する前とした後で属するタイルのインデックスが変わっていたらタイル側のインデックス情報を更新する
+                if (TileIndex != currentTileIndex)
                 {
-                    g_Soup.Tiles[IntegerizedPositionY * soupSizeX + IntegerizedPositionX].Element += Element * g_Soup.ElementAmountMultiplier;
-                    Element = 0;
-                    OnDisable();
-                }
-
-                Age++;
-            }
-            else throw new InvalidOperationException("This animal is not initialized.");
-        }
-
-        public void ApplyDrag()
-        {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
-            {
-                Velocity *= 1d - g_Soup.Settings.Drag;
-                AngularVelocity *= 1d - g_Soup.Settings.AngularVelocityDrag;
-            }
-            else throw new InvalidOperationException("This animal is not initialized.");
-        }
-
-        public Animal? CreateOffspring(Random random)
-        {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
-            {
-                if (Element >= g_Soup.Settings.AnimalForkCost * 2)
-                {
-                    Double2d OffspringPosition = Position + Double2d.FromAngle(Angle + 0.5) * 0.5;
-                    if (
-                        OffspringPosition.X >= 0 && OffspringPosition.X <= g_Soup.Settings.SizeX && OffspringPosition.Y >= 0 && OffspringPosition.Y <= g_Soup.Settings.SizeY && 
-                        g_Soup.Tiles[int.Max(0, int.Min(g_Soup.Settings.SizeY - 1, (int)double.Floor(OffspringPosition.Y))) * g_Soup.Settings.SizeX + int.Max(0, int.Min(g_Soup.Settings.SizeX - 1, (int)double.Floor(OffspringPosition.X)))].Type == TileType.Default
-                    )
+                    lock (soup.Tiles[TileIndex].LockObject)
                     {
-                        Element -= g_Soup.Settings.AnimalForkCost;
-                        OffspringCount++;
-                        return new Animal(this, Position + Double2d.FromAngle(Angle + 0.5) * 0.5, g_Soup.Settings.AnimalForkCost, random);
+                        soup.Tiles[TileIndex].AnimalIndexes.Remove(Index);
                     }
-                    else return null;
+                    lock (soup.Tiles[currentTileIndex].LockObject)
+                    {
+                        soup.Tiles[currentTileIndex].AnimalIndexes.Add(Index);
+                    }
+
+                    TileIndex = currentTileIndex;
                 }
-                else return null;
+
+                double effectiveAngularVelocity = AngularVelocity;
+                if (double.Abs(effectiveAngularVelocity) > settings.MaximumEffectiveAngularVelocity) effectiveAngularVelocity *= settings.MaximumEffectiveAngularVelocity / double.Abs(effectiveAngularVelocity);
+                Angle += effectiveAngularVelocity;
+                if (Angle > 0.5d) Angle -= 1d;
+                if (Angle <= -0.5d) Angle += 1d;
             }
-            else throw new InvalidOperationException("This animal is not initialized.");
         }
 
-        public void OnDisable()
+        // エレメントの消費とフェロモンの生産
+        public void LosingElement(Soup soup, SoupSettings settings)
         {
-            if (g_Soup is null || !g_Soup.Initialized) throw new SoupNotCreatedOrInitializedException();
-
-            if (Initialized)
+            if (IsAlive && Age >= 0)
             {
-                Exist = false;
+                Tile targetTile = soup.Tiles[TileIndex];
 
-                g_Soup.Tiles[IntegerizedPositionY * g_Soup.Settings.SizeX + IntegerizedPositionX].LocalAnimalIndexes.Remove(Index);
-                g_Soup.AnimalUnusedIndexes.Add(Index);
+                lock (targetTile.LockObject)
+                {
+                    double elementCost = 0;
+                    elementCost += settings.AnimalElementBaseCost;
+                    elementCost += settings.AnimalElementAccelerationCost * double.Min(1d, double.Abs(Brain.Output.Acceleration));
+                    elementCost += settings.AnimalElementRotationCost * double.Min(1d, double.Abs(Brain.Output.Rotation));
+                    if (Brain.Output.Eat > 0 && Brain.Output.Eat > Brain.Output.Attack) elementCost += settings.AnimalElementEatCost;
+                    if (Brain.Output.Attack > 0 && Brain.Output.Attack > Brain.Output.Eat) elementCost += settings.AnimalElementAttackCost;
+                    if (Brain.Output.PheromoneRedProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneRedProduction) * settings.AnimalElementPheromoneProductionCost / 3d;
+                    if (Brain.Output.PheromoneGreenProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneGreenProduction) * settings.AnimalElementPheromoneProductionCost / 3d;
+                    if (Brain.Output.PheromoneBlueProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneBlueProduction) * settings.AnimalElementPheromoneProductionCost / 3d;
 
-                g_Soup.TotalDieCount++;
+                    double elementBuffer = double.Min(Element, elementCost);
+                    Element -= elementBuffer;
+
+
+                    lock (targetTile.LockObject)
+                    {
+                        targetTile.Element += elementBuffer * soup.ElementAmountMultiplier;
+
+                        targetTile.PheromoneRed += double.Max(0d, double.Min(1d, Brain.Output.PheromoneRedProduction)) * settings.AnimalPheromoneProductionRate;
+                        targetTile.PheromoneGreen += double.Max(0d, double.Min(1d, Brain.Output.PheromoneGreenProduction)) * settings.AnimalPheromoneProductionRate;
+                        targetTile.PheromoneBlue += double.Max(0d, double.Min(1d, Brain.Output.PheromoneBlueProduction)) * settings.AnimalPheromoneProductionRate;
+                    }
+
+                    if (Element > settings.AnimalForkCost)
+                    {
+                        ReproductionProgress += Element - settings.AnimalForkCost;
+                        Element = 16d;
+                    }
+
+                    Mass = Element + ReproductionProgress;
+
+                    ElementLossRate = -elementBuffer;
+                }
             }
-            else throw new InvalidOperationException("This animal is not initialized.");
+        }
+
+        // 子孫の生成
+        public Animal? CreateOffspring(Soup soup, SoupSettings settings)
+        {
+            if (IsAlive)
+            {
+                // エレメントの量がPlantMaximumElementAmount以上であれば子孫を生成して自身は死滅する
+                if (ReproductionProgress >= settings.AnimalForkCost)
+                {
+                    Random rand = new Random();
+
+                    Animal result = new Animal(settings, Position + Double2d.FromAngle01(Angle + 0.5d) * 0.25d, Angle + 0.5d, settings.AnimalForkCost * soup.ElementAmountMultiplier, this);
+
+                    ReproductionProgress -= settings.AnimalForkCost;
+
+                    OffspringCount++;
+
+                    return result;
+                }
+            }
+            return null;
+        }
+
+        // セルが生きていない時の処理
+        public void IsNotAlive(Soup soup, SoupSettings settings)
+        {
+            Tile targetTile = soup.Tiles[TileIndex];
+
+            // エレメント量が0以下であるかセルが壁の中に埋まっているならそのセルは死んでいるものとして扱う
+            if (Element <= 0) IsAlive = false;
+            if (targetTile.Type == TileType.Wall) IsAlive = false;
+            if (Age >= settings.AnimalLifespan) IsAlive = false;
+
+            if (!IsAlive)
+            {
+                // タイル側のインデックス情報から自身のインデックスを削除し、タイルが壁でなければ残っているエレメントをタイルに追加する
+                targetTile.AnimalIndexes.Remove(Index);
+                if (targetTile.Type == TileType.Default) targetTile.Element += (double.Max(0d, Element) + ReproductionProgress) * soup.ElementAmountMultiplier;
+            }
         }
     }
 }

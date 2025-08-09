@@ -5,6 +5,7 @@ namespace Paramecium.Engine
 {
     public class Perlin
     {
+
         public int repeat;
 
         public Perlin(int repeat = -1)
@@ -71,8 +72,8 @@ namespace Paramecium.Engine
             int zi = (int)z & 255;                              // plus 1.  Next we calculate the location (from 0.0 to 1.0) in that cube.
             double xf = x - (int)x;                             // We also fade the location to smooth the result.
             double yf = y - (int)y;
-
-            double zf = z - (int)z;
+    
+        double zf = z - (int)z;
             double u = fade(xf);
             double v = fade(yf);
             double w = fade(zf);

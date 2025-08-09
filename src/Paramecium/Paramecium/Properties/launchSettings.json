@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Paramecium": {
+      "commandName": "Project",
+      "commandLineArgs": "-debug"
+    }
+  }
+}

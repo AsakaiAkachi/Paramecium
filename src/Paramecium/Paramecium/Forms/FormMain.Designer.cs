@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             TopMenu = new MenuStrip();
             TopMenu_File = new ToolStripMenuItem();
@@ -39,35 +38,40 @@
             TopMenu_File_Separator1 = new ToolStripSeparator();
             TopMenu_File_Exit = new ToolStripMenuItem();
             TopMenu_Soup = new ToolStripMenuItem();
+            TopMenu_Soup_RunPause = new ToolStripMenuItem();
+            TopMenu_Soup_StepRun = new ToolStripMenuItem();
+            TopMenu_Soup_ThreadCountInc = new ToolStripMenuItem();
+            TopMenu_Soup_ThreadCountDec = new ToolStripMenuItem();
+            TopMenu_Soup_Separator1 = new ToolStripSeparator();
             TopMenu_Soup_EditSoupSettings = new ToolStripMenuItem();
-            TopMenuBar_Soup_EditAutosaveSettings = new ToolStripMenuItem();
-            TopMenu_Help = new ToolStripMenuItem();
-            TopMenu_Help_AboutParamecium = new ToolStripMenuItem();
+            TopMenu_View = new ToolStripMenuItem();
+            TopMenu_View_ZoomIn = new ToolStripMenuItem();
+            TopMenu_View_ZoomOut = new ToolStripMenuItem();
+            TopMenu_View_Reset = new ToolStripMenuItem();
+            TopMenu_View_Separator1 = new ToolStripSeparator();
+            TopMenu_View_TrackingSelectedCell = new ToolStripMenuItem();
+            TopMenu_View_TrackingRandomAnimal = new ToolStripMenuItem();
+            TopMenu_View_AutoSelectTrackedCells = new ToolStripMenuItem();
             BottomStat = new StatusStrip();
             BottomStat_SoupState = new ToolStripStatusLabel();
-            BottomStat_ElapsedTimeSteps = new ToolStripStatusLabel();
+            BottomStat_TimeSteps = new ToolStripStatusLabel();
             BottomStat_Population = new ToolStripStatusLabel();
-            BottomStat_LatestGeneration = new ToolStripStatusLabel();
-            BottomStat_TotalBornDieCount = new ToolStripStatusLabel();
+            BottomStat_Generation = new ToolStripStatusLabel();
+            BottomStat_TotalBornDie = new ToolStripStatusLabel();
             BottomStat_Tps = new ToolStripStatusLabel();
             BottomStat_Fps = new ToolStripStatusLabel();
             SoupView = new PictureBox();
-            SaveFileDialog_SaveSoup = new SaveFileDialog();
-            OpenFileDialog_LoadSoup = new OpenFileDialog();
-            SelectedObjectOperation = new ContextMenuStrip(components);
-            SelectedObjectOperation_Cut = new ToolStripMenuItem();
-            SelectedObjectOperation_Copy = new ToolStripMenuItem();
-            SelectedObjectOperation_Paste = new ToolStripMenuItem();
-            SelectedObjectOperation_Delete = new ToolStripMenuItem();
+            LoadSoupDialog = new OpenFileDialog();
+            SaveSoupDialog = new SaveFileDialog();
             TopMenu.SuspendLayout();
             BottomStat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SoupView).BeginInit();
-            SelectedObjectOperation.SuspendLayout();
             SuspendLayout();
             // 
             // TopMenu
             // 
-            TopMenu.Items.AddRange(new ToolStripItem[] { TopMenu_File, TopMenu_Soup, TopMenu_Help });
+            TopMenu.BackColor = Color.White;
+            TopMenu.Items.AddRange(new ToolStripItem[] { TopMenu_File, TopMenu_Soup, TopMenu_View });
             TopMenu.Location = new Point(0, 0);
             TopMenu.Name = "TopMenu";
             TopMenu.Size = new Size(1200, 24);
@@ -84,82 +88,166 @@
             // TopMenu_File_New
             // 
             TopMenu_File_New.Name = "TopMenu_File_New";
-            TopMenu_File_New.Size = new Size(123, 22);
+            TopMenu_File_New.ShortcutKeyDisplayString = "Ctrl+N";
+            TopMenu_File_New.Size = new Size(194, 22);
             TopMenu_File_New.Text = "New";
             TopMenu_File_New.Click += TopMenu_File_New_Click;
             // 
             // TopMenu_File_Open
             // 
             TopMenu_File_Open.Name = "TopMenu_File_Open";
-            TopMenu_File_Open.Size = new Size(123, 22);
+            TopMenu_File_Open.ShortcutKeyDisplayString = "Ctrl+O";
+            TopMenu_File_Open.Size = new Size(194, 22);
             TopMenu_File_Open.Text = "Open...";
             TopMenu_File_Open.Click += TopMenu_File_Open_Click;
             // 
             // TopMenu_File_Save
             // 
+            TopMenu_File_Save.Enabled = false;
             TopMenu_File_Save.Name = "TopMenu_File_Save";
-            TopMenu_File_Save.Size = new Size(123, 22);
+            TopMenu_File_Save.ShortcutKeyDisplayString = "Ctrl+S";
+            TopMenu_File_Save.Size = new Size(194, 22);
             TopMenu_File_Save.Text = "Save";
             TopMenu_File_Save.Click += TopMenu_File_Save_Click;
             // 
             // TopMenu_File_SaveAs
             // 
+            TopMenu_File_SaveAs.Enabled = false;
             TopMenu_File_SaveAs.Name = "TopMenu_File_SaveAs";
-            TopMenu_File_SaveAs.Size = new Size(123, 22);
+            TopMenu_File_SaveAs.ShortcutKeyDisplayString = "Ctrl+Shift+S";
+            TopMenu_File_SaveAs.Size = new Size(194, 22);
             TopMenu_File_SaveAs.Text = "Save As...";
             TopMenu_File_SaveAs.Click += TopMenu_File_SaveAs_Click;
             // 
             // TopMenu_File_Separator1
             // 
             TopMenu_File_Separator1.Name = "TopMenu_File_Separator1";
-            TopMenu_File_Separator1.Size = new Size(120, 6);
+            TopMenu_File_Separator1.Size = new Size(191, 6);
             // 
             // TopMenu_File_Exit
             // 
             TopMenu_File_Exit.Name = "TopMenu_File_Exit";
-            TopMenu_File_Exit.Size = new Size(123, 22);
+            TopMenu_File_Exit.Size = new Size(194, 22);
             TopMenu_File_Exit.Text = "Exit";
             TopMenu_File_Exit.Click += TopMenu_File_Exit_Click;
             // 
             // TopMenu_Soup
             // 
-            TopMenu_Soup.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Soup_EditSoupSettings, TopMenuBar_Soup_EditAutosaveSettings });
+            TopMenu_Soup.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Soup_RunPause, TopMenu_Soup_StepRun, TopMenu_Soup_ThreadCountInc, TopMenu_Soup_ThreadCountDec, TopMenu_Soup_Separator1, TopMenu_Soup_EditSoupSettings });
+            TopMenu_Soup.Enabled = false;
             TopMenu_Soup.Name = "TopMenu_Soup";
             TopMenu_Soup.Size = new Size(46, 20);
             TopMenu_Soup.Text = "Soup";
             // 
+            // TopMenu_Soup_RunPause
+            // 
+            TopMenu_Soup_RunPause.Name = "TopMenu_Soup_RunPause";
+            TopMenu_Soup_RunPause.ShortcutKeyDisplayString = "Space";
+            TopMenu_Soup_RunPause.Size = new Size(256, 22);
+            TopMenu_Soup_RunPause.Text = "Run/Pause";
+            TopMenu_Soup_RunPause.Click += TopMenu_Soup_RunPause_Click;
+            // 
+            // TopMenu_Soup_StepRun
+            // 
+            TopMenu_Soup_StepRun.Name = "TopMenu_Soup_StepRun";
+            TopMenu_Soup_StepRun.ShortcutKeyDisplayString = "Question";
+            TopMenu_Soup_StepRun.Size = new Size(256, 22);
+            TopMenu_Soup_StepRun.Text = "Step Run";
+            TopMenu_Soup_StepRun.Click += TopMenu_Soup_StepRun_Click;
+            // 
+            // TopMenu_Soup_ThreadCountInc
+            // 
+            TopMenu_Soup_ThreadCountInc.Name = "TopMenu_Soup_ThreadCountInc";
+            TopMenu_Soup_ThreadCountInc.ShortcutKeyDisplayString = "Period";
+            TopMenu_Soup_ThreadCountInc.Size = new Size(256, 22);
+            TopMenu_Soup_ThreadCountInc.Text = "Inc. Num of Threads by 1";
+            TopMenu_Soup_ThreadCountInc.Click += TopMenu_Soup_ThreadCountInc_Click;
+            // 
+            // TopMenu_Soup_ThreadCountDec
+            // 
+            TopMenu_Soup_ThreadCountDec.Name = "TopMenu_Soup_ThreadCountDec";
+            TopMenu_Soup_ThreadCountDec.ShortcutKeyDisplayString = "Comma";
+            TopMenu_Soup_ThreadCountDec.Size = new Size(256, 22);
+            TopMenu_Soup_ThreadCountDec.Text = "Dec. Num of Threads by 1";
+            TopMenu_Soup_ThreadCountDec.Click += TopMenu_Soup_ThreadCountDec_Click;
+            // 
+            // TopMenu_Soup_Separator1
+            // 
+            TopMenu_Soup_Separator1.Name = "TopMenu_Soup_Separator1";
+            TopMenu_Soup_Separator1.Size = new Size(253, 6);
+            // 
             // TopMenu_Soup_EditSoupSettings
             // 
             TopMenu_Soup_EditSoupSettings.Name = "TopMenu_Soup_EditSoupSettings";
-            TopMenu_Soup_EditSoupSettings.Size = new Size(180, 22);
-            TopMenu_Soup_EditSoupSettings.Text = "Edit Soup Settings...";
+            TopMenu_Soup_EditSoupSettings.Size = new Size(256, 22);
+            TopMenu_Soup_EditSoupSettings.Text = "Edit Soup Settings";
             TopMenu_Soup_EditSoupSettings.Click += TopMenu_Soup_EditSoupSettings_Click;
             // 
-            // TopMenuBar_Soup_EditAutosaveSettings
+            // TopMenu_View
             // 
-            TopMenuBar_Soup_EditAutosaveSettings.Name = "TopMenuBar_Soup_EditAutosaveSettings";
-            TopMenuBar_Soup_EditAutosaveSettings.Size = new Size(180, 22);
-            TopMenuBar_Soup_EditAutosaveSettings.Text = "Autosave Settings...";
-            TopMenuBar_Soup_EditAutosaveSettings.Click += TopMenuBar_Soup_EditAutosaveSettings_Click;
+            TopMenu_View.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_View_ZoomIn, TopMenu_View_ZoomOut, TopMenu_View_Reset, TopMenu_View_Separator1, TopMenu_View_TrackingSelectedCell, TopMenu_View_TrackingRandomAnimal, TopMenu_View_AutoSelectTrackedCells });
+            TopMenu_View.Enabled = false;
+            TopMenu_View.Name = "TopMenu_View";
+            TopMenu_View.Size = new Size(44, 20);
+            TopMenu_View.Text = "View";
             // 
-            // TopMenu_Help
+            // TopMenu_View_ZoomIn
             // 
-            TopMenu_Help.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Help_AboutParamecium });
-            TopMenu_Help.Name = "TopMenu_Help";
-            TopMenu_Help.Size = new Size(44, 20);
-            TopMenu_Help.Text = "Help";
+            TopMenu_View_ZoomIn.Name = "TopMenu_View_ZoomIn";
+            TopMenu_View_ZoomIn.ShortcutKeyDisplayString = "Ctrl+LClick";
+            TopMenu_View_ZoomIn.Size = new Size(219, 22);
+            TopMenu_View_ZoomIn.Text = "Zoom In";
+            TopMenu_View_ZoomIn.Click += TopMenu_View_ZoomIn_Click;
             // 
-            // TopMenu_Help_AboutParamecium
+            // TopMenu_View_ZoomOut
             // 
-            TopMenu_Help_AboutParamecium.Name = "TopMenu_Help_AboutParamecium";
-            TopMenu_Help_AboutParamecium.Size = new Size(175, 22);
-            TopMenu_Help_AboutParamecium.Text = "About Paramecium";
-            TopMenu_Help_AboutParamecium.Click += TopMenu_Help_AboutParamecium_Click;
+            TopMenu_View_ZoomOut.Name = "TopMenu_View_ZoomOut";
+            TopMenu_View_ZoomOut.ShortcutKeyDisplayString = "Ctrl+RClick";
+            TopMenu_View_ZoomOut.Size = new Size(219, 22);
+            TopMenu_View_ZoomOut.Text = "Zoom Out";
+            TopMenu_View_ZoomOut.Click += TopMenu_View_ZoomOut_Click;
+            // 
+            // TopMenu_View_Reset
+            // 
+            TopMenu_View_Reset.Name = "TopMenu_View_Reset";
+            TopMenu_View_Reset.ShortcutKeyDisplayString = "C";
+            TopMenu_View_Reset.Size = new Size(219, 22);
+            TopMenu_View_Reset.Text = "Reset Position and Zoom";
+            TopMenu_View_Reset.Click += TopMenu_View_Reset_Click;
+            // 
+            // TopMenu_View_Separator1
+            // 
+            TopMenu_View_Separator1.Name = "TopMenu_View_Separator1";
+            TopMenu_View_Separator1.Size = new Size(216, 6);
+            // 
+            // TopMenu_View_TrackingSelectedCell
+            // 
+            TopMenu_View_TrackingSelectedCell.Name = "TopMenu_View_TrackingSelectedCell";
+            TopMenu_View_TrackingSelectedCell.ShortcutKeyDisplayString = "T";
+            TopMenu_View_TrackingSelectedCell.Size = new Size(219, 22);
+            TopMenu_View_TrackingSelectedCell.Text = "Tracking Selected Cell";
+            TopMenu_View_TrackingSelectedCell.Click += TopMenu_View_TrackingSelectedCell_Click;
+            // 
+            // TopMenu_View_TrackingRandomAnimal
+            // 
+            TopMenu_View_TrackingRandomAnimal.Name = "TopMenu_View_TrackingRandomAnimal";
+            TopMenu_View_TrackingRandomAnimal.ShortcutKeyDisplayString = "R";
+            TopMenu_View_TrackingRandomAnimal.Size = new Size(219, 22);
+            TopMenu_View_TrackingRandomAnimal.Text = "Tracking Random Animal";
+            TopMenu_View_TrackingRandomAnimal.Click += TopMenu_View_TrackingRandomAnimal_Click;
+            // 
+            // TopMenu_View_AutoSelectTrackedCells
+            // 
+            TopMenu_View_AutoSelectTrackedCells.Name = "TopMenu_View_AutoSelectTrackedCells";
+            TopMenu_View_AutoSelectTrackedCells.Size = new Size(219, 22);
+            TopMenu_View_AutoSelectTrackedCells.Text = "Auto Select Tracked Cells";
+            TopMenu_View_AutoSelectTrackedCells.Click += TopMenu_View_AutoSelectTrackedCells_Click;
             // 
             // BottomStat
             // 
-            BottomStat.Items.AddRange(new ToolStripItem[] { BottomStat_SoupState, BottomStat_ElapsedTimeSteps, BottomStat_Population, BottomStat_LatestGeneration, BottomStat_TotalBornDieCount, BottomStat_Tps, BottomStat_Fps });
-            BottomStat.Location = new Point(0, 822);
+            BottomStat.BackColor = Color.White;
+            BottomStat.Items.AddRange(new ToolStripItem[] { BottomStat_SoupState, BottomStat_TimeSteps, BottomStat_Population, BottomStat_Generation, BottomStat_TotalBornDie, BottomStat_Tps, BottomStat_Fps });
+            BottomStat.Location = new Point(0, 824);
             BottomStat.Name = "BottomStat";
             BottomStat.Size = new Size(1200, 24);
             BottomStat.TabIndex = 1;
@@ -168,50 +256,56 @@
             // BottomStat_SoupState
             // 
             BottomStat_SoupState.Name = "BottomStat_SoupState";
-            BottomStat_SoupState.Size = new Size(79, 19);
-            BottomStat_SoupState.Text = "Status : Pause";
+            BottomStat_SoupState.Size = new Size(92, 19);
+            BottomStat_SoupState.Text = "Status : Stopped";
             // 
-            // BottomStat_ElapsedTimeSteps
+            // BottomStat_TimeSteps
             // 
-            BottomStat_ElapsedTimeSteps.BorderSides = ToolStripStatusLabelBorderSides.Left;
-            BottomStat_ElapsedTimeSteps.Name = "BottomStat_ElapsedTimeSteps";
-            BottomStat_ElapsedTimeSteps.Size = new Size(100, 19);
-            BottomStat_ElapsedTimeSteps.Text = "Time Step : 0 (T1)";
+            BottomStat_TimeSteps.BorderSides = ToolStripStatusLabelBorderSides.Left;
+            BottomStat_TimeSteps.BorderStyle = Border3DStyle.Raised;
+            BottomStat_TimeSteps.Name = "BottomStat_TimeSteps";
+            BottomStat_TimeSteps.Size = new Size(100, 19);
+            BottomStat_TimeSteps.Text = "Time Step : 0 (T1)";
             // 
             // BottomStat_Population
             // 
             BottomStat_Population.BorderSides = ToolStripStatusLabelBorderSides.Left;
+            BottomStat_Population.BorderStyle = Border3DStyle.Raised;
             BottomStat_Population.Name = "BottomStat_Population";
             BottomStat_Population.Size = new Size(148, 19);
             BottomStat_Population.Text = "Population (P/A/T) : 0/0/0";
             // 
-            // BottomStat_LatestGeneration
+            // BottomStat_Generation
             // 
-            BottomStat_LatestGeneration.BorderSides = ToolStripStatusLabelBorderSides.Left;
-            BottomStat_LatestGeneration.Name = "BottomStat_LatestGeneration";
-            BottomStat_LatestGeneration.Size = new Size(84, 19);
-            BottomStat_LatestGeneration.Text = "Generation : 0";
+            BottomStat_Generation.BorderSides = ToolStripStatusLabelBorderSides.Left;
+            BottomStat_Generation.BorderStyle = Border3DStyle.Raised;
+            BottomStat_Generation.Name = "BottomStat_Generation";
+            BottomStat_Generation.Size = new Size(84, 19);
+            BottomStat_Generation.Text = "Generation : 0";
             // 
-            // BottomStat_TotalBornDieCount
+            // BottomStat_TotalBornDie
             // 
-            BottomStat_TotalBornDieCount.BorderSides = ToolStripStatusLabelBorderSides.Left;
-            BottomStat_TotalBornDieCount.Name = "BottomStat_TotalBornDieCount";
-            BottomStat_TotalBornDieCount.Size = new Size(112, 19);
-            BottomStat_TotalBornDieCount.Text = "Total Born/Die : 0/0";
+            BottomStat_TotalBornDie.BorderSides = ToolStripStatusLabelBorderSides.Left;
+            BottomStat_TotalBornDie.BorderStyle = Border3DStyle.Raised;
+            BottomStat_TotalBornDie.Name = "BottomStat_TotalBornDie";
+            BottomStat_TotalBornDie.Size = new Size(112, 19);
+            BottomStat_TotalBornDie.Text = "Total Born/Die : 0/0";
             // 
             // BottomStat_Tps
             // 
             BottomStat_Tps.BorderSides = ToolStripStatusLabelBorderSides.Left;
+            BottomStat_Tps.BorderStyle = Border3DStyle.Raised;
             BottomStat_Tps.Name = "BottomStat_Tps";
-            BottomStat_Tps.Size = new Size(54, 19);
-            BottomStat_Tps.Text = "TPS : 0.0";
+            BottomStat_Tps.Size = new Size(113, 19);
+            BottomStat_Tps.Text = "TPS : 0.0 (0.0000ms)";
             // 
             // BottomStat_Fps
             // 
             BottomStat_Fps.BorderSides = ToolStripStatusLabelBorderSides.Left;
+            BottomStat_Fps.BorderStyle = Border3DStyle.Raised;
             BottomStat_Fps.Name = "BottomStat_Fps";
-            BottomStat_Fps.Size = new Size(45, 19);
-            BottomStat_Fps.Text = "FPS : 0";
+            BottomStat_Fps.Size = new Size(113, 19);
+            BottomStat_Fps.Text = "FPS : 0.0 (0.0000ms)";
             // 
             // SoupView
             // 
@@ -226,58 +320,24 @@
             SoupView.MouseMove += SoupView_MouseMove;
             SoupView.MouseUp += SoupView_MouseUp;
             // 
-            // SaveFileDialog_SaveSoup
+            // LoadSoupDialog
             // 
-            SaveFileDialog_SaveSoup.Filter = "Paramecium Soup File|*.soup|All Files|*.*";
-            SaveFileDialog_SaveSoup.Title = "Save As";
+            LoadSoupDialog.Filter = "Paramecium Soup File|*.soup|All FIles|*.*";
             // 
-            // OpenFileDialog_LoadSoup
+            // SaveSoupDialog
             // 
-            OpenFileDialog_LoadSoup.Filter = "Paramecium Soup File|*.soup|All Files|*.*";
-            OpenFileDialog_LoadSoup.Title = "Open";
-            // 
-            // SelectedObjectOperation
-            // 
-            SelectedObjectOperation.Items.AddRange(new ToolStripItem[] { SelectedObjectOperation_Cut, SelectedObjectOperation_Copy, SelectedObjectOperation_Paste, SelectedObjectOperation_Delete });
-            SelectedObjectOperation.Name = "SelectedObjectOperation";
-            SelectedObjectOperation.Size = new Size(181, 114);
-            // 
-            // SelectedObjectOperation_Cut
-            // 
-            SelectedObjectOperation_Cut.Name = "SelectedObjectOperation_Cut";
-            SelectedObjectOperation_Cut.Size = new Size(180, 22);
-            SelectedObjectOperation_Cut.Text = "Cut";
-            SelectedObjectOperation_Cut.Click += SelectedObjectOperation_Cut_Click;
-            // 
-            // SelectedObjectOperation_Copy
-            // 
-            SelectedObjectOperation_Copy.Name = "SelectedObjectOperation_Copy";
-            SelectedObjectOperation_Copy.Size = new Size(180, 22);
-            SelectedObjectOperation_Copy.Text = "Copy";
-            SelectedObjectOperation_Copy.Click += SelectedObjectOperation_Copy_Click;
-            // 
-            // SelectedObjectOperation_Paste
-            // 
-            SelectedObjectOperation_Paste.Name = "SelectedObjectOperation_Paste";
-            SelectedObjectOperation_Paste.Size = new Size(180, 22);
-            SelectedObjectOperation_Paste.Text = "Paste";
-            SelectedObjectOperation_Paste.Click += SelectedObjectOperation_Paste_Click;
-            // 
-            // SelectedObjectOperation_Delete
-            // 
-            SelectedObjectOperation_Delete.Name = "SelectedObjectOperation_Delete";
-            SelectedObjectOperation_Delete.Size = new Size(180, 22);
-            SelectedObjectOperation_Delete.Text = "Delete";
-            SelectedObjectOperation_Delete.Click += SelectedObjectOperation_Delete_Click;
+            SaveSoupDialog.FileName = "untitled.soup";
+            SaveSoupDialog.Filter = "Paramecium Soup File|*.soup|All FIles|*.*";
             // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1200, 846);
-            Controls.Add(SoupView);
+            BackColor = SystemColors.Control;
+            ClientSize = new Size(1200, 848);
             Controls.Add(BottomStat);
             Controls.Add(TopMenu);
+            Controls.Add(SoupView);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = TopMenu;
             Name = "FormMain";
@@ -290,7 +350,6 @@
             BottomStat.ResumeLayout(false);
             BottomStat.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)SoupView).EndInit();
-            SelectedObjectOperation.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -301,11 +360,12 @@
         private StatusStrip BottomStat;
         private PictureBox SoupView;
         private ToolStripStatusLabel BottomStat_SoupState;
-        private ToolStripStatusLabel BottomStat_ElapsedTimeSteps;
+        private ToolStripStatusLabel BottomStat_TimeSteps;
+        private ToolStripStatusLabel BottomStat_Population;
+        private ToolStripStatusLabel BottomStat_Generation;
+        private ToolStripStatusLabel BottomStat_TotalBornDie;
         private ToolStripStatusLabel BottomStat_Tps;
         private ToolStripStatusLabel BottomStat_Fps;
-        private ToolStripStatusLabel BottomStat_Population;
-        private ToolStripStatusLabel BottomStat_TotalBornDieCount;
         private ToolStripMenuItem TopMenu_File;
         private ToolStripMenuItem TopMenu_File_New;
         private ToolStripMenuItem TopMenu_File_Open;
@@ -313,18 +373,22 @@
         private ToolStripMenuItem TopMenu_File_SaveAs;
         private ToolStripSeparator TopMenu_File_Separator1;
         private ToolStripMenuItem TopMenu_File_Exit;
-        private SaveFileDialog SaveFileDialog_SaveSoup;
-        private OpenFileDialog OpenFileDialog_LoadSoup;
-        private ToolStripStatusLabel BottomStat_LatestGeneration;
         private ToolStripMenuItem TopMenu_Soup;
         private ToolStripMenuItem TopMenu_Soup_EditSoupSettings;
-        private ToolStripMenuItem TopMenu_Help;
-        private ToolStripMenuItem TopMenu_Help_AboutParamecium;
-        private ToolStripMenuItem TopMenuBar_Soup_EditAutosaveSettings;
-        private ContextMenuStrip SelectedObjectOperation;
-        private ToolStripMenuItem SelectedObjectOperation_Delete;
-        private ToolStripMenuItem SelectedObjectOperation_Cut;
-        private ToolStripMenuItem SelectedObjectOperation_Copy;
-        private ToolStripMenuItem SelectedObjectOperation_Paste;
+        private ToolStripSeparator TopMenu_Soup_Separator1;
+        private ToolStripMenuItem TopMenu_Soup_RunPause;
+        private ToolStripMenuItem TopMenu_Soup_StepRun;
+        private ToolStripMenuItem TopMenu_Soup_ThreadCountInc;
+        private ToolStripMenuItem TopMenu_Soup_ThreadCountDec;
+        private ToolStripMenuItem TopMenu_View;
+        private ToolStripMenuItem TopMenu_View_ZoomIn;
+        private ToolStripMenuItem TopMenu_View_ZoomOut;
+        private ToolStripMenuItem TopMenu_View_Reset;
+        private OpenFileDialog LoadSoupDialog;
+        private SaveFileDialog SaveSoupDialog;
+        private ToolStripSeparator TopMenu_View_Separator1;
+        private ToolStripMenuItem TopMenu_View_TrackingSelectedCell;
+        private ToolStripMenuItem TopMenu_View_TrackingRandomAnimal;
+        private ToolStripMenuItem TopMenu_View_AutoSelectTrackedCells;
     }
 }
