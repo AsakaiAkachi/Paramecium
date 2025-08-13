@@ -5,6 +5,7 @@ namespace Paramecium.Forms.Controls
     public partial class SoupSettingsLabel : UserControl
     {
         [Browsable(true)]
+        [Category("Soup Settings Label")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string Label
         {
@@ -13,6 +14,7 @@ namespace Paramecium.Forms.Controls
         }
 
         [Browsable(true)]
+        [Category("Soup Settings Label")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public Color BackgroundColor
         {

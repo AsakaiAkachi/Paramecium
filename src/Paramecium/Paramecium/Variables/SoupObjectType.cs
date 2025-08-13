@@ -3,6 +3,7 @@
     public enum SoupObjectType
     {
         None,
+        Tile,
         Plant,
         Animal
     }

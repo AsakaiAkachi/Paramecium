@@ -13,14 +13,20 @@ namespace Paramecium.Forms.Controls
     public partial class SoupSettingsItemCheckbox : UserControl
     {
         [Browsable(true)]
+        [Category("Soup Settings Item Checkbox")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string ItemName
         {
             get => ItemNameLabel.Text;
-            set => ItemNameLabel.Text = value;
+            set
+            {
+                ItemNameLabel.Text = value;
+                Invalidate();
+            }
         }
 
         [Browsable(true)]
+        [Category("Soup Settings Item Checkbox")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool DefaultValue
         {
@@ -29,18 +35,43 @@ namespace Paramecium.Forms.Controls
             {
                 _defaultValue = value;
                 InputCheckBox.Checked = value;
+                Invalidate();
+            }
+        }
+
+        [Browsable(true)]
+        [Category("Soup Settings Item Num Up Down")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool Editable
+        {
+            get => _editable;
+            set
+            {
+                _editable = value;
+
+                ItemNameLabel.Enabled = value;
+                InputCheckBox.Enabled = value;
+                ResetButton.Enabled = value;
+
+                Invalidate();
             }
         }
 
         [Browsable(false)]
+        [Category("Soup Settings Item Num Up Down")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Checked
         {
             get => InputCheckBox.Checked;
-            set => InputCheckBox.Checked = value;
+            set
+            {
+                InputCheckBox.Checked = value;
+                Invalidate();
+            }
         }
 
         private bool _defaultValue = false;
+        private bool _editable = true;
 
         public SoupSettingsItemCheckbox()
         {

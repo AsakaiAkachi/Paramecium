@@ -20,6 +20,8 @@ namespace Paramecium.Engine
         public double Element { get; set; } = 0;                    // セルのエレメント量
         public double Mass { get; set; } = 0;                       // セルの質量
 
+        public int TimeSinceLastAttacked { get; set; } = 0;         // セルが最後に攻撃されてからの経過時間
+
         public object LockObject = new object();                    // セルのパラメーターを複数スレッドから操作する際の排他制御用オブジェクト
 
         public Plant() { }
@@ -35,6 +37,8 @@ namespace Paramecium.Engine
             Radius = CalcRadius(settings, element);
             Element = element;
             Mass = element;
+
+            TimeSinceLastAttacked = settings.PlantUnderAttackTime;
         }
         public Plant(SoupSettings settings, Double2d position, double element, Plant parent)
         {
@@ -50,6 +54,8 @@ namespace Paramecium.Engine
             Radius = CalcRadius(settings, element);
             Element = element;
             Mass = element;
+
+            TimeSinceLastAttacked = settings.PlantUnderAttackTime;
         }
 
         public void UpdateAge(Soup soup, SoupSettings settings)
@@ -57,6 +63,8 @@ namespace Paramecium.Engine
             if (IsAlive)
             {
                 Age += 1;
+
+                TimeSinceLastAttacked++;
             }
         }
 
@@ -212,18 +220,21 @@ namespace Paramecium.Engine
         {
             if (IsAlive)
             {
-                Tile targetTile = soup.Tiles[TileIndex];
-
-                double elementBuffer = 0;
-                lock (targetTile.LockObject)
+                if (TimeSinceLastAttacked >= settings.PlantUnderAttackTime)
                 {
-                    elementBuffer = targetTile.Element * settings.PlantElementCollectRate;
-                    targetTile.Element -= elementBuffer;
+                    Tile targetTile = soup.Tiles[TileIndex];
 
-                    if (targetTile.Element < 0) targetTile.Element = 0;
+                    double elementBuffer = 0;
+                    lock (targetTile.LockObject)
+                    {
+                        elementBuffer = targetTile.Element * settings.PlantElementCollectRate;
+                        targetTile.Element -= elementBuffer;
+
+                        if (targetTile.Element < 0) targetTile.Element = 0;
+                    }
+
+                    Element += elementBuffer * soup.ElementAmountMultiplier;
                 }
-
-                Element += elementBuffer * soup.ElementAmountMultiplier;
 
                 Radius = CalcRadius(settings, Element);
                 Mass = Element;
@@ -241,19 +252,19 @@ namespace Paramecium.Engine
                     Random rand = new Random();
 
                     List<Plant> result = new List<Plant>();
-                    int offspringCount = rand.Next(settings.PlantForkOffspringCountMin, settings.PlantForkOffspringCountMax + 1);
+                    int divisionCount = rand.Next(settings.PlantDivisionCountMin, settings.PlantDivisionCountMax + 1);
 
-                    double[] offspringElementAmount = new double[offspringCount];
+                    double[] offspringElementAmount = new double[divisionCount];
                     double offspringElementAmountTotal = 0d;
 
-                    for (int i = 0; i < offspringCount; i++)
+                    for (int i = 0; i < divisionCount; i++)
                     {
                         offspringElementAmount[i] = rand.NextDouble();
                         offspringElementAmountTotal += offspringElementAmount[i];
                     }
-                    for (int i = 0; i < offspringCount; i++) offspringElementAmount[i] *= (1d / offspringElementAmountTotal) * Element;
+                    for (int i = 0; i < divisionCount; i++) offspringElementAmount[i] *= (1d / offspringElementAmountTotal) * Element;
 
-                    for (int i = 0; i < offspringCount; i++) result.Add(new Plant(settings, Position + Double2d.FromAngle01(rand.NextDouble()) * Radius * 0.1d, offspringElementAmount[i], this));
+                    for (int i = 0; i < divisionCount; i++) result.Add(new Plant(settings, Position + Double2d.FromAngle01(rand.NextDouble()) * Radius * 0.1d, offspringElementAmount[i], this));
 
                     Element = 0;
                     IsAlive = false;

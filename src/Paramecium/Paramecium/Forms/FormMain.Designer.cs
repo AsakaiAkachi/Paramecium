@@ -52,6 +52,11 @@
             TopMenu_View_TrackingSelectedCell = new ToolStripMenuItem();
             TopMenu_View_TrackingRandomAnimal = new ToolStripMenuItem();
             TopMenu_View_AutoSelectTrackedCells = new ToolStripMenuItem();
+            TopMenu_View_Separator2 = new ToolStripSeparator();
+            TopMenu_View_ToggleFullScreen = new ToolStripMenuItem();
+            TopMenu_Window = new ToolStripMenuItem();
+            TopMenu_Window_AutosaveSettings = new ToolStripMenuItem();
+            TopMenu_Window_ObjectEditor = new ToolStripMenuItem();
             BottomStat = new StatusStrip();
             BottomStat_SoupState = new ToolStripStatusLabel();
             BottomStat_TimeSteps = new ToolStripStatusLabel();
@@ -71,7 +76,7 @@
             // TopMenu
             // 
             TopMenu.BackColor = Color.White;
-            TopMenu.Items.AddRange(new ToolStripItem[] { TopMenu_File, TopMenu_Soup, TopMenu_View });
+            TopMenu.Items.AddRange(new ToolStripItem[] { TopMenu_File, TopMenu_Soup, TopMenu_View, TopMenu_Window });
             TopMenu.Location = new Point(0, 0);
             TopMenu.Name = "TopMenu";
             TopMenu.Size = new Size(1200, 24);
@@ -185,7 +190,7 @@
             // 
             // TopMenu_View
             // 
-            TopMenu_View.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_View_ZoomIn, TopMenu_View_ZoomOut, TopMenu_View_Reset, TopMenu_View_Separator1, TopMenu_View_TrackingSelectedCell, TopMenu_View_TrackingRandomAnimal, TopMenu_View_AutoSelectTrackedCells });
+            TopMenu_View.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_View_ZoomIn, TopMenu_View_ZoomOut, TopMenu_View_Reset, TopMenu_View_Separator1, TopMenu_View_TrackingSelectedCell, TopMenu_View_TrackingRandomAnimal, TopMenu_View_AutoSelectTrackedCells, TopMenu_View_Separator2, TopMenu_View_ToggleFullScreen });
             TopMenu_View.Enabled = false;
             TopMenu_View.Name = "TopMenu_View";
             TopMenu_View.Size = new Size(44, 20);
@@ -242,6 +247,42 @@
             TopMenu_View_AutoSelectTrackedCells.Size = new Size(219, 22);
             TopMenu_View_AutoSelectTrackedCells.Text = "Auto Select Tracked Cells";
             TopMenu_View_AutoSelectTrackedCells.Click += TopMenu_View_AutoSelectTrackedCells_Click;
+            // 
+            // TopMenu_View_Separator2
+            // 
+            TopMenu_View_Separator2.Name = "TopMenu_View_Separator2";
+            TopMenu_View_Separator2.Size = new Size(216, 6);
+            // 
+            // TopMenu_View_ToggleFullScreen
+            // 
+            TopMenu_View_ToggleFullScreen.Name = "TopMenu_View_ToggleFullScreen";
+            TopMenu_View_ToggleFullScreen.ShortcutKeyDisplayString = "Crtl+F";
+            TopMenu_View_ToggleFullScreen.Size = new Size(219, 22);
+            TopMenu_View_ToggleFullScreen.Text = "Toggle Full Screen";
+            TopMenu_View_ToggleFullScreen.Click += TopMenu_View_ToggleFullScreen_Click;
+            // 
+            // TopMenu_Window
+            // 
+            TopMenu_Window.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Window_AutosaveSettings, TopMenu_Window_ObjectEditor });
+            TopMenu_Window.Enabled = false;
+            TopMenu_Window.Name = "TopMenu_Window";
+            TopMenu_Window.Size = new Size(63, 20);
+            TopMenu_Window.Text = "Window";
+            // 
+            // TopMenu_Window_AutosaveSettings
+            // 
+            TopMenu_Window_AutosaveSettings.Name = "TopMenu_Window_AutosaveSettings";
+            TopMenu_Window_AutosaveSettings.Size = new Size(214, 22);
+            TopMenu_Window_AutosaveSettings.Text = "Autosave Settings";
+            TopMenu_Window_AutosaveSettings.Click += TopMenu_Window_AutosaveSettings_Click;
+            // 
+            // TopMenu_Window_ObjectEditor
+            // 
+            TopMenu_Window_ObjectEditor.Name = "TopMenu_Window_ObjectEditor";
+            TopMenu_Window_ObjectEditor.ShortcutKeyDisplayString = "Crtl+Shift+E";
+            TopMenu_Window_ObjectEditor.Size = new Size(214, 22);
+            TopMenu_Window_ObjectEditor.Text = "Object Editor";
+            TopMenu_Window_ObjectEditor.Click += TopMenuWindowObjectEditor_Click;
             // 
             // BottomStat
             // 
@@ -390,5 +431,10 @@
         private ToolStripMenuItem TopMenu_View_TrackingSelectedCell;
         private ToolStripMenuItem TopMenu_View_TrackingRandomAnimal;
         private ToolStripMenuItem TopMenu_View_AutoSelectTrackedCells;
+        private ToolStripMenuItem TopMenu_Window;
+        private ToolStripMenuItem TopMenu_Window_ObjectEditor;
+        private ToolStripMenuItem TopMenu_Window_AutosaveSettings;
+        private ToolStripSeparator TopMenu_View_Separator2;
+        private ToolStripMenuItem TopMenu_View_ToggleFullScreen;
     }
 }

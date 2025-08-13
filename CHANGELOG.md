@@ -1,12 +1,26 @@
 # Changelog
 
+## [0.7.0 indev-2] - 2025-08-13
+
+### Added
+ - Added 7 new brain node functions. (`Input_ReproductionProgress` `Input_Age` `Input_Ate` `Input_Attacked` `Input_AttackdAngle` `Input_AttackSuccessful` `Output_Reproduction`)
+ - Reimplemented some of the features that were not reimplemented in `0.7.0 indev-1`.
+
+### Changed
+ - Renamed 1 brain node function. (`Input_Satiety => Input_Element`)
+ - The reproduction progress speed is now controlled by the neural network output (`Reproduction`).
+ - Animals and plants now enter an “Under Attack” state for a period of time when attacked. Plants stop growing while in this state, and animals have had a neural network input added that outputs 1 only while in this state.
+ - A new setting option, `AnimalMaximumElementAmount`, has been added to set the amount of elements an animal can hold separately from `AnimalReproductionCost`. Animals use these stored elements for life maintenance and actions. Note that elements in Reproduction Progress cannot be used for anything other than reproduction and cannot be stolen when attacked by other animals.
+ - The amount of elements consumed when an animal attacks another animal now increases in proportion to the square root of the `Attack` value if the `Attack` value of the neural network output is greater than 1.
+ - When an animal attacks another animal, if the opponent is facing toward itself, it cannot steal the element unless its NN output value for `Attack` is greater than the opponent's NN output value for `Attack`.
+
 ## [0.7.0 indev-1] - 2025-08-10
 
 ### Added
-- 2 types of brain node functions have been added. (`Input_AnimalWAvgDistance` `Input_AnimalWAvgSpeciesSigDiff`)
+- Added 2 new brain node functions. (`Input_AnimalWAvgDistance` `Input_AnimalWAvgSpeciesSigDiff`)
 
 ### Deleted
-- 4 types of brain node function have been deleted. (`Input_AnimalSameSpeciesAvgAngle` `Input_AnimalSameSpeciesProximity` `Input_AnimalOtherSpeciesAvgAngle` `Input_AnimalOtherSpeciesProximity`)
+- Removed 4 new brain node functions. (`Input_AnimalSameSpeciesAvgAngle` `Input_AnimalSameSpeciesProximity` `Input_AnimalOtherSpeciesAvgAngle` `Input_AnimalOtherSpeciesProximity`)
 
 ### Changed
 - Rebuilt the project and rewrote most of the code.

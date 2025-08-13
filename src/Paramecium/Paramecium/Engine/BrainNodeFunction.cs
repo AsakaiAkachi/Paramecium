@@ -11,19 +11,25 @@
 
         Input_Velocity,                         // 現在の速度
         Input_AngularVelocity,                  // 現在の角速度
-        Input_Satiety,                          // 現在のエレメント量
-        Input_Attacked,                         // 攻撃を受けてからしばらくの間のみ0より大きい値になる
+        Input_Element,                          // 現在のエレメント量
+        Input_ReproductionProgress,             // 現在の繁殖の進捗
+        Input_Age,                              // 現在の年齢
 
-        Input_WallWAvgAngle,                    // 自身から見た壁の平均角度
-        Input_WallWAvgProximity,                // 自身から見た壁までの平均距離(近いほど値が大きくなる)
-        Input_WallWAvgDistance,                 // 自身から見た壁までの平均距離(遠いほど値が大きくなる)
+        Input_Ate,                              // 植物を食べることに成功したかどうか
+        Input_Attacked,                         // 攻撃を受けてからしばらくの間のみ0より大きい値になる
+        Input_AttackdAngle,                     // 最後に攻撃を受けたときの攻撃方向の相対角度
+        Input_AttackSuccessful,                 // 最後に行った攻撃が成功したかどうか
+
+        Input_WallWAvgAngle,                    // 自身から見た壁の加重平均角度
+        Input_WallWAvgProximity,                // 自身から見た壁までの加重平均距離(近いほど値が大きくなる)
+        Input_WallWAvgDistance,                 // 自身から見た壁までの加重平均距離(遠いほど値が大きくなる)
         Input_PlantWAvgAngle,                   // 植物
         Input_PlantWAvgProximity,
         Input_PlantWAvgDistance,
         Input_AnimalWAvgAngle,                  // 動物
         Input_AnimalWAvgProximity,
         Input_AnimalWAvgDistance,
-        Input_AnimalWAvgSpeciesSigDiff,
+        Input_AnimalWAvgSpeciesSigDiff,         // 自身から見た視界内にいる動物の種族値の自身の種族値との差の加重平均値(自身と同じ種族値の場合は差は0、そうでなければ差は1として扱う)
 
         Input_PheromoneRedConcentration,        // 赤フェロモンの濃度
         Input_PheromoneRedGradAngle,            // 赤フェロモンの濃度勾配角度×濃度
@@ -31,26 +37,6 @@
         Input_PheromoneGreenGradAngle,
         Input_PheromoneBlueConcentration,       // 青フェロモン
         Input_PheromoneBlueGradAngle,
-
-        /**
-        Input_Memory0,                          // メモリ
-        Input_Memory1,
-        Input_Memory2,
-        Input_Memory3,
-        Input_Memory4,
-        Input_Memory5,
-        Input_Memory6,
-        Input_Memory7,
-
-        Input_InheritedMemory0,                 // 継承メモリ
-        Input_InheritedMemory1,
-        Input_InheritedMemory2,
-        Input_InheritedMemory3,
-        Input_InheritedMemory4,
-        Input_InheritedMemory5,
-        Input_InheritedMemory6,
-        Input_InheritedMemory7,
-        **/
 
 
         // 隠れ層
@@ -73,28 +59,10 @@
         Output_Eat,                             // 植物の摂食
         Output_Attack,                          // 動物への攻撃
 
+        Output_Reproduction,                    // 繁殖の進捗を進めるために消費するエレメント量
+
         Output_PheromoneRedProduction,          // フェロモンの生成
         Output_PheromoneGreenProduction,
-        Output_PheromoneBlueProduction,
-
-        /**
-        Output_Memory0,                         // メモリ
-        Output_Memory1,
-        Output_Memory2,
-        Output_Memory3,
-        Output_Memory4,
-        Output_Memory5,
-        Output_Memory6,
-        Output_Memory7,
-
-        Output_InheritedMemory0,                // 継承メモリ
-        Output_InheritedMemory1,
-        Output_InheritedMemory2,
-        Output_InheritedMemory3,
-        Output_InheritedMemory4,
-        Output_InheritedMemory5,
-        Output_InheritedMemory6,
-        Output_InheritedMemory7,
-        **/
+        Output_PheromoneBlueProduction
     }
 }

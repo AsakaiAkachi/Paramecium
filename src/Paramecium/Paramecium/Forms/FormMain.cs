@@ -28,11 +28,19 @@ namespace Paramecium.Forms
         private int _mousePosY = 0;
 
         // オブジェクトの選択
-        private SoupObjectType _selectedCellType = SoupObjectType.None;
-        private int _selectedCellIndex = -1;
-        private long _selectedCellId = -1;
+        private SoupObjectPointer _selectedSoupObject = new SoupObjectPointer();
+
+        // オーバーレイ
+        private OverlayToggles _overlayToggles = (OverlayToggles.AllOverlays | OverlayToggles.SelectedObject | OverlayToggles.AnimalBrainDiagram | OverlayToggles.AnimalBrainInputOutput | OverlayToggles.FullScreenOverlay);
+
+        // フルスクリーン
+        private bool _isFullScreen = false;
+        private FormWindowState _prevWindowState;
+        private Size _prevClientSize;
 
         // サブウィンドウ
+        private FormAutosaveSettings _formAutosaveSettings = new FormAutosaveSettings();
+        private FormObjectEditor _formObjectEditor = new FormObjectEditor();
 
         public FormMain()
         {
@@ -77,13 +85,13 @@ namespace Paramecium.Forms
                             _randomTrackingTargetIndex = -1;
                             _randomTrackingTargetId = -1;
 
-                            if (_selectedCellType == SoupObjectType.None) _trackingMode = CameraTrackingMode.Disabled;
-                            else if (_selectedCellType == SoupObjectType.Plant)
+                            if (_selectedSoupObject.ObjectType == SoupObjectType.Tile || _selectedSoupObject.ObjectType == SoupObjectType.None) _trackingMode = CameraTrackingMode.Disabled;
+                            else if (_selectedSoupObject.ObjectType == SoupObjectType.Plant)
                             {
-                                Plant? targetPlant = soup.Plants[_selectedCellIndex];
+                                Plant? targetPlant = soup.Plants[_selectedSoupObject.ObjectIndex];
                                 if (targetPlant is not null)
                                 {
-                                    if (targetPlant.Id == _selectedCellId)
+                                    if (targetPlant.Id == _selectedSoupObject.ObjectId)
                                     {
                                         _cameraPosition = Double2d.Lerp(_cameraPosition, targetPlant.Position, 0.1d);
                                     }
@@ -91,12 +99,12 @@ namespace Paramecium.Forms
                                 }
                                 else _trackingMode = CameraTrackingMode.Disabled;
                             }
-                            else if (_selectedCellType == SoupObjectType.Animal)
+                            else if (_selectedSoupObject.ObjectType == SoupObjectType.Animal)
                             {
-                                Animal? targetAnimal = soup.Animals[_selectedCellIndex];
+                                Animal? targetAnimal = soup.Animals[_selectedSoupObject.ObjectIndex];
                                 if (targetAnimal is not null)
                                 {
-                                    if (targetAnimal.Id == _selectedCellId)
+                                    if (targetAnimal.Id == _selectedSoupObject.ObjectId)
                                     {
                                         _cameraPosition = Double2d.Lerp(_cameraPosition, targetAnimal.Position, 0.1d);
                                     }
@@ -132,7 +140,7 @@ namespace Paramecium.Forms
 
                                         if (_autoSelectTrackedCell)
                                         {
-                                            SelectCell(SoupObjectType.Animal, _randomTrackingTargetIndex, _randomTrackingTargetId);
+                                            _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Animal, _randomTrackingTargetIndex, _randomTrackingTargetId);
                                         }
                                     }
                                     else
@@ -152,36 +160,36 @@ namespace Paramecium.Forms
                             TopMenu_View_TrackingRandomAnimal.Checked = true;
                         }
 
-                        if (_selectedCellType == SoupObjectType.Plant)
+                        if (_selectedSoupObject.ObjectType == SoupObjectType.Plant)
                         {
-                            Plant? targetPlant = soup.Plants[_selectedCellIndex];
+                            Plant? targetPlant = soup.Plants[_selectedSoupObject.ObjectIndex];
 
                             if (targetPlant is not null)
                             {
-                                if (targetPlant.Id != _selectedCellId)
+                                if (targetPlant.Id != _selectedSoupObject.ObjectId)
                                 {
-                                    SelectCell(SoupObjectType.None, -1, -1);
+                                    _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Tile, -1, -1);
                                 }
                             }
                             else
                             {
-                                SelectCell(SoupObjectType.None, -1, -1);
+                                _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Tile, -1, -1);
                             }
                         }
-                        if (_selectedCellType == SoupObjectType.Animal)
+                        else if (_selectedSoupObject.ObjectType == SoupObjectType.Animal)
                         {
-                            Animal? targetAnimal = soup.Animals[_selectedCellIndex];
+                            Animal? targetAnimal = soup.Animals[_selectedSoupObject.ObjectIndex];
 
                             if (targetAnimal is not null)
                             {
-                                if (targetAnimal.Id != _selectedCellId)
+                                if (targetAnimal.Id != _selectedSoupObject.ObjectId)
                                 {
-                                    SelectCell(SoupObjectType.None, -1, -1);
+                                    _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Tile, -1, -1);
                                 }
                             }
                             else
                             {
-                                SelectCell(SoupObjectType.None, -1, -1);
+                                _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Tile, -1, -1);
                             }
                         }
                     }
@@ -190,11 +198,14 @@ namespace Paramecium.Forms
                     if (SoupView.Width > 0 && SoupView.Height > 0)
                     {
                         Bitmap prevFrameSoupViewImage = _soupViewImage;
+                        _soupViewImage = new Bitmap(SoupView.Width, SoupView.Height);
 
                         try
                         {
-                            Int2d SoupViewSize = new Int2d(SoupView.Width, SoupView.Height);
-                            _soupViewImage = SoupViewRenderer.DrawSoupView(soup, soup.Settings, SoupViewSize, _cameraPosition, _cameraZoomLevel, _unitPerPixel, new Int2d(_mousePosX, _mousePosY), _selectedCellType, _selectedCellIndex, _selectedCellId);
+                            SoupViewRenderer.DrawSoupView(_soupViewImage, soup, soup.Settings, _cameraPosition, _cameraZoomLevel, _unitPerPixel, new Int2d(_mousePosX, _mousePosY), _selectedSoupObject);
+                            SoupObjectOverlayRenderer.DrawSoupObjectOverlayRenderer(_soupViewImage, soup, soup.Settings, _cameraPosition, _cameraZoomLevel, _unitPerPixel, new Int2d(_mousePosX, _mousePosY), _selectedSoupObject, _overlayToggles);
+                            if (_isFullScreen) FullScreenOverlayRenderer.DrawFullScreenOverlay(_soupViewImage, frameTime.Elapsed.TotalMilliseconds, _overlayToggles);
+
                             SoupView.Image = _soupViewImage;
                         }
                         catch { }
@@ -217,6 +228,7 @@ namespace Paramecium.Forms
                     TopMenu_File_SaveAs.Enabled = true;
                     TopMenu_Soup.Enabled = true;
                     TopMenu_View.Enabled = true;
+                    TopMenu_Window.Enabled = true;
 
                     if (soup.ThreadCount > 1) TopMenu_Soup_ThreadCountDec.Enabled = true;
                     else TopMenu_Soup_ThreadCountDec.Enabled = false;
@@ -226,10 +238,21 @@ namespace Paramecium.Forms
                     if (_cameraZoomLevel < 10) TopMenu_View_ZoomIn.Enabled = true;
                     else TopMenu_View_ZoomIn.Enabled = false;
 
-                    if (_selectedCellType != SoupObjectType.None) TopMenu_View_TrackingSelectedCell.Enabled = true;
+                    if (_selectedSoupObject.ObjectType == SoupObjectType.Plant || _selectedSoupObject.ObjectType == SoupObjectType.Animal) TopMenu_View_TrackingSelectedCell.Enabled = true;
                     else TopMenu_View_TrackingSelectedCell.Enabled = false;
                     if (soup.Animals.Count > 0 && soup.AnimalPopulation > 0) TopMenu_View_TrackingRandomAnimal.Enabled = true;
                     else TopMenu_View_TrackingRandomAnimal.Enabled = false;
+
+                    if (_isFullScreen) TopMenu_View_ToggleFullScreen.Checked = true;
+                    else TopMenu_View_ToggleFullScreen.Checked = false;
+
+                    if (_formAutosaveSettings.IsDisposed) TopMenu_Window_ObjectEditor.Checked = false;
+                    else if (_formAutosaveSettings.Visible) TopMenu_Window_ObjectEditor.Checked = true;
+                    else TopMenu_Window_ObjectEditor.Checked = false;
+
+                    if (_formObjectEditor.IsDisposed) TopMenu_Window_AutosaveSettings.Checked = false;
+                    else if (_formObjectEditor.Visible) TopMenu_Window_ObjectEditor.Checked = true;
+                    else TopMenu_Window_ObjectEditor.Checked = false;
                 }
 
                 frameTime.Restart();
@@ -242,11 +265,14 @@ namespace Paramecium.Forms
         {
             switch (e.KeyCode)
             {
-                case Keys.N:
+                case Keys.N:        // スープの新規作成
                     if (ModifierKeys == Keys.Control) NewSoup();
                     break;
-                case Keys.O:
+                case Keys.O:        // スープの読み込み
                     if (ModifierKeys == Keys.Control) OpenSoup();
+                    break;
+                case Keys.F:
+                    if (ModifierKeys == Keys.Control) ToggleFullScreen();
                     break;
             }
 
@@ -256,9 +282,9 @@ namespace Paramecium.Forms
             {
                 switch (e.KeyCode)
                 {
-                    case Keys.S:
-                        if (ModifierKeys == (Keys.Control & Keys.Shift)) SaveAsSoup();
-                        else if (ModifierKeys == Keys.Control) SaveSoup();
+                    case Keys.S:            // スープの保存
+                        if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) SaveAsSoup();
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control) SaveSoup();
                         break;
                     case Keys.Space:        // スープの一時停止/再開
                         SoupRunPause();
@@ -283,6 +309,26 @@ namespace Paramecium.Forms
                         if (_trackingMode == CameraTrackingMode.TrackingRandomAnimal) _trackingMode = CameraTrackingMode.Disabled;
                         else _trackingMode = CameraTrackingMode.TrackingRandomAnimal;
                         break;
+                    case Keys.E:            // オブジェクトエディターを表示する
+                        if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) ShowFormObjectEditor();
+                        break;
+
+                    // オーバーレイの表示切替
+                    case Keys.F1:           // 全てのオーバーレイ
+                        ChangeOverlayToggles(OverlayToggles.AllOverlays);
+                        break;
+                    case Keys.F2:           // 選択したオブジェクトの情報
+                        ChangeOverlayToggles(OverlayToggles.SelectedObject);
+                        break;
+                    case Keys.F3:           // 動物:BrainDiagram
+                        ChangeOverlayToggles(OverlayToggles.AnimalBrainDiagram);
+                        break;
+                    case Keys.F4:           // 動物:BrainInputOutput
+                        ChangeOverlayToggles(OverlayToggles.AnimalBrainInputOutput);
+                        break;
+                    case Keys.F8:           // フルスクリーンオーバーレイ
+                        ChangeOverlayToggles(OverlayToggles.FullScreenOverlay);
+                        break;
                 }
             }
         }
@@ -305,9 +351,9 @@ namespace Paramecium.Forms
                             case Keys.Shift:    // セルを移動する
                                 if (soup.SoupState == SoupState.Pause)
                                 {
-                                    if (_selectedCellType == SoupObjectType.Plant)
+                                    if (_selectedSoupObject.ObjectType == SoupObjectType.Plant)
                                     {
-                                        Plant? targetPlant = GetSelectedPlant();
+                                        Plant? targetPlant = (Plant?)_selectedSoupObject.GetSoupObject();
 
                                         if (targetPlant is not null)
                                         {
@@ -318,9 +364,9 @@ namespace Paramecium.Forms
                                             soup.Tiles[targetPlant.TileIndex].PlantIndexes.Add(targetPlant.Index);
                                         }
                                     }
-                                    if (_selectedCellType == SoupObjectType.Animal)
+                                    if (_selectedSoupObject.ObjectType == SoupObjectType.Animal)
                                     {
-                                        Animal? targetAnimal = GetSelectedAnimal();
+                                        Animal? targetAnimal = (Animal?)_selectedSoupObject.GetSoupObject();
 
                                         if (targetAnimal is not null)
                                         {
@@ -352,11 +398,16 @@ namespace Paramecium.Forms
                                     }
                                 }
                                 break;
-                            default:            // セルを選択する
-                                SelectCell(SoupObjectType.None, -1, -1);
+                            default:            // オブジェクトを選択する
+                                _selectedSoupObject = new SoupObjectPointer();
 
                                 try
                                 {
+                                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                                    {
+                                        _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Tile, mouseTileIndex, -1);
+                                    }
+
                                     if (_cameraZoomLevel >= 5)
                                     {
                                         if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
@@ -382,7 +433,7 @@ namespace Paramecium.Forms
                                                                 {
                                                                     if (Double2d.DistanceSquared(mousePositionInSoup, targetPlant.Position) < targetPlant.Radius * targetPlant.Radius)
                                                                     {
-                                                                        SelectCell(SoupObjectType.Plant, targetPlant.Index, targetPlant.Id);
+                                                                        _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Plant, targetPlant.Index, targetPlant.Id);
                                                                     }
                                                                 }
                                                             }
@@ -394,7 +445,7 @@ namespace Paramecium.Forms
                                                                 {
                                                                     if (Double2d.DistanceSquared(mousePositionInSoup, targetAnimal.Position) < targetAnimal.Radius * targetAnimal.Radius)
                                                                     {
-                                                                        SelectCell(SoupObjectType.Animal, targetAnimal.Index, targetAnimal.Id);
+                                                                        _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Animal, targetAnimal.Index, targetAnimal.Id);
                                                                     }
                                                                 }
                                                             }
@@ -416,7 +467,7 @@ namespace Paramecium.Forms
 
                                                 if (targetAnimal is not null)
                                                 {
-                                                    SelectCell(SoupObjectType.Animal, targetAnimal.Index, targetAnimal.Id);
+                                                    _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Animal, targetAnimal.Index, targetAnimal.Id);
                                                 }
                                             }
                                             else if (targetTile.PlantPopulation > 0)
@@ -425,13 +476,22 @@ namespace Paramecium.Forms
 
                                                 if (targetPlant is not null)
                                                 {
-                                                    SelectCell(SoupObjectType.Plant, targetPlant.Index, targetPlant.Id);
+                                                    _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Plant, targetPlant.Index, targetPlant.Id);
                                                 }
                                             }
                                         }
                                     }
                                 }
                                 catch { }
+
+                                if (!_formObjectEditor.IsDisposed)
+                                {
+                                    if (_formObjectEditor.Visible)
+                                    {
+                                        _formObjectEditor.LoadSoupObject(_selectedSoupObject);
+                                    }
+                                }
+
                                 break;
                         }
                         break;
@@ -489,6 +549,20 @@ namespace Paramecium.Forms
 
             if (soup is not null)
             {
+                Double2d mousePositionInSoup = new Double2d((e.X - SoupView.Width / 2d) * _unitPerPixel + _cameraPosition.X, (e.Y - SoupView.Height / 2d) * _unitPerPixel + _cameraPosition.Y);
+                Int2d mouseTilePosition = soup.GetTilePositionFromPosition(mousePositionInSoup);
+                int mouseTileIndex = soup.GetTileIndexFromTilePosition(mouseTilePosition);
+
+                if (_selectedSoupObject.ObjectType == SoupObjectType.None || _selectedSoupObject.ObjectType == SoupObjectType.Tile)
+                {
+                    _selectedSoupObject = new SoupObjectPointer();
+
+                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                    {
+                        _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Tile, mouseTileIndex, -1);
+                    }
+                }
+
                 if (_isDragging)    // カメラを移動させる
                 {
                     _cameraPosition.X += (_mousePosX - e.X) * _unitPerPixel;
@@ -504,10 +578,6 @@ namespace Paramecium.Forms
                     _mousePosX = e.X;
                     _mousePosY = e.Y;
 
-                    Double2d mousePositionInSoup = new Double2d((e.X - SoupView.Width / 2d) * _unitPerPixel + _cameraPosition.X, (e.Y - SoupView.Height / 2d) * _unitPerPixel + _cameraPosition.Y);
-                    Int2d mouseTilePosition = soup.GetTilePositionFromPosition(mousePositionInSoup);
-                    int mouseTileIndex = soup.GetTileIndexFromTilePosition(mouseTilePosition);
-
                     switch (e.Button)
                     {
                         case MouseButtons.Left:
@@ -516,9 +586,9 @@ namespace Paramecium.Forms
                                 case Keys.Shift:    // セルを移動する
                                     if (soup.SoupState == SoupState.Pause)
                                     {
-                                        if (_selectedCellType == SoupObjectType.Plant)
+                                        if (_selectedSoupObject.ObjectType == SoupObjectType.Plant)
                                         {
-                                            Plant? targetPlant = GetSelectedPlant();
+                                            Plant? targetPlant = (Plant?)_selectedSoupObject.GetSoupObject();
 
                                             if (targetPlant is not null)
                                             {
@@ -529,9 +599,9 @@ namespace Paramecium.Forms
                                                 soup.Tiles[targetPlant.TileIndex].PlantIndexes.Add(targetPlant.Index);
                                             }
                                         }
-                                        if (_selectedCellType == SoupObjectType.Animal)
+                                        if (_selectedSoupObject.ObjectType == SoupObjectType.Animal)
                                         {
-                                            Animal? targetAnimal = GetSelectedAnimal();
+                                            Animal? targetAnimal = (Animal?)_selectedSoupObject.GetSoupObject();
 
                                             if (targetAnimal is not null)
                                             {
@@ -795,6 +865,21 @@ namespace Paramecium.Forms
             }
         }
 
+        private void TopMenu_View_ToggleFullScreen_Click(object sender, EventArgs e)
+        {
+            ToggleFullScreen();
+        }
+
+        private void TopMenu_Window_AutosaveSettings_Click(object sender, EventArgs e)
+        {
+            ShowFormAutosaveSettings();
+        }
+
+        private void TopMenuWindowObjectEditor_Click(object sender, EventArgs e)
+        {
+            ShowFormObjectEditor();
+        }
+
         private void NewSoup()
         {
             Soup? soup = Globals.Soup;
@@ -825,7 +910,7 @@ namespace Paramecium.Forms
             {
                 if (soup is not null)
                 {
-                    SelectCell(SoupObjectType.None, -1, -1);
+                    _selectedSoupObject = new SoupObjectPointer();
                     soup.SetSoupState(SoupState.Stop);
                 }
 
@@ -857,7 +942,7 @@ namespace Paramecium.Forms
                     bool soupSavedOrDiscard = ShowSaveSoupChangesDialog();
                     if (!soupSavedOrDiscard)
                     {
-                        SelectCell(SoupObjectType.None, -1, -1);
+                        _selectedSoupObject = new SoupObjectPointer();
                         soup.SetSoupState(soupState);
                         return;
                     }
@@ -880,6 +965,13 @@ namespace Paramecium.Forms
 
                     Globals.SoupFilePath = LoadSoupDialog.FileName;
                     Globals.SoupFileName = Path.GetFileName(LoadSoupDialog.FileName);
+
+                    LoadSoupDialog.FileName = Globals.SoupFileName;
+                    SaveSoupDialog.InitialDirectory = Path.GetDirectoryName(Globals.SoupFilePath);
+                    SaveSoupDialog.FileName = Globals.SoupFileName;
+
+                    //SaveSoupDialog.InitialDirectory = Globals.SoupFilePath;
+                    //SaveSoupDialog.FileName = Globals.SoupFileName;
 
                     _cameraPosition = new Double2d(Globals.Soup.Settings.SizeX / 2d, Globals.Soup.Settings.SizeY / 2d);
                 }
@@ -910,11 +1002,15 @@ namespace Paramecium.Forms
                 }
                 else if (SaveSoupDialog.ShowDialog() == DialogResult.OK)
                 {
+                    soup.Modified = false;
+                    JsonFileImportAndExport.Export(SaveSoupDialog.FileName, soup);
+
                     Globals.SoupFilePath = SaveSoupDialog.FileName;
                     Globals.SoupFileName = Path.GetFileName(SaveSoupDialog.FileName);
-                    soup.Modified = false;
 
-                    JsonFileImportAndExport.Export(SaveSoupDialog.FileName, soup);
+                    LoadSoupDialog.InitialDirectory = Path.GetDirectoryName(Globals.SoupFilePath);
+                    LoadSoupDialog.FileName = Globals.SoupFileName;
+                    SaveSoupDialog.FileName = Globals.SoupFileName;
 
                     soup.SetSoupState(soupState);
                     return true;
@@ -941,11 +1037,15 @@ namespace Paramecium.Forms
 
                 if (SaveSoupDialog.ShowDialog() == DialogResult.OK)
                 {
+                    soup.Modified = false;
+                    JsonFileImportAndExport.Export(SaveSoupDialog.FileName, soup);
+
                     Globals.SoupFilePath = SaveSoupDialog.FileName;
                     Globals.SoupFileName = Path.GetFileName(SaveSoupDialog.FileName);
-                    soup.Modified = false;
 
-                    JsonFileImportAndExport.Export(SaveSoupDialog.FileName, soup);
+                    LoadSoupDialog.InitialDirectory = Path.GetDirectoryName(Globals.SoupFilePath);
+                    LoadSoupDialog.FileName = Globals.SoupFileName;
+                    SaveSoupDialog.FileName = Globals.SoupFileName;
 
                     soup.SetSoupState(soupState);
                     return true;
@@ -1040,98 +1140,90 @@ namespace Paramecium.Forms
             }
         }
 
-        private void UpdateUnitPerPixel()
-        {
-            _unitPerPixel = 1d / Math.Pow(2, _cameraZoomLevel);
-        }
-
-        private void SelectCell(SoupObjectType type, int index, long id)
+        private void ShowFormAutosaveSettings()
         {
             Soup? soup = Globals.Soup;
 
             if (soup is not null)
             {
-                if (type != SoupObjectType.None)
+                if (_formAutosaveSettings.IsDisposed) _formAutosaveSettings = new FormAutosaveSettings();
+
+                SoupState soupState = soup.SoupState;
+                soup.SetSoupState(SoupState.Pause);
+
+                _formAutosaveSettings.ShowDialog();
+
+                soup.SetSoupState(soupState);
+            }
+        }
+
+        private void ShowFormObjectEditor()
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                if (_formObjectEditor.IsDisposed) _formObjectEditor = new FormObjectEditor();
+
+                if (!_formObjectEditor.Visible)
                 {
-                    if (type == SoupObjectType.Plant)
-                    {
-                        Plant? targetPlant = soup.Plants[index];
-                        if (targetPlant is not null)
-                        {
-                            if (targetPlant.Id == id)
-                            {
-                                _selectedCellType = type;
-                                _selectedCellIndex = index;
-                                _selectedCellId = id;
-                            }
-                        }
-                    }
-                    if (type == SoupObjectType.Animal)
-                    {
-                        Animal? targetAnimal = soup.Animals[index];
-                        if (targetAnimal is not null)
-                        {
-                            if (targetAnimal.Id == id)
-                            {
-                                _selectedCellType = type;
-                                _selectedCellIndex = index;
-                                _selectedCellId = id;
-                            }
-                        }
-                    }
+                    _formObjectEditor.Show(this);
+                    _formObjectEditor.LoadSoupObject(_selectedSoupObject);
                 }
                 else
                 {
-                    _selectedCellType = type;
-                    _selectedCellIndex = index;
-                    _selectedCellId = id;
+                    _formObjectEditor.Focus();
                 }
             }
         }
 
-        private Plant? GetSelectedPlant()
+        private void ToggleFullScreen()
         {
-            Soup? soup = Globals.Soup;
-
-            if (soup is not null)
+            if (!_isFullScreen)
             {
-                if (_selectedCellType == SoupObjectType.Plant)
-                {
-                    Plant? targetPlant = soup.Plants[_selectedCellIndex];
+                _isFullScreen = true;
 
-                    if (targetPlant is not null)
-                    {
-                        if (targetPlant.Id == _selectedCellId) return targetPlant;
-                        else return null;
-                    }
-                    else return null;
-                }
-                else return null;
+                TopMenu.Hide();
+                BottomStat.Hide();
+
+                SoupView.Location = new Point(0, 0);
+                SoupView.Size = ClientSize;
+
+                FormBorderStyle = FormBorderStyle.None;
+
+                _prevWindowState = WindowState;
+                _prevClientSize = ClientSize;
+
+                WindowState = FormWindowState.Normal;
+                WindowState = FormWindowState.Maximized;
             }
+            else
+            {
+                _isFullScreen = false;
 
-            return null;
+                TopMenu.Show();
+                BottomStat.Show();
+
+                SoupView.Location = new Point(0, 24);
+                SoupView.Size = new Size(ClientSize.Width, ClientSize.Height - 48);
+
+                FormBorderStyle = FormBorderStyle.Sizable;
+
+                WindowState = FormWindowState.Normal;
+                WindowState = _prevWindowState;
+
+                ClientSize = _prevClientSize;
+            }
         }
-        private Animal? GetSelectedAnimal()
+
+        private void ChangeOverlayToggles(OverlayToggles toggles)
         {
-            Soup? soup = Globals.Soup;
+            _overlayToggles ^= toggles;
+        }
 
-            if (soup is not null)
-            {
-                if (_selectedCellType == SoupObjectType.Animal)
-                {
-                    Animal? targetAnimal = soup.Animals[_selectedCellIndex];
-
-                    if (targetAnimal is not null)
-                    {
-                        if (targetAnimal.Id == _selectedCellId) return targetAnimal;
-                        else return null;
-                    }
-                    else return null;
-                }
-                else return null;
-            }
-
-            return null;
+        private void UpdateUnitPerPixel()
+        {
+            _unitPerPixel = 1d / Math.Pow(2, _cameraZoomLevel);
         }
     }
 }

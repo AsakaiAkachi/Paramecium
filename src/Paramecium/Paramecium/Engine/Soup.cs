@@ -1,4 +1,5 @@
 ﻿using Paramecium.Variables;
+using Paramecium.Utils;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
@@ -29,7 +30,6 @@ namespace Paramecium.Engine
         public bool Modified { get; set; } = true;                              // スープファイルが読み込まれてから変更されているかどうか
         public bool AutosaveEnabled { get; set; } = false;                      // オートセーブが有効化されているかどうか
         public long AutosaveInterval { get; set; } = 100000;                    // オートセーブの間隔
-        public long LastAutoSaveTime { get; set; } = 0;                         // 最後にオートセーブされた時刻
 
         // ステート管理
         private Task SoupMainThread = Task.CompletedTask;                       // スープのメインスレッド
@@ -69,7 +69,7 @@ namespace Paramecium.Engine
         {
             Settings = settings;
 
-            Tiles = new Tile[Settings.Area]; for (int i = 0; i < Tiles.Length; i++) Tiles[i] = new Tile();
+            Tiles = new Tile[Settings.Area]; for (int i = 0; i < Tiles.Length; i++) Tiles[i] = new Tile() { Index = i, Position = GetTilePositionFromTileIndex(i) };
 
             //Random rand = new Random(Settings.InitialSeed);
             Random rand = new Random();
@@ -198,7 +198,7 @@ namespace Paramecium.Engine
                         else break;
                     }
 
-                    Animal animal = new Animal(settings, position, rand.NextDouble(), Settings.AnimalForkCost);
+                    Animal animal = new Animal(settings, position, rand.NextDouble() - 0.5d, Settings.AnimalMaximumElementAmount);
                     unusedElementAmount -= animal.Element;
 
                     AddAnimal(animal);
@@ -536,6 +536,8 @@ namespace Paramecium.Engine
 
                             Modified = true;
 
+                            if (AutosaveEnabled && ElapsedTimeSteps % AutosaveInterval == 0 && ElapsedTimeSteps != 0) Autosave();
+
                             StepTime = stepTime.Elapsed.TotalSeconds;
                             stepTime.Restart();
                         }
@@ -641,6 +643,31 @@ namespace Paramecium.Engine
                 return (obj1Pos - obj2Pos).Normalized * (1d - distance / (obj1Radius + obj2Radius)) * Settings.RestitutionCoefficient;
             }
             else return Double2d.Zero;
+        }
+
+        public static string StringFromCellId(long cellId)
+        {
+            string cellIdChars = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+            string result = "";
+
+            for (int i = 0; i < 12; i++)
+            {
+                result += cellIdChars[(int)(cellId % 36)];
+                cellId /= 36;
+            }
+
+            return result;
+        }
+
+        private void Autosave()
+        {
+            bool modified = Modified;
+            Modified = false;
+
+            JsonFileImportAndExport.Export(@$"{Globals.AutosavesDirectoryPath}\{Path.GetFileNameWithoutExtension(Globals.SoupFileName)}-{ElapsedTimeSteps}steps.soup", this);
+
+            Modified = modified;
         }
     }
 }

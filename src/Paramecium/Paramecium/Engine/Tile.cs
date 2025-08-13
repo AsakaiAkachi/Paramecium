@@ -1,10 +1,14 @@
-﻿using System.Text.Json.Serialization;
+﻿using Paramecium.Variables;
+using System.Text.Json.Serialization;
 
 namespace Paramecium.Engine
 {
     // スープの空間を構成するタイルのデータを保存するクラス
     public class Tile
     {
+        public int Index { get; set; } = -1;
+        public Int2d Position { get; set; } = Int2d.Zero;
+
         public TileType Type { get; set; } = TileType.Default;              // タイルの種別
 
         public double Element { get; set; } = 0d;                           // タイルのエレメント量

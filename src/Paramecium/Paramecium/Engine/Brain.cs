@@ -102,12 +102,15 @@ namespace Paramecium.Engine
                 result.Nodes.Add(new BrainNode() { Function = BrainNodeFunction.Output_Acceleration });
                 result.Nodes.Add(new BrainNode() { Function = BrainNodeFunction.Output_Rotation });
                 result.Nodes.Add(new BrainNode() { Function = BrainNodeFunction.Output_Eat });
+                result.Nodes.Add(new BrainNode() { Function = BrainNodeFunction.Input_Element });
+                result.Nodes.Add(new BrainNode() { Function = BrainNodeFunction.Output_Reproduction });
 
                 result.Connections.Add(new BrainNodeConnection() { OriginIndex = 0, TargetIndex = 3, Weight = 1 });
                 result.Connections.Add(new BrainNodeConnection() { OriginIndex = 0, TargetIndex = 5, Weight = -0.5 });
                 result.Connections.Add(new BrainNodeConnection() { OriginIndex = 1, TargetIndex = 4, Weight = 1 });
                 result.Connections.Add(new BrainNodeConnection() { OriginIndex = 2, TargetIndex = 3, Weight = -0.95 });
                 result.Connections.Add(new BrainNodeConnection() { OriginIndex = 2, TargetIndex = 5, Weight = 1 });
+                result.Connections.Add(new BrainNodeConnection() { OriginIndex = 6, TargetIndex = 7, Weight = 0.5 });
 
                 return result;
             }
@@ -146,7 +149,7 @@ namespace Paramecium.Engine
             if (mutationType == 0) mutationSuccessful = AddNodeMutation(settings);
             if (mutationType == 1) mutationSuccessful = RemoveNodeMutation();
             if (mutationType == 2) mutationSuccessful = ChangeNodeTypeMutation(settings);
-            if (mutationType == 3) mutationSuccessful = AddConnectionMutation();
+            if (mutationType == 3) mutationSuccessful = AddConnectionMutation(settings);
             if (mutationType == 4) mutationSuccessful = RemoveConnectionMutation();
             if (mutationType == 5) mutationSuccessful = ChangeConnectionOriginMutation();
             if (mutationType == 6) mutationSuccessful = ChangeConnectionTargetMutation();
@@ -191,7 +194,15 @@ namespace Paramecium.Engine
                 }
                 else return false;
             }
-            else return false;
+            else
+            {
+                int fallbackMutationType = WeightedSelector(settings.AnimalMutationTypeWeightsAddNodeMutationFallback);
+
+                if (fallbackMutationType == 0) return RemoveNodeMutation();
+                if (fallbackMutationType == 1) return ChangeNodeTypeMutation(settings);
+            }
+
+            return false;
         }
         public bool RemoveNodeMutation()
         {
@@ -214,7 +225,8 @@ namespace Paramecium.Engine
 
                 return true;
             }
-            else return false;
+            
+            return false;
         }
         public bool ChangeNodeTypeMutation(SoupSettings settings)
         {
@@ -280,28 +292,42 @@ namespace Paramecium.Engine
 
                 return true;
             }
-            else return false;
+            
+            return false;
         }
-        public bool AddConnectionMutation()
+        public bool AddConnectionMutation(SoupSettings settings)
         {
             if (Nodes.Count >= 2)
             {
-                Random rand = new Random();
-
-                int[] inputAndHiddenNodeIndexes = InputAndHiddenNodeIndexes;
-                int[] outputAndHiddenNodeIndexes = OutputAndHiddenNodeIndexes;
-
-                int connectionOriginIndex = inputAndHiddenNodeIndexes[rand.Next(0, inputAndHiddenNodeIndexes.Length)];
-                int connectionTargetIndex = outputAndHiddenNodeIndexes[rand.Next(0, outputAndHiddenNodeIndexes.Length)];
-
-                if (connectionOriginIndex != connectionTargetIndex && !ContainConnection(connectionOriginIndex, connectionTargetIndex))
+                if (Connections.Count < Nodes.Count * settings.AnimalMaximumConnectionCountPerNode)
                 {
-                    Connections.Add(new BrainNodeConnection() { OriginIndex = connectionOriginIndex, TargetIndex = connectionTargetIndex, Weight = rand.NextDouble() * 4d - 2d });
-                    return true;
+                    Random rand = new Random();
+
+                    int[] inputAndHiddenNodeIndexes = InputAndHiddenNodeIndexes;
+                    int[] outputAndHiddenNodeIndexes = OutputAndHiddenNodeIndexes;
+
+                    int connectionOriginIndex = inputAndHiddenNodeIndexes[rand.Next(0, inputAndHiddenNodeIndexes.Length)];
+                    int connectionTargetIndex = outputAndHiddenNodeIndexes[rand.Next(0, outputAndHiddenNodeIndexes.Length)];
+
+                    if (connectionOriginIndex != connectionTargetIndex && !ContainConnection(connectionOriginIndex, connectionTargetIndex))
+                    {
+                        Connections.Add(new BrainNodeConnection() { OriginIndex = connectionOriginIndex, TargetIndex = connectionTargetIndex, Weight = rand.NextDouble() * 4d - 2d });
+                        return true;
+                    }
+                    else return false;
                 }
-                else return false;
+                else
+                {
+                    int fallbackMutationType = WeightedSelector(settings.AnimalMutationTypeWeightsAddConnectionMutationFallback);
+
+                    if (fallbackMutationType == 0) return RemoveConnectionMutation();
+                    if (fallbackMutationType == 1) return ChangeConnectionOriginMutation();
+                    if (fallbackMutationType == 2) return ChangeConnectionTargetMutation();
+                    if (fallbackMutationType == 3) return ChangeConnectionWeightMutation();
+                }
             }
-            else return false;
+            
+            return false;
         }
         public bool RemoveConnectionMutation()
         {
@@ -314,7 +340,8 @@ namespace Paramecium.Engine
 
                 return true;
             }
-            else return false;
+            
+            return false;
         }
         public bool ChangeConnectionOriginMutation()
         {
@@ -335,7 +362,8 @@ namespace Paramecium.Engine
                 }
                 else return false;
             }
-            else return false;
+            
+            return false;
         }
         public bool ChangeConnectionTargetMutation()
         {
@@ -356,7 +384,8 @@ namespace Paramecium.Engine
                 }
                 else return false;
             }
-            else return false;
+            
+            return false;
         }
         public bool ChangeConnectionWeightMutation()
         {
@@ -371,7 +400,8 @@ namespace Paramecium.Engine
 
                 return true;
             }
-            else return false;
+            
+            return false;
         }
 
         public void RemoveInvalidNode()

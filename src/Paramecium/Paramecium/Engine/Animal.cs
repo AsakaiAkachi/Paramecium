@@ -10,7 +10,9 @@ namespace Paramecium.Engine
         public int Index { get; set; } = -1;                        // セルのインデックス
         public long Id { get; set; } = -1;                          // セルのID
 
+        public Double4d SpeciesSignature { get; set; } = new Double4d(1d, 1d, 1d, 1d);      // セルの種族シグネチャ
         public int Generation { get; set; } = 1;                    // セルの世代数
+        public long MutationCount { get; set; } = 0;                // セルの累計突然変異数
         public int Age { get; set; } = 0;                           // セルの年齢
         public int OffspringCount { get; set; } = 0;                // 子孫の数
 
@@ -25,11 +27,12 @@ namespace Paramecium.Engine
         public double Mass { get; set; } = 0;                       // セルの質量
 
         public double ElementLossRate { get; set; } = 0;            // エレメントの消費速度
+        public double ReproductionRate { get; set; } = 0;           // 繁殖の進捗速度
 
+        public int Ate { get; set; } = 0;                           // セルが最後に行った植物を食べる試みが成功したかどうか
         public int TimeSinceLastAttacked { get; set; } = 0;         // セルが最後に攻撃されてからの経過時間
-
-        public Double4d SpeciesSignature { get; set; } = new Double4d(1d, 1d, 1d, 1d);      // セルの種族シグネチャ
-        public long MutationCount { get; set; } = 0;                // セルの累計突然変異数
+        public double LastAttackedAngle { get; set; } = 0;          // セルが最後に攻撃された時の攻撃方向の相対角度
+        public int AttackSuccessful { get; set; } = 0;              // セルが最後に行った攻撃が成功したかどうか
 
         public Brain Brain { get; set; } = new Brain();             // セルのニューラルネット
 
@@ -52,7 +55,7 @@ namespace Paramecium.Engine
 
             TimeSinceLastAttacked = settings.AnimalUnderAttackTime;
 
-            SpeciesSignature = new Double4d(rand.NextDouble(), rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
+            SpeciesSignature = new Double4d(Math.Round(rand.NextDouble(), 6), Math.Round(rand.NextDouble(), 6), Math.Round(rand.NextDouble(), 6), Math.Round(rand.NextDouble(), 6));
 
             Brain = Brain.DefaultBrain;
         }
@@ -89,7 +92,7 @@ namespace Paramecium.Engine
                     {
                         MutationCount++;
 
-                        SpeciesSignature = new Double4d(rand.NextDouble(), rand.NextDouble(), rand.NextDouble(), rand.NextDouble());
+                        if (!settings.AnimalDisableSpeciesSigChangeByMutation) SpeciesSignature = new Double4d(Math.Round(rand.NextDouble(), 6), Math.Round(rand.NextDouble(), 6), Math.Round(rand.NextDouble(), 6), Math.Round(rand.NextDouble(), 6));
                     }
                     if (rand.NextDouble() > settings.AnimalMutationCountFactor) break;
                 }
@@ -101,12 +104,15 @@ namespace Paramecium.Engine
             if (IsAlive)
             {
                 Age += 1;
+
                 if (Age < 0)
                 {
                     Radius = double.Lerp(0.5d, 0.5d * settings.AnimalEggRadiusRatio, -Age / (double)settings.AnimalEggHatchingTime);
                 }
+                else Radius = 0.5d;
 
                 TimeSinceLastAttacked++;
+                if (TimeSinceLastAttacked >= settings.AnimalUnderAttackTime) LastAttackedAngle = 0;
             }
         }
 
@@ -131,8 +137,13 @@ namespace Paramecium.Engine
                     VisionData = animalVisionOutput,
                     Velocity = double.Min(1d, Velocity.Magnitude / settings.MaximumEffectiveVelocity),
                     AngularVelocity = double.Min(1d, AngularVelocity / settings.MaximumEffectiveAngularVelocity),
-                    Satiety = Element / settings.AnimalForkCost,
-                    Attacked = Math.Ceiling(double.Max(0d, settings.AnimalUnderAttackTime - TimeSinceLastAttacked) / (double)settings.AnimalUnderAttackTime)
+                    Element = Element / settings.AnimalReproductionCost,
+                    ReproductionProgress = ReproductionProgress / settings.AnimalReproductionCost,
+                    Age = Age / (double)settings.AnimalLifespan,
+                    Ate = Ate,
+                    Attacked = Math.Ceiling(double.Max(0d, settings.AnimalUnderAttackTime - TimeSinceLastAttacked) / settings.AnimalUnderAttackTime),
+                    AttackedAngle = LastAttackedAngle,
+                    AttackSuccessful = AttackSuccessful,
                 };
 
                 Brain.UpdateBrain(brainInput);
@@ -154,10 +165,10 @@ namespace Paramecium.Engine
                 SoupObjectType attackTargetType = SoupObjectType.None;
                 double attackTargetAngleAbs = 2;
 
-                // セルが属しているタイルを中心とした3x3タイルにある植物に対して衝突判定の処理を行う
-                for (int x = -1; x <= 1; x++)
+                // セルが属しているタイルを中心とした5x5タイルにある動植物に対して衝突判定の処理を行う
+                for (int x = -2; x <= 2; x++)
                 {
-                    for (int y = -1; y <= 1; y++)
+                    for (int y = -2; y <= 2; y++)
                     {
                         // 現在処理の対象になっているタイルの位置を取得
                         Int2d targetTilePosition = tilePosition + new Int2d(x, y);
@@ -195,8 +206,6 @@ namespace Paramecium.Engine
                                         Double2d targetPosition = targetPlant.Position;
                                         double targetMass = targetPlant.Mass;
 
-                                        double distance = Double2d.Distance(Position, targetPosition);
-
                                         Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
 
                                         // ニューラルネットのEat出力の値が0より大きくかつEat出力の値がAttack出力の値より大きい場合、正面にある植物をターゲットとしてマークする
@@ -204,7 +213,7 @@ namespace Paramecium.Engine
                                         {
                                             double targetAngleAbs = double.Abs(Double2d.ToAngle01(Double2d.Rotate01(targetPosition - Position, -Angle)));
 
-                                            if (targetAngleAbs < 0.125d && Double2d.DistanceSquared(Position, targetPosition) < (Radius + targetRadius + 0.1d) * (Radius + targetRadius + 0.1d))
+                                            if (targetAngleAbs <= 0.125d && Double2d.DistanceSquared(Position, targetPosition) < (Radius + targetRadius + 0.25d) * (Radius + targetRadius + 0.25d))
                                             {
                                                 if (targetAngleAbs < attackTargetAngleAbs)
                                                 {
@@ -234,7 +243,7 @@ namespace Paramecium.Engine
                                             Double2d targetPosition = targetAnimal.Position;
                                             double targetMass = targetAnimal.Mass;
 
-                                            double distance = Double2d.Distance(Position, targetPosition);
+                                            double distanceSqr = Double2d.DistanceSquared(Position, targetPosition);
 
                                             Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
 
@@ -243,7 +252,7 @@ namespace Paramecium.Engine
                                             {
                                                 double targetAngleAbs = double.Abs(Double2d.ToAngle01(Double2d.Rotate01(targetPosition - Position, -Angle)));
 
-                                                if (targetAngleAbs < 0.125d && Double2d.DistanceSquared(Position, targetPosition) < (Radius + targetRadius + 0.1d) * (Radius + targetRadius + 0.1d))
+                                                if (targetAngleAbs <= 0.125d && distanceSqr < (Radius + targetRadius + 0.25d) * (Radius + targetRadius + 0.25d))
                                                 {
                                                     if (targetAngleAbs < attackTargetAngleAbs)
                                                     {
@@ -261,6 +270,8 @@ namespace Paramecium.Engine
                     }
                 }
 
+                Ate = 0;
+
                 if (attackTargetType == SoupObjectType.Plant)
                 {
                     Plant? targetPlant = soup.Plants[attackTargetIndex];
@@ -270,8 +281,12 @@ namespace Paramecium.Engine
                         double elementBuffer = 0d;
                         lock (targetPlant.LockObject)
                         {
-                            elementBuffer += double.Min(settings.AnimalPlantIngestionRate, targetPlant.Element);
+                            elementBuffer += double.Max(double.Min(double.Min(settings.AnimalPlantIngestionRate, targetPlant.Element), settings.AnimalMaximumElementAmount - Element), 0d);
                             targetPlant.Element -= elementBuffer;
+
+                            targetPlant.TimeSinceLastAttacked = 0;
+
+                            Ate = 1;
                         }
 
                         lock (LockObject)
@@ -280,6 +295,9 @@ namespace Paramecium.Engine
                         }
                     }
                 }
+
+                AttackSuccessful = 0;
+
                 if (attackTargetType == SoupObjectType.Animal)
                 {
                     Animal? targetAnimal = soup.Animals[attackTargetIndex];
@@ -289,10 +307,19 @@ namespace Paramecium.Engine
                         double elementBuffer = 0d;
                         lock (targetAnimal.LockObject)
                         {
-                            elementBuffer += double.Min(settings.AnimalAnimalIngestionRate, targetAnimal.Element);
-                            targetAnimal.Element -= elementBuffer;
+                            double fromTargetAngle = Double2d.ToAngle01(Double2d.Rotate01(Position - targetAnimal.Position, -targetAnimal.Angle));
 
                             targetAnimal.TimeSinceLastAttacked = 0;
+                            targetAnimal.LastAttackedAngle = fromTargetAngle;
+
+                            // 実際にエレメントを奪い取るためには「相手がこちらを向いていない」または「自身のNNのAttack出力の値が相手のNNのAttack出力の値より大きい」必要がある
+                            if (double.Abs(fromTargetAngle) > 0.125d || Brain.Output.Attack > targetAnimal.Brain.Output.Attack)
+                            {
+                                elementBuffer += double.Max(double.Min(double.Min(settings.AnimalAnimalIngestionRate, targetAnimal.Element), settings.AnimalMaximumElementAmount - Element), 0d);
+                                targetAnimal.Element -= elementBuffer;
+
+                                AttackSuccessful = 1;
+                            }
                         }
 
                         lock (LockObject)
@@ -378,33 +405,32 @@ namespace Paramecium.Engine
                     elementCost += settings.AnimalElementAccelerationCost * double.Min(1d, double.Abs(Brain.Output.Acceleration));
                     elementCost += settings.AnimalElementRotationCost * double.Min(1d, double.Abs(Brain.Output.Rotation));
                     if (Brain.Output.Eat > 0 && Brain.Output.Eat > Brain.Output.Attack) elementCost += settings.AnimalElementEatCost;
-                    if (Brain.Output.Attack > 0 && Brain.Output.Attack > Brain.Output.Eat) elementCost += settings.AnimalElementAttackCost;
-                    if (Brain.Output.PheromoneRedProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneRedProduction) * settings.AnimalElementPheromoneProductionCost / 3d;
-                    if (Brain.Output.PheromoneGreenProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneGreenProduction) * settings.AnimalElementPheromoneProductionCost / 3d;
-                    if (Brain.Output.PheromoneBlueProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneBlueProduction) * settings.AnimalElementPheromoneProductionCost / 3d;
+                    if (Brain.Output.Attack > 0 && Brain.Output.Attack > Brain.Output.Eat) elementCost += settings.AnimalElementAttackCost * double.Max(1d, Math.Sqrt(Brain.Output.Attack));
+                    if (Brain.Output.PheromoneRedProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneRedProduction) * settings.AnimalElementPheromoneProductionCost;
+                    if (Brain.Output.PheromoneGreenProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneGreenProduction) * settings.AnimalElementPheromoneProductionCost;
+                    if (Brain.Output.PheromoneBlueProduction > 0) elementCost += double.Min(1d, Brain.Output.PheromoneBlueProduction) * settings.AnimalElementPheromoneProductionCost;
 
-                    double elementBuffer = double.Min(Element, elementCost);
-                    Element -= elementBuffer;
+                    elementCost = double.Min(Element, elementCost);
+                    Element -= elementCost;
 
+                    double reproductionRate = 0;
+                    if (Brain.Output.Reproduction > 0) reproductionRate = double.Min(Element, settings.AnimalMaximumReproductionRate * double.Max(0d, double.Min(1d, Brain.Output.Reproduction)));
+                    Element -= reproductionRate;
+                    ReproductionProgress += reproductionRate;
 
                     lock (targetTile.LockObject)
                     {
-                        targetTile.Element += elementBuffer * soup.ElementAmountMultiplier;
+                        targetTile.Element += elementCost * soup.ElementAmountMultiplier;
 
                         targetTile.PheromoneRed += double.Max(0d, double.Min(1d, Brain.Output.PheromoneRedProduction)) * settings.AnimalPheromoneProductionRate;
                         targetTile.PheromoneGreen += double.Max(0d, double.Min(1d, Brain.Output.PheromoneGreenProduction)) * settings.AnimalPheromoneProductionRate;
                         targetTile.PheromoneBlue += double.Max(0d, double.Min(1d, Brain.Output.PheromoneBlueProduction)) * settings.AnimalPheromoneProductionRate;
                     }
 
-                    if (Element > settings.AnimalForkCost)
-                    {
-                        ReproductionProgress += Element - settings.AnimalForkCost;
-                        Element = 16d;
-                    }
-
                     Mass = Element + ReproductionProgress;
 
-                    ElementLossRate = -elementBuffer;
+                    ElementLossRate = -(elementCost + reproductionRate);
+                    ReproductionRate = reproductionRate;
                 }
             }
         }
@@ -415,13 +441,13 @@ namespace Paramecium.Engine
             if (IsAlive)
             {
                 // エレメントの量がPlantMaximumElementAmount以上であれば子孫を生成して自身は死滅する
-                if (ReproductionProgress >= settings.AnimalForkCost)
+                if (ReproductionProgress >= settings.AnimalReproductionCost)
                 {
                     Random rand = new Random();
 
-                    Animal result = new Animal(settings, Position + Double2d.FromAngle01(Angle + 0.5d) * 0.25d, Angle + 0.5d, settings.AnimalForkCost * soup.ElementAmountMultiplier, this);
+                    Animal result = new Animal(settings, Position + Double2d.FromAngle01(Angle + 0.5d) * 0.25d, Angle + 0.5d, settings.AnimalReproductionCost, this);
 
-                    ReproductionProgress -= settings.AnimalForkCost;
+                    ReproductionProgress -= settings.AnimalReproductionCost;
 
                     OffspringCount++;
 

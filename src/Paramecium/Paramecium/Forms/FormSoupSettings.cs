@@ -21,23 +21,23 @@ namespace Paramecium.Forms
 
             if (soupIsCreated)
             {
-                SoupSettingsItem_SizeX.Enabled = false;
-                SoupSettingsItem_SizeY.Enabled = false;
+                SoupSettingsItem_SizeX.Editable = false;
+                SoupSettingsItem_SizeY.Editable = false;
 
-                SoupSettingsItem_WallEnabled.Enabled = false;
+                SoupSettingsItem_WallEnabled.Editable = false;
                 ButtonRandomizeWallNoiseOffset.Enabled = false;
-                SoupSettingsItem_WallNoiseOffsetX.Enabled = false;
-                SoupSettingsItem_WallNoiseOffsetY.Enabled = false;
-                SoupSettingsItem_WallNoiseOffsetZ.Enabled = false;
-                SoupSettingsItem_WallNoiseSamplingInterval.Enabled = false;
-                SoupSettingsItem_WallNoiseOctave.Enabled = false;
-                SoupSettingsItem_WallThickness.Enabled = false;
+                SoupSettingsItem_WallNoiseOffsetX.Editable = false;
+                SoupSettingsItem_WallNoiseOffsetY.Editable = false;
+                SoupSettingsItem_WallNoiseOffsetZ.Editable = false;
+                SoupSettingsItem_WallNoiseSamplingInterval.Editable = false;
+                SoupSettingsItem_WallNoiseOctave.Editable = false;
+                SoupSettingsItem_WallThickness.Editable = false;
 
-                SoupSettingsItem_TotalElementAmount.Enabled = false;
+                SoupSettingsItem_TotalElementAmount.Editable = false;
 
-                SoupSettingsItem_PlantInitialPopulation.Enabled = false;
+                SoupSettingsItem_PlantInitialPopulation.Editable = false;
 
-                SoupSettingsItem_AnimalInitialPopulation.Enabled = false;
+                SoupSettingsItem_AnimalInitialPopulation.Editable = false;
             }
 
             if (_soupSettingsSetter.SoupSettings is not null)
@@ -127,13 +127,15 @@ namespace Paramecium.Forms
 
             SoupSettingsItem_PlantMaximumElementAmount.InputValueDouble = soupSettings.PlantMaximumElementAmount;
             SoupSettingsItem_ElementCollectRate.InputValueDouble = soupSettings.PlantElementCollectRate;
+            SoupSettingsItem_PlantUnderAttackTime.InputValueInt = soupSettings.PlantUnderAttackTime;
 
             SoupSettingsItem_PlantSpreadingTime.InputValueInt = soupSettings.PlantSpreadingTime;
-            SoupSettingsItem_PlantForkOffspringCountMin.InputValueInt = soupSettings.PlantForkOffspringCountMin;
-            SoupSettingsItem_PlantForkOffspringCountMax.InputValueInt = soupSettings.PlantForkOffspringCountMax;
+            SoupSettingsItem_PlantDivisionCountMin.InputValueInt = soupSettings.PlantDivisionCountMin;
+            SoupSettingsItem_PlantDivisionCountMax.InputValueInt = soupSettings.PlantDivisionCountMax;
 
             if (!dontLoadImmutableItems) SoupSettingsItem_AnimalInitialPopulation.InputValueInt = soupSettings.InitialAnimalPopulation;
 
+            SoupSettingsItem_AnimalMaximumElementAmount.InputValueDouble = soupSettings.AnimalMaximumElementAmount;
             SoupSettingsItem_AnimalElementBaseCost.InputValueDouble = soupSettings.AnimalElementBaseCost;
             SoupSettingsItem_AnimalElementAccelerationCost.InputValueDouble = soupSettings.AnimalElementAccelerationCost;
             SoupSettingsItem_AnimalElementRotationCost.InputValueDouble = soupSettings.AnimalElementRotationCost;
@@ -151,7 +153,8 @@ namespace Paramecium.Forms
             SoupSettingsItem_AnimalPlantIngestionRate.InputValueDouble = soupSettings.AnimalPlantIngestionRate;
             SoupSettingsItem_AnimalAnimalIngestionRate.InputValueDouble = soupSettings.AnimalAnimalIngestionRate;
 
-            SoupSettingsItem_AnimalForkCost.InputValueDouble = soupSettings.AnimalForkCost;
+            SoupSettingsItem_AnimalReproductionCost.InputValueDouble = soupSettings.AnimalReproductionCost;
+            SoupSettingsItem_AnimalMaximumReproductionRate.InputValueDouble = soupSettings.AnimalMaximumReproductionRate;
             SoupSettingsItem_AnimalEggHatchingTime.InputValueInt = soupSettings.AnimalEggHatchingTime;
             SoupSettingsItem_AnimalEggRadiusRatio.InputValueDouble = soupSettings.AnimalEggRadiusRatio;
 
@@ -163,6 +166,7 @@ namespace Paramecium.Forms
             SoupSettingsItem_AnimalMutationRate.InputValueDouble = soupSettings.AnimalMutationRate;
             SoupSettingsItem_AnimalMaximumMutationCount.InputValueInt = soupSettings.AnimalMaximumMutationCount;
             SoupSettingsItem_AnimalMutationCountFactor.InputValueDouble = soupSettings.AnimalMutationCountFactor;
+            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Checked = soupSettings.AnimalDisableSpeciesSigChangeByMutation;
 
             SoupSettingsItem_AnimalMutationAddNodeWeight.InputValueDouble = soupSettings.AnimalMutationAddNodeWeight;
             SoupSettingsItem_AnimalMutationRemoveNodeWeight.InputValueDouble = soupSettings.AnimalMutationRemoveNodeWeight;
@@ -211,13 +215,15 @@ namespace Paramecium.Forms
 
             result.PlantMaximumElementAmount = SoupSettingsItem_PlantMaximumElementAmount.InputValueDouble;
             result.PlantElementCollectRate = SoupSettingsItem_ElementCollectRate.InputValueDouble;
+            result.PlantUnderAttackTime = SoupSettingsItem_PlantUnderAttackTime.InputValueInt;
 
             result.PlantSpreadingTime = SoupSettingsItem_PlantSpreadingTime.InputValueInt;
-            result.PlantForkOffspringCountMin = SoupSettingsItem_PlantForkOffspringCountMin.InputValueInt;
-            result.PlantForkOffspringCountMax = SoupSettingsItem_PlantForkOffspringCountMax.InputValueInt;
+            result.PlantDivisionCountMin = SoupSettingsItem_PlantDivisionCountMin.InputValueInt;
+            result.PlantDivisionCountMax = SoupSettingsItem_PlantDivisionCountMax.InputValueInt;
 
             result.InitialAnimalPopulation = SoupSettingsItem_AnimalInitialPopulation.InputValueInt;
 
+            result.AnimalMaximumElementAmount = SoupSettingsItem_AnimalMaximumElementAmount.InputValueDouble;
             result.AnimalElementBaseCost = SoupSettingsItem_AnimalElementBaseCost.InputValueDouble;
             result.AnimalElementAccelerationCost = SoupSettingsItem_AnimalElementAccelerationCost.InputValueDouble;
             result.AnimalElementRotationCost = SoupSettingsItem_AnimalElementRotationCost.InputValueDouble;
@@ -235,7 +241,8 @@ namespace Paramecium.Forms
             result.AnimalPlantIngestionRate = SoupSettingsItem_AnimalPlantIngestionRate.InputValueDouble;
             result.AnimalAnimalIngestionRate = SoupSettingsItem_AnimalAnimalIngestionRate.InputValueDouble;
 
-            result.AnimalForkCost = SoupSettingsItem_AnimalForkCost.InputValueDouble;
+            result.AnimalReproductionCost = SoupSettingsItem_AnimalReproductionCost.InputValueDouble;
+            result.AnimalMaximumReproductionRate = SoupSettingsItem_AnimalMaximumReproductionRate.InputValueDouble;
             result.AnimalEggHatchingTime = SoupSettingsItem_AnimalEggHatchingTime.InputValueInt;
             result.AnimalEggRadiusRatio = SoupSettingsItem_AnimalEggRadiusRatio.InputValueDouble;
 
@@ -247,6 +254,7 @@ namespace Paramecium.Forms
             result.AnimalMutationRate = SoupSettingsItem_AnimalMutationRate.InputValueDouble;
             result.AnimalMaximumMutationCount = SoupSettingsItem_AnimalMaximumMutationCount.InputValueInt;
             result.AnimalMutationCountFactor = SoupSettingsItem_AnimalMutationCountFactor.InputValueDouble;
+            result.AnimalDisableSpeciesSigChangeByMutation = SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Checked;
 
             result.AnimalMutationAddNodeWeight = SoupSettingsItem_AnimalMutationAddNodeWeight.InputValueDouble;
             result.AnimalMutationRemoveNodeWeight = SoupSettingsItem_AnimalMutationRemoveNodeWeight.InputValueDouble;

@@ -31,11 +31,27 @@ namespace Paramecium.Engine
                     case BrainNodeFunction.Input_AngularVelocity:
                         Output = brainInput.AngularVelocity;
                         break;
-                    case BrainNodeFunction.Input_Satiety:
-                        Output = brainInput.Satiety;
+                    case BrainNodeFunction.Input_Element:
+                        Output = brainInput.Element;
+                        break;
+                    case BrainNodeFunction.Input_ReproductionProgress:
+                        Output = brainInput.ReproductionProgress;
+                        break;
+                    case BrainNodeFunction.Input_Age:
+                        Output = brainInput.Age;
+                        break;
+
+                    case BrainNodeFunction.Input_Ate:
+                        Output = brainInput.Ate;
                         break;
                     case BrainNodeFunction.Input_Attacked:
                         Output = brainInput.Attacked;
+                        break;
+                    case BrainNodeFunction.Input_AttackdAngle:
+                        Output = brainInput.AttackedAngle;
+                        break;
+                    case BrainNodeFunction.Input_AttackSuccessful:
+                        Output = brainInput.AttackSuccessful;
                         break;
 
                     case BrainNodeFunction.Input_WallWAvgAngle:
@@ -87,58 +103,6 @@ namespace Paramecium.Engine
                     case BrainNodeFunction.Input_PheromoneBlueGradAngle:
                         Output = brainInput.VisionData.PheromoneBlueGradAngle;
                         break;
-
-                    /**
-                    case BrainNodeFunction.Input_Memory0:
-                        Output = brainInput.PrevStepOutput.Memory0;
-                        break;
-                    case BrainNodeFunction.Input_Memory1:
-                        Output = brainInput.PrevStepOutput.Memory1;
-                        break;
-                    case BrainNodeFunction.Input_Memory2:
-                        Output = brainInput.PrevStepOutput.Memory2;
-                        break;
-                    case BrainNodeFunction.Input_Memory3:
-                        Output = brainInput.PrevStepOutput.Memory3;
-                        break;
-                    case BrainNodeFunction.Input_Memory4:
-                        Output = brainInput.PrevStepOutput.Memory4;
-                        break;
-                    case BrainNodeFunction.Input_Memory5:
-                        Output = brainInput.PrevStepOutput.Memory5;
-                        break;
-                    case BrainNodeFunction.Input_Memory6:
-                        Output = brainInput.PrevStepOutput.Memory6;
-                        break;
-                    case BrainNodeFunction.Input_Memory7:
-                        Output = brainInput.PrevStepOutput.Memory7;
-                        break;
-
-                    case BrainNodeFunction.Input_InheritedMemory0:
-                        Output = brain.InheritedMemory0;
-                        break;
-                    case BrainNodeFunction.Input_InheritedMemory1:
-                        Output = brain.InheritedMemory1;
-                        break;
-                    case BrainNodeFunction.Input_InheritedMemory2:
-                        Output = brain.InheritedMemory2;
-                        break;
-                    case BrainNodeFunction.Input_InheritedMemory3:
-                        Output = brain.InheritedMemory3;
-                        break;
-                    case BrainNodeFunction.Input_InheritedMemory4:
-                        Output = brain.InheritedMemory4;
-                        break;
-                    case BrainNodeFunction.Input_InheritedMemory5:
-                        Output = brain.InheritedMemory5;
-                        break;
-                    case BrainNodeFunction.Input_InheritedMemory6:
-                        Output = brain.InheritedMemory6;
-                        break;
-                    case BrainNodeFunction.Input_InheritedMemory7:
-                        Output = brain.InheritedMemory7;
-                        break;
-                    **/
                 }
             }
         }
@@ -214,6 +178,10 @@ namespace Paramecium.Engine
                         brainOutput.Attack += Input;
                         break;
 
+                    case BrainNodeFunction.Output_Reproduction:
+                        brainOutput.Reproduction += Input;
+                        break;
+
                     case BrainNodeFunction.Output_PheromoneRedProduction:
                         brainOutput.PheromoneRedProduction += Input;
                         break;
@@ -223,58 +191,6 @@ namespace Paramecium.Engine
                     case BrainNodeFunction.Output_PheromoneBlueProduction:
                         brainOutput.PheromoneBlueProduction += Input;
                         break;
-
-                    /**
-                    case BrainNodeFunction.Output_Memory0:
-                        brainOutput.Memory0 += Input;
-                        break;
-                    case BrainNodeFunction.Output_Memory1:
-                        brainOutput.Memory1 += Input;
-                        break;
-                    case BrainNodeFunction.Output_Memory2:
-                        brainOutput.Memory2 += Input;
-                        break;
-                    case BrainNodeFunction.Output_Memory3:
-                        brainOutput.Memory3 += Input;
-                        break;
-                    case BrainNodeFunction.Output_Memory4:
-                        brainOutput.Memory4 += Input;
-                        break;
-                    case BrainNodeFunction.Output_Memory5:
-                        brainOutput.Memory5 += Input;
-                        break;
-                    case BrainNodeFunction.Output_Memory6:
-                        brainOutput.Memory6 += Input;
-                        break;
-                    case BrainNodeFunction.Output_Memory7:
-                        brainOutput.Memory7 += Input;
-                        break;
-
-                    case BrainNodeFunction.Output_InheritedMemory0:
-                        brainOutput.InheritedMemory0 += Input;
-                        break;
-                    case BrainNodeFunction.Output_InheritedMemory1:
-                        brainOutput.InheritedMemory1 += Input;
-                        break;
-                    case BrainNodeFunction.Output_InheritedMemory2:
-                        brainOutput.InheritedMemory2 += Input;
-                        break;
-                    case BrainNodeFunction.Output_InheritedMemory3:
-                        brainOutput.InheritedMemory3 += Input;
-                        break;
-                    case BrainNodeFunction.Output_InheritedMemory4:
-                        brainOutput.InheritedMemory4 += Input;
-                        break;
-                    case BrainNodeFunction.Output_InheritedMemory5:
-                        brainOutput.InheritedMemory5 += Input;
-                        break;
-                    case BrainNodeFunction.Output_InheritedMemory6:
-                        brainOutput.InheritedMemory6 += Input;
-                        break;
-                    case BrainNodeFunction.Output_InheritedMemory7:
-                        brainOutput.InheritedMemory7 += Input;
-                        break;
-                    **/
                 }
             }
         }
