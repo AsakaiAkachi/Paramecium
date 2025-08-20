@@ -2,6 +2,7 @@
 
 namespace Paramecium.Variables
 {
+    // Int型2次元ベクトル、主にタイルの位置の表現や画像の描画に使用
     public struct Int2d
     {
         public int X { get; set; }

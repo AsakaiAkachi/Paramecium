@@ -44,6 +44,12 @@
             TopMenu_Soup_ThreadCountDec = new ToolStripMenuItem();
             TopMenu_Soup_Separator1 = new ToolStripSeparator();
             TopMenu_Soup_EditSoupSettings = new ToolStripMenuItem();
+            TopMenu_Edit = new ToolStripMenuItem();
+            TopMenu_Edit_CopySelectedCell = new ToolStripMenuItem();
+            TopMenu_Edit_CutSelectedCell = new ToolStripMenuItem();
+            TopMenu_Edit_PasteSelectedCell = new ToolStripMenuItem();
+            TopMenu_Edit_KillSelectedCell = new ToolStripMenuItem();
+            TopMenu_Edit_MoveSelectedCell = new ToolStripMenuItem();
             TopMenu_View = new ToolStripMenuItem();
             TopMenu_View_ZoomIn = new ToolStripMenuItem();
             TopMenu_View_ZoomOut = new ToolStripMenuItem();
@@ -54,9 +60,17 @@
             TopMenu_View_AutoSelectTrackedCells = new ToolStripMenuItem();
             TopMenu_View_Separator2 = new ToolStripSeparator();
             TopMenu_View_ToggleFullScreen = new ToolStripMenuItem();
+            TopMenu_View_ToggleOverlays = new ToolStripMenuItem();
+            TopMenu_View_ToggleOverlays_AllOverlays = new ToolStripMenuItem();
+            TopMenu_View_ToggleOverlays_SelectedObject = new ToolStripMenuItem();
+            TopMenu_View_ToggleOverlays_BrainDiagram = new ToolStripMenuItem();
+            TopMenu_View_ToggleOverlays_BrainInputOutput = new ToolStripMenuItem();
+            TopMenu_View_ToggleOverlays_FullScreenOverlay = new ToolStripMenuItem();
             TopMenu_Window = new ToolStripMenuItem();
             TopMenu_Window_AutosaveSettings = new ToolStripMenuItem();
             TopMenu_Window_ObjectEditor = new ToolStripMenuItem();
+            TopMenu_Help = new ToolStripMenuItem();
+            TopMenu_Help_AboutParamecium = new ToolStripMenuItem();
             BottomStat = new StatusStrip();
             BottomStat_SoupState = new ToolStripStatusLabel();
             BottomStat_TimeSteps = new ToolStripStatusLabel();
@@ -68,6 +82,7 @@
             SoupView = new PictureBox();
             LoadSoupDialog = new OpenFileDialog();
             SaveSoupDialog = new SaveFileDialog();
+            TopMenu_Edit_Separator1 = new ToolStripSeparator();
             TopMenu.SuspendLayout();
             BottomStat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SoupView).BeginInit();
@@ -76,7 +91,7 @@
             // TopMenu
             // 
             TopMenu.BackColor = Color.White;
-            TopMenu.Items.AddRange(new ToolStripItem[] { TopMenu_File, TopMenu_Soup, TopMenu_View, TopMenu_Window });
+            TopMenu.Items.AddRange(new ToolStripItem[] { TopMenu_File, TopMenu_Soup, TopMenu_Edit, TopMenu_View, TopMenu_Window, TopMenu_Help });
             TopMenu.Location = new Point(0, 0);
             TopMenu.Name = "TopMenu";
             TopMenu.Size = new Size(1200, 24);
@@ -87,6 +102,7 @@
             // 
             TopMenu_File.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_File_New, TopMenu_File_Open, TopMenu_File_Save, TopMenu_File_SaveAs, TopMenu_File_Separator1, TopMenu_File_Exit });
             TopMenu_File.Name = "TopMenu_File";
+            TopMenu_File.ShortcutKeyDisplayString = "";
             TopMenu_File.Size = new Size(37, 20);
             TopMenu_File.Text = "File";
             // 
@@ -188,9 +204,56 @@
             TopMenu_Soup_EditSoupSettings.Text = "Edit Soup Settings";
             TopMenu_Soup_EditSoupSettings.Click += TopMenu_Soup_EditSoupSettings_Click;
             // 
+            // TopMenu_Edit
+            // 
+            TopMenu_Edit.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Edit_CopySelectedCell, TopMenu_Edit_CutSelectedCell, TopMenu_Edit_PasteSelectedCell, TopMenu_Edit_KillSelectedCell, TopMenu_Edit_Separator1, TopMenu_Edit_MoveSelectedCell });
+            TopMenu_Edit.Enabled = false;
+            TopMenu_Edit.Name = "TopMenu_Edit";
+            TopMenu_Edit.Size = new Size(39, 20);
+            TopMenu_Edit.Text = "Edit";
+            // 
+            // TopMenu_Edit_CopySelectedCell
+            // 
+            TopMenu_Edit_CopySelectedCell.Name = "TopMenu_Edit_CopySelectedCell";
+            TopMenu_Edit_CopySelectedCell.ShortcutKeyDisplayString = "Crtl+C";
+            TopMenu_Edit_CopySelectedCell.Size = new Size(211, 22);
+            TopMenu_Edit_CopySelectedCell.Text = "Copy Selected Cell";
+            TopMenu_Edit_CopySelectedCell.Click += TopMenu_Edit_CopySelectedCell_Click;
+            // 
+            // TopMenu_Edit_CutSelectedCell
+            // 
+            TopMenu_Edit_CutSelectedCell.Name = "TopMenu_Edit_CutSelectedCell";
+            TopMenu_Edit_CutSelectedCell.ShortcutKeyDisplayString = "Crtl+X";
+            TopMenu_Edit_CutSelectedCell.Size = new Size(211, 22);
+            TopMenu_Edit_CutSelectedCell.Text = "Cut Selected Cell";
+            TopMenu_Edit_CutSelectedCell.Click += TopMenu_Edit_CutSelectedCell_Click;
+            // 
+            // TopMenu_Edit_PasteSelectedCell
+            // 
+            TopMenu_Edit_PasteSelectedCell.Name = "TopMenu_Edit_PasteSelectedCell";
+            TopMenu_Edit_PasteSelectedCell.ShortcutKeyDisplayString = "Crtl+V";
+            TopMenu_Edit_PasteSelectedCell.Size = new Size(211, 22);
+            TopMenu_Edit_PasteSelectedCell.Text = "Paste Selected Cell";
+            TopMenu_Edit_PasteSelectedCell.Click += TopMenu_Edit_PasteSelectedCell_Click;
+            // 
+            // TopMenu_Edit_KillSelectedCell
+            // 
+            TopMenu_Edit_KillSelectedCell.Name = "TopMenu_Edit_KillSelectedCell";
+            TopMenu_Edit_KillSelectedCell.ShortcutKeyDisplayString = "Crtl+D";
+            TopMenu_Edit_KillSelectedCell.Size = new Size(211, 22);
+            TopMenu_Edit_KillSelectedCell.Text = "Kill Selected Cell";
+            TopMenu_Edit_KillSelectedCell.Click += TopMenu_Edit_KillSelectedCell_Click;
+            // 
+            // TopMenu_Edit_MoveSelectedCell
+            // 
+            TopMenu_Edit_MoveSelectedCell.Name = "TopMenu_Edit_MoveSelectedCell";
+            TopMenu_Edit_MoveSelectedCell.Size = new Size(211, 22);
+            TopMenu_Edit_MoveSelectedCell.Text = "Move Selected Cell";
+            TopMenu_Edit_MoveSelectedCell.Click += TopMenu_Edit_MoveSelectedCell_Click;
+            // 
             // TopMenu_View
             // 
-            TopMenu_View.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_View_ZoomIn, TopMenu_View_ZoomOut, TopMenu_View_Reset, TopMenu_View_Separator1, TopMenu_View_TrackingSelectedCell, TopMenu_View_TrackingRandomAnimal, TopMenu_View_AutoSelectTrackedCells, TopMenu_View_Separator2, TopMenu_View_ToggleFullScreen });
+            TopMenu_View.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_View_ZoomIn, TopMenu_View_ZoomOut, TopMenu_View_Reset, TopMenu_View_Separator1, TopMenu_View_TrackingSelectedCell, TopMenu_View_TrackingRandomAnimal, TopMenu_View_AutoSelectTrackedCells, TopMenu_View_Separator2, TopMenu_View_ToggleFullScreen, TopMenu_View_ToggleOverlays });
             TopMenu_View.Enabled = false;
             TopMenu_View.Name = "TopMenu_View";
             TopMenu_View.Size = new Size(44, 20);
@@ -199,16 +262,16 @@
             // TopMenu_View_ZoomIn
             // 
             TopMenu_View_ZoomIn.Name = "TopMenu_View_ZoomIn";
-            TopMenu_View_ZoomIn.ShortcutKeyDisplayString = "Ctrl+LClick";
-            TopMenu_View_ZoomIn.Size = new Size(219, 22);
+            TopMenu_View_ZoomIn.ShortcutKeyDisplayString = "Z";
+            TopMenu_View_ZoomIn.Size = new Size(250, 22);
             TopMenu_View_ZoomIn.Text = "Zoom In";
             TopMenu_View_ZoomIn.Click += TopMenu_View_ZoomIn_Click;
             // 
             // TopMenu_View_ZoomOut
             // 
             TopMenu_View_ZoomOut.Name = "TopMenu_View_ZoomOut";
-            TopMenu_View_ZoomOut.ShortcutKeyDisplayString = "Ctrl+RClick";
-            TopMenu_View_ZoomOut.Size = new Size(219, 22);
+            TopMenu_View_ZoomOut.ShortcutKeyDisplayString = "X";
+            TopMenu_View_ZoomOut.Size = new Size(250, 22);
             TopMenu_View_ZoomOut.Text = "Zoom Out";
             TopMenu_View_ZoomOut.Click += TopMenu_View_ZoomOut_Click;
             // 
@@ -216,20 +279,20 @@
             // 
             TopMenu_View_Reset.Name = "TopMenu_View_Reset";
             TopMenu_View_Reset.ShortcutKeyDisplayString = "C";
-            TopMenu_View_Reset.Size = new Size(219, 22);
+            TopMenu_View_Reset.Size = new Size(250, 22);
             TopMenu_View_Reset.Text = "Reset Position and Zoom";
             TopMenu_View_Reset.Click += TopMenu_View_Reset_Click;
             // 
             // TopMenu_View_Separator1
             // 
             TopMenu_View_Separator1.Name = "TopMenu_View_Separator1";
-            TopMenu_View_Separator1.Size = new Size(216, 6);
+            TopMenu_View_Separator1.Size = new Size(247, 6);
             // 
             // TopMenu_View_TrackingSelectedCell
             // 
             TopMenu_View_TrackingSelectedCell.Name = "TopMenu_View_TrackingSelectedCell";
             TopMenu_View_TrackingSelectedCell.ShortcutKeyDisplayString = "T";
-            TopMenu_View_TrackingSelectedCell.Size = new Size(219, 22);
+            TopMenu_View_TrackingSelectedCell.Size = new Size(250, 22);
             TopMenu_View_TrackingSelectedCell.Text = "Tracking Selected Cell";
             TopMenu_View_TrackingSelectedCell.Click += TopMenu_View_TrackingSelectedCell_Click;
             // 
@@ -237,29 +300,77 @@
             // 
             TopMenu_View_TrackingRandomAnimal.Name = "TopMenu_View_TrackingRandomAnimal";
             TopMenu_View_TrackingRandomAnimal.ShortcutKeyDisplayString = "R";
-            TopMenu_View_TrackingRandomAnimal.Size = new Size(219, 22);
+            TopMenu_View_TrackingRandomAnimal.Size = new Size(250, 22);
             TopMenu_View_TrackingRandomAnimal.Text = "Tracking Random Animal";
             TopMenu_View_TrackingRandomAnimal.Click += TopMenu_View_TrackingRandomAnimal_Click;
             // 
             // TopMenu_View_AutoSelectTrackedCells
             // 
             TopMenu_View_AutoSelectTrackedCells.Name = "TopMenu_View_AutoSelectTrackedCells";
-            TopMenu_View_AutoSelectTrackedCells.Size = new Size(219, 22);
+            TopMenu_View_AutoSelectTrackedCells.ShortcutKeyDisplayString = "Shift+R";
+            TopMenu_View_AutoSelectTrackedCells.Size = new Size(250, 22);
             TopMenu_View_AutoSelectTrackedCells.Text = "Auto Select Tracked Cells";
             TopMenu_View_AutoSelectTrackedCells.Click += TopMenu_View_AutoSelectTrackedCells_Click;
             // 
             // TopMenu_View_Separator2
             // 
             TopMenu_View_Separator2.Name = "TopMenu_View_Separator2";
-            TopMenu_View_Separator2.Size = new Size(216, 6);
+            TopMenu_View_Separator2.Size = new Size(247, 6);
             // 
             // TopMenu_View_ToggleFullScreen
             // 
             TopMenu_View_ToggleFullScreen.Name = "TopMenu_View_ToggleFullScreen";
             TopMenu_View_ToggleFullScreen.ShortcutKeyDisplayString = "Crtl+F";
-            TopMenu_View_ToggleFullScreen.Size = new Size(219, 22);
+            TopMenu_View_ToggleFullScreen.Size = new Size(250, 22);
             TopMenu_View_ToggleFullScreen.Text = "Toggle Full Screen";
             TopMenu_View_ToggleFullScreen.Click += TopMenu_View_ToggleFullScreen_Click;
+            // 
+            // TopMenu_View_ToggleOverlays
+            // 
+            TopMenu_View_ToggleOverlays.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_View_ToggleOverlays_AllOverlays, TopMenu_View_ToggleOverlays_SelectedObject, TopMenu_View_ToggleOverlays_BrainDiagram, TopMenu_View_ToggleOverlays_BrainInputOutput, TopMenu_View_ToggleOverlays_FullScreenOverlay });
+            TopMenu_View_ToggleOverlays.Name = "TopMenu_View_ToggleOverlays";
+            TopMenu_View_ToggleOverlays.Size = new Size(250, 22);
+            TopMenu_View_ToggleOverlays.Text = "Toggle Overlays";
+            // 
+            // TopMenu_View_ToggleOverlays_AllOverlays
+            // 
+            TopMenu_View_ToggleOverlays_AllOverlays.Name = "TopMenu_View_ToggleOverlays_AllOverlays";
+            TopMenu_View_ToggleOverlays_AllOverlays.ShortcutKeyDisplayString = "0";
+            TopMenu_View_ToggleOverlays_AllOverlays.Size = new Size(188, 22);
+            TopMenu_View_ToggleOverlays_AllOverlays.Text = "All Overlays";
+            TopMenu_View_ToggleOverlays_AllOverlays.Click += TopMenu_View_ToggleOverlays_AllOverlays_Click;
+            // 
+            // TopMenu_View_ToggleOverlays_SelectedObject
+            // 
+            TopMenu_View_ToggleOverlays_SelectedObject.Name = "TopMenu_View_ToggleOverlays_SelectedObject";
+            TopMenu_View_ToggleOverlays_SelectedObject.ShortcutKeyDisplayString = "1";
+            TopMenu_View_ToggleOverlays_SelectedObject.Size = new Size(188, 22);
+            TopMenu_View_ToggleOverlays_SelectedObject.Text = "Selected Object";
+            TopMenu_View_ToggleOverlays_SelectedObject.Click += TopMenu_View_ToggleOverlays_SelectedObject_Click;
+            // 
+            // TopMenu_View_ToggleOverlays_BrainDiagram
+            // 
+            TopMenu_View_ToggleOverlays_BrainDiagram.Name = "TopMenu_View_ToggleOverlays_BrainDiagram";
+            TopMenu_View_ToggleOverlays_BrainDiagram.ShortcutKeyDisplayString = "2";
+            TopMenu_View_ToggleOverlays_BrainDiagram.Size = new Size(188, 22);
+            TopMenu_View_ToggleOverlays_BrainDiagram.Text = "Brain Diagram";
+            TopMenu_View_ToggleOverlays_BrainDiagram.Click += TopMenu_View_ToggleOverlays_BrainDiagram_Click;
+            // 
+            // TopMenu_View_ToggleOverlays_BrainInputOutput
+            // 
+            TopMenu_View_ToggleOverlays_BrainInputOutput.Name = "TopMenu_View_ToggleOverlays_BrainInputOutput";
+            TopMenu_View_ToggleOverlays_BrainInputOutput.ShortcutKeyDisplayString = "3";
+            TopMenu_View_ToggleOverlays_BrainInputOutput.Size = new Size(188, 22);
+            TopMenu_View_ToggleOverlays_BrainInputOutput.Text = "Brain Input/Output";
+            TopMenu_View_ToggleOverlays_BrainInputOutput.Click += TopMenu_View_ToggleOverlays_BrainInputOutput_Click;
+            // 
+            // TopMenu_View_ToggleOverlays_FullScreenOverlay
+            // 
+            TopMenu_View_ToggleOverlays_FullScreenOverlay.Name = "TopMenu_View_ToggleOverlays_FullScreenOverlay";
+            TopMenu_View_ToggleOverlays_FullScreenOverlay.ShortcutKeyDisplayString = "9";
+            TopMenu_View_ToggleOverlays_FullScreenOverlay.Size = new Size(188, 22);
+            TopMenu_View_ToggleOverlays_FullScreenOverlay.Text = "Full Screen Overlay";
+            TopMenu_View_ToggleOverlays_FullScreenOverlay.Click += TopMenu_View_ToggleOverlays_FullScreenOverlay_Click;
             // 
             // TopMenu_Window
             // 
@@ -283,6 +394,20 @@
             TopMenu_Window_ObjectEditor.Size = new Size(214, 22);
             TopMenu_Window_ObjectEditor.Text = "Object Editor";
             TopMenu_Window_ObjectEditor.Click += TopMenuWindowObjectEditor_Click;
+            // 
+            // TopMenu_Help
+            // 
+            TopMenu_Help.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Help_AboutParamecium });
+            TopMenu_Help.Name = "TopMenu_Help";
+            TopMenu_Help.Size = new Size(44, 20);
+            TopMenu_Help.Text = "Help";
+            // 
+            // TopMenu_Help_AboutParamecium
+            // 
+            TopMenu_Help_AboutParamecium.Name = "TopMenu_Help_AboutParamecium";
+            TopMenu_Help_AboutParamecium.Size = new Size(175, 22);
+            TopMenu_Help_AboutParamecium.Text = "About Paramecium";
+            TopMenu_Help_AboutParamecium.Click += TopMenu_Help_AboutParamecium_Click;
             // 
             // BottomStat
             // 
@@ -321,8 +446,8 @@
             BottomStat_Generation.BorderSides = ToolStripStatusLabelBorderSides.Left;
             BottomStat_Generation.BorderStyle = Border3DStyle.Raised;
             BottomStat_Generation.Name = "BottomStat_Generation";
-            BottomStat_Generation.Size = new Size(84, 19);
-            BottomStat_Generation.Text = "Generation : 0";
+            BottomStat_Generation.Size = new Size(118, 19);
+            BottomStat_Generation.Text = "Latest Generation : 0";
             // 
             // BottomStat_TotalBornDie
             // 
@@ -369,6 +494,11 @@
             // 
             SaveSoupDialog.FileName = "untitled.soup";
             SaveSoupDialog.Filter = "Paramecium Soup File|*.soup|All FIles|*.*";
+            // 
+            // TopMenu_Edit_Separator1
+            // 
+            TopMenu_Edit_Separator1.Name = "TopMenu_Edit_Separator1";
+            TopMenu_Edit_Separator1.Size = new Size(208, 6);
             // 
             // FormMain
             // 
@@ -436,5 +566,20 @@
         private ToolStripMenuItem TopMenu_Window_AutosaveSettings;
         private ToolStripSeparator TopMenu_View_Separator2;
         private ToolStripMenuItem TopMenu_View_ToggleFullScreen;
+        private ToolStripMenuItem TopMenu_View_ToggleOverlays;
+        private ToolStripMenuItem TopMenu_View_ToggleOverlays_AllOverlays;
+        private ToolStripMenuItem TopMenu_View_ToggleOverlays_SelectedObject;
+        private ToolStripMenuItem TopMenu_View_ToggleOverlays_BrainDiagram;
+        private ToolStripMenuItem TopMenu_View_ToggleOverlays_BrainInputOutput;
+        private ToolStripMenuItem TopMenu_View_ToggleOverlays_FullScreenOverlay;
+        private ToolStripMenuItem TopMenu_Help;
+        private ToolStripMenuItem TopMenu_Help_AboutParamecium;
+        private ToolStripMenuItem TopMenu_Edit;
+        private ToolStripMenuItem TopMenu_Edit_CopySelectedCell;
+        private ToolStripMenuItem TopMenu_Edit_CutSelectedCell;
+        private ToolStripMenuItem TopMenu_Edit_PasteSelectedCell;
+        private ToolStripMenuItem TopMenu_Edit_KillSelectedCell;
+        private ToolStripMenuItem TopMenu_Edit_MoveSelectedCell;
+        private ToolStripSeparator TopMenu_Edit_Separator1;
     }
 }

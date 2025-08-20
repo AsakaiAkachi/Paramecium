@@ -33,13 +33,13 @@
             label2 = new Label();
             NumUpDownAutosaveInterval = new NumericUpDown();
             panel1 = new Panel();
+            label5 = new Label();
             panel2 = new Panel();
             label3 = new Label();
             label4 = new Label();
-            label5 = new Label();
             panel3 = new Panel();
-            ButtonCancel = new Button();
             ButtonApplySettings = new Button();
+            ButtonCancel = new Button();
             ((System.ComponentModel.ISupportInitialize)NumUpDownAutosaveInterval).BeginInit();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -93,6 +93,15 @@
             panel1.Size = new Size(250, 31);
             panel1.TabIndex = 5;
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(90, 8);
+            label5.Name = "label5";
+            label5.Size = new Size(10, 15);
+            label5.TabIndex = 9;
+            label5.Text = ":";
+            // 
             // panel2
             // 
             panel2.Controls.Add(label3);
@@ -122,15 +131,6 @@
             label4.TabIndex = 8;
             label4.Text = ":";
             // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new Point(90, 8);
-            label5.Name = "label5";
-            label5.Size = new Size(10, 15);
-            label5.TabIndex = 9;
-            label5.Text = ":";
-            // 
             // panel3
             // 
             panel3.Controls.Add(ButtonApplySettings);
@@ -139,17 +139,6 @@
             panel3.Name = "panel3";
             panel3.Size = new Size(250, 31);
             panel3.TabIndex = 7;
-            // 
-            // ButtonCancel
-            // 
-            ButtonCancel.Location = new Point(146, 4);
-            ButtonCancel.Margin = new Padding(0);
-            ButtonCancel.Name = "ButtonCancel";
-            ButtonCancel.Size = new Size(100, 23);
-            ButtonCancel.TabIndex = 0;
-            ButtonCancel.Text = "Cancel";
-            ButtonCancel.UseVisualStyleBackColor = true;
-            ButtonCancel.Click += ButtonCancel_Click;
             // 
             // ButtonApplySettings
             // 
@@ -161,6 +150,17 @@
             ButtonApplySettings.Text = "Apply Settings";
             ButtonApplySettings.UseVisualStyleBackColor = true;
             ButtonApplySettings.Click += ButtonApplySettings_Click;
+            // 
+            // ButtonCancel
+            // 
+            ButtonCancel.Location = new Point(146, 4);
+            ButtonCancel.Margin = new Padding(0);
+            ButtonCancel.Name = "ButtonCancel";
+            ButtonCancel.Size = new Size(100, 23);
+            ButtonCancel.TabIndex = 0;
+            ButtonCancel.Text = "Cancel";
+            ButtonCancel.UseVisualStyleBackColor = true;
+            ButtonCancel.Click += ButtonCancel_Click;
             // 
             // FormAutosaveSettings
             // 
@@ -177,6 +177,7 @@
             ShowIcon = false;
             ShowInTaskbar = false;
             Text = "Autosave Settings";
+            Shown += FormAutosaveSettings_Shown;
             ((System.ComponentModel.ISupportInitialize)NumUpDownAutosaveInterval).EndInit();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Paramecium.Engine
+﻿namespace Paramecium.Engine
 {
+    // 脳から出力されるデータが格納されるクラス
     public class BrainOutput
     {
         public double Acceleration { get; set; }

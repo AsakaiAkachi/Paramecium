@@ -3,11 +3,9 @@ using Paramecium.Variables;
 
 namespace Paramecium.Rendering
 {
+    // フルスクリーン時のオーバーレイを描画するクラス
     public static class FullScreenOverlayRenderer
     {
-        public static readonly SolidBrush OverlayBackgroundBrush = new SolidBrush(Color.FromArgb(127, 63, 63, 63));
-        public static readonly SolidBrush OverlayTextBrush = new SolidBrush(Color.FromArgb(255, 255, 255, 255));
-
         public static void DrawFullScreenOverlay(Bitmap soupViewImage, double frameTime, OverlayToggles overlayToggles)
         {
             if ((overlayToggles & OverlayToggles.AllOverlays) != OverlayToggles.AllOverlays) return;
@@ -24,7 +22,7 @@ namespace Paramecium.Rendering
                     statusString = $"Status : {soup.SoupState}   " +
                         $"Time Step : {soup.ElapsedTimeSteps} (T{soup.ThreadCount})   " +
                         $"Population (P/A/T) : {soup.PlantPopulation}/{soup.AnimalPopulation}/{soup.TotalPopulation}   " +
-                        $"Generation : {soup.LatestGeneration}   " +
+                        $"Latest Generation : {soup.LatestGeneration}   " +
                         $"Total Born/Die : {soup.TotalBornCount}/{soup.TotalDieCount}   " +
                         $"TPS : {(1d / soup.StepTime).ToString("0.0")} ({(soup.StepTime * 1000d).ToString("0.0000")}ms)   " +
                         $"FPS : {(1000d / frameTime).ToString("0.0")} ({(frameTime).ToString("0.0000")}ms)   "

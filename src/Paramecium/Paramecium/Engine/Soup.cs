@@ -1,7 +1,9 @@
-﻿using Paramecium.Variables;
+﻿using Paramecium.Rendering;
 using Paramecium.Utils;
+using Paramecium.Variables;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace Paramecium.Engine
 {
@@ -69,7 +71,7 @@ namespace Paramecium.Engine
         {
             Settings = settings;
 
-            Tiles = new Tile[Settings.Area]; for (int i = 0; i < Tiles.Length; i++) Tiles[i] = new Tile() { Index = i, Position = GetTilePositionFromTileIndex(i) };
+            Tiles = new Tile[Settings.SoupArea]; for (int i = 0; i < Tiles.Length; i++) Tiles[i] = new Tile() { Index = i, Position = GetTilePositionFromTileIndex(i) };
 
             //Random rand = new Random(Settings.InitialSeed);
             Random rand = new Random();
@@ -77,7 +79,7 @@ namespace Paramecium.Engine
             int defaultTypeTileCount = 0;
 
             // スープ内の壁を生成する
-            if (Settings.WallEnabled)
+            if (Settings.SoupWallEnabled)
             {
                 Perlin perlin = new Perlin();
 
@@ -87,14 +89,14 @@ namespace Paramecium.Engine
                     Tile targetTile = Tiles[i];
                     Int2d targetTilePosition = GetTilePositionFromTileIndex(i);
 
-                    if (Math.Abs(perlin.OctavePerlin(Settings.WallNoiseX + targetTilePosition.X * Settings.WallNoiseSamplingInterval, Settings.WallNoiseY + targetTilePosition.Y * Settings.WallNoiseSamplingInterval, Settings.WallNoiseZ, Settings.WallNoiseOctave, 0.5d) - 0.5d) < Settings.WallThickness)
+                    if (Math.Abs(perlin.OctavePerlin(Settings.SoupWallNoiseX + targetTilePosition.X * Settings.SoupWallNoiseSamplingInterval, Settings.SoupWallNoiseY + targetTilePosition.Y * Settings.SoupWallNoiseSamplingInterval, Settings.SoupWallNoiseZ, Settings.SoupWallNoiseOctave, 0.5d) - 0.5d) < Settings.SoupWallThickness)
                     {
                         targetTile.Type = TileType.Wall;
                     }
                 }
 
                 // 最も大きな連続した壁ではない領域を残して、それ以外を全て壁で埋める (例えば、外部から壁で隔離された小さな領域などがあればそれを壁で埋める)
-                bool[] continuousRegionFlag = new bool[Settings.Area];
+                bool[] continuousRegionFlag = new bool[Settings.SoupArea];
                 int continuousRegionArea = 0;
 
                 for (int i = 0; i < 16; i++)
@@ -102,12 +104,12 @@ namespace Paramecium.Engine
                     int exploredTileCount = 0;
 
                     List<int> exploreTiles = new List<int>();
-                    bool[] exploredTiles = new bool[Settings.Area];
+                    bool[] exploredTiles = new bool[Settings.SoupArea];
 
-                    exploreTiles.Add(new Random().Next(0, Settings.Area));
+                    exploreTiles.Add(new Random().Next(0, Settings.SoupArea));
                     for (int j = 0; j < 16; j++)
                     {
-                        if (Tiles[exploreTiles[0]].Type == TileType.Wall) exploreTiles[0] = new Random().Next(0, Settings.Area);
+                        if (Tiles[exploreTiles[0]].Type == TileType.Wall) exploreTiles[0] = new Random().Next(0, Settings.SoupArea);
                         else break;
                     }
 
@@ -119,8 +121,8 @@ namespace Paramecium.Engine
 
                         for (int j = 0; j < exploreTiles.Count; j++)
                         {
-                            int x = exploreTiles[j] % Settings.SizeX;
-                            int y = exploreTiles[j] / Settings.SizeX;
+                            int x = exploreTiles[j] % Settings.SoupSizeX;
+                            int y = exploreTiles[j] / Settings.SoupSizeX;
 
                             for (int ix = -1; ix <= 1; ix++)
                             {
@@ -128,12 +130,12 @@ namespace Paramecium.Engine
                                 {
                                     if (int.Abs(ix + iy) == 1)
                                     {
-                                        if (x + ix >= 0 && x + ix < Settings.SizeX && y + iy >= 0 && y + iy < Settings.SizeY)
+                                        if (x + ix >= 0 && x + ix < Settings.SoupSizeX && y + iy >= 0 && y + iy < Settings.SoupSizeY)
                                         {
-                                            if (Tiles[(y + iy) * Settings.SizeX + (x + ix)].Type == TileType.Default && !exploredTiles[(y + iy) * Settings.SizeX + (x + ix)])
+                                            if (Tiles[(y + iy) * Settings.SoupSizeX + (x + ix)].Type == TileType.Default && !exploredTiles[(y + iy) * Settings.SoupSizeX + (x + ix)])
                                             {
-                                                exploredTiles[(y + iy) * Settings.SizeX + (x + ix)] = true;
-                                                nextStepExploreTiles.Add((y + iy) * Settings.SizeX + (x + ix));
+                                                exploredTiles[(y + iy) * Settings.SoupSizeX + (x + ix)] = true;
+                                                nextStepExploreTiles.Add((y + iy) * Settings.SoupSizeX + (x + ix));
                                                 exploredTileCount++;
                                             }
                                         }
@@ -151,30 +153,31 @@ namespace Paramecium.Engine
                         continuousRegionArea = exploredTileCount;
                     }
 
-                    if (exploredTileCount > Settings.Area / 2) break;
+                    if (exploredTileCount > Settings.SoupArea / 2) break;
                 }
 
-                for (int i = 0; i < Settings.Area; i++)
+                for (int i = 0; i < Settings.SoupArea; i++)
                 {
                     if (!continuousRegionFlag[i]) Tiles[i].Type = TileType.Wall;
                 }
 
                 defaultTypeTileCount = continuousRegionArea;
             }
+            else defaultTypeTileCount = Settings.SoupArea;
 
             // 壁ではないエリアが存在しない場合は何も生成しない
             if (defaultTypeTileCount > 0)
             {
-                double unusedElementAmount = Settings.TotalElementAmount;
+                double unusedElementAmount = Settings.SoupTotalElementAmount;
 
                 // 植物を生成する
-                for (int i = 0; i < Settings.InitialPlantPopulation; i++)
+                for (int i = 0; i < Settings.PlantInitialPopulation; i++)
                 {
                     // 生成する位置をランダムに決定しそこが壁の中であれば生成する位置を再度ランダムに生成する (16回生成しても位置が壁の中であれば処理を打ち切る)
-                    Double2d position = new Double2d(rand.NextDouble() * Settings.SizeX, rand.NextDouble() * Settings.SizeY);
+                    Double2d position = new Double2d(rand.NextDouble() * Settings.SoupSizeX, rand.NextDouble() * Settings.SoupSizeY);
                     for (int j = 0; j < 16; j++)
                     {
-                        if (Tiles[GetTileIndexFromPosition(position)].Type == TileType.Wall) position = new Double2d(rand.NextDouble() * Settings.SizeX, rand.NextDouble() * Settings.SizeY);
+                        if (Tiles[GetTileIndexFromPosition(position)].Type == TileType.Wall) position = new Double2d(rand.NextDouble() * Settings.SoupSizeX, rand.NextDouble() * Settings.SoupSizeY);
                         else break;
                     }
 
@@ -188,13 +191,13 @@ namespace Paramecium.Engine
                 }
 
                 // 動物を生成する
-                for (int i = 0; i < Settings.InitialAnimalPopulation; i++)
+                for (int i = 0; i < Settings.AnimalInitialPopulation; i++)
                 {
                     // 生成する位置をランダムに決定しそこが壁の中であれば生成する位置を再度ランダムに生成する (16回生成しても位置が壁の中であれば処理を打ち切る)
-                    Double2d position = new Double2d(rand.NextDouble() * Settings.SizeX, rand.NextDouble() * Settings.SizeY);
+                    Double2d position = new Double2d(rand.NextDouble() * Settings.SoupSizeX, rand.NextDouble() * Settings.SoupSizeY);
                     for (int j = 0; j < 16; j++)
                     {
-                        if (Tiles[GetTileIndexFromPosition(position)].Type == TileType.Wall) position = new Double2d(rand.NextDouble() * Settings.SizeX, rand.NextDouble() * Settings.SizeY);
+                        if (Tiles[GetTileIndexFromPosition(position)].Type == TileType.Wall) position = new Double2d(rand.NextDouble() * Settings.SoupSizeX, rand.NextDouble() * Settings.SoupSizeY);
                         else break;
                     }
 
@@ -245,7 +248,7 @@ namespace Paramecium.Engine
 
                             // ElementAmountMultiplierを計算する
                             double currentTotalElementAmount = 0;
-                            for (int i = 0; i < Settings.Area; i++)
+                            for (int i = 0; i < Settings.SoupArea; i++)
                             {
                                 currentTotalElementAmount += Tiles[i].Element;
                             }
@@ -259,25 +262,42 @@ namespace Paramecium.Engine
                                 Animal? targetAnimal = Animals[i];
                                 if (targetAnimal is not null) currentTotalElementAmount += targetAnimal.Element;
                             }
-                            ElementAmountMultiplier = Settings.TotalElementAmount / currentTotalElementAmount;
+                            ElementAmountMultiplier = Settings.SoupTotalElementAmount / currentTotalElementAmount;
+
+                            // ステップの処理開始時に最初に実行する処理
+                            Parallel.For(0, Settings.SoupArea, parallelOptions, i =>
+                            {
+                                Tile targetTile = Tiles[i];
+                                targetTile.OnStepStart(this, Settings);
+                            });
+                            Parallel.For(0, Plants.Count, parallelOptions, i =>
+                            {
+                                Plant? targetPlant = Plants[i];
+                                if (targetPlant is not null) targetPlant.OnStepStart(this, Settings);
+                            });
+                            Parallel.For(0, Animals.Count, parallelOptions, i =>
+                            {
+                                Animal? targetAnimal = Animals[i];
+                                if (targetAnimal is not null) targetAnimal.OnStepStart(this, Settings);
+                            });
 
                             // タイルのエレメントとフェロモンの流量の計算
-                            double[] elementFlowAmount = new double[Settings.Area];
-                            double[] pheromoneRedFlowAmount = new double[Settings.Area];
-                            double[] pheromoneGreenFlowAmount = new double[Settings.Area];
-                            double[] pheromoneBlueFlowAmount = new double[Settings.Area];
-                            Parallel.For(0, Settings.Area, parallelOptions, i =>
+                            double[] elementFlowAmount = new double[Settings.SoupArea];
+                            double[] pheromoneRedFlowAmount = new double[Settings.SoupArea];
+                            double[] pheromoneGreenFlowAmount = new double[Settings.SoupArea];
+                            double[] pheromoneBlueFlowAmount = new double[Settings.SoupArea];
+                            Parallel.For(0, Settings.SoupArea, parallelOptions, i =>
                             {
                                 Int2d tilePos = GetTilePositionFromTileIndex(i);
                                 Tile targetTile = Tiles[i];
 
-                                double tileElementAmount = targetTile.Element;
-                                double tilepheromoneRedAmount = targetTile.PheromoneRed;
-                                double tilepheromoneGreenAmount = targetTile.PheromoneGreen;
-                                double tilepheromoneBlueAmount = targetTile.PheromoneBlue;
+                                double tileElementAmount = targetTile.ElementBuffer;
+                                double tilepheromoneRedAmount = targetTile.PheromoneRedBuffer;
+                                double tilepheromoneGreenAmount = targetTile.PheromoneGreenBuffer;
+                                double tilepheromoneBlueAmount = targetTile.PheromoneBlueBuffer;
 
-                                double elementFlowRate = Settings.ElementFlowRate;
-                                double pheromoneFlowRate = Settings.PheromoneFlowRate;
+                                double elementFlowRate = Settings.SoupElementFlowRate;
+                                double pheromoneFlowRate = Settings.SoupPheromoneFlowRate;
 
                                 if (targetTile.Type == TileType.Default)
                                 {
@@ -289,7 +309,7 @@ namespace Paramecium.Engine
                                             {
                                                 Int2d targetTilePos = tilePos + new Int2d(x, y);
 
-                                                if (targetTilePos.X >= 0 && targetTilePos.X < Settings.SizeX && targetTilePos.Y >= 0 && targetTilePos.Y < Settings.SizeY)
+                                                if (targetTilePos.X >= 0 && targetTilePos.X < Settings.SoupSizeX && targetTilePos.Y >= 0 && targetTilePos.Y < Settings.SoupSizeY)
                                                 {
                                                     int targetTileIndex = GetTileIndexFromTilePosition(targetTilePos);
                                                     Tile targetTile2 = Tiles[targetTileIndex];
@@ -298,9 +318,9 @@ namespace Paramecium.Engine
                                                     {
                                                         elementFlowAmount[i] += (targetTile2.Element - tileElementAmount) * elementFlowRate / 4d;
 
-                                                        pheromoneRedFlowAmount[i] += (targetTile2.PheromoneRed - tilepheromoneRedAmount) * pheromoneFlowRate / 4d;
-                                                        pheromoneGreenFlowAmount[i] += (targetTile2.PheromoneGreen - tilepheromoneGreenAmount) * pheromoneFlowRate / 4d;
-                                                        pheromoneBlueFlowAmount[i] += (targetTile2.PheromoneBlue - tilepheromoneBlueAmount) * pheromoneFlowRate / 4d;
+                                                        pheromoneRedFlowAmount[i] += (targetTile2.PheromoneRedBuffer - tilepheromoneRedAmount) * pheromoneFlowRate / 4d;
+                                                        pheromoneGreenFlowAmount[i] += (targetTile2.PheromoneGreenBuffer - tilepheromoneGreenAmount) * pheromoneFlowRate / 4d;
+                                                        pheromoneBlueFlowAmount[i] += (targetTile2.PheromoneBlueBuffer - tilepheromoneBlueAmount) * pheromoneFlowRate / 4d;
                                                     }
                                                 }
                                             }
@@ -310,30 +330,30 @@ namespace Paramecium.Engine
                             });
 
                             // 計算したエレメントとフェロモンの流量を適用する
-                            Parallel.For(0, Settings.Area, parallelOptions, i =>
+                            Parallel.For(0, Settings.SoupArea, parallelOptions, i =>
                             {
                                 Tile targetTile = Tiles[i];
 
                                 if (targetTile.Type == TileType.Default)
                                 {
-                                    if (elementFlowAmount[i] >= 0) targetTile.Element += elementFlowAmount[i] * ElementAmountMultiplier;
-                                    else targetTile.Element += elementFlowAmount[i];
+                                    if (elementFlowAmount[i] >= 0) targetTile.ElementBuffer += elementFlowAmount[i] * ElementAmountMultiplier;
+                                    else targetTile.ElementBuffer += elementFlowAmount[i];
 
-                                    targetTile.PheromoneRed += pheromoneRedFlowAmount[i];
-                                    targetTile.PheromoneGreen += pheromoneGreenFlowAmount[i];
-                                    targetTile.PheromoneBlue += pheromoneBlueFlowAmount[i];
+                                    targetTile.PheromoneRedBuffer += pheromoneRedFlowAmount[i];
+                                    targetTile.PheromoneGreenBuffer += pheromoneGreenFlowAmount[i];
+                                    targetTile.PheromoneBlueBuffer += pheromoneBlueFlowAmount[i];
 
-                                    if (targetTile.PheromoneRed < Settings.MinimumEffectivePheromoneAmount) targetTile.PheromoneRed = 0d;
-                                    if (targetTile.PheromoneGreen < Settings.MinimumEffectivePheromoneAmount) targetTile.PheromoneGreen = 0d;
-                                    if (targetTile.PheromoneBlue < Settings.MinimumEffectivePheromoneAmount) targetTile.PheromoneBlue = 0d;
+                                    if (targetTile.PheromoneRedBuffer < Settings.SoupMinimumEffectivePheromoneAmount) targetTile.PheromoneRedBuffer = 0d;
+                                    if (targetTile.PheromoneGreenBuffer < Settings.SoupMinimumEffectivePheromoneAmount) targetTile.PheromoneGreenBuffer = 0d;
+                                    if (targetTile.PheromoneBlueBuffer < Settings.SoupMinimumEffectivePheromoneAmount) targetTile.PheromoneBlueBuffer = 0d;
                                 }
                                 else
                                 {
-                                    targetTile.Element = 0;
+                                    targetTile.ElementBuffer = 0;
 
-                                    targetTile.PheromoneRed = 0d;
-                                    targetTile.PheromoneGreen = 0d;
-                                    targetTile.PheromoneBlue = 0d;
+                                    targetTile.PheromoneRedBuffer = 0d;
+                                    targetTile.PheromoneGreenBuffer = 0d;
+                                    targetTile.PheromoneBlueBuffer = 0d;
                                 }
                             });
 
@@ -368,11 +388,31 @@ namespace Paramecium.Engine
                                 if (targetPlant is not null) targetPlant.CollectElement(this, Settings);
                             });
 
+                            // タイルのフェロモン量を減衰させる
+                            Parallel.For(0, Settings.SoupArea, parallelOptions, i =>
+                            {
+                                Tile targetTile = Tiles[i];
+
+                                if (targetTile.Type == TileType.Default)
+                                {
+                                    targetTile.PheromoneRedBuffer *= 1d - Settings.SoupPheromoneDecayRate;
+                                    targetTile.PheromoneGreenBuffer *= 1d - Settings.SoupPheromoneDecayRate;
+                                    targetTile.PheromoneBlueBuffer *= 1d - Settings.SoupPheromoneDecayRate;
+                                }
+                            });
+
                             // 動物:ニューラルネットの更新
                             Parallel.For(0, Animals.Count, parallelOptions, i =>
                             {
                                 Animal? targetAnimal = Animals[i];
                                 if (targetAnimal is not null) targetAnimal.UpdateBrain(this, Settings);
+                            });
+
+                            // 動物:エレメントの消費とフェロモンの生産
+                            Parallel.For(0, Animals.Count, parallelOptions, i =>
+                            {
+                                Animal? targetAnimal = Animals[i];
+                                if (targetAnimal is not null) targetAnimal.LosingElement(this, Settings);
                             });
 
                             // 当たり判定の処理
@@ -399,26 +439,6 @@ namespace Paramecium.Engine
                                 if (targetAnimal is not null) targetAnimal.UpdatePosition(this, Settings);
                             });
 
-                            // タイルのフェロモン量を減衰させる
-                            Parallel.For(0, Settings.Area, parallelOptions, i =>
-                            {
-                                Tile targetTile = Tiles[i];
-
-                                if (targetTile.Type == TileType.Default)
-                                {
-                                    targetTile.PheromoneRed *= 1d - Settings.PheromoneDecayRate;
-                                    targetTile.PheromoneGreen *= 1d - Settings.PheromoneDecayRate;
-                                    targetTile.PheromoneBlue *= 1d - Settings.PheromoneDecayRate;
-                                }
-                            });
-
-                            // 動物:エレメントを消費する
-                            Parallel.For(0, Animals.Count, parallelOptions, i =>
-                            {
-                                Animal? targetAnimal = Animals[i];
-                                if (targetAnimal is not null) targetAnimal.LosingElement(this, Settings);
-                            });
-
                             // セルの子孫を生成する
                             List<Plant>?[] plantOffsprings = new List<Plant>[Plants.Count];
                             Parallel.For(0, Plants.Count, parallelOptions, i =>
@@ -440,11 +460,7 @@ namespace Paramecium.Engine
                                 if (targetPlant is not null)
                                 {
                                     targetPlant.IsNotAlive(this, Settings);
-                                    if (!targetPlant.IsAlive)
-                                    {
-                                        PlantUnusedIndexes.Add(i);
-                                        Plants[i] = null;
-                                    }
+                                    if (!targetPlant.IsAlive) RemovePlant(i);
                                 }
                             }
                             for (int i = 0; i < Animals.Count; i++)
@@ -455,12 +471,28 @@ namespace Paramecium.Engine
                                     targetAnimal.IsNotAlive(this, Settings);
                                     if (!targetAnimal.IsAlive)
                                     {
-                                        AnimalUnusedIndexes.Add(i);
-                                        Animals[i] = null;
+                                        RemoveAnimal(i);
                                         TotalDieCount++;
                                     }
                                 }
                             }
+
+                            // ステップの処理終了直前に実行される処理
+                            Parallel.For(0, Settings.SoupArea, parallelOptions, i =>
+                            {
+                                Tile targetTile = Tiles[i];
+                                targetTile.OnStepEnd(this, Settings);
+                            });
+                            Parallel.For(0, Plants.Count, parallelOptions, i =>
+                            {
+                                Plant? targetPlant = Plants[i];
+                                if (targetPlant is not null) targetPlant.OnStepEnd(this, Settings);
+                            });
+                            Parallel.For(0, Animals.Count, parallelOptions, i =>
+                            {
+                                Animal? targetAnimal = Animals[i];
+                                if (targetAnimal is not null) targetAnimal.OnStepEnd(this, Settings);
+                            });
 
                             // セルの子孫をスープに追加する
                             for (int i = 0; i < plantOffsprings.Length; i++)
@@ -564,6 +596,7 @@ namespace Paramecium.Engine
             }
 
             plant.Index = index;
+            plant.Id = new Random().NextInt64(0, 4738381338321616896);
 
             plant.TileIndex = GetTileIndexFromPosition(plant.Position);
 
@@ -588,10 +621,35 @@ namespace Paramecium.Engine
             }
 
             animal.Index = index;
+            animal.Id = new Random().NextInt64(0, 4738381338321616896);
 
             animal.TileIndex = GetTileIndexFromPosition(animal.Position);
 
             Tiles[GetTileIndexFromPosition(animal.Position)].AnimalIndexes.Add(index);
+        }
+
+        public void RemovePlant(int index)
+        {
+            Plant? targetPlant = Plants[index];
+
+            if (targetPlant is not null)
+            {
+                Tiles[targetPlant.TileIndex].PlantIndexes.Remove(index);
+                PlantUnusedIndexes.Add(index);
+                Plants[index] = null;
+            }
+        }
+
+        public void RemoveAnimal(int index)
+        {
+            Animal? targetAnimal = Animals[index];
+
+            if (targetAnimal is not null)
+            {
+                Tiles[targetAnimal.TileIndex].AnimalIndexes.Remove(index);
+                AnimalUnusedIndexes.Add(index);
+                Animals[index] = null;
+            }
         }
 
         public void SetSoupState(SoupState soupState)
@@ -606,20 +664,20 @@ namespace Paramecium.Engine
 
         public Int2d GetTilePositionFromPosition(Double2d position)
         {
-            return new Int2d((int)Math.Max(0, Math.Min(Settings.SizeX - 1, position.X)), (int)Math.Max(0, Math.Min(Settings.SizeY - 1, position.Y)));
+            return new Int2d((int)Math.Max(0, Math.Min(Settings.SoupSizeX - 1, position.X)), (int)Math.Max(0, Math.Min(Settings.SoupSizeY - 1, position.Y)));
         }
         public Int2d GetTilePositionFromTileIndex(int tileIndex)
         {
-            return new Int2d(tileIndex % Settings.SizeX, tileIndex / Settings.SizeX);
+            return new Int2d(tileIndex % Settings.SoupSizeX, tileIndex / Settings.SoupSizeX);
         }
 
         public int GetTileIndexFromPosition(Double2d position)
         {
-            return (int)Math.Max(0, Math.Min(Settings.SizeX - 1, position.X)) + (int)Math.Max(0, Math.Min(Settings.SizeY - 1, position.Y)) * Settings.SizeX;
+            return (int)Math.Max(0, Math.Min(Settings.SoupSizeX - 1, position.X)) + (int)Math.Max(0, Math.Min(Settings.SoupSizeY - 1, position.Y)) * Settings.SoupSizeX;
         }
         public int GetTileIndexFromTilePosition(Int2d tilePosition)
         {
-            return tilePosition.X + tilePosition.Y * Settings.SizeX;
+            return tilePosition.X + tilePosition.Y * Settings.SoupSizeX;
         }
 
         public Double2d CalculateCollisionTwoObjects(Double2d obj1Pos, double obj1Radius, double obj1Mass, Double2d obj2Pos, double obj2Radius, double obj2Mass)
@@ -629,7 +687,7 @@ namespace Paramecium.Engine
             if (distanceSqr < (obj1Radius + obj2Radius) * (obj1Radius + obj2Radius))
             {
                 double distance = Double2d.Distance(obj1Pos, obj2Pos);
-                return (obj1Pos - obj2Pos).Normalized * (1d - distance / (obj1Radius + obj2Radius)) * Math.Min(1d, obj2Mass / obj1Mass) * Settings.RestitutionCoefficient;
+                return (obj1Pos - obj2Pos).Normalized * (1d - distance / (obj1Radius + obj2Radius)) * Math.Min(1d, obj2Mass / obj1Mass) * Settings.SoupRestitutionCoefficient;
             }
             else return Double2d.Zero;
         }
@@ -640,7 +698,7 @@ namespace Paramecium.Engine
             if (distanceSqr < (obj1Radius + obj2Radius) * (obj1Radius + obj2Radius))
             {
                 double distance = Double2d.Distance(obj1Pos, obj2Pos);
-                return (obj1Pos - obj2Pos).Normalized * (1d - distance / (obj1Radius + obj2Radius)) * Settings.RestitutionCoefficient;
+                return (obj1Pos - obj2Pos).Normalized * (1d - distance / (obj1Radius + obj2Radius)) * Settings.SoupRestitutionCoefficient;
             }
             else return Double2d.Zero;
         }
@@ -659,13 +717,30 @@ namespace Paramecium.Engine
 
             return result;
         }
+        public static string StringFromSpeciesSignature(Double4d speciesSignature)
+        {
+            string cellIdChars = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+            string result = 
+                $"{cellIdChars[int.Min(cellIdChars.Length - 1, (int)(speciesSignature.X * (cellIdChars.Length * cellIdChars.Length)) / cellIdChars.Length)]}" +
+                $"{cellIdChars[int.Min(cellIdChars.Length - 1, (int)(speciesSignature.X * (cellIdChars.Length * cellIdChars.Length)) % cellIdChars.Length)]}" +
+                $"{cellIdChars[int.Min(cellIdChars.Length - 1, (int)(speciesSignature.Y * (cellIdChars.Length * cellIdChars.Length)) / cellIdChars.Length)]}" +
+                $"{cellIdChars[int.Min(cellIdChars.Length - 1, (int)(speciesSignature.Y * (cellIdChars.Length * cellIdChars.Length)) % cellIdChars.Length)]}" +
+                $"{cellIdChars[int.Min(cellIdChars.Length - 1, (int)(speciesSignature.Z * (cellIdChars.Length * cellIdChars.Length)) / cellIdChars.Length)]}" +
+                $"{cellIdChars[int.Min(cellIdChars.Length - 1, (int)(speciesSignature.Z * (cellIdChars.Length * cellIdChars.Length)) % cellIdChars.Length)]}" +
+                $"{cellIdChars[int.Min(cellIdChars.Length - 1, (int)(speciesSignature.W * (cellIdChars.Length * cellIdChars.Length)) / cellIdChars.Length)]}" +
+                $"{cellIdChars[int.Min(cellIdChars.Length - 1, (int)(speciesSignature.W * (cellIdChars.Length * cellIdChars.Length)) % cellIdChars.Length)]}"
+            ;
+
+            return result;
+        }
 
         private void Autosave()
         {
             bool modified = Modified;
             Modified = false;
 
-            JsonFileImportAndExport.Export(@$"{Globals.AutosavesDirectoryPath}\{Path.GetFileNameWithoutExtension(Globals.SoupFileName)}-{ElapsedTimeSteps}steps.soup", this);
+            JsonImportAndExport.FileExport(@$"{Globals.AutosavesDirectoryPath}\{Path.GetFileNameWithoutExtension(Globals.SoupFileName)}-{ElapsedTimeSteps}steps.soup", this);
 
             Modified = modified;
         }

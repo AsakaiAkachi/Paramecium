@@ -2,6 +2,7 @@
 
 namespace Paramecium.Engine
 {
+    // 動物の周辺認識の情報が格納されているクラス
     public class AnimalVisionOutput
     {
         // 視覚情報

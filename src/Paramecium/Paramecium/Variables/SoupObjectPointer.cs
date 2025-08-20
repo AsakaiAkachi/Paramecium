@@ -2,11 +2,12 @@
 
 namespace Paramecium.Variables
 {
+    // スープ上の特定のオブジェクトを指定するためのクラス
     public class SoupObjectPointer
     {
-        public SoupObjectType ObjectType;
-        public int ObjectIndex;
-        public long ObjectId;
+        public SoupObjectType ObjectType;   // オブジェクトの種類
+        public int ObjectIndex;             // オブジェクトのインデックス
+        public long ObjectId;               // オブジェクトのID (指定しない場合は-1、またタイルはIDを持たないためIDの指定は意味を持たない)
 
         public SoupObjectPointer()
         {
@@ -22,6 +23,7 @@ namespace Paramecium.Variables
             ObjectId = objectId;
         }
 
+        // 指定されたデータをもとにスープ内のオブジェクトを取得する (該当するオブジェクトが存在しない場合はnullを返す)
         public object? GetSoupObject()
         {
             Soup? soup = Globals.Soup;

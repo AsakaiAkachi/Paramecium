@@ -2,11 +2,12 @@
 
 namespace Paramecium.Engine
 {
+    // 脳のノードのデータを保存する用のクラス
     public class BrainNode
     {
-        public BrainNodeFunction Function { get; set; }
-        public double Input { get; set; }
-        public double Output { get; set; }
+        public BrainNodeFunction Function { get; set; }     // ノードの挙動
+        public double Input { get; set; }                   // ノードの入力値
+        public double Output { get; set; }                  // ノードの出力値
 
         [JsonIgnore]
         public bool IsInput { get { return (int)Function >= (int)BrainNodeFunction.Input_Bias && (int)Function <= (int)BrainNodeFunction.Input_PheromoneBlueGradAngle; } }
@@ -15,6 +16,7 @@ namespace Paramecium.Engine
         [JsonIgnore]
         public bool IsOutput { get { return (int)Function >= (int)BrainNodeFunction.Output_Acceleration && (int)Function <= (int)BrainNodeFunction.Output_PheromoneBlueProduction; } }
 
+        // 入力ノードの場合対応する入力値を出力する
         public void ApplyBrainInput(Brain brain, BrainInput brainInput)
         {
             if (IsInput)
@@ -107,6 +109,7 @@ namespace Paramecium.Engine
             }
         }
 
+        // 隠れノードの場合入力値をもとに出力値を計算する
         public void CalculateNodeOutput()
         {
             if (IsHidden)
@@ -159,6 +162,7 @@ namespace Paramecium.Engine
             Output = double.Max(-100d, double.Min(100d, Output));
         }
 
+        // 出力ノードの場合入力値を対応する出力に出力する
         public void ApplyBrainOutput(ref BrainOutput brainOutput)
         {
             if (IsOutput)

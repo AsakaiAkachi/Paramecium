@@ -1,9 +1,10 @@
 ﻿using Paramecium.Engine;
-using Paramecium.Variables;
 using Paramecium.Utils;
+using Paramecium.Variables;
 
 namespace Paramecium.Forms
 {
+    // スープの設定を変更するためのForm
     public partial class FormSoupSettings : Form
     {
         SoupSettingsSetter _soupSettingsSetter;
@@ -21,19 +22,19 @@ namespace Paramecium.Forms
 
             if (soupIsCreated)
             {
-                SoupSettingsItem_SizeX.Editable = false;
-                SoupSettingsItem_SizeY.Editable = false;
+                SoupSettingsItem_SoupSizeX.Editable = false;
+                SoupSettingsItem_SoupSizeY.Editable = false;
 
-                SoupSettingsItem_WallEnabled.Editable = false;
+                SoupSettingsItem_SoupWallEnabled.Editable = false;
                 ButtonRandomizeWallNoiseOffset.Enabled = false;
-                SoupSettingsItem_WallNoiseOffsetX.Editable = false;
-                SoupSettingsItem_WallNoiseOffsetY.Editable = false;
-                SoupSettingsItem_WallNoiseOffsetZ.Editable = false;
-                SoupSettingsItem_WallNoiseSamplingInterval.Editable = false;
-                SoupSettingsItem_WallNoiseOctave.Editable = false;
-                SoupSettingsItem_WallThickness.Editable = false;
+                SoupSettingsItem_SoupWallNoiseOffsetX.Editable = false;
+                SoupSettingsItem_SoupWallNoiseOffsetY.Editable = false;
+                SoupSettingsItem_SoupWallNoiseOffsetZ.Editable = false;
+                SoupSettingsItem_SoupWallNoiseSamplingInterval.Editable = false;
+                SoupSettingsItem_SoupWallNoiseOctave.Editable = false;
+                SoupSettingsItem_SoupWallThickness.Editable = false;
 
-                SoupSettingsItem_TotalElementAmount.Editable = false;
+                SoupSettingsItem_SoupTotalElementAmount.Editable = false;
 
                 SoupSettingsItem_PlantInitialPopulation.Editable = false;
 
@@ -64,7 +65,7 @@ namespace Paramecium.Forms
         {
             if (ImportPresetDialog.ShowDialog() == DialogResult.OK)
             {
-                SoupSettings? soupSettings = JsonFileImportAndExport.Import<SoupSettings>(ImportPresetDialog.FileName);
+                SoupSettings? soupSettings = JsonImportAndExport.FileImport<SoupSettings>(ImportPresetDialog.FileName);
 
                 if (soupSettings is not null)
                 {
@@ -77,63 +78,65 @@ namespace Paramecium.Forms
         {
             if (ExportPresetDialog.ShowDialog() == DialogResult.OK)
             {
-                JsonFileImportAndExport.Export(ExportPresetDialog.FileName, SaveSoupSettingsFromSettingsItems());
+                JsonImportAndExport.FileExport(ExportPresetDialog.FileName, SaveSoupSettingsFromSettingsItems());
             }
         }
 
+        // 壁生成用ノイズをランダム化する
         private void ButtonRandomizeWallNoiseOffset_Click(object sender, EventArgs e)
         {
             Random rand = new Random();
 
-            SoupSettingsItem_WallNoiseOffsetX.InputValueDouble = rand.NextDouble() * 256d;
-            SoupSettingsItem_WallNoiseOffsetY.InputValueDouble = rand.NextDouble() * 256d;
-            SoupSettingsItem_WallNoiseOffsetZ.InputValueDouble = rand.NextDouble() * 256d;
+            SoupSettingsItem_SoupWallNoiseOffsetX.InputValueDouble = rand.NextDouble() * 256d;
+            SoupSettingsItem_SoupWallNoiseOffsetY.InputValueDouble = rand.NextDouble() * 256d;
+            SoupSettingsItem_SoupWallNoiseOffsetZ.InputValueDouble = rand.NextDouble() * 256d;
         }
 
+        // スープの設定をSoupSettingsから読み込む
         private void LoadSoupSettingsToSettingsItems(SoupSettings soupSettings, bool dontLoadImmutableItems)
         {
             if (!dontLoadImmutableItems)
             {
-                SoupSettingsItem_SizeX.InputValueInt = soupSettings.SizeX;
-                SoupSettingsItem_SizeY.InputValueInt = soupSettings.SizeY;
+                SoupSettingsItem_SoupSizeX.InputValueInt = soupSettings.SoupSizeX;
+                SoupSettingsItem_SoupSizeY.InputValueInt = soupSettings.SoupSizeY;
             }
 
             if (!dontLoadImmutableItems)
             {
-                SoupSettingsItem_WallEnabled.Checked = soupSettings.WallEnabled;
-                SoupSettingsItem_WallNoiseOffsetX.InputValueDouble = soupSettings.WallNoiseX;
-                SoupSettingsItem_WallNoiseOffsetY.InputValueDouble = soupSettings.WallNoiseY;
-                SoupSettingsItem_WallNoiseOffsetZ.InputValueDouble = soupSettings.WallNoiseZ;
-                SoupSettingsItem_WallNoiseSamplingInterval.InputValueDouble = soupSettings.WallNoiseSamplingInterval;
-                SoupSettingsItem_WallNoiseOctave.InputValueInt = soupSettings.WallNoiseOctave;
-                SoupSettingsItem_WallThickness.InputValueDouble = soupSettings.WallThickness;
+                SoupSettingsItem_SoupWallEnabled.Checked = soupSettings.SoupWallEnabled;
+                SoupSettingsItem_SoupWallNoiseOffsetX.InputValueDouble = soupSettings.SoupWallNoiseX;
+                SoupSettingsItem_SoupWallNoiseOffsetY.InputValueDouble = soupSettings.SoupWallNoiseY;
+                SoupSettingsItem_SoupWallNoiseOffsetZ.InputValueDouble = soupSettings.SoupWallNoiseZ;
+                SoupSettingsItem_SoupWallNoiseSamplingInterval.InputValueDouble = soupSettings.SoupWallNoiseSamplingInterval;
+                SoupSettingsItem_SoupWallNoiseOctave.InputValueInt = soupSettings.SoupWallNoiseOctave;
+                SoupSettingsItem_SoupWallThickness.InputValueDouble = soupSettings.SoupWallThickness;
             }
 
-            if (!dontLoadImmutableItems) SoupSettingsItem_TotalElementAmount.InputValueDouble = soupSettings.TotalElementAmount;
-            SoupSettingsItem_ElementFlowRate.InputValueDouble = soupSettings.ElementFlowRate;
+            if (!dontLoadImmutableItems) SoupSettingsItem_SoupTotalElementAmount.InputValueDouble = soupSettings.SoupTotalElementAmount;
+            SoupSettingsItem_ElementFlowRate.InputValueDouble = soupSettings.SoupElementFlowRate;
 
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.InputValueDouble = soupSettings.MaximumEffectivePheromoneAmount;
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.InputValueDouble = soupSettings.MinimumEffectivePheromoneAmount;
-            SoupSettingsItem_PheromoneFlowRate.InputValueDouble = soupSettings.PheromoneFlowRate;
-            SoupSettingsItem_PheromoneDecayRate.InputValueDouble = soupSettings.PheromoneDecayRate;
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.InputValueDouble = soupSettings.SoupMaximumEffectivePheromoneAmount;
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.InputValueDouble = soupSettings.SoupMinimumEffectivePheromoneAmount;
+            SoupSettingsItem_SoupPheromoneFlowRate.InputValueDouble = soupSettings.SoupPheromoneFlowRate;
+            SoupSettingsItem_SoupPheromoneDecayRate.InputValueDouble = soupSettings.SoupPheromoneDecayRate;
 
-            SoupSettingsItem_Drag.InputValueDouble = soupSettings.Drag;
-            SoupSettingsItem_AngularVelocityDrag.InputValueDouble = soupSettings.AngularVelocityDrag;
-            SoupSettingsItem_MaximumEffectiveVelocity.InputValueDouble = soupSettings.MaximumEffectiveVelocity;
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.InputValueDouble = soupSettings.MaximumEffectiveAngularVelocity;
-            SoupSettingsItem_RestitutionCoefficient.InputValueDouble = soupSettings.RestitutionCoefficient;
+            SoupSettingsItem_SoupDrag.InputValueDouble = soupSettings.SoupDrag;
+            SoupSettingsItem_SoupAngularVelocityDrag.InputValueDouble = soupSettings.SoupAngularVelocityDrag;
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.InputValueDouble = soupSettings.SoupMaximumEffectiveVelocity;
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.InputValueDouble = soupSettings.SoupMaximumEffectiveAngularVelocity;
+            SoupSettingsItem_SoupRestitutionCoefficient.InputValueDouble = soupSettings.SoupRestitutionCoefficient;
 
-            if (!dontLoadImmutableItems) SoupSettingsItem_PlantInitialPopulation.InputValueInt = soupSettings.InitialPlantPopulation;
+            if (!dontLoadImmutableItems) SoupSettingsItem_PlantInitialPopulation.InputValueInt = soupSettings.PlantInitialPopulation;
 
             SoupSettingsItem_PlantMaximumElementAmount.InputValueDouble = soupSettings.PlantMaximumElementAmount;
-            SoupSettingsItem_ElementCollectRate.InputValueDouble = soupSettings.PlantElementCollectRate;
+            SoupSettingsItem_PlantElementCollectRate.InputValueDouble = soupSettings.PlantElementCollectRate;
             SoupSettingsItem_PlantUnderAttackTime.InputValueInt = soupSettings.PlantUnderAttackTime;
 
             SoupSettingsItem_PlantSpreadingTime.InputValueInt = soupSettings.PlantSpreadingTime;
             SoupSettingsItem_PlantDivisionCountMin.InputValueInt = soupSettings.PlantDivisionCountMin;
             SoupSettingsItem_PlantDivisionCountMax.InputValueInt = soupSettings.PlantDivisionCountMax;
 
-            if (!dontLoadImmutableItems) SoupSettingsItem_AnimalInitialPopulation.InputValueInt = soupSettings.InitialAnimalPopulation;
+            if (!dontLoadImmutableItems) SoupSettingsItem_AnimalInitialPopulation.InputValueInt = soupSettings.AnimalInitialPopulation;
 
             SoupSettingsItem_AnimalMaximumElementAmount.InputValueDouble = soupSettings.AnimalMaximumElementAmount;
             SoupSettingsItem_AnimalElementBaseCost.InputValueDouble = soupSettings.AnimalElementBaseCost;
@@ -160,68 +163,69 @@ namespace Paramecium.Forms
 
             SoupSettingsItem_AnimalLifespan.InputValueInt = soupSettings.AnimalLifespan;
 
-            SoupSettingsItem_AnimalMaximumNodeCount.InputValueInt = soupSettings.AnimalMaximumNodeCount;
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.InputValueInt = soupSettings.AnimalMaximumConnectionCountPerNode;
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.InputValueInt = soupSettings.AnimalBrainMaximumNodeCount;
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.InputValueInt = soupSettings.AnimalBrainMaximumConnectionCountPerNode;
 
-            SoupSettingsItem_AnimalMutationRate.InputValueDouble = soupSettings.AnimalMutationRate;
-            SoupSettingsItem_AnimalMaximumMutationCount.InputValueInt = soupSettings.AnimalMaximumMutationCount;
-            SoupSettingsItem_AnimalMutationCountFactor.InputValueDouble = soupSettings.AnimalMutationCountFactor;
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Checked = soupSettings.AnimalDisableSpeciesSigChangeByMutation;
+            SoupSettingsItem_AnimalMutationMutationRate.InputValueDouble = soupSettings.AnimalMutationMutationRate;
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.InputValueInt = soupSettings.AnimalMutationMaximumMutationCount;
+            SoupSettingsItem_AnimalMutationMutationCountFactor.InputValueDouble = soupSettings.AnimalMutationMutationCountFactor;
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.Checked = soupSettings.AnimalMutationDisableSpeciesSigChangeByMutation;
 
-            SoupSettingsItem_AnimalMutationAddNodeWeight.InputValueDouble = soupSettings.AnimalMutationAddNodeWeight;
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.InputValueDouble = soupSettings.AnimalMutationRemoveNodeWeight;
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.InputValueDouble = soupSettings.AnimalMutationChangeNodeTypeWeight;
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.InputValueDouble = soupSettings.AnimalMutationAddConnectionWeight;
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.InputValueDouble = soupSettings.AnimalMutationRemoveConnectionWeight;
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.InputValueDouble = soupSettings.AnimalMutationChangeConnectionOriginWeight;
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.InputValueDouble = soupSettings.AnimalMutationChangeConnectionTargetWeight;
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.InputValueDouble = soupSettings.AnimalMutationChangeConnectionWeightWeight;
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.InputValueDouble = soupSettings.AnimalMutationMutationTypeAddNodeWeight;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.InputValueDouble = soupSettings.AnimalMutationMutationTypeRemoveNodeWeight;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.InputValueDouble = soupSettings.AnimalMutationMutationTypeChangeNodeTypeWeight;
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.InputValueDouble = soupSettings.AnimalMutationMutationTypeAddConnectionWeight;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.InputValueDouble = soupSettings.AnimalMutationMutationTypeRemoveConnectionWeight;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.InputValueDouble = soupSettings.AnimalMutationMutationTypeChangeConnectionOriginWeight;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.InputValueDouble = soupSettings.AnimalMutationMutationTypeChangeConnectionTargetWeight;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.InputValueDouble = soupSettings.AnimalMutationMutationTypeChangeConnectionWeightWeight;
 
-            SoupSettingsItem_AnimalNodeTypeInputWeight.InputValueDouble = soupSettings.AnimalNodeTypeInputWeight;
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.InputValueDouble = soupSettings.AnimalNodeTypeHiddenWeight;
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.InputValueDouble = soupSettings.AnimalNodeTypeOutputWeight;
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.InputValueDouble = soupSettings.AnimalMutationNodeTypeInputWeight;
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.InputValueDouble = soupSettings.AnimalMutationNodeTypeHiddenWeight;
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.InputValueDouble = soupSettings.AnimalMutationNodeTypeOutputWeight;
         }
 
+        // スープの設定をSoupSettingsに書き込む
         private SoupSettings SaveSoupSettingsFromSettingsItems()
         {
             SoupSettings result = new SoupSettings();
 
-            result.SizeX = SoupSettingsItem_SizeX.InputValueInt;
-            result.SizeY = SoupSettingsItem_SizeY.InputValueInt;
+            result.SoupSizeX = SoupSettingsItem_SoupSizeX.InputValueInt;
+            result.SoupSizeY = SoupSettingsItem_SoupSizeY.InputValueInt;
 
-            result.WallEnabled = SoupSettingsItem_WallEnabled.Checked;
-            result.WallNoiseX = SoupSettingsItem_WallNoiseOffsetX.InputValueDouble;
-            result.WallNoiseY = SoupSettingsItem_WallNoiseOffsetY.InputValueDouble;
-            result.WallNoiseZ = SoupSettingsItem_WallNoiseOffsetZ.InputValueDouble;
-            result.WallNoiseSamplingInterval = SoupSettingsItem_WallNoiseSamplingInterval.InputValueDouble;
-            result.WallNoiseOctave = SoupSettingsItem_WallNoiseOctave.InputValueInt;
-            result.WallThickness = SoupSettingsItem_WallThickness.InputValueDouble;
+            result.SoupWallEnabled = SoupSettingsItem_SoupWallEnabled.Checked;
+            result.SoupWallNoiseX = SoupSettingsItem_SoupWallNoiseOffsetX.InputValueDouble;
+            result.SoupWallNoiseY = SoupSettingsItem_SoupWallNoiseOffsetY.InputValueDouble;
+            result.SoupWallNoiseZ = SoupSettingsItem_SoupWallNoiseOffsetZ.InputValueDouble;
+            result.SoupWallNoiseSamplingInterval = SoupSettingsItem_SoupWallNoiseSamplingInterval.InputValueDouble;
+            result.SoupWallNoiseOctave = SoupSettingsItem_SoupWallNoiseOctave.InputValueInt;
+            result.SoupWallThickness = SoupSettingsItem_SoupWallThickness.InputValueDouble;
 
-            result.TotalElementAmount = SoupSettingsItem_TotalElementAmount.InputValueDouble;
-            result.ElementFlowRate = SoupSettingsItem_ElementFlowRate.InputValueDouble;
+            result.SoupTotalElementAmount = SoupSettingsItem_SoupTotalElementAmount.InputValueDouble;
+            result.SoupElementFlowRate = SoupSettingsItem_ElementFlowRate.InputValueDouble;
 
-            result.MaximumEffectivePheromoneAmount = SoupSettingsItem_MaximumEffectivePheromoneAmount.InputValueDouble;
-            result.MinimumEffectivePheromoneAmount = SoupSettingsItem_MinimumEffectivePheromoneAmount.InputValueDouble;
-            result.PheromoneFlowRate = SoupSettingsItem_PheromoneFlowRate.InputValueDouble;
-            result.PheromoneDecayRate = SoupSettingsItem_PheromoneDecayRate.InputValueDouble;
+            result.SoupMaximumEffectivePheromoneAmount = SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.InputValueDouble;
+            result.SoupMinimumEffectivePheromoneAmount = SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.InputValueDouble;
+            result.SoupPheromoneFlowRate = SoupSettingsItem_SoupPheromoneFlowRate.InputValueDouble;
+            result.SoupPheromoneDecayRate = SoupSettingsItem_SoupPheromoneDecayRate.InputValueDouble;
 
-            result.Drag = SoupSettingsItem_Drag.InputValueDouble;
-            result.AngularVelocityDrag = SoupSettingsItem_AngularVelocityDrag.InputValueDouble;
-            result.MaximumEffectiveVelocity = SoupSettingsItem_MaximumEffectiveVelocity.InputValueDouble;
-            result.MaximumEffectiveAngularVelocity = SoupSettingsItem_MaximumEffectiveAngularVelocity.InputValueDouble;
-            result.RestitutionCoefficient = SoupSettingsItem_RestitutionCoefficient.InputValueDouble;
+            result.SoupDrag = SoupSettingsItem_SoupDrag.InputValueDouble;
+            result.SoupAngularVelocityDrag = SoupSettingsItem_SoupAngularVelocityDrag.InputValueDouble;
+            result.SoupMaximumEffectiveVelocity = SoupSettingsItem_SoupMaximumEffectiveVelocity.InputValueDouble;
+            result.SoupMaximumEffectiveAngularVelocity = SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.InputValueDouble;
+            result.SoupRestitutionCoefficient = SoupSettingsItem_SoupRestitutionCoefficient.InputValueDouble;
 
-            result.InitialPlantPopulation = SoupSettingsItem_PlantInitialPopulation.InputValueInt;
+            result.PlantInitialPopulation = SoupSettingsItem_PlantInitialPopulation.InputValueInt;
 
             result.PlantMaximumElementAmount = SoupSettingsItem_PlantMaximumElementAmount.InputValueDouble;
-            result.PlantElementCollectRate = SoupSettingsItem_ElementCollectRate.InputValueDouble;
+            result.PlantElementCollectRate = SoupSettingsItem_PlantElementCollectRate.InputValueDouble;
             result.PlantUnderAttackTime = SoupSettingsItem_PlantUnderAttackTime.InputValueInt;
 
             result.PlantSpreadingTime = SoupSettingsItem_PlantSpreadingTime.InputValueInt;
             result.PlantDivisionCountMin = SoupSettingsItem_PlantDivisionCountMin.InputValueInt;
             result.PlantDivisionCountMax = SoupSettingsItem_PlantDivisionCountMax.InputValueInt;
 
-            result.InitialAnimalPopulation = SoupSettingsItem_AnimalInitialPopulation.InputValueInt;
+            result.AnimalInitialPopulation = SoupSettingsItem_AnimalInitialPopulation.InputValueInt;
 
             result.AnimalMaximumElementAmount = SoupSettingsItem_AnimalMaximumElementAmount.InputValueDouble;
             result.AnimalElementBaseCost = SoupSettingsItem_AnimalElementBaseCost.InputValueDouble;
@@ -248,26 +252,26 @@ namespace Paramecium.Forms
 
             result.AnimalLifespan = SoupSettingsItem_AnimalLifespan.InputValueInt;
 
-            result.AnimalMaximumNodeCount = SoupSettingsItem_AnimalMaximumNodeCount.InputValueInt;
-            result.AnimalMaximumConnectionCountPerNode = SoupSettingsItem_AnimalMaximumConnectionCountPerNode.InputValueInt;
+            result.AnimalBrainMaximumNodeCount = SoupSettingsItem_AnimalBrainMaximumNodeCount.InputValueInt;
+            result.AnimalBrainMaximumConnectionCountPerNode = SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.InputValueInt;
 
-            result.AnimalMutationRate = SoupSettingsItem_AnimalMutationRate.InputValueDouble;
-            result.AnimalMaximumMutationCount = SoupSettingsItem_AnimalMaximumMutationCount.InputValueInt;
-            result.AnimalMutationCountFactor = SoupSettingsItem_AnimalMutationCountFactor.InputValueDouble;
-            result.AnimalDisableSpeciesSigChangeByMutation = SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Checked;
+            result.AnimalMutationMutationRate = SoupSettingsItem_AnimalMutationMutationRate.InputValueDouble;
+            result.AnimalMutationMaximumMutationCount = SoupSettingsItem_AnimalMutationMaximumMutationCount.InputValueInt;
+            result.AnimalMutationMutationCountFactor = SoupSettingsItem_AnimalMutationMutationCountFactor.InputValueDouble;
+            result.AnimalMutationDisableSpeciesSigChangeByMutation = SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.Checked;
 
-            result.AnimalMutationAddNodeWeight = SoupSettingsItem_AnimalMutationAddNodeWeight.InputValueDouble;
-            result.AnimalMutationRemoveNodeWeight = SoupSettingsItem_AnimalMutationRemoveNodeWeight.InputValueDouble;
-            result.AnimalMutationChangeNodeTypeWeight = SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.InputValueDouble;
-            result.AnimalMutationAddConnectionWeight = SoupSettingsItem_AnimalMutationAddConnectionWeight.InputValueDouble;
-            result.AnimalMutationRemoveConnectionWeight = SoupSettingsItem_AnimalMutationRemoveConnectionWeight.InputValueDouble;
-            result.AnimalMutationChangeConnectionOriginWeight = SoupSettingsItem_AnimalMutationChangeConnectionOrigin.InputValueDouble;
-            result.AnimalMutationChangeConnectionTargetWeight = SoupSettingsItem_AnimalMutationChangeConnectionTarget.InputValueDouble;
-            result.AnimalMutationChangeConnectionWeightWeight = SoupSettingsItem_AnimalMutationChangeConnectionWeight.InputValueDouble;
+            result.AnimalMutationMutationTypeAddNodeWeight = SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.InputValueDouble;
+            result.AnimalMutationMutationTypeRemoveNodeWeight = SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.InputValueDouble;
+            result.AnimalMutationMutationTypeChangeNodeTypeWeight = SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.InputValueDouble;
+            result.AnimalMutationMutationTypeAddConnectionWeight = SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.InputValueDouble;
+            result.AnimalMutationMutationTypeRemoveConnectionWeight = SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.InputValueDouble;
+            result.AnimalMutationMutationTypeChangeConnectionOriginWeight = SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.InputValueDouble;
+            result.AnimalMutationMutationTypeChangeConnectionTargetWeight = SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.InputValueDouble;
+            result.AnimalMutationMutationTypeChangeConnectionWeightWeight = SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.InputValueDouble;
 
-            result.AnimalNodeTypeInputWeight = SoupSettingsItem_AnimalNodeTypeInputWeight.InputValueDouble;
-            result.AnimalNodeTypeHiddenWeight = SoupSettingsItem_AnimalNodeTypeHiddenWeight.InputValueDouble;
-            result.AnimalNodeTypeOutputWeight = SoupSettingsItem_AnimalNodeTypeOutputWeight.InputValueDouble;
+            result.AnimalMutationNodeTypeInputWeight = SoupSettingsItem_AnimalMutationNodeTypeInputWeight.InputValueDouble;
+            result.AnimalMutationNodeTypeHiddenWeight = SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.InputValueDouble;
+            result.AnimalMutationNodeTypeOutputWeight = SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.InputValueDouble;
 
             return result;
         }

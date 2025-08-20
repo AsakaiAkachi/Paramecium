@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Paramecium.Rendering
 {
+    // SoupViewを描画するクラス
     public static partial class SoupViewRenderer
     {
         private static readonly Double4d _soupBackgroundColor = new Double4d(1, 0, 0, 0.125);                               // スープの背景
@@ -17,9 +18,10 @@ namespace Paramecium.Rendering
         private static readonly Double4d _plantLowElementColor = new Double4d(1, 0, 0.25, 0);                               // 植物の色(エレメント量が0の時)
         private static readonly Double4d _plantHighElementColor = new Double4d(1, 0, 1, 0);                                 // 植物の色(エレメント量がPlantMaximumElementAmountに等しい時)
         private static readonly Double4d _animalEyeColor = new Double4d(1, 0, 0, 0);                                        // 動物の目の色
+        private static readonly Double4d _animalEyeOutlineColor = new Double4d(1, 0.5, 0.5, 0.5);                           // 動物の目の輪郭の色(色が非常に暗い動物用)
         private static readonly Double4d _animalEggColor = new Double4d(1, 1, 0.75, 1);                                     // 動物の卵の色
         private static readonly Double4d _animalUnderAttackColor = new Double4d(1, 1, 0, 0);                                // 攻撃を受けた動物の色
-        private static readonly Double4d _animalUnderAttackColor2 = new Double4d(1, 0, 0, 0);                            // 攻撃を受けた動物の色 (色が_animalUnderAttackColorに近い動物用)
+        private static readonly Double4d _animalUnderAttackColor2 = new Double4d(1, 0, 0, 0);                               // 攻撃を受けた動物の色 (色が_animalUnderAttackColorに近い動物用)
 
         private static readonly Pen _soupBorderPen = new Pen(Color.FromArgb(255, 255, 0, 0));                               // スープの端
         private static readonly SolidBrush _soupOutsideBrush = new SolidBrush(Color.FromArgb(255, 0, 0, 0));                // スープの外側を塗りつぶす用
@@ -27,6 +29,7 @@ namespace Paramecium.Rendering
         private static readonly Pen _cellOutlinePen = new Pen((Color)_cellOutlineColor);                                    // セルの輪郭
         private static readonly SolidBrush _animalEggBrush = new SolidBrush((Color)_animalEggColor);                        // 動物の卵の色
         private static readonly SolidBrush _animalEyeBrush = new SolidBrush((Color)_animalEyeColor);                        // 動物の目の色
+        private static readonly Pen _animalEyeOutlinePen = new Pen((Color)_animalEyeOutlineColor);                          // 動物の目の輪郭の色(色が非常に暗い動物用)
 
         public static void DrawSoupView(Bitmap soupViewImage, Soup soup, SoupSettings settings, Double2d cameraPosition, int cameraZoomLevel, double unitPerPixel, Int2d mousePosition, SoupObjectPointer selectedObjectPointer)
         {
@@ -42,7 +45,7 @@ namespace Paramecium.Rendering
             {
                 // 画面内に入っているタイルの範囲を計算する
                 Int2d soupViewStartTilePosition = new Int2d(Math.Max(0, (int)Math.Floor(cameraPosition.X - (imageSize.X / 2d * unitPerPixel)) - 1), Math.Max(0, (int)Math.Floor(cameraPosition.Y - (imageSize.Y / 2d * unitPerPixel)) - 1));
-                Int2d soupViewEndTilePosition = new Int2d(Math.Min(settings.SizeX - 1, (int)Math.Ceiling(cameraPosition.X + (imageSize.X / 2d * unitPerPixel)) + 1), Math.Min(settings.SizeY - 1, (int)Math.Ceiling(cameraPosition.Y + (imageSize.Y / 2d * unitPerPixel)) + 1));
+                Int2d soupViewEndTilePosition = new Int2d(Math.Min(settings.SoupSizeX - 1, (int)Math.Ceiling(cameraPosition.X + (imageSize.X / 2d * unitPerPixel)) + 1), Math.Min(settings.SoupSizeY - 1, (int)Math.Ceiling(cameraPosition.Y + (imageSize.Y / 2d * unitPerPixel)) + 1));
 
                 // 植物の描画
                 for (int x = soupViewStartTilePosition.X; x <= soupViewEndTilePosition.X; x++)
@@ -52,21 +55,26 @@ namespace Paramecium.Rendering
                         int tileIndex = soup.GetTileIndexFromTilePosition(new Int2d(x, y));
                         Tile targetTile = soup.Tiles[tileIndex];
 
-                        for (int i = 0; i < targetTile.PlantPopulation; i++)
+                        List<int> targetTilePlantIndexes = new List<int>(targetTile.PlantIndexes);
+
+                        for (int i = 0; i < targetTilePlantIndexes.Count; i++)
                         {
                             try
                             {
-                                int targetPlantIndex = targetTile.PlantIndexes[i];
+                                int targetPlantIndex = targetTilePlantIndexes[i];
                                 Plant? targetPlant = soup.Plants[targetPlantIndex];
 
                                 if (targetPlant is not null)
                                 {
                                     // セルの描画
+                                    Double2d targetPlantPosition = targetPlant.Position;
+                                    double targetPlantRadius = targetPlant.Radius;
+
                                     SolidBrush plantColorBrush = new SolidBrush((Color)Double4d.Lerp(_plantLowElementColor, _plantHighElementColor, targetPlant.Element / settings.PlantMaximumElementAmount));
 
-                                    FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetPlant.Position, targetPlant.Radius, plantColorBrush);
+                                    FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetPlantPosition, targetPlantRadius, plantColorBrush);
                                     plantColorBrush.Dispose();
-                                    DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetPlant.Position, targetPlant.Radius, _cellOutlinePen);
+                                    DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetPlantPosition, targetPlantRadius, _cellOutlinePen);
                                 }
                             }
                             catch { }
@@ -82,15 +90,24 @@ namespace Paramecium.Rendering
                         int tileIndex = soup.GetTileIndexFromTilePosition(new Int2d(x, y));
                         Tile targetTile = soup.Tiles[tileIndex];
 
-                        for (int i = 0; i < targetTile.AnimalPopulation; i++)
+                        List<int> targetTileAnimalIndexes = new List<int>(targetTile.AnimalIndexes);
+
+                        for (int i = 0; i < targetTileAnimalIndexes.Count; i++)
                         {
                             try
                             {
-                                int targetAnimalIndex = targetTile.AnimalIndexes[i];
+                                int targetAnimalIndex = targetTileAnimalIndexes[i];
                                 Animal? targetAnimal = soup.Animals[targetAnimalIndex];
 
                                 if (targetAnimal is not null)
                                 {
+                                    Double2d targetAnimalPosition = targetAnimal.Position;
+                                    double targetAnimalAngle = targetAnimal.Angle;
+                                    double targetAnimalRadius = targetAnimal.Radius;
+
+                                    double targetAnimalBrainOutputAcceleration = targetAnimal.Brain.Output.Acceleration;
+                                    double targetAnimalBrainOutputRotation = targetAnimal.Brain.Output.Rotation;
+
                                     Double4d targetAnimalSpeciesSignature = targetAnimal.SpeciesSignature;
                                     Double4d targetAnimalColor = new Double4d(1d, targetAnimalSpeciesSignature.Y, targetAnimalSpeciesSignature.Z, targetAnimalSpeciesSignature.W);
 
@@ -99,9 +116,9 @@ namespace Paramecium.Rendering
                                         // 卵の描画
                                         SolidBrush animalColorBrush = new SolidBrush((Color)(new Double4d(1d, targetAnimalSpeciesSignature.Y * 0.9375d, targetAnimalSpeciesSignature.Z * 0.9375d, targetAnimalSpeciesSignature.W * 0.9375d)));
 
-                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimal.Position, targetAnimal.Radius, _animalEggBrush);
-                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimal.Position, targetAnimal.Radius * 0.75, animalColorBrush);
-                                        DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimal.Position, targetAnimal.Radius, _cellOutlinePen);
+                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition, targetAnimalRadius, _animalEggBrush);
+                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition, targetAnimalRadius * 0.75, animalColorBrush);
+                                        DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition, targetAnimalRadius, _cellOutlinePen);
 
                                         animalColorBrush.Dispose();
                                     }
@@ -118,13 +135,18 @@ namespace Paramecium.Rendering
                                         else animalColorBrush = new SolidBrush((Color)targetAnimalColor);
 
                                         // セルの描画
-                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimal.Position, targetAnimal.Radius, animalColorBrush);
+                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition, targetAnimalRadius, animalColorBrush);
                                         animalColorBrush.Dispose();
-                                        DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimal.Position, targetAnimal.Radius, _cellOutlinePen);
+                                        DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition, targetAnimalRadius, _cellOutlinePen);
 
                                         // 目の描画
-                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimal.Position + Double2d.Rotate01(new Double2d(0.4d, 0d), targetAnimal.Angle + 0.075d), targetAnimal.Radius * 0.1d, _animalEyeBrush);
-                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimal.Position + Double2d.Rotate01(new Double2d(0.4d, 0d), targetAnimal.Angle - 0.075d), targetAnimal.Radius * 0.1d, _animalEyeBrush);
+                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition + Double2d.Rotate01(new Double2d(0.4d, 0d), targetAnimalAngle + 0.075d), targetAnimalRadius * 0.1d, _animalEyeBrush);
+                                        FillEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition + Double2d.Rotate01(new Double2d(0.4d, 0d), targetAnimalAngle - 0.075d), targetAnimalRadius * 0.1d, _animalEyeBrush);
+                                        if (Double4d.DistanceSquared(targetAnimalColor, new Double4d(1d, 0d, 0d, 0d)) < 0.125d * 0.125d)
+                                        {
+                                            DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition + Double2d.Rotate01(new Double2d(0.4d, 0d), targetAnimalAngle + 0.075d), targetAnimalRadius * 0.1d, _animalEyeOutlinePen);
+                                            DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimalPosition + Double2d.Rotate01(new Double2d(0.4d, 0d), targetAnimalAngle - 0.075d), targetAnimalRadius * 0.1d, _animalEyeOutlinePen);
+                                        }
 
                                         // 鞭毛の描画
                                         if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Acceleration))
@@ -135,10 +157,10 @@ namespace Paramecium.Rendering
                                             {
                                                 DrawLine(
                                                     imageSize, graphics, cameraPosition, unitPerPixel,
-                                                    targetAnimal.Position + Double2d.FromAngle01(targetAnimal.Angle + 0.5d) * 0.5d,
-                                                    targetAnimal.Position + Double2d.FromAngle01(targetAnimal.Angle + 0.5d) * 0.5d + Double2d.FromAngle01(
-                                                        targetAnimal.Angle + 0.5d + (animalFlagellumAngleRandom.NextDouble() * 2d - 1d) * 0.05d * double.Min(1d, double.Abs(targetAnimal.Brain.Output.Acceleration)) +      // ニューラルネットのAcceleration出力の値に応じて鞭毛の角度の幅を変える
-                                                        double.Max(-1d, double.Min(1d, targetAnimal.Brain.Output.Rotation)) * 0.1d      // ニューラルネットのRotation出力の値に応じて鞭毛の角度を変える
+                                                    targetAnimalPosition + Double2d.FromAngle01(targetAnimalAngle + 0.5d) * 0.5d,
+                                                    targetAnimalPosition + Double2d.FromAngle01(targetAnimalAngle + 0.5d) * 0.5d + Double2d.FromAngle01(
+                                                        targetAnimalAngle + 0.5d + (animalFlagellumAngleRandom.NextDouble() * 2d - 1d) * 0.05d * Math.Sqrt(double.Min(1d, double.Abs(targetAnimalBrainOutputAcceleration))) +       // ニューラルネットのAcceleration出力の値に応じて鞭毛の角度の幅を変える
+                                                        Math.Sqrt(double.Min(1d, double.Abs(targetAnimalBrainOutputRotation))) * -double.Sign(targetAnimalBrainOutputRotation) * 0.1d       // ニューラルネットのRotation出力の値に応じて鞭毛の角度を変える
                                                     ) * (0.5d + ((animalFlagellumLengthRandom.NextDouble() * 2d - 1d) * 0.1d)),         // 鞭毛の長さをランダム化する
                                                     _cellOutlinePen
                                                 );
@@ -173,11 +195,11 @@ namespace Paramecium.Rendering
             }
 
             // スープの端の線と外側の塗りつぶし
-            FillRectangle(imageSize, graphics, cameraPosition, unitPerPixel, new Double2d(-16, -16), new Double2d(settings.SizeX + 16, 0), _soupOutsideBrush);
-            FillRectangle(imageSize, graphics, cameraPosition, unitPerPixel, new Double2d(-16, settings.SizeY), new Double2d(settings.SizeX + 16, settings.SizeY + 16), _soupOutsideBrush);
-            FillRectangle(imageSize, graphics, cameraPosition, unitPerPixel, new Double2d(-16, -16), new Double2d(0, settings.SizeY + 16), _soupOutsideBrush);
-            FillRectangle(imageSize, graphics, cameraPosition, unitPerPixel, new Double2d(settings.SizeX, -16), new Double2d(settings.SizeX + 16, settings.SizeY + 16), _soupOutsideBrush);
-            DrawRectangle(imageSize, graphics, cameraPosition, unitPerPixel, Double2d.Zero, new Double2d(settings.SizeX, settings.SizeY), _soupBorderPen);
+            FillRectangle(imageSize, graphics, cameraPosition, unitPerPixel, new Double2d(-16, -16), new Double2d(settings.SoupSizeX + 16, 0), _soupOutsideBrush);
+            FillRectangle(imageSize, graphics, cameraPosition, unitPerPixel, new Double2d(-16, settings.SoupSizeY), new Double2d(settings.SoupSizeX + 16, settings.SoupSizeY + 16), _soupOutsideBrush);
+            FillRectangle(imageSize, graphics, cameraPosition, unitPerPixel, new Double2d(-16, -16), new Double2d(0, settings.SoupSizeY + 16), _soupOutsideBrush);
+            FillRectangle(imageSize, graphics, cameraPosition, unitPerPixel, new Double2d(settings.SoupSizeX, -16), new Double2d(settings.SoupSizeX + 16, settings.SoupSizeY + 16), _soupOutsideBrush);
+            DrawRectangle(imageSize, graphics, cameraPosition, unitPerPixel, Double2d.Zero, new Double2d(settings.SoupSizeX, settings.SoupSizeY), _soupBorderPen);
 
 
             graphics.Dispose();
@@ -187,24 +209,24 @@ namespace Paramecium.Rendering
         private static void DrawSoupOverview(Soup soup, SoupSettings settings, Int2d size, Graphics graphics, Double2d cameraPosition, int cameraZoomLevel, double unitPerPixel)
         {
             Int2d startPixelPosition = new Int2d((int)Math.Floor((-cameraPosition.X) / unitPerPixel + size.X / 2d - Math.Floor(0.5d / unitPerPixel)), (int)Math.Floor((-cameraPosition.Y) / unitPerPixel + size.Y / 2d - Math.Floor(0.5d / unitPerPixel)));
-            Int2d drawSize = new Int2d((int)Math.Ceiling(settings.SizeX / unitPerPixel + (1d / unitPerPixel)), (int)Math.Ceiling(settings.SizeY / unitPerPixel + (1d / unitPerPixel)));
+            Int2d drawSize = new Int2d((int)Math.Ceiling(settings.SoupSizeX / unitPerPixel + (1d / unitPerPixel)), (int)Math.Ceiling(settings.SoupSizeY / unitPerPixel + (1d / unitPerPixel)));
 
-            Double4d[] overviewColor = new Double4d[settings.Area];
-            uint[] overviewData = new uint[(settings.SizeX + 1) * (settings.SizeY + 1)];
+            Double4d[] overviewColor = new Double4d[settings.SoupArea];
+            uint[] overviewData = new uint[(settings.SoupSizeX + 1) * (settings.SoupSizeY + 1)];
 
             // ピクセルの色を計算する
             for (int i = 0; i < overviewColor.Length; i++)
             {
                 Tile targetTile = soup.Tiles[i];
 
-                if (targetTile.Element <= settings.ElementPerTile) overviewColor[i] = Double4d.Lerp(_soupBackgroundColor, _soupElementColor1, targetTile.Element / settings.ElementPerTile);
-                else overviewColor[i] = Double4d.Lerp(_soupElementColor1, _soupElementColor2, double.Min(1d, (targetTile.Element - settings.ElementPerTile) / settings.ElementPerTile / 3d));
+                if (targetTile.Element <= settings.SoupElementPerTile) overviewColor[i] = Double4d.Lerp(_soupBackgroundColor, _soupElementColor1, targetTile.Element / settings.SoupElementPerTile);
+                else overviewColor[i] = Double4d.Lerp(_soupElementColor1, _soupElementColor2, double.Min(1d, (targetTile.Element - settings.SoupElementPerTile) / settings.SoupElementPerTile / 3d));
 
                 overviewColor[i] = new Double4d(
                     1d,
-                    double.Lerp(overviewColor[i].Y, 1d, double.Max(0d, double.Min(1d, Math.Sqrt(targetTile.PheromoneRed / settings.MaximumEffectivePheromoneAmount)))),
-                    double.Lerp(overviewColor[i].Z, 1d, double.Max(0d, double.Min(1d, Math.Sqrt(targetTile.PheromoneGreen / settings.MaximumEffectivePheromoneAmount)))),
-                    double.Lerp(overviewColor[i].W, 1d, double.Max(0d, double.Min(1d, Math.Sqrt(targetTile.PheromoneBlue / settings.MaximumEffectivePheromoneAmount))))
+                    double.Lerp(overviewColor[i].Y, 1d, double.Max(0d, double.Min(1d, Math.Sqrt(targetTile.PheromoneRed / settings.SoupMaximumEffectivePheromoneAmount)))),
+                    double.Lerp(overviewColor[i].Z, 1d, double.Max(0d, double.Min(1d, Math.Sqrt(targetTile.PheromoneGreen / settings.SoupMaximumEffectivePheromoneAmount)))),
+                    double.Lerp(overviewColor[i].W, 1d, double.Max(0d, double.Min(1d, Math.Sqrt(targetTile.PheromoneBlue / settings.SoupMaximumEffectivePheromoneAmount))))
                 );
 
                 // cameraZoomLevelが4以下の場合、タイルに植物か動物がいればそれに応じた色でピクセルの色を上書きする
@@ -214,7 +236,9 @@ namespace Paramecium.Rendering
                     {
                         try
                         {
-                            Plant? targetPlant = soup.Plants[targetTile.PlantIndexes[targetTile.PlantPopulation - 1]];
+                            List<int> targetTilePlantIndexes = new List<int>(targetTile.PlantIndexes);
+
+                            Plant? targetPlant = soup.Plants[targetTilePlantIndexes[targetTilePlantIndexes.Count - 1]];
 
                             if (targetPlant is not null) overviewColor[i] = _soupOverviewPlantColor;
                         }
@@ -227,16 +251,12 @@ namespace Paramecium.Rendering
                     {
                         try
                         {
-                            Animal? targetAnimal = soup.Animals[targetTile.AnimalIndexes[targetTile.AnimalPopulation - 1]];
+                            List<int> targetTileAnimalIndexes = new List<int>(targetTile.AnimalIndexes);
+
+                            Animal? targetAnimal = soup.Animals[targetTileAnimalIndexes[targetTileAnimalIndexes.Count - 1]];
 
                             if (targetAnimal is not null)
                             {
-                                //if (targetAnimal.Age < 0) overviewColor[i] = _animalEggColor;
-                                //else
-                                //{
-                                //    Double4d targetAnimalSpeciesSignature = targetAnimal.SpeciesSignature;
-                                //    overviewColor[i] = new Double4d(1d, targetAnimalSpeciesSignature.Y, targetAnimalSpeciesSignature.Z, targetAnimalSpeciesSignature.W);
-                                //}
                                 Double4d targetAnimalSpeciesSignature = targetAnimal.SpeciesSignature;
                                 overviewColor[i] = new Double4d(1d, targetAnimalSpeciesSignature.Y, targetAnimalSpeciesSignature.Z, targetAnimalSpeciesSignature.W);
                             }
@@ -257,15 +277,15 @@ namespace Paramecium.Rendering
             // 計算した色をuint型配列に格納
             for (int i = 0; i < overviewData.Length; i++)
             {
-                Int2d pixelPosition = new Int2d(i % (settings.SizeX + 1), i / (settings.SizeX + 1));
+                Int2d pixelPosition = new Int2d(i % (settings.SoupSizeX + 1), i / (settings.SoupSizeX + 1));
                 if (pixelPosition.X > 0 && pixelPosition.Y > 0)
                 {
-                    overviewData[i] = (uint)overviewColor[(pixelPosition.X - 1) + (pixelPosition.Y - 1) * settings.SizeX];
+                    overviewData[i] = (uint)overviewColor[(pixelPosition.X - 1) + (pixelPosition.Y - 1) * settings.SoupSizeX];
                 }
             }
 
             // uint型配列をbyte型配列としてBitmapの色情報に書き込み
-            Bitmap overviewImage = new Bitmap(settings.SizeX + 1, settings.SizeY + 1);
+            Bitmap overviewImage = new Bitmap(settings.SoupSizeX + 1, settings.SoupSizeY + 1);
             BitmapData overviewImageData = overviewImage.LockBits(new Rectangle(0, 0, overviewImage.Width, overviewImage.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             Marshal.Copy(MemoryMarshal.AsBytes<uint>(overviewData).ToArray(), 0, overviewImageData.Scan0, overviewData.Length * 4);
             overviewImage.UnlockBits(overviewImageData);

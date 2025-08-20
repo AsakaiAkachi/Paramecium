@@ -4,11 +4,12 @@ namespace Paramecium.Engine
 {
     public static class AnimalVision
     {
-        // 動物の周辺状況の認識(視覚)の処理
+        // 動物の周辺状況の認識(視覚と嗅覚)の処理
         public static AnimalVisionOutput Observe(Soup soup, SoupSettings settings, Double2d position, double angle, int index, Double4d speciesSignature, int rayCount, int raySamplingCount, double rayLength, double viewingAngle)
         {
             AnimalVisionOutput result = new AnimalVisionOutput();
 
+            // 動物の視覚の処理
             Double2d frontVector = Double2d.FromAngle01(angle);
             double raySamplingRadius = rayLength / raySamplingCount / 2d;
 
@@ -16,6 +17,7 @@ namespace Paramecium.Engine
             double plantTotalWeight = 0d;
             double animalTotalWeight = 0d;
 
+            // rayCountで指定された数の仮想的な光線を発射する
             for (int i = 0; i < rayCount; i++)
             {
                 double rayAngle = double.Lerp(-(viewingAngle / 2d), viewingAngle / 2d, 1d / (rayCount - 1) * i);
@@ -25,6 +27,7 @@ namespace Paramecium.Engine
 
                 Double2d prevSamplingPosition = position;
 
+                // 光線上をraySamplingCountで指定された数に分割して各地点に存在するオブジェクトを取得し、それに応じて出力の値と重みづけを計算する
                 for (int j = 1; j <= raySamplingCount; j++)
                 {
                     Double2d samplingPosition = Double2d.Lerp(position, position + rayVector * rayLength, (double)j / raySamplingCount);
@@ -34,7 +37,7 @@ namespace Paramecium.Engine
                     double proximity = (1d - (double)j / raySamplingCount) * weight;
                     double distance = (double)j / raySamplingCount * weight;
 
-                    if (samplingPosition.X < 0d || samplingPosition.X > settings.SizeX || samplingPosition.Y < 0d || samplingPosition.Y > settings.SizeY)
+                    if (samplingPosition.X < 0d || samplingPosition.X > settings.SoupSizeX || samplingPosition.Y < 0d || samplingPosition.Y > settings.SoupSizeY)
                     {
                         wallTotalWeight += weight;
                         result.WallWAvgAngle = unweightedAngle * weight;
@@ -123,6 +126,7 @@ namespace Paramecium.Engine
                 }
             }
 
+            // 重みづけの合計が1になるように出力を調整する
             if (wallTotalWeight > 0)
             {
                 result.WallWAvgAngle /= wallTotalWeight;
@@ -164,6 +168,7 @@ namespace Paramecium.Engine
                 result.AnimalWAvgSpeciesSigDiff = 0d;
             }
 
+            // 動物の嗅覚(フェロモン)の処理
             double pheromoneRedConcentration = 0d;
             double pheromoneGreenConcentration = 0d;
             double pheromoneBlueConcentration = 0d;
@@ -171,7 +176,7 @@ namespace Paramecium.Engine
             Double2d pheromoneGreenGradAngleVector = Double2d.Zero;
             Double2d pheromoneBlueGradAngleVector = Double2d.Zero;
 
-            double maximumEffectivePheromoneAmount = settings.MaximumEffectivePheromoneAmount;
+            double maximumEffectivePheromoneAmount = settings.SoupMaximumEffectivePheromoneAmount;
 
             for (int x = 0; x <= 1; x++)
             {
@@ -179,7 +184,7 @@ namespace Paramecium.Engine
                 {
                     Double2d pheromoneSamplingPosition = position + new Double2d(-0.5d, -0.5d) + new Double2d(x, y);
 
-                    if (pheromoneSamplingPosition.X >= 0d && pheromoneSamplingPosition.X <= settings.SizeX && pheromoneSamplingPosition.Y >= 0d && pheromoneSamplingPosition.Y <= settings.SizeY)
+                    if (pheromoneSamplingPosition.X >= 0d && pheromoneSamplingPosition.X <= settings.SoupSizeX && pheromoneSamplingPosition.Y >= 0d && pheromoneSamplingPosition.Y <= settings.SoupSizeY)
                     {
                         Tile targetTile = soup.Tiles[soup.GetTileIndexFromPosition(pheromoneSamplingPosition)];
 

@@ -1,5 +1,6 @@
 ﻿namespace Paramecium.Engine
 {
+    // 脳のノードのタイプを表す列挙型
     public enum BrainNodeFunction
     {
         // その他

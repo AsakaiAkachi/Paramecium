@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Paramecium.Variables
 {
+    // Double型4次元ベクトル、主に種族シグネチャや色の表現に使用
     public struct Double4d
     {
         public double X { get; set; }

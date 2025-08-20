@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Paramecium.Variables
 {
+    // Double型2次元ベクトル、主に座標と速度の表現に使用
     public struct Double2d
     {
         public double X { get; set; }

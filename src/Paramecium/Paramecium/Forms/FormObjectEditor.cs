@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Paramecium.Forms
 {
+    // オブジェクトエディターのForm
     public partial class FormObjectEditor : Form
     {
         private static JsonSerializerOptions _jsonSerializerOptions;

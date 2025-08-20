@@ -2,19 +2,12 @@
 
 namespace Paramecium.Forms
 {
+    // オートセーブの設定をするためのForm
     public partial class FormAutosaveSettings : Form
     {
         public FormAutosaveSettings()
         {
             InitializeComponent();
-
-            Soup? soup = Globals.Soup;
-
-            if (soup is not null)
-            {
-                CheckBoxAutosaveEnable.Checked = soup.AutosaveEnabled;
-                NumUpDownAutosaveInterval.Value = soup.AutosaveInterval;
-            }
         }
 
         private void ButtonApplySettings_Click(object sender, EventArgs e)
@@ -34,6 +27,17 @@ namespace Paramecium.Forms
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void FormAutosaveSettings_Shown(object sender, EventArgs e)
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                CheckBoxAutosaveEnable.Checked = soup.AutosaveEnabled;
+                NumUpDownAutosaveInterval.Value = soup.AutosaveInterval;
+            }
         }
     }
 }

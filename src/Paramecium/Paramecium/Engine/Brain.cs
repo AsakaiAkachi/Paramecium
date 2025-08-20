@@ -1,28 +1,19 @@
-﻿using System.Linq;
+﻿using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 
 namespace Paramecium.Engine
 {
+    // 動物のニューラルネットが格納されているクラス
     public class Brain
     {
 
-        public List<BrainNode> Nodes { get; set; } = new List<BrainNode>();
-        public List<BrainNodeConnection> Connections { get; set; } = new List<BrainNodeConnection>();
+        public List<BrainNode> Nodes { get; set; } = new List<BrainNode>();                             // 脳のノード
+        public List<BrainNodeConnection> Connections { get; set; } = new List<BrainNodeConnection>();   // 脳のノード間接続
 
-        /**
-        public double InheritedMemory0 { get; set; }
-        public double InheritedMemory1 { get; set; }
-        public double InheritedMemory2 { get; set; }
-        public double InheritedMemory3 { get; set; }
-        public double InheritedMemory4 { get; set; }
-        public double InheritedMemory5 { get; set; }
-        public double InheritedMemory6 { get; set; }
-        public double InheritedMemory7 { get; set; }
-        **/
+        public BrainInput Input { get; set; } = new BrainInput();       // 入力
+        public BrainOutput Output { get; set; } = new BrainOutput();    // 出力
 
-        public BrainInput Input { get; set; } = new BrainInput();
-        public BrainOutput Output { get; set; } = new BrainOutput();
-
+        // Nodesに入っているノードの内特定の種類のノードのみを列挙する
         [JsonIgnore]
         public int[] InputNodeIndexes
         {
@@ -75,26 +66,25 @@ namespace Paramecium.Engine
         }
 
         [JsonIgnore]
+        public static readonly int IndexOfFirstInputTypeBrainNodeFunction = (int)BrainNodeFunction.Input_Bias;
+        [JsonIgnore]
+        public static readonly int IndexOfLastInputTypeBrainNodeFunction = (int)BrainNodeFunction.Input_PheromoneBlueGradAngle;
+        [JsonIgnore]
+        public static readonly int IndexOfFirstHiddenTypeBrainNodeFunction = (int)BrainNodeFunction.Hidden_ReLU;
+        [JsonIgnore]
+        public static readonly int IndexOfLastHiddenTypeBrainNodeFunction = (int)BrainNodeFunction.Hidden_Frac;
+        [JsonIgnore]
+        public static readonly int IndexOfFirstOutputTypeBrainNodeFunction = (int)BrainNodeFunction.Output_Acceleration;
+        [JsonIgnore]
+        public static readonly int IndexOfLastOutputTypeBrainNodeFunction = (int)BrainNodeFunction.Output_PheromoneBlueProduction;
+
+        // デフォルトの脳を取得する
+        [JsonIgnore]
         public static Brain DefaultBrain
         {
             get
             {
                 Brain result = new Brain();
-
-                /**
-                result.Nodes.Add(new BrainNode() { Type = BrainNodeType.Input_Bias });
-                result.Nodes.Add(new BrainNode() { Type = BrainNodeType.Input_PlantAvgAngle });
-                result.Nodes.Add(new BrainNode() { Type = BrainNodeType.Input_PlantAvgDistance });
-                result.Nodes.Add(new BrainNode() { Type = BrainNodeType.Output_Acceleration });
-                result.Nodes.Add(new BrainNode() { Type = BrainNodeType.Output_Rotation });
-                result.Nodes.Add(new BrainNode() { Type = BrainNodeType.Output_Attack });
-
-                result.Connections.Add(new BrainNodeConnection() { OriginIndex = 0, TargetIndex = 4, Weight = 0.01 });
-                result.Connections.Add(new BrainNodeConnection() { OriginIndex = 0, TargetIndex = 5, Weight = 0.25 });
-                result.Connections.Add(new BrainNodeConnection() { OriginIndex = 1, TargetIndex = 4, Weight = 1 });
-                result.Connections.Add(new BrainNodeConnection() { OriginIndex = 2, TargetIndex = 3, Weight = 1 });
-                result.Connections.Add(new BrainNodeConnection() { OriginIndex = 2, TargetIndex = 5, Weight = -1 });
-                **/
 
                 result.Nodes.Add(new BrainNode() { Function = BrainNodeFunction.Input_Bias });
                 result.Nodes.Add(new BrainNode() { Function = BrainNodeFunction.Input_PlantWAvgAngle });
@@ -117,7 +107,7 @@ namespace Paramecium.Engine
         }
 
         public Brain() { }
-        public Brain(Brain parentBrain)
+        public Brain(Brain parentBrain)     // 動物が生殖した際に親から脳の構造を継承する用のコンストラクター
         {
             for (int i = 0; i < parentBrain.Nodes.Count; i++)
             {
@@ -127,42 +117,51 @@ namespace Paramecium.Engine
             {
                 Connections.Add(new BrainNodeConnection() { OriginIndex = parentBrain.Connections[i].OriginIndex, TargetIndex = parentBrain.Connections[i].TargetIndex, Weight = parentBrain.Connections[i].Weight });
             }
+        }
 
-            /**
-            InheritedMemory0 = parentBrain.Output.InheritedMemory0;
-            InheritedMemory1 = parentBrain.Output.InheritedMemory1;
-            InheritedMemory2 = parentBrain.Output.InheritedMemory2;
-            InheritedMemory3 = parentBrain.Output.InheritedMemory3;
-            InheritedMemory4 = parentBrain.Output.InheritedMemory4;
-            InheritedMemory5 = parentBrain.Output.InheritedMemory5;
-            InheritedMemory6 = parentBrain.Output.InheritedMemory6;
-            InheritedMemory7 = parentBrain.Output.InheritedMemory7;
-            **/
+        // 脳を突然変異させる処理
+        public int TryMutation(SoupSettings settings)
+        {
+            Random rand = new Random();
+
+            int mutationCount = 0;
+
+            if (rand.NextDouble() < settings.AnimalMutationMutationRate)
+            {
+                for (int i = 0; i < settings.AnimalMutationMaximumMutationCount; i++)
+                {
+                    bool mutationSuccessful = Mutate(settings);
+                    if (mutationSuccessful) mutationCount++;
+
+                    if (rand.NextDouble() > settings.AnimalMutationMutationCountFactor) break;
+                }
+            }
+
+            RemoveInvalidNode();
+
+            return mutationCount;
         }
 
         public bool Mutate(SoupSettings settings)
         {
             int mutationType = WeightedSelector(settings.AnimalMutationTypeWeights);
-
             bool mutationSuccessful = false;
 
             if (mutationType == 0) mutationSuccessful = AddNodeMutation(settings);
-            if (mutationType == 1) mutationSuccessful = RemoveNodeMutation();
-            if (mutationType == 2) mutationSuccessful = ChangeNodeTypeMutation(settings);
-            if (mutationType == 3) mutationSuccessful = AddConnectionMutation(settings);
-            if (mutationType == 4) mutationSuccessful = RemoveConnectionMutation();
-            if (mutationType == 5) mutationSuccessful = ChangeConnectionOriginMutation();
-            if (mutationType == 6) mutationSuccessful = ChangeConnectionTargetMutation();
-            if (mutationType == 7) mutationSuccessful = ChangeConnectionWeightMutation();
-
-            RemoveInvalidNode();
+            else if (mutationType == 1) mutationSuccessful = RemoveNodeMutation();
+            else if (mutationType == 2) mutationSuccessful = ChangeNodeTypeMutation(settings);
+            else if (mutationType == 3) mutationSuccessful = AddConnectionMutation(settings);
+            else if (mutationType == 4) mutationSuccessful = RemoveConnectionMutation();
+            else if (mutationType == 5) mutationSuccessful = ChangeConnectionOriginMutation();
+            else if (mutationType == 6) mutationSuccessful = ChangeConnectionTargetMutation();
+            else if (mutationType == 7) mutationSuccessful = ChangeConnectionWeightMutation();
 
             return mutationSuccessful;
         }
 
-        public bool AddNodeMutation(SoupSettings settings)
+        public bool AddNodeMutation(SoupSettings settings)  // ランダムなノードを追加する突然変異
         {
-            if (Nodes.Count < settings.AnimalMaximumNodeCount)
+            if (Nodes.Count < settings.AnimalBrainMaximumNodeCount)
             {
                 if (InputNodeIndexes.Length > 0 && OutputNodeIndexes.Length > 0)
                 {
@@ -171,22 +170,30 @@ namespace Paramecium.Engine
                     BrainNode targetNode = new BrainNode();
                     int targetNodeIndex = Nodes.Count;
 
-                    int nodeType = WeightedSelector(settings.AnimalNodeTypeWeights);
-                    //if (nodeType == 0) targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Input_Bias, (int)BrainNodeFunction.Input_InheritedMemory7 + 1);
-                    if (nodeType == 0) targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Input_Bias, (int)BrainNodeFunction.Input_PheromoneBlueGradAngle + 1);
-                    if (nodeType == 1) targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Hidden_ReLU, (int)BrainNodeFunction.Hidden_Frac + 1);
-                    //if (nodeType == 2) targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Output_Acceleration, (int)BrainNodeFunction.Output_InheritedMemory7 + 1);
-                    if (nodeType == 2) targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Output_Acceleration, (int)BrainNodeFunction.Output_PheromoneBlueProduction + 1);
+                    int nodeType = WeightedSelector(settings.AnimalMutationNodeTypeWeights);
+                    if (nodeType == 0) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstInputTypeBrainNodeFunction, IndexOfLastInputTypeBrainNodeFunction + 1);
+                    if (nodeType == 1) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstHiddenTypeBrainNodeFunction, IndexOfLastHiddenTypeBrainNodeFunction + 1);
+                    if (nodeType == 2) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstOutputTypeBrainNodeFunction, IndexOfLastOutputTypeBrainNodeFunction + 1);
 
                     if (nodeType == 0 || nodeType == 1)
                     {
                         int[] outputAndHiddenNodeIndexes = OutputAndHiddenNodeIndexes;
-                        Connections.Add(new BrainNodeConnection() { OriginIndex = targetNodeIndex, TargetIndex = outputAndHiddenNodeIndexes[rand.Next(0, outputAndHiddenNodeIndexes.Length)], Weight = rand.NextDouble() * 4d - 2d });
+                        if (outputAndHiddenNodeIndexes.Length == 0) return false;
+
+                        BrainNodeConnection targetConnection = new BrainNodeConnection() { OriginIndex = targetNodeIndex, TargetIndex = outputAndHiddenNodeIndexes[rand.Next(0, outputAndHiddenNodeIndexes.Length)], Weight = rand.NextDouble() * 4d - 2d };
+
+                        if (targetConnection.OriginIndex != targetConnection.TargetIndex) Connections.Add(targetConnection);
+                        else return false;
                     }
                     if (nodeType == 1 || nodeType == 2)
                     {
                         int[] inputAndHiddenNodeIndexes = InputAndHiddenNodeIndexes;
-                        Connections.Add(new BrainNodeConnection() { OriginIndex = inputAndHiddenNodeIndexes[rand.Next(0, inputAndHiddenNodeIndexes.Length)], TargetIndex = targetNodeIndex, Weight = rand.NextDouble() * 4d - 2d });
+                        if (inputAndHiddenNodeIndexes.Length == 0) return false;
+
+                        BrainNodeConnection targetConnection = new BrainNodeConnection() { OriginIndex = inputAndHiddenNodeIndexes[rand.Next(0, inputAndHiddenNodeIndexes.Length)], TargetIndex = targetNodeIndex, Weight = rand.NextDouble() * 4d - 2d };
+
+                        if (targetConnection.OriginIndex != targetConnection.TargetIndex) Connections.Add(targetConnection);
+                        else return false;
                     }
 
                     Nodes.Add(targetNode);
@@ -196,6 +203,7 @@ namespace Paramecium.Engine
             }
             else
             {
+                // ノード数が上限に達している場合はRemoveNodeMutationかChangeNodeTypeMutationにフォールバックする
                 int fallbackMutationType = WeightedSelector(settings.AnimalMutationTypeWeightsAddNodeMutationFallback);
 
                 if (fallbackMutationType == 0) return RemoveNodeMutation();
@@ -204,7 +212,7 @@ namespace Paramecium.Engine
 
             return false;
         }
-        public bool RemoveNodeMutation()
+        public bool RemoveNodeMutation()    // ランダムなノードを削除する突然変異
         {
             if (Nodes.Count > 0)
             {
@@ -228,7 +236,7 @@ namespace Paramecium.Engine
             
             return false;
         }
-        public bool ChangeNodeTypeMutation(SoupSettings settings)
+        public bool ChangeNodeTypeMutation(SoupSettings settings)   // ランダムなノードの種類を変更する突然変異
         {
             if (Nodes.Count > 0)
             {
@@ -242,51 +250,76 @@ namespace Paramecium.Engine
                 if (targetNode.IsHidden) targetNodePrevNodeType = 1;
                 if (targetNode.IsOutput) targetNodePrevNodeType = 2;
 
-                int nodeType = WeightedSelector(settings.AnimalNodeTypeWeights);
+                int nodeType = WeightedSelector(settings.AnimalMutationNodeTypeWeights);
 
-                if (nodeType == 0) targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Input_Bias, (int)BrainNodeFunction.Input_PheromoneBlueGradAngle + 1);
-                if (nodeType == 1) targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Hidden_ReLU, (int)BrainNodeFunction.Hidden_Frac + 1);
-                if (nodeType == 2) targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Output_Acceleration, (int)BrainNodeFunction.Output_PheromoneBlueProduction + 1);
+                // ノードの種類を変更する
+                if (nodeType == 0) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstInputTypeBrainNodeFunction, IndexOfLastInputTypeBrainNodeFunction + 1);
+                if (nodeType == 1) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstHiddenTypeBrainNodeFunction, IndexOfLastHiddenTypeBrainNodeFunction + 1);
+                if (nodeType == 2) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstOutputTypeBrainNodeFunction, IndexOfLastOutputTypeBrainNodeFunction + 1);
 
+                // 入力ノードから隠れノードに変異した際の処理
                 if (targetNodePrevNodeType == 0 && nodeType == 1)
                 {
-                    if (InputAndHiddenNodeIndexes.Length > 1)
+                    if (InputAndHiddenNodeIndexes.Length > 0 && Connections.Count < Nodes.Count * settings.AnimalBrainMaximumConnectionCountPerNode)
                     {
                         int[] inputAndHiddenNodeIndexes = InputAndHiddenNodeIndexes;
                         Connections.Add(new BrainNodeConnection() { OriginIndex = inputAndHiddenNodeIndexes[rand.Next(0, inputAndHiddenNodeIndexes.Length)], TargetIndex = targetNodeIndex, Weight = rand.NextDouble() * 4d - 2d });
                     }
-                    else
+                    else if (InputAndHiddenNodeIndexes.Length == 0)     // 突然変異によって入力ノードが存在しなくなる場合
                     {
                         targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Input_Bias, (int)BrainNodeFunction.Input_PheromoneBlueGradAngle + 1);
-                        return true;
+                    }
+                    else if (Connections.Count >= Nodes.Count * settings.AnimalBrainMaximumConnectionCountPerNode)  // 接続数がすでに上限に達している場合
+                    {
+                        nodeType = WeightedSelector(settings.AnimalMutationNodeTypeWeightsWithoutHidden);
+                        if (nodeType == 0) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstInputTypeBrainNodeFunction, IndexOfLastInputTypeBrainNodeFunction + 1);
+                        if (nodeType == 1) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstOutputTypeBrainNodeFunction, IndexOfLastOutputTypeBrainNodeFunction + 1);
                     }
                 }
+                // 出力ノードから隠れノードに変異した際の処理
                 if (targetNodePrevNodeType == 2 && nodeType == 1)
                 {
-                    if (OutputAndHiddenNodeIndexes.Length > 1)
+                    if (OutputAndHiddenNodeIndexes.Length > 0 && Connections.Count < Nodes.Count * settings.AnimalBrainMaximumConnectionCountPerNode)
                     {
                         int[] outputAndHiddenNodeIndexes = OutputAndHiddenNodeIndexes;
                         Connections.Add(new BrainNodeConnection() { OriginIndex = targetNodeIndex, TargetIndex = outputAndHiddenNodeIndexes[rand.Next(0, outputAndHiddenNodeIndexes.Length)], Weight = rand.NextDouble() * 4d - 2d });
                     }
-                    else
+                    else if (OutputAndHiddenNodeIndexes.Length == 0)    // 突然変異によって出力ノードが存在しなくなる場合
                     {
                         targetNode.Function = (BrainNodeFunction)rand.Next((int)BrainNodeFunction.Output_Acceleration, (int)BrainNodeFunction.Output_PheromoneBlueProduction + 1);
-                        return true;
+                    }
+                    else if (Connections.Count >= Nodes.Count * settings.AnimalBrainMaximumConnectionCountPerNode)  // 接続数がすでに上限に達している場合
+                    {
+                        nodeType = WeightedSelector(settings.AnimalMutationNodeTypeWeightsWithoutHidden);
+                        if (nodeType == 0) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstInputTypeBrainNodeFunction, IndexOfLastInputTypeBrainNodeFunction + 1);
+                        if (nodeType == 1) targetNode.Function = (BrainNodeFunction)rand.Next(IndexOfFirstOutputTypeBrainNodeFunction, IndexOfLastOutputTypeBrainNodeFunction + 1);
                     }
                 }
 
+                // 入力ノード以外から入力ノードに変異した際の処理
                 if (targetNodePrevNodeType != 0 && nodeType == 0)
                 {
                     for (int i = Connections.Count - 1; i >= 0; i--)
                     {
                         if (Connections[i].TargetIndex == targetNodeIndex) Connections.RemoveAt(i);
                     }
+                    if (targetNodePrevNodeType == 2)    // 元のノードが出力ノードだった場合の処理
+                    {
+                        int[] outputAndHiddenNodeIndexes = OutputAndHiddenNodeIndexes;
+                        Connections.Add(new BrainNodeConnection() { OriginIndex = targetNodeIndex, TargetIndex = outputAndHiddenNodeIndexes[rand.Next(0, outputAndHiddenNodeIndexes.Length)], Weight = rand.NextDouble() * 4d - 2d });
+                    }
                 }
+                // 出力ノード以外から出力ノードに変異した際の処理
                 if (targetNodePrevNodeType != 2 && nodeType == 2)
                 {
                     for (int i = Connections.Count - 1; i >= 0; i--)
                     {
                         if (Connections[i].OriginIndex == targetNodeIndex) Connections.RemoveAt(i);
+                    }
+                    if (targetNodePrevNodeType == 0)    // 元のノードが入力ノードだった場合の処理
+                    {
+                        int[] inputAndHiddenNodeIndexes = InputAndHiddenNodeIndexes;
+                        Connections.Add(new BrainNodeConnection() { OriginIndex = inputAndHiddenNodeIndexes[rand.Next(0, inputAndHiddenNodeIndexes.Length)], TargetIndex = targetNodeIndex, Weight = rand.NextDouble() * 4d - 2d });
                     }
                 }
 
@@ -295,11 +328,11 @@ namespace Paramecium.Engine
             
             return false;
         }
-        public bool AddConnectionMutation(SoupSettings settings)
+        public bool AddConnectionMutation(SoupSettings settings)    // ランダムな接続を追加する突然変異
         {
             if (Nodes.Count >= 2)
             {
-                if (Connections.Count < Nodes.Count * settings.AnimalMaximumConnectionCountPerNode)
+                if (Connections.Count < Nodes.Count * settings.AnimalBrainMaximumConnectionCountPerNode)
                 {
                     Random rand = new Random();
 
@@ -318,6 +351,7 @@ namespace Paramecium.Engine
                 }
                 else
                 {
+                    // 接続数が上限に達している場合はRemoveConnectionMutation、ChangeConnectionOriginMutation、ChangeConnectionTargetMutation、ChangeConnectionWeightMutationのいずれかにフォールバックする
                     int fallbackMutationType = WeightedSelector(settings.AnimalMutationTypeWeightsAddConnectionMutationFallback);
 
                     if (fallbackMutationType == 0) return RemoveConnectionMutation();
@@ -329,7 +363,7 @@ namespace Paramecium.Engine
             
             return false;
         }
-        public bool RemoveConnectionMutation()
+        public bool RemoveConnectionMutation()  // ランダムな接続を削除する突然変異
         {
             if (Connections.Count > 0)
             {
@@ -343,7 +377,7 @@ namespace Paramecium.Engine
             
             return false;
         }
-        public bool ChangeConnectionOriginMutation()
+        public bool ChangeConnectionOriginMutation()    // ランダムな接続のOriginIndexを変更する突然変異
         {
             if (Connections.Count > 0)
             {
@@ -365,7 +399,7 @@ namespace Paramecium.Engine
             
             return false;
         }
-        public bool ChangeConnectionTargetMutation()
+        public bool ChangeConnectionTargetMutation()    // ランダムな接続のTargetIndexを変更する突然変異
         {
             if (Connections.Count > 0)
             {
@@ -387,7 +421,7 @@ namespace Paramecium.Engine
             
             return false;
         }
-        public bool ChangeConnectionWeightMutation()
+        public bool ChangeConnectionWeightMutation()    // ランダムな接続の重みを変更する突然変異
         {
             if (Connections.Count > 0)
             {
@@ -404,6 +438,7 @@ namespace Paramecium.Engine
             return false;
         }
 
+        // 無効なノードを削除する処理
         public void RemoveInvalidNode()
         {
             List<int>[] nodeIncomingConnections = new List<int>[Nodes.Count];
@@ -413,7 +448,6 @@ namespace Paramecium.Engine
             {
                 nodeIncomingConnections[i] = new List<int>();
                 nodeOutgoingConnections[i] = new List<int>();
-                invalidNodeIndexes.Add(i);
             }
             for (int i = 0; i < Connections.Count; i++)
             {
@@ -424,6 +458,7 @@ namespace Paramecium.Engine
             List<int> connectedFromInputNodeIndexes = new List<int>();
             List<int> connectedFromOutputNodeIndexes = new List<int>();
 
+            // 入力ノード及び入力ノードから接続を順に(OriginからTargetに向かって)たどってたどり着くルートが存在するノードを列挙する
             List<int> exploreNodeIndexes = InputNodeIndexes.ToList<int>();
             while (exploreNodeIndexes.Count > 0)
             {
@@ -444,6 +479,7 @@ namespace Paramecium.Engine
                 exploreNodeIndexes = nextStepExploreNodeIndexes;
             }
 
+            // 出力ノード及び出力ノードから接続を逆に(TargetからOriginに向かって)たどってたどり着くルートが存在するノードを列挙する
             exploreNodeIndexes = OutputNodeIndexes.ToList<int>();
             while (exploreNodeIndexes.Count > 0)
             {
@@ -464,11 +500,13 @@ namespace Paramecium.Engine
                 exploreNodeIndexes = nextStepExploreNodeIndexes;
             }
 
+            // 無効なノード(入力ノードから接続を順にたどって到達するルートか出力ノードから接続を逆にたどって到達するルートのいずれかまたは両方が存在しないノード)を列挙する
             for (int i = 0; i < Nodes.Count; i++)
             {
-                if (connectedFromInputNodeIndexes.Contains(i) && connectedFromOutputNodeIndexes.Contains(i)) invalidNodeIndexes.Remove(i);
+                if (!(connectedFromInputNodeIndexes.Contains(i) && connectedFromOutputNodeIndexes.Contains(i))) invalidNodeIndexes.Add(i);
             }
-
+            
+            // 無効なノードをすべて削除する
             for (int i = invalidNodeIndexes.Count - 1; i >= 0; i--)
             {
                 Nodes.RemoveAt(invalidNodeIndexes[i]);
@@ -485,6 +523,7 @@ namespace Paramecium.Engine
             }
         }
 
+        // 重みづけを考慮して複数の選択肢の中からランダムに一つ選ぶためのメソッド
         private int WeightedSelector(double[] weight)
         {
             double totalWeight = 0d;
@@ -500,6 +539,7 @@ namespace Paramecium.Engine
             return weight.Length - 1;
         }
 
+        // 指定されたOriginとTargetを持つ接続が存在するか調べるメソッド
         private bool ContainConnection(int originIndex, int targetIndex)
         {
             for (int i = 0; i < Connections.Count; i++)
@@ -509,7 +549,8 @@ namespace Paramecium.Engine
 
             return false;
         }
-
+        
+        // 指定されたBrainNodeFunctionを持つノードが存在するか調べるメソッド
         public bool ContainNodeFunction(BrainNodeFunction function)
         {
             for (int i = 0; i < Nodes.Count; i++)
@@ -529,6 +570,7 @@ namespace Paramecium.Engine
             return false;
         }
 
+        // 脳のニューラルネットの更新処理
         public void UpdateBrain(BrainInput brainInput)
         {
             Input = brainInput;

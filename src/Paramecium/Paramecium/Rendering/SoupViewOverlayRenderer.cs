@@ -2,6 +2,7 @@
 
 namespace Paramecium.Rendering
 {
+    // SoupViewのオーバーレイを描画するクラス
     public static class SoupViewOverlayRenderer
     {
         public static readonly SolidBrush OverlayBackgroundBrush = new SolidBrush(Color.FromArgb(127, 63, 63, 63));
@@ -9,11 +10,23 @@ namespace Paramecium.Rendering
         public static readonly SolidBrush OverlayGaugeColor1 = new SolidBrush(Color.FromArgb(255, 127, 127, 127));
         public static readonly SolidBrush OverlayGaugeColor2 = new SolidBrush(Color.FromArgb(255, 191, 191, 191));
 
+        public static void OverlayDrawInformation(OverlayDrawInfo overlayDrawInfo, Graphics graphics, SolidBrush backgroundBrush, SolidBrush textBrush, string text)
+        {
+            OverlayFillRectangle(overlayDrawInfo, graphics, backgroundBrush);
+            OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, text, textBrush);
+            overlayDrawInfo.NextLine();
+        }
+        public static void OverlayDrawInformation(OverlayDrawInfo overlayDrawInfo, Graphics graphics, Color backgroundColor, Color textColor, string text)
+        {
+            SolidBrush backgroundBrush = new SolidBrush(backgroundColor);
+            SolidBrush textBrush = new SolidBrush(textColor);
+            OverlayDrawInformation(overlayDrawInfo, graphics, backgroundBrush, textBrush, text);
+            backgroundBrush.Dispose();
+            textBrush.Dispose();
+        }
         public static void OverlayDrawInformation(OverlayDrawInfo overlayDrawInfo, Graphics graphics, string text)
         {
-            OverlayFillRectangle(overlayDrawInfo, graphics, OverlayBackgroundBrush);
-            OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, text, OverlayTextBrush);
-            overlayDrawInfo.NextLine();
+            OverlayDrawInformation(overlayDrawInfo, graphics, OverlayBackgroundBrush, OverlayTextBrush, text);
         }
 
         public static void OverlayDrawInformationWithGauge(OverlayDrawInfo overlayDrawInfo, Graphics graphics, string text, SolidBrush gaugeBrush, double gaugeValue)
@@ -48,27 +61,8 @@ namespace Paramecium.Rendering
             overlayDrawInfo.NextLine();
         }
 
-        public static void OverlayDrawAnimalBrainInOutInfomation(OverlayDrawInfo overlayDrawInfo, Graphics graphics, string nodeName, double value, Double4d neutralOutputColor, Double4d negativeOutputColor, Double4d positiveOutputColor, Pen nodeOutlinePen)
-        {
-            Double4d color = neutralOutputColor;
-            if (value < 0) color = Double4d.Lerp(color, negativeOutputColor, double.Min(1d, -value));
-            if (value > 0) color = Double4d.Lerp(color, positiveOutputColor, double.Min(1d, value));
-
-            OverlayFillEllipse(overlayDrawInfo, graphics, (Color)color, new Int2d(8, 8), 7);
-            OverlayDrawEllipse(overlayDrawInfo, graphics, nodeOutlinePen, new Int2d(8, 8), 7);
-            OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 8, $"{nodeName}", OverlayTextBrush, new Int2d(18, 0));
-            OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 8, $"{value.ToString("0.000")}", OverlayTextBrush, new Int2d(18, 9));
-            overlayDrawInfo.NextLine();
-        }
 
 
-
-        public static void OverlayFillRectangle(OverlayDrawInfo overlayDrawInfo, Graphics graphics, SolidBrush brush, Int2d position, Int2d size)
-        {
-            Int2d itemPosition = overlayDrawInfo.GetItemPosition();
-
-            graphics.FillRectangle(brush, itemPosition.X + position.X, itemPosition.Y + position.Y, size.X, size.Y);
-        }
         public static void OverlayFillRectangle(OverlayDrawInfo overlayDrawInfo, Graphics graphics, SolidBrush brush, Int2d position)
         {
             Int2d itemPosition = overlayDrawInfo.GetItemPosition();

@@ -6,38 +6,38 @@ namespace Paramecium.Engine
     public class SoupSettings
     {
         // スープの基本設定
-        public int SizeX { get; set; } = 256;   // スープの横方向の大きさ
-        public int SizeY { get; set; } = 256;   // スープの縦方向の大きさ
+        public int SoupSizeX { get; set; } = 256;   // スープの横方向の大きさ
+        public int SoupSizeY { get; set; } = 256;   // スープの縦方向の大きさ
         [JsonIgnore]
-        public int Area { get { return SizeX * SizeY; } }   // スープの面積
+        public int SoupArea { get { return SoupSizeX * SoupSizeY; } }   // スープの面積
 
-        public bool WallEnabled { get; set; } = true;       // 壁が有効であるかどうか
-        public double WallNoiseX { get; set; } = 0d;        // 壁生成用ノイズのオフセット (X,Y,Z)
-        public double WallNoiseY { get; set; } = 0d;
-        public double WallNoiseZ { get; set; } = 0d;
-        public double WallNoiseSamplingInterval { get; set; } = 0.03d;  // 壁生成用ノイズのサンプリング間隔
-        public int WallNoiseOctave { get; set; } = 4;           // 壁生成用ノイズのオクターブ
-        public double WallThickness { get; set; } = 0.01125d;   // 壁の厚さ
+        public bool SoupWallEnabled { get; set; } = true;       // 壁が有効であるかどうか
+        public double SoupWallNoiseX { get; set; } = 0d;        // 壁生成用ノイズのオフセット (X,Y,Z)
+        public double SoupWallNoiseY { get; set; } = 0d;
+        public double SoupWallNoiseZ { get; set; } = 0d;
+        public double SoupWallNoiseSamplingInterval { get; set; } = 0.03d;  // 壁生成用ノイズのサンプリング間隔
+        public int SoupWallNoiseOctave { get; set; } = 4;           // 壁生成用ノイズのオクターブ
+        public double SoupWallThickness { get; set; } = 0.01125d;   // 壁の厚さ
 
-        public double TotalElementAmount { get; set; } = 65536d;    // スープ全体のエレメント総量
-        public double ElementFlowRate { get; set; } = 0.01d;        // タイル間でエレメントが移動する速度
+        public double SoupTotalElementAmount { get; set; } = 65536d;    // スープ全体のエレメント総量
+        public double SoupElementFlowRate { get; set; } = 0.01d;        // タイル間でエレメントが移動する速度
         [JsonIgnore]
-        public double ElementPerTile { get { return TotalElementAmount / Area; } }  // タイル当たりのエレメント量
+        public double SoupElementPerTile { get { return SoupTotalElementAmount / SoupArea; } }  // タイル当たりのエレメント量
 
-        public double MaximumEffectivePheromoneAmount { get; set; } = 1d;       // 有効なフェロモン濃度の上限値、これよりフェロモン濃度が高い場合はこのフェロモン濃度であるものとして扱う
-        public double MinimumEffectivePheromoneAmount { get; set; } = 0.0001d;  // 有効なフェロモン濃度の下限値、これよりフェロモン濃度が低い場合は0として扱う
-        public double PheromoneFlowRate { get; set; } = 0.4d;                   // タイル間でフェロモンが移動する速度
-        public double PheromoneDecayRate { get; set; } = 0.01d;                 // フェロモン量が減少する速度
+        public double SoupMaximumEffectivePheromoneAmount { get; set; } = 1d;       // 有効なフェロモン濃度の上限値、これよりフェロモン濃度が高い場合はこのフェロモン濃度であるものとして扱う
+        public double SoupMinimumEffectivePheromoneAmount { get; set; } = 0.0001d;  // 有効なフェロモン濃度の下限値、これよりフェロモン濃度が低い場合は0として扱う
+        public double SoupPheromoneFlowRate { get; set; } = 0.4d;                   // タイル間でフェロモンが移動する速度
+        public double SoupPheromoneDecayRate { get; set; } = 0.01d;                 // フェロモン量が減少する速度
 
-        public double Drag { get; set; } = 0.1d;                            // 速度に対して毎ステップかかる抵抗の大きさ
-        public double AngularVelocityDrag { get; set; } = 0.1d;             // 角速度に対して毎ステップかかる抵抗の大きさ
-        public double MaximumEffectiveVelocity { get; set; } = 0.1d;        // 有効な速度の上限値、これよりも速度が速い場合はこの速度であるものとして扱う
-        public double MaximumEffectiveAngularVelocity { get; set; } = 0.1d; // 有効な角速度の上限値、これよりも角速度が速い場合はこの角速度であるものとして扱う
-        public double RestitutionCoefficient { get; set; } = 0.1d;          // 反発係数
+        public double SoupDrag { get; set; } = 0.1d;                            // 速度に対して毎ステップかかる抵抗の大きさ
+        public double SoupAngularVelocityDrag { get; set; } = 0.1d;             // 角速度に対して毎ステップかかる抵抗の大きさ
+        public double SoupMaximumEffectiveVelocity { get; set; } = 0.1d;        // 有効な速度の上限値、これよりも速度が速い場合はこの速度であるものとして扱う
+        public double SoupMaximumEffectiveAngularVelocity { get; set; } = 0.1d; // 有効な角速度の上限値、これよりも角速度が速い場合はこの角速度であるものとして扱う
+        public double SoupRestitutionCoefficient { get; set; } = 0.1d;          // 反発係数
 
 
         // 植物
-        public int InitialPlantPopulation { get; set; } = 4096;             // 植物の初期個体数
+        public int PlantInitialPopulation { get; set; } = 4096;             // 植物の初期個体数
 
         public double PlantMaximumElementAmount { get; set; } = 4d;         // 植物の最大エレメント量、このエレメント量を超えると分裂する
         public double PlantElementCollectRate { get; set; } = 0.1d;         // 植物がエレメントを収集する速度
@@ -49,7 +49,7 @@ namespace Paramecium.Engine
 
 
         // 動物 (基本設定)
-        public int InitialAnimalPopulation { get; set; } = 16;                      // 動物の初期個体数
+        public int AnimalInitialPopulation { get; set; } = 16;                      // 動物の初期個体数
 
         public double AnimalMaximumElementAmount { get; set; } = 16d;               // 動物が持てるエレメント量の上限値
         public double AnimalElementBaseCost { get; set; } = 0.004d;                 // 動物が生存するのに必要な基礎エレメント量(ステップ当たり)
@@ -65,7 +65,7 @@ namespace Paramecium.Engine
         public double AnimalMaximumAngularAcceleration { get; set; } = 0.01d;   // 動物の最大角加速度
 
         public bool AnimalDisableSameSpeciesAttack { get; set; } = false;       // 同種間での攻撃を禁止するかどうか
-        public int AnimalUnderAttackTime { get; set; } = 25;                    // 動物が攻撃された際に「Under Attack」状態でいる時間、この間は動物は摂食や攻撃ができない
+        public int AnimalUnderAttackTime { get; set; } = 25;                    // 動物が攻撃された際に「Under Attack」状態でいる時間
         public double AnimalPlantIngestionRate { get; set; } = 0.04d;           // 動物が植物を攻撃した際にステップ毎に奪い取るエレメントの量
         public double AnimalAnimalIngestionRate { get; set; } = 0.32d;          // 動物が動物を攻撃した際にステップ毎に奪い取るエレメントの量
 
@@ -78,32 +78,34 @@ namespace Paramecium.Engine
 
 
         // 動物 (ニューラルネット)
-        public int AnimalMaximumNodeCount { get; set; } = 32;                   // 最大ノード数
-        public int AnimalMaximumConnectionCountPerNode { get; set; } = 2;       // 最大接続数(ノード1個毎)
+        public int AnimalBrainMaximumNodeCount { get; set; } = 32;                  // 最大ノード数
+        public int AnimalBrainMaximumConnectionCountPerNode { get; set; } = 2;      // 最大接続数(ノード1個毎)
 
         // 動物 (突然変異)
-        public double AnimalMutationRate { get; set; } = 0.25d;                         // 繁殖時の突然変異率
-        public int AnimalMaximumMutationCount { get; set; } = 8;                        // 最大突然変異数
-        public double AnimalMutationCountFactor { get; set; } = 0.5d;                   // 突然変異数係数
-        public bool AnimalDisableSpeciesSigChangeByMutation { get; set; } = false;      // 突然変異による種族シグネチャの変化の無効化
+        public double AnimalMutationMutationRate { get; set; } = 0.1d;                      // 繁殖時の突然変異率
+        public int AnimalMutationMaximumMutationCount { get; set; } = 8;                    // 最大突然変異数
+        public double AnimalMutationMutationCountFactor { get; set; } = 0.5d;               // 突然変異数係数
+        public bool AnimalMutationDisableSpeciesSigChangeByMutation { get; set; } = false;  // 突然変異による種族シグネチャの変化の無効化
 
-        public double AnimalMutationAddNodeWeight { get; set; } = 1d;                   // 突然変異のタイプ毎の重み / AddNode (ランダムなノードと付随する接続の追加)
-        public double AnimalMutationRemoveNodeWeight { get; set; } = 0.25d;             // RemoveNode (ランダムなノードと関連する接続の削除)
-        public double AnimalMutationChangeNodeTypeWeight { get; set; } = 0.5d;          // ChangeNodeType (ノードの種類の変更)
-        public double AnimalMutationAddConnectionWeight { get; set; } = 1d;             // AddConnection (ランダムな接続の追加)
-        public double AnimalMutationRemoveConnectionWeight { get; set; } = 0.25d;       // RemoveConnection (ランダムな接続の削除)
-        public double AnimalMutationChangeConnectionOriginWeight { get; set; } = 0.25d; // ChangeConnectionOrigin (ランダムな接続の接続元の変更)
-        public double AnimalMutationChangeConnectionTargetWeight { get; set; } = 0.25d; // ChangeConnectionTarget (ランダムな接続の接続先の変更)
-        public double AnimalMutationChangeConnectionWeightWeight { get; set; } = 1d;    // ChangeConnectionWeight (ランダムな接続の重みの変更)
+        public double AnimalMutationMutationTypeAddNodeWeight { get; set; } = 1d;                       // 突然変異のタイプ毎の重み / AddNode (ランダムなノードと付随する接続の追加)
+        public double AnimalMutationMutationTypeRemoveNodeWeight { get; set; } = 0.25d;                 // RemoveNode (ランダムなノードと関連する接続の削除)
+        public double AnimalMutationMutationTypeChangeNodeTypeWeight { get; set; } = 0.5d;              // ChangeNodeType (ノードの種類の変更)
+        public double AnimalMutationMutationTypeAddConnectionWeight { get; set; } = 1d;                 // AddConnection (ランダムな接続の追加)
+        public double AnimalMutationMutationTypeRemoveConnectionWeight { get; set; } = 0.25d;           // RemoveConnection (ランダムな接続の削除)
+        public double AnimalMutationMutationTypeChangeConnectionOriginWeight { get; set; } = 0.25d;     // ChangeConnectionOrigin (ランダムな接続の接続元の変更)
+        public double AnimalMutationMutationTypeChangeConnectionTargetWeight { get; set; } = 0.25d;     // ChangeConnectionTarget (ランダムな接続の接続先の変更)
+        public double AnimalMutationMutationTypeChangeConnectionWeightWeight { get; set; } = 1d;        // ChangeConnectionWeight (ランダムな接続の重みの変更)
         [JsonIgnore]
-        public double[] AnimalMutationTypeWeights { get { return new double[] { AnimalMutationAddNodeWeight, AnimalMutationRemoveNodeWeight, AnimalMutationChangeNodeTypeWeight, AnimalMutationAddConnectionWeight, AnimalMutationRemoveConnectionWeight, AnimalMutationChangeConnectionOriginWeight, AnimalMutationChangeConnectionTargetWeight, AnimalMutationChangeConnectionWeightWeight }; } }
-        public double[] AnimalMutationTypeWeightsAddNodeMutationFallback { get { return new double[] { AnimalMutationRemoveNodeWeight, AnimalMutationChangeNodeTypeWeight }; } }
-        public double[] AnimalMutationTypeWeightsAddConnectionMutationFallback { get { return new double[] { AnimalMutationRemoveConnectionWeight, AnimalMutationChangeConnectionOriginWeight, AnimalMutationChangeConnectionTargetWeight, AnimalMutationChangeConnectionWeightWeight }; } }
+        public double[] AnimalMutationTypeWeights { get { return new double[] { AnimalMutationMutationTypeAddNodeWeight, AnimalMutationMutationTypeRemoveNodeWeight, AnimalMutationMutationTypeChangeNodeTypeWeight, AnimalMutationMutationTypeAddConnectionWeight, AnimalMutationMutationTypeRemoveConnectionWeight, AnimalMutationMutationTypeChangeConnectionOriginWeight, AnimalMutationMutationTypeChangeConnectionTargetWeight, AnimalMutationMutationTypeChangeConnectionWeightWeight }; } }
+        public double[] AnimalMutationTypeWeightsAddNodeMutationFallback { get { return new double[] { AnimalMutationMutationTypeRemoveNodeWeight, AnimalMutationMutationTypeChangeNodeTypeWeight }; } }
+        public double[] AnimalMutationTypeWeightsAddConnectionMutationFallback { get { return new double[] { AnimalMutationMutationTypeRemoveConnectionWeight, AnimalMutationMutationTypeChangeConnectionOriginWeight, AnimalMutationMutationTypeChangeConnectionTargetWeight, AnimalMutationMutationTypeChangeConnectionWeightWeight }; } }
 
-        public double AnimalNodeTypeInputWeight { get; set; } = 1d;                     // AddNode突然変異とChangeNodeType突然変異でランダムなFunctionが選ばれる際のタイプ毎の重み / Input (入力層)
-        public double AnimalNodeTypeHiddenWeight { get; set; } = 1d;                    // Hidden (隠れ層)
-        public double AnimalNodeTypeOutputWeight { get; set; } = 1d;                    // Output (出力層)
+        public double AnimalMutationNodeTypeInputWeight { get; set; } = 1d;             // AddNode突然変異とChangeNodeType突然変異でランダムなFunctionが選ばれる際のタイプ毎の重み / Input (入力層)
+        public double AnimalMutationNodeTypeHiddenWeight { get; set; } = 1d;            // Hidden (隠れ層)
+        public double AnimalMutationNodeTypeOutputWeight { get; set; } = 1d;            // Output (出力層)
         [JsonIgnore]
-        public double[] AnimalNodeTypeWeights { get { return new double[] { AnimalNodeTypeInputWeight, AnimalNodeTypeHiddenWeight, AnimalNodeTypeOutputWeight }; } }
+        public double[] AnimalMutationNodeTypeWeights { get { return new double[] { AnimalMutationNodeTypeInputWeight, AnimalMutationNodeTypeHiddenWeight, AnimalMutationNodeTypeOutputWeight }; } }
+        [JsonIgnore]
+        public double[] AnimalMutationNodeTypeWeightsWithoutHidden { get { return new double[] { AnimalMutationNodeTypeInputWeight, AnimalMutationNodeTypeOutputWeight }; } }
     }
 }

@@ -6,6 +6,7 @@ using System.Diagnostics;
 
 namespace Paramecium.Forms
 {
+    // メインのForm
     public partial class FormMain : Form
     {
         // Soup Viewに表示する画像
@@ -41,6 +42,7 @@ namespace Paramecium.Forms
         // サブウィンドウ
         private FormAutosaveSettings _formAutosaveSettings = new FormAutosaveSettings();
         private FormObjectEditor _formObjectEditor = new FormObjectEditor();
+        private FormAboutParamecium _formAboutParamecium = new FormAboutParamecium();
 
         public FormMain()
         {
@@ -219,7 +221,7 @@ namespace Paramecium.Forms
                     BottomStat_SoupState.Text = $"Status : {soup.SoupState}";
                     BottomStat_TimeSteps.Text = $"Time Step : {soup.ElapsedTimeSteps} (T{soup.ThreadCount})";
                     BottomStat_Population.Text = $"Population (P/A/T) : {soup.PlantPopulation}/{soup.AnimalPopulation}/{soup.TotalPopulation}";
-                    BottomStat_Generation.Text = $"Generation : {soup.LatestGeneration}";
+                    BottomStat_Generation.Text = $"Latest Generation : {soup.LatestGeneration}";
                     BottomStat_TotalBornDie.Text = $"Total Born/Die : {soup.TotalBornCount}/{soup.TotalDieCount}";
                     BottomStat_Tps.Text = $"TPS : {(1d / soup.StepTime).ToString("0.0")} ({(soup.StepTime * 1000d).ToString("0.0000")}ms)";
                     BottomStat_Fps.Text = $"FPS : {(1d / frameTime.Elapsed.TotalSeconds).ToString("0.0")} ({(frameTime.Elapsed.TotalMilliseconds).ToString("0.0000")}ms)";
@@ -227,6 +229,7 @@ namespace Paramecium.Forms
                     TopMenu_File_Save.Enabled = true;
                     TopMenu_File_SaveAs.Enabled = true;
                     TopMenu_Soup.Enabled = true;
+                    TopMenu_Edit.Enabled = true;
                     TopMenu_View.Enabled = true;
                     TopMenu_Window.Enabled = true;
 
@@ -253,6 +256,12 @@ namespace Paramecium.Forms
                     if (_formObjectEditor.IsDisposed) TopMenu_Window_AutosaveSettings.Checked = false;
                     else if (_formObjectEditor.Visible) TopMenu_Window_ObjectEditor.Checked = true;
                     else TopMenu_Window_ObjectEditor.Checked = false;
+
+                    TopMenu_View_ToggleOverlays_AllOverlays.Checked = (_overlayToggles & OverlayToggles.AllOverlays) == OverlayToggles.AllOverlays;
+                    TopMenu_View_ToggleOverlays_SelectedObject.Checked = (_overlayToggles & OverlayToggles.SelectedObject) == OverlayToggles.SelectedObject;
+                    TopMenu_View_ToggleOverlays_BrainDiagram.Checked = (_overlayToggles & OverlayToggles.AnimalBrainDiagram) == OverlayToggles.AnimalBrainDiagram;
+                    TopMenu_View_ToggleOverlays_BrainInputOutput.Checked = (_overlayToggles & OverlayToggles.AnimalBrainInputOutput) == OverlayToggles.AnimalBrainInputOutput;
+                    TopMenu_View_ToggleOverlays_FullScreenOverlay.Checked = (_overlayToggles & OverlayToggles.FullScreenOverlay) == OverlayToggles.FullScreenOverlay;
                 }
 
                 frameTime.Restart();
@@ -280,54 +289,90 @@ namespace Paramecium.Forms
 
             if (soup is not null)
             {
+                Double2d mousePositionInSoup = new Double2d((_mousePosX - SoupView.Width / 2d) * _unitPerPixel + _cameraPosition.X, (_mousePosY - SoupView.Height / 2d) * _unitPerPixel + _cameraPosition.Y);
+                Int2d mouseTilePosition = soup.GetTilePositionFromPosition(mousePositionInSoup);
+                int mouseTileIndex = soup.GetTileIndexFromTilePosition(mouseTilePosition);
+
                 switch (e.KeyCode)
                 {
-                    case Keys.S:            // スープの保存
-                        if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) SaveAsSoup();
-                        else if ((ModifierKeys & Keys.Control) == Keys.Control) SaveSoup();
+                    case Keys.W:
+                        if (ModifierKeys == Keys.None) _cameraPosition = new Double2d(double.Floor(_cameraPosition.X) + 0.5, double.Max(0, double.Floor(_cameraPosition.Y - 1)) + 0.5);                         // カメラを上方向に移動
+                        break;
+                    case Keys.S:
+                        if (ModifierKeys == Keys.None) _cameraPosition = new Double2d(double.Floor(_cameraPosition.X) + 0.5, double.Min(soup.Settings.SoupSizeY - 1, double.Floor(_cameraPosition.Y + 1)) + 0.5);   // カメラを下方向に移動
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) SaveAsSoup();  // スープを上書き保存
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control) SaveSoup();                                                 // スープを名前を付けて保存
+                        break;
+                    case Keys.A:
+                        if (ModifierKeys == Keys.None) _cameraPosition = new Double2d(double.Max(0, double.Floor(_cameraPosition.X - 1)) + 0.5, double.Floor(_cameraPosition.Y) + 0.5);                         // カメラを左方向に移動
+                        break;
+                    case Keys.D:
+                        if (ModifierKeys == Keys.None) _cameraPosition = new Double2d(double.Min(soup.Settings.SoupSizeX - 1, double.Floor(_cameraPosition.X + 1)) + 0.5, double.Floor(_cameraPosition.Y) + 0.5);   // カメラを右方向に移動
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control) KillSelectedCell();     // 選択中のセルを殺す
+                        break;
+                    case Keys.OemMinus:     // ズームアウト
                         break;
                     case Keys.Space:        // スープの一時停止/再開
-                        SoupRunPause();
+                        if (ModifierKeys == Keys.None) SoupRunPause();
                         break;
                     case Keys.OemQuestion:  // スープを1ステップだけ実行
-                        SoupStepRun();
+                        if (ModifierKeys == Keys.None) SoupStepRun();
                         break;
                     case Keys.Oemcomma:     // スープのスレッド数を1減らす
-                        SoupThreadCountDec();
+                        if (ModifierKeys == Keys.None) SoupThreadCountDec();
                         break;
                     case Keys.OemPeriod:    // スープのスレッド数を1増やす
-                        SoupThreadCountInc();
+                        if (ModifierKeys == Keys.None) SoupThreadCountInc();
                         break;
-                    case Keys.C:            // カメラの位置と倍率をリセットする
-                        ResetCameraPosition();
+                    case Keys.C:
+                        if (ModifierKeys == Keys.None) ResetCameraPosition();   // カメラの位置と倍率をリセットする
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control) CopySelectedCell();     // 選択中のセルをコピーする
+                        break;
+                    case Keys.Z:      // ズームイン
+                        if (ModifierKeys == Keys.None) if (_cameraZoomLevel < 10) { _cameraZoomLevel++; UpdateUnitPerPixel(); }
+                        break;
+                    case Keys.X:
+                        if (ModifierKeys == Keys.None) if (_cameraZoomLevel > 0) { _cameraZoomLevel--; UpdateUnitPerPixel(); }  // ズームアウト
+                            else if ((ModifierKeys & Keys.Control) == Keys.Control) CutSelectedCell();      // 選択中のセルをカットする
+                        break;
+                    case Keys.V:
+                        if ((ModifierKeys & Keys.Control) == Keys.Control) PasteClipboardCell(mousePositionInSoup); // クリップボードからセルをペーストする
                         break;
                     case Keys.T:            // カメラの追跡モードを「選択中のセルの追跡」に変更、または追跡を無効化
                         if (_trackingMode == CameraTrackingMode.TrackingSelectedCell) _trackingMode = CameraTrackingMode.Disabled;
                         else _trackingMode = CameraTrackingMode.TrackingSelectedCell;
                         break;
-                    case Keys.R:            // カメラの追跡モードを「ランダムな動物の追跡」に変更、または追跡を無効化
-                        if (_trackingMode == CameraTrackingMode.TrackingRandomAnimal) _trackingMode = CameraTrackingMode.Disabled;
-                        else _trackingMode = CameraTrackingMode.TrackingRandomAnimal;
+                    case Keys.R:
+                        if (ModifierKeys == Keys.None)                              // カメラの追跡モードを「ランダムな動物の追跡」に変更、または追跡を無効化
+                        {
+                            if (_trackingMode == CameraTrackingMode.TrackingRandomAnimal) _trackingMode = CameraTrackingMode.Disabled;
+                            else _trackingMode = CameraTrackingMode.TrackingRandomAnimal;
+                        }
+                        else if ((ModifierKeys & Keys.Shift) == Keys.Shift)         // 追跡中のオブジェクトの自動選択の切り替え
+                        {
+                            if (!_autoSelectTrackedCell) _autoSelectTrackedCell = true;
+                            else _autoSelectTrackedCell = false;
+                        }
                         break;
                     case Keys.E:            // オブジェクトエディターを表示する
                         if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) ShowFormObjectEditor();
                         break;
 
                     // オーバーレイの表示切替
-                    case Keys.F1:           // 全てのオーバーレイ
-                        ChangeOverlayToggles(OverlayToggles.AllOverlays);
+                    case Keys.D0:           // 全てのオーバーレイ
+                        if (ModifierKeys == Keys.None) ChangeOverlayToggles(OverlayToggles.AllOverlays);
                         break;
-                    case Keys.F2:           // 選択したオブジェクトの情報
-                        ChangeOverlayToggles(OverlayToggles.SelectedObject);
+                    case Keys.D1:           // 選択したオブジェクトの情報
+                        if (ModifierKeys == Keys.None) ChangeOverlayToggles(OverlayToggles.SelectedObject);
                         break;
-                    case Keys.F3:           // 動物:BrainDiagram
-                        ChangeOverlayToggles(OverlayToggles.AnimalBrainDiagram);
+                    case Keys.D2:           // 動物:BrainDiagram
+                        if (ModifierKeys == Keys.None) ChangeOverlayToggles(OverlayToggles.AnimalBrainDiagram);
                         break;
-                    case Keys.F4:           // 動物:BrainInputOutput
-                        ChangeOverlayToggles(OverlayToggles.AnimalBrainInputOutput);
+                    case Keys.D3:           // 動物:BrainInputOutput
+                        if (ModifierKeys == Keys.None) ChangeOverlayToggles(OverlayToggles.AnimalBrainInputOutput);
                         break;
-                    case Keys.F8:           // フルスクリーンオーバーレイ
-                        ChangeOverlayToggles(OverlayToggles.FullScreenOverlay);
+                    case Keys.D9:           // フルスクリーンオーバーレイ
+                        if (ModifierKeys == Keys.None) ChangeOverlayToggles(OverlayToggles.FullScreenOverlay);
                         break;
                 }
             }
@@ -349,35 +394,7 @@ namespace Paramecium.Forms
                         switch (ModifierKeys)
                         {
                             case Keys.Shift:    // セルを移動する
-                                if (soup.SoupState == SoupState.Pause)
-                                {
-                                    if (_selectedSoupObject.ObjectType == SoupObjectType.Plant)
-                                    {
-                                        Plant? targetPlant = (Plant?)_selectedSoupObject.GetSoupObject();
-
-                                        if (targetPlant is not null)
-                                        {
-                                            targetPlant.Position = mousePositionInSoup;
-
-                                            soup.Tiles[targetPlant.TileIndex].PlantIndexes.Remove(targetPlant.Index);
-                                            targetPlant.TileIndex = mouseTileIndex;
-                                            soup.Tiles[targetPlant.TileIndex].PlantIndexes.Add(targetPlant.Index);
-                                        }
-                                    }
-                                    if (_selectedSoupObject.ObjectType == SoupObjectType.Animal)
-                                    {
-                                        Animal? targetAnimal = (Animal?)_selectedSoupObject.GetSoupObject();
-
-                                        if (targetAnimal is not null)
-                                        {
-                                            targetAnimal.Position = mousePositionInSoup;
-
-                                            soup.Tiles[targetAnimal.TileIndex].AnimalIndexes.Remove(targetAnimal.Index);
-                                            targetAnimal.TileIndex = mouseTileIndex;
-                                            soup.Tiles[targetAnimal.TileIndex].AnimalIndexes.Add(targetAnimal.Index);
-                                        }
-                                    }
-                                }
+                                MoveSelectedCell(mousePositionInSoup);
                                 break;
                             case Keys.Control:  // ズームイン
                                 if (_cameraZoomLevel < 10)
@@ -392,7 +409,7 @@ namespace Paramecium.Forms
                             case Keys.Alt:      // 壁を作成する
                                 if (soup.SoupState == SoupState.Pause)
                                 {
-                                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SoupSizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SoupSizeY)
                                     {
                                         soup.Tiles[mouseTileIndex].Type = TileType.Wall;
                                     }
@@ -403,14 +420,14 @@ namespace Paramecium.Forms
 
                                 try
                                 {
-                                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SoupSizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SoupSizeY)
                                     {
                                         _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Tile, mouseTileIndex, -1);
                                     }
 
                                     if (_cameraZoomLevel >= 5)
                                     {
-                                        if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                                        if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SoupSizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SoupSizeY)
                                         {
                                             for (int x = -1; x <= 1; x++)
                                             {
@@ -418,7 +435,7 @@ namespace Paramecium.Forms
                                                 {
                                                     Int2d targetTilePosition = mouseTilePosition + new Int2d(x, y);
 
-                                                    if (targetTilePosition.X >= 0 && targetTilePosition.X < soup.Settings.SizeX && targetTilePosition.Y >= 0 && targetTilePosition.Y < soup.Settings.SizeY)
+                                                    if (targetTilePosition.X >= 0 && targetTilePosition.X < soup.Settings.SoupSizeX && targetTilePosition.Y >= 0 && targetTilePosition.Y < soup.Settings.SoupSizeY)
                                                     {
                                                         int targetTileIndex = soup.GetTileIndexFromTilePosition(targetTilePosition);
                                                         Tile targetTile = soup.Tiles[targetTileIndex];
@@ -457,7 +474,7 @@ namespace Paramecium.Forms
                                     }
                                     else
                                     {
-                                        if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                                        if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SoupSizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SoupSizeY)
                                         {
                                             Tile targetTile = soup.Tiles[mouseTileIndex];
 
@@ -513,7 +530,7 @@ namespace Paramecium.Forms
                             case Keys.Alt:      // 壁を削除する
                                 if (soup.SoupState == SoupState.Pause)
                                 {
-                                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SoupSizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SoupSizeY)
                                     {
                                         soup.Tiles[mouseTileIndex].Type = TileType.Default;
                                     }
@@ -557,7 +574,7 @@ namespace Paramecium.Forms
                 {
                     _selectedSoupObject = new SoupObjectPointer();
 
-                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                    if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SoupSizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SoupSizeY)
                     {
                         _selectedSoupObject = new SoupObjectPointer(SoupObjectType.Tile, mouseTileIndex, -1);
                     }
@@ -584,42 +601,14 @@ namespace Paramecium.Forms
                             switch (ModifierKeys)
                             {
                                 case Keys.Shift:    // セルを移動する
-                                    if (soup.SoupState == SoupState.Pause)
-                                    {
-                                        if (_selectedSoupObject.ObjectType == SoupObjectType.Plant)
-                                        {
-                                            Plant? targetPlant = (Plant?)_selectedSoupObject.GetSoupObject();
-
-                                            if (targetPlant is not null)
-                                            {
-                                                targetPlant.Position = mousePositionInSoup;
-
-                                                soup.Tiles[targetPlant.TileIndex].PlantIndexes.Remove(targetPlant.Index);
-                                                targetPlant.TileIndex = mouseTileIndex;
-                                                soup.Tiles[targetPlant.TileIndex].PlantIndexes.Add(targetPlant.Index);
-                                            }
-                                        }
-                                        if (_selectedSoupObject.ObjectType == SoupObjectType.Animal)
-                                        {
-                                            Animal? targetAnimal = (Animal?)_selectedSoupObject.GetSoupObject();
-
-                                            if (targetAnimal is not null)
-                                            {
-                                                targetAnimal.Position = mousePositionInSoup;
-
-                                                soup.Tiles[targetAnimal.TileIndex].AnimalIndexes.Remove(targetAnimal.Index);
-                                                targetAnimal.TileIndex = mouseTileIndex;
-                                                soup.Tiles[targetAnimal.TileIndex].AnimalIndexes.Add(targetAnimal.Index);
-                                            }
-                                        }
-                                    }
+                                    MoveSelectedCell(mousePositionInSoup);
                                     break;
                                 case Keys.Control:
                                     break;
                                 case Keys.Alt:      // 壁を作成する
                                     if (soup.SoupState == SoupState.Pause)
                                     {
-                                        if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                                        if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SoupSizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SoupSizeY)
                                         {
                                             soup.Tiles[mouseTileIndex].Type = TileType.Wall;
                                         }
@@ -639,7 +628,7 @@ namespace Paramecium.Forms
                                 case Keys.Alt:      // 壁を削除する
                                     if (soup.SoupState == SoupState.Pause)
                                     {
-                                        if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SizeY)
+                                        if (mousePositionInSoup.X >= 0d && mousePositionInSoup.X <= soup.Settings.SoupSizeX && mousePositionInSoup.Y >= 0d && mousePositionInSoup.Y <= soup.Settings.SoupSizeY)
                                         {
                                             soup.Tiles[mouseTileIndex].Type = TileType.Default;
                                         }
@@ -791,6 +780,27 @@ namespace Paramecium.Forms
             }
         }
 
+        private void TopMenu_Edit_CopySelectedCell_Click(object sender, EventArgs e)
+        {
+            CopySelectedCell();
+        }
+        private void TopMenu_Edit_CutSelectedCell_Click(object sender, EventArgs e)
+        {
+            CutSelectedCell();
+        }
+        private void TopMenu_Edit_PasteSelectedCell_Click(object sender, EventArgs e)
+        {
+            PasteClipboardCell(_cameraPosition);
+        }
+        private void TopMenu_Edit_KillSelectedCell_Click(object sender, EventArgs e)
+        {
+            KillSelectedCell();
+        }
+        private void TopMenu_Edit_MoveSelectedCell_Click(object sender, EventArgs e)
+        {
+            MoveSelectedCell(_cameraPosition);
+        }
+
         private void TopMenu_View_ZoomIn_Click(object sender, EventArgs e)
         {
             Soup? soup = Globals.Soup;
@@ -846,6 +856,56 @@ namespace Paramecium.Forms
             }
         }
 
+        private void TopMenu_View_ToggleOverlays_AllOverlays_Click(object sender, EventArgs e)
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                ChangeOverlayToggles(OverlayToggles.AllOverlays);
+            }
+        }
+
+        private void TopMenu_View_ToggleOverlays_SelectedObject_Click(object sender, EventArgs e)
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                ChangeOverlayToggles(OverlayToggles.SelectedObject);
+            }
+        }
+
+        private void TopMenu_View_ToggleOverlays_BrainDiagram_Click(object sender, EventArgs e)
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                ChangeOverlayToggles(OverlayToggles.AnimalBrainDiagram);
+            }
+        }
+
+        private void TopMenu_View_ToggleOverlays_BrainInputOutput_Click(object sender, EventArgs e)
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                ChangeOverlayToggles(OverlayToggles.AnimalBrainInputOutput);
+            }
+        }
+
+        private void TopMenu_View_ToggleOverlays_FullScreenOverlay_Click(object sender, EventArgs e)
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                ChangeOverlayToggles(OverlayToggles.FullScreenOverlay);
+            }
+        }
+
         private void TopMenu_View_AutoSelectTrackedCells_Click(object sender, EventArgs e)
         {
             Soup? soup = Globals.Soup;
@@ -878,6 +938,14 @@ namespace Paramecium.Forms
         private void TopMenuWindowObjectEditor_Click(object sender, EventArgs e)
         {
             ShowFormObjectEditor();
+        }
+
+        private void TopMenu_Help_AboutParamecium_Click(object sender, EventArgs e)
+        {
+            if (_formAboutParamecium.IsDisposed) _formAboutParamecium = new FormAboutParamecium();
+
+            if (!_formAboutParamecium.Visible) _formAboutParamecium.Show(this);
+            else _formAboutParamecium.Focus();
         }
 
         private void NewSoup()
@@ -920,7 +988,7 @@ namespace Paramecium.Forms
                 Globals.SoupFilePath = string.Empty;
                 Globals.SoupFileName = "untitled.soup";
 
-                _cameraPosition = new Double2d(Globals.Soup.Settings.SizeX / 2d, Globals.Soup.Settings.SizeY / 2d);
+                _cameraPosition = new Double2d(Globals.Soup.Settings.SoupSizeX / 2d, Globals.Soup.Settings.SoupSizeY / 2d);
             }
             else if (soup is not null)
             {
@@ -951,7 +1019,7 @@ namespace Paramecium.Forms
 
             if (LoadSoupDialog.ShowDialog() == DialogResult.OK)
             {
-                Soup? loadedSoup = JsonFileImportAndExport.Import<Soup>(LoadSoupDialog.FileName);
+                Soup? loadedSoup = JsonImportAndExport.FileImport<Soup>(LoadSoupDialog.FileName);
 
                 if (loadedSoup is not null)
                 {
@@ -970,10 +1038,7 @@ namespace Paramecium.Forms
                     SaveSoupDialog.InitialDirectory = Path.GetDirectoryName(Globals.SoupFilePath);
                     SaveSoupDialog.FileName = Globals.SoupFileName;
 
-                    //SaveSoupDialog.InitialDirectory = Globals.SoupFilePath;
-                    //SaveSoupDialog.FileName = Globals.SoupFileName;
-
-                    _cameraPosition = new Double2d(Globals.Soup.Settings.SizeX / 2d, Globals.Soup.Settings.SizeY / 2d);
+                    _cameraPosition = new Double2d(Globals.Soup.Settings.SoupSizeX / 2d, Globals.Soup.Settings.SoupSizeY / 2d);
                 }
             }
             else if (soup is not null)
@@ -995,7 +1060,7 @@ namespace Paramecium.Forms
                 if (File.Exists(Globals.SoupFilePath))
                 {
                     soup.Modified = false;
-                    JsonFileImportAndExport.Export(Globals.SoupFilePath, soup);
+                    JsonImportAndExport.FileExport(Globals.SoupFilePath, soup);
 
                     soup.SetSoupState(soupState);
                     return true;
@@ -1003,7 +1068,7 @@ namespace Paramecium.Forms
                 else if (SaveSoupDialog.ShowDialog() == DialogResult.OK)
                 {
                     soup.Modified = false;
-                    JsonFileImportAndExport.Export(SaveSoupDialog.FileName, soup);
+                    JsonImportAndExport.FileExport(SaveSoupDialog.FileName, soup);
 
                     Globals.SoupFilePath = SaveSoupDialog.FileName;
                     Globals.SoupFileName = Path.GetFileName(SaveSoupDialog.FileName);
@@ -1038,7 +1103,7 @@ namespace Paramecium.Forms
                 if (SaveSoupDialog.ShowDialog() == DialogResult.OK)
                 {
                     soup.Modified = false;
-                    JsonFileImportAndExport.Export(SaveSoupDialog.FileName, soup);
+                    JsonImportAndExport.FileExport(SaveSoupDialog.FileName, soup);
 
                     Globals.SoupFilePath = SaveSoupDialog.FileName;
                     Globals.SoupFileName = Path.GetFileName(SaveSoupDialog.FileName);
@@ -1128,13 +1193,172 @@ namespace Paramecium.Forms
             }
         }
 
+        private void CopySelectedCell()
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                if (soup.SoupState == SoupState.Pause)
+                {
+                    if (_selectedSoupObject.ObjectType == SoupObjectType.Plant || _selectedSoupObject.ObjectType == SoupObjectType.Animal)
+                    {
+                        object? soupObject = _selectedSoupObject.GetSoupObject();
+
+                        if (soupObject is not null)
+                        {
+                            Clipboard.SetText($"{_selectedSoupObject.ObjectType.ToString()}/{JsonImportAndExport.JsonExport(soupObject)}");
+                        }
+                    }
+                }
+            }
+        }
+        private void CutSelectedCell()
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                if (soup.SoupState == SoupState.Pause)
+                {
+                    if (_selectedSoupObject.ObjectType == SoupObjectType.Plant || _selectedSoupObject.ObjectType == SoupObjectType.Animal)
+                    {
+                        object? soupObject = _selectedSoupObject.GetSoupObject();
+
+                        if (soupObject is not null)
+                        {
+                            Clipboard.SetText($"{_selectedSoupObject.ObjectType.ToString()}/{JsonImportAndExport.JsonExport(soupObject)}");
+
+                            if (_selectedSoupObject.ObjectType == SoupObjectType.Plant) soup.RemovePlant(_selectedSoupObject.ObjectIndex);
+                            else if (_selectedSoupObject.ObjectType == SoupObjectType.Animal) soup.RemoveAnimal(_selectedSoupObject.ObjectIndex);
+
+                            soup.Modified = true;
+                        }
+                    }
+                }
+            }
+        }
+        private void PasteClipboardCell(Double2d position)
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                if (soup.SoupState == SoupState.Pause)
+                {
+                    string soupObjectJsonText = Clipboard.GetText();
+
+                    if (soupObjectJsonText.StartsWith($"{SoupObjectType.Plant.ToString()}"))
+                    {
+                        Plant? soupObject = JsonImportAndExport.JsonImport<Plant>(soupObjectJsonText.Replace($"{SoupObjectType.Plant.ToString()}/", ""));
+
+                        if (soupObject is not null)
+                        {
+                            soupObject.Position = position;
+                            soup.AddPlant(soupObject);
+
+                            soup.Modified = true;
+                        }
+                    }
+                    if (soupObjectJsonText.StartsWith($"{SoupObjectType.Animal.ToString()}"))
+                    {
+                        Animal? soupObject = JsonImportAndExport.JsonImport<Animal>(soupObjectJsonText.Replace($"{SoupObjectType.Animal.ToString()}/", ""));
+
+                        if (soupObject is not null)
+                        {
+                            soupObject.Position = position;
+                            soup.AddAnimal(soupObject);
+
+                            soup.Modified = true;
+                        }
+                    }
+                }
+            }
+        }
+        private void KillSelectedCell()
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                if (soup.SoupState == SoupState.Pause)
+                {
+                    if (_selectedSoupObject.ObjectType == SoupObjectType.Plant || _selectedSoupObject.ObjectType == SoupObjectType.Animal)
+                    {
+                        object? soupObject = _selectedSoupObject.GetSoupObject();
+
+                        if (soupObject is not null)
+                        {
+                            if (_selectedSoupObject.ObjectType == SoupObjectType.Plant)
+                            {
+                                ((Plant)soupObject).IsAlive = false;
+                                ((Plant)soupObject).IsNotAlive(soup, soup.Settings);
+                                soup.RemovePlant(_selectedSoupObject.ObjectIndex);
+
+                                soup.Modified = true;
+                            }
+                            else if (_selectedSoupObject.ObjectType == SoupObjectType.Animal)
+                            {
+                                ((Animal)soupObject).IsAlive = false;
+                                ((Animal)soupObject).IsNotAlive(soup, soup.Settings);
+                                soup.RemoveAnimal(_selectedSoupObject.ObjectIndex);
+
+                                soup.Modified = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private void MoveSelectedCell(Double2d position)
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                if (soup.SoupState == SoupState.Pause)
+                {
+                    if (_selectedSoupObject.ObjectType == SoupObjectType.Plant)
+                    {
+                        Plant? targetPlant = (Plant?)_selectedSoupObject.GetSoupObject();
+
+                        if (targetPlant is not null)
+                        {
+                            targetPlant.Position = position;
+
+                            soup.Tiles[targetPlant.TileIndex].PlantIndexes.Remove(targetPlant.Index);
+                            targetPlant.TileIndex = soup.GetTileIndexFromPosition(position);
+                            soup.Tiles[targetPlant.TileIndex].PlantIndexes.Add(targetPlant.Index);
+
+                            soup.Modified = true;
+                        }
+                    }
+                    if (_selectedSoupObject.ObjectType == SoupObjectType.Animal)
+                    {
+                        Animal? targetAnimal = (Animal?)_selectedSoupObject.GetSoupObject();
+
+                        if (targetAnimal is not null)
+                        {
+                            targetAnimal.Position = position;
+
+                            soup.Tiles[targetAnimal.TileIndex].AnimalIndexes.Remove(targetAnimal.Index);
+                            targetAnimal.TileIndex = soup.GetTileIndexFromPosition(position);
+                            soup.Tiles[targetAnimal.TileIndex].AnimalIndexes.Add(targetAnimal.Index);
+
+                            soup.Modified = true;
+                        }
+                    }
+                }
+            }
+        }
+
         private void ResetCameraPosition()
         {
             Soup? soup = Globals.Soup;
 
             if (soup is not null)
             {
-                _cameraPosition = new Double2d(soup.Settings.SizeX / 2d, soup.Settings.SizeY / 2d);
+                _cameraPosition = new Double2d(soup.Settings.SoupSizeX / 2d, soup.Settings.SoupSizeY / 2d);
                 _cameraZoomLevel = 0;
                 UpdateUnitPerPixel();
             }

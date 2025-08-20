@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.7.0 indev-3] - 2025-08-21
+
+### Added
+ - Added an overlay toggle item to the `TopMenu` of `FormMain`.
+ - Added the function to move the viewpoint with the `W/A/S/D` keys.
+ - Added the zoom in and zoom out functions using the `Z/X` keys.
+ - Added functions to copy, cut, paste, and delete selected cells using `Ctrl+C`, `Ctrl+X`, `Ctrl+V`, and `Ctrl+D`, respectively.
+ - Added `About Paramecium` window.
+
+### Changed
+ - The default soup settings have been changed.
+
+### Fixed
+ - Fixed a bug related to animal mutations.
+
 ## [0.7.0 indev-2] - 2025-08-13
 
 ### Added

@@ -1,4 +1,5 @@
 ﻿using Paramecium.Variables;
+using System.Text.Json.Serialization;
 
 namespace Paramecium.Engine
 {
@@ -16,9 +17,14 @@ namespace Paramecium.Engine
         public Double2d Position { get; set; } = Double2d.Zero;     // セルの位置
         public int TileIndex { get; set; } = 0;                     // セルが属しているタイルのインデックス
         public Double2d Velocity { get; set; } = Double2d.Zero;     // セルの速度
+        private Double2d VelocityBuffer = Double2d.Zero;
         public double Radius { get; set; } = 0;                     // セルの半径
         public double Element { get; set; } = 0;                    // セルのエレメント量
+        public double ElementBuffer = 0;
         public double Mass { get; set; } = 0;                       // セルの質量
+
+        public double ElementGainLoss { get; set; } = 0;            // エレメントのステップ毎の獲得/喪失量
+        public double ElementGainLossBuffer = 0;
 
         public int TimeSinceLastAttacked { get; set; } = 0;         // セルが最後に攻撃されてからの経過時間
 
@@ -31,8 +37,6 @@ namespace Paramecium.Engine
 
             IsAlive = true;
 
-            Id = rand.NextInt64(0, 4738381338321616896);
-
             Position = position;
             Radius = CalcRadius(settings, element);
             Element = element;
@@ -40,13 +44,11 @@ namespace Paramecium.Engine
 
             TimeSinceLastAttacked = settings.PlantUnderAttackTime;
         }
-        public Plant(SoupSettings settings, Double2d position, double element, Plant parent)
+        public Plant(SoupSettings settings, Double2d position, double element, Plant parent)    // 植物が分裂するとき用のコンストラクター
         {
             Random rand = new Random();
 
             IsAlive = true;
-
-            Id = rand.NextInt64(0, 4738381338321616896);
 
             Generation = parent.Generation + 1;
 
@@ -58,6 +60,14 @@ namespace Paramecium.Engine
             TimeSinceLastAttacked = settings.PlantUnderAttackTime;
         }
 
+        // 現在のステップの処理が始まった際に最初に実行されるメソッド
+        public void OnStepStart(Soup soup, SoupSettings settings)
+        {
+            VelocityBuffer = Velocity;
+            ElementBuffer = Element;
+        }
+
+        // 年齢等の時間経過で変化するパラメーターの更新処理
         public void UpdateAge(Soup soup, SoupSettings settings)
         {
             if (IsAlive)
@@ -73,7 +83,9 @@ namespace Paramecium.Engine
         {
             if (IsAlive && Age >= settings.PlantSpreadingTime)
             {
-                Velocity *= 1d - settings.Drag;
+                VelocityBuffer *= 1d - settings.SoupDrag;
+
+                if (VelocityBuffer.MagnitudeSquared < 0.000001d * 0.000001d) VelocityBuffer = Double2d.Zero;
             }
         }
 
@@ -86,7 +98,7 @@ namespace Paramecium.Engine
                 Int2d tilePosition = soup.GetTilePositionFromTileIndex(TileIndex);
 
                 double WallRestitutionCoefficientMultiplier = 1d;
-                if (Velocity.MagnitudeSquared > settings.MaximumEffectiveVelocity * settings.MaximumEffectiveVelocity) WallRestitutionCoefficientMultiplier = double.Max(1d, Velocity.Magnitude / settings.MaximumEffectiveVelocity);
+                if (Velocity.MagnitudeSquared > settings.SoupMaximumEffectiveVelocity * settings.SoupMaximumEffectiveVelocity) WallRestitutionCoefficientMultiplier = double.Max(1d, Velocity.Magnitude / settings.SoupMaximumEffectiveVelocity);
 
                 // セルが属しているタイルを中心とした3x3タイルにある植物に対して衝突判定の処理を行う
                 for (int x = -1; x <= 1; x++)
@@ -97,7 +109,7 @@ namespace Paramecium.Engine
                         Int2d targetTilePosition = tilePosition + new Int2d(x, y);
 
                         // 処理対象のタイルの位置がスープの内かどうかをチェックしてスープの外だったらスキップする
-                        if (targetTilePosition.X >= 0 && targetTilePosition.X < settings.SizeX && targetTilePosition.Y >= 0 && targetTilePosition.Y < settings.SizeY)
+                        if (targetTilePosition.X >= 0 && targetTilePosition.X < settings.SoupSizeX && targetTilePosition.Y >= 0 && targetTilePosition.Y < settings.SoupSizeY)
                         {
                             // 処理対象のタイルのインデックスを取得
                             int targetTileIndex = soup.GetTileIndexFromTilePosition(targetTilePosition);
@@ -107,11 +119,11 @@ namespace Paramecium.Engine
                             if (targetTile.Type == TileType.Wall)
                             {
                                 // 壁に対する衝突判定の計算
-                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.25d, targetTilePosition.Y + 0.25d), 0.356d) * WallRestitutionCoefficientMultiplier;
-                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.75d, targetTilePosition.Y + 0.25d), 0.356d) * WallRestitutionCoefficientMultiplier;
-                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.25d, targetTilePosition.Y + 0.75d), 0.356d) * WallRestitutionCoefficientMultiplier;
-                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.75d, targetTilePosition.Y + 0.75d), 0.356d) * WallRestitutionCoefficientMultiplier;
-                                Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.5d, targetTilePosition.Y + 0.5d), 0.5d) * WallRestitutionCoefficientMultiplier;
+                                VelocityBuffer += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.25d, targetTilePosition.Y + 0.25d), 0.356d) * WallRestitutionCoefficientMultiplier;
+                                VelocityBuffer += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.75d, targetTilePosition.Y + 0.25d), 0.356d) * WallRestitutionCoefficientMultiplier;
+                                VelocityBuffer += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.25d, targetTilePosition.Y + 0.75d), 0.356d) * WallRestitutionCoefficientMultiplier;
+                                VelocityBuffer += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.75d, targetTilePosition.Y + 0.75d), 0.356d) * WallRestitutionCoefficientMultiplier;
+                                VelocityBuffer += soup.CalculateCollisionTwoObjects(Position, Radius, new Double2d(targetTilePosition.X + 0.5d, targetTilePosition.Y + 0.5d), 0.5d) * WallRestitutionCoefficientMultiplier;
                             }
                             else
                             {
@@ -132,7 +144,7 @@ namespace Paramecium.Engine
                                             Double2d targetPosition = targetPlant.Position;
                                             double targetMass = targetPlant.Mass;
 
-                                            Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
+                                            VelocityBuffer += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
                                         }
                                     }
                                 }
@@ -140,7 +152,7 @@ namespace Paramecium.Engine
                                 // 動物に対する衝突判定の計算
                                 for (int i = 0; i < soup.Tiles[targetTileIndex].AnimalPopulation; i++)
                                 {
-                                    // 衝突判定の処理の相手になる植物を取得
+                                    // 衝突判定の処理の相手になる動物を取得
                                     int targetIndex = targetTile.AnimalIndexes[i];
 
                                     // 衝突判定の処理の本体
@@ -151,7 +163,7 @@ namespace Paramecium.Engine
                                         Double2d targetPosition = targetAnimal.Position;
                                         double targetMass = targetAnimal.Mass;
 
-                                        Velocity += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
+                                        VelocityBuffer += soup.CalculateCollisionTwoObjects(Position, Radius, Mass, targetPosition, targetRadius, targetMass);
                                     }
                                 }
                             }
@@ -166,9 +178,11 @@ namespace Paramecium.Engine
         {
             if (IsAlive)
             {
+                Velocity = VelocityBuffer;
+
                 // effectiveVelocityをMaximumEffectiveVelocity以下に制限する
                 Double2d effectiveVelocity = Velocity;
-                if (effectiveVelocity.Magnitude > settings.MaximumEffectiveVelocity) effectiveVelocity *= settings.MaximumEffectiveVelocity / effectiveVelocity.Magnitude;
+                if (effectiveVelocity.Magnitude > settings.SoupMaximumEffectiveVelocity) effectiveVelocity *= settings.SoupMaximumEffectiveVelocity / effectiveVelocity.Magnitude;
 
                 // 位置を更新する
                 Position += effectiveVelocity;
@@ -179,9 +193,9 @@ namespace Paramecium.Engine
                     Position = new Double2d(Radius, Position.Y);
                     Velocity = new Double2d(-Velocity.X, Velocity.Y);
                 }
-                if (Position.X > settings.SizeX - Radius)
+                if (Position.X > settings.SoupSizeX - Radius)
                 {
-                    Position = new Double2d(settings.SizeX - Radius, Position.Y);
+                    Position = new Double2d(settings.SoupSizeX - Radius, Position.Y);
                     Velocity = new Double2d(-Velocity.X, Velocity.Y);
                 }
                 if (Position.Y < Radius)
@@ -189,9 +203,9 @@ namespace Paramecium.Engine
                     Position = new Double2d(Position.X, Radius);
                     Velocity = new Double2d(Velocity.X, -Velocity.Y);
                 }
-                if (Position.Y > settings.SizeY - Radius)
+                if (Position.Y > settings.SoupSizeY - Radius)
                 {
-                    Position = new Double2d(Position.X, settings.SizeY - Radius);
+                    Position = new Double2d(Position.X, settings.SoupSizeY - Radius);
                     Velocity = new Double2d(Velocity.X, -Velocity.Y);
                 }
 
@@ -227,17 +241,18 @@ namespace Paramecium.Engine
                     double elementBuffer = 0;
                     lock (targetTile.LockObject)
                     {
-                        elementBuffer = targetTile.Element * settings.PlantElementCollectRate;
-                        targetTile.Element -= elementBuffer;
+                        elementBuffer = targetTile.ElementBuffer * settings.PlantElementCollectRate;
+                        targetTile.ElementBuffer -= elementBuffer;
 
-                        if (targetTile.Element < 0) targetTile.Element = 0;
+                        if (targetTile.ElementBuffer < 0) targetTile.ElementBuffer = 0;
                     }
 
-                    Element += elementBuffer * soup.ElementAmountMultiplier;
+                    ElementBuffer += elementBuffer * soup.ElementAmountMultiplier;
+                    ElementGainLossBuffer += elementBuffer * soup.ElementAmountMultiplier;
                 }
 
-                Radius = CalcRadius(settings, Element);
-                Mass = Element;
+                Radius = CalcRadius(settings, ElementBuffer);
+                Mass = ElementBuffer;
             }
         }
 
@@ -247,7 +262,7 @@ namespace Paramecium.Engine
             if (IsAlive)
             {
                 // エレメントの量がPlantMaximumElementAmount以上であれば子孫を生成して自身は死滅する
-                if (Element >= settings.PlantMaximumElementAmount)
+                if (ElementBuffer >= settings.PlantMaximumElementAmount)
                 {
                     Random rand = new Random();
 
@@ -262,11 +277,11 @@ namespace Paramecium.Engine
                         offspringElementAmount[i] = rand.NextDouble();
                         offspringElementAmountTotal += offspringElementAmount[i];
                     }
-                    for (int i = 0; i < divisionCount; i++) offspringElementAmount[i] *= (1d / offspringElementAmountTotal) * Element;
+                    for (int i = 0; i < divisionCount; i++) offspringElementAmount[i] *= (1d / offspringElementAmountTotal) * ElementBuffer;
 
                     for (int i = 0; i < divisionCount; i++) result.Add(new Plant(settings, Position + Double2d.FromAngle01(rand.NextDouble()) * Radius * 0.1d, offspringElementAmount[i], this));
 
-                    Element = 0;
+                    ElementBuffer = 0;
                     IsAlive = false;
 
                     return result;
@@ -281,15 +296,22 @@ namespace Paramecium.Engine
             Tile targetTile = soup.Tiles[TileIndex];
 
             // エレメント量が0以下であるかセルが壁の中に埋まっているならそのセルは死んでいるものとして扱う
-            if (Element <= 0) IsAlive = false;
+            if (ElementBuffer <= 0) IsAlive = false;
             if (targetTile.Type == TileType.Wall) IsAlive = false;
 
             if (!IsAlive)
             {
-                // タイル側のインデックス情報から自身のインデックスを削除し、タイルが壁でなければ残っているエレメントをタイルに追加する
-                soup.Tiles[TileIndex].PlantIndexes.Remove(Index);
-                if (targetTile.Type == TileType.Default) targetTile.Element += double.Max(0d, Element);
+                // セルが壁に埋まっていなければ持っているエレメントをを全てタイルに放出する
+                if (targetTile.Type == TileType.Default) targetTile.ElementBuffer += double.Max(0d, ElementBuffer) * soup.ElementAmountMultiplier;
             }
+        }
+
+        // 現在のステップの処理が終わる直前に実行されるメソッド
+        public void OnStepEnd(Soup soup, SoupSettings settings)
+        {
+            Element = ElementBuffer;
+            ElementGainLoss = ElementGainLossBuffer;
+            ElementGainLossBuffer = 0;
         }
 
         // 半径の計算

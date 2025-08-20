@@ -4,6 +4,7 @@ using System.Drawing;
 
 namespace Paramecium.Rendering
 {
+    // 選択されたオブジェクトの情報を表示するオーバーレイ
     public static class SoupObjectOverlayRenderer
     {
         private static readonly Double4d _pheromoneRedColor = new Double4d(1, 1, 0, 0);                                     // 赤フェロモンの色
@@ -49,8 +50,8 @@ namespace Paramecium.Rendering
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Plant #{Soup.StringFromCellId(targetPlant.Id)}");
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Generation : {targetPlant.Generation}");
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Position : ({targetPlant.Position.X.ToString("0.000")}, {targetPlant.Position.Y.ToString("0.000")})");
-                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Velocity : ({targetPlant.Velocity.X.ToString("0.000")}, {targetPlant.Velocity.Y.ToString("0.000")}) / {targetPlant.Velocity.Magnitude.ToString("0.000")} u/s", SoupViewOverlayRenderer.OverlayGaugeColor1, targetPlant.Velocity.Magnitude / settings.MaximumEffectiveVelocity);
-                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Element : {targetPlant.Element.ToString("0.000")} / {settings.PlantMaximumElementAmount.ToString("0.000")}", SoupViewOverlayRenderer.OverlayGaugeColor1, targetPlant.Element / settings.PlantMaximumElementAmount);
+                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Velocity : ({targetPlant.Velocity.X.ToString("0.000")}, {targetPlant.Velocity.Y.ToString("0.000")}) / {targetPlant.Velocity.Magnitude.ToString("0.000")} u/s", SoupViewOverlayRenderer.OverlayGaugeColor1, targetPlant.Velocity.Magnitude / settings.SoupMaximumEffectiveVelocity);
+                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Element : {targetPlant.Element.ToString("0.000")} / {settings.PlantMaximumElementAmount.ToString("0.000")} ({targetPlant.ElementGainLoss.ToString("+0.000;-0.000;0.000")}/step)", SoupViewOverlayRenderer.OverlayGaugeColor1, targetPlant.Element / settings.PlantMaximumElementAmount);
                         }
                     }
                 }
@@ -69,7 +70,7 @@ namespace Paramecium.Rendering
 
                             // 画面内に入っているタイルの範囲を計算する
                             Int2d soupViewStartTilePosition = new Int2d(Math.Max(0, (int)Math.Floor(cameraPosition.X - (imageSize.X / 2d * unitPerPixel)) - 1), Math.Max(0, (int)Math.Ceiling(cameraPosition.Y - (imageSize.Y / 2d * unitPerPixel)) - 1));
-                            Int2d soupViewEndTilePosition = new Int2d(Math.Min(settings.SizeX - 1, (int)Math.Floor(cameraPosition.X + (imageSize.X / 2d * unitPerPixel)) + 1), Math.Min(settings.SizeY - 1, (int)Math.Ceiling(cameraPosition.Y + (imageSize.Y / 2d * unitPerPixel)) + 1));
+                            Int2d soupViewEndTilePosition = new Int2d(Math.Min(settings.SoupSizeX - 1, (int)Math.Floor(cameraPosition.X + (imageSize.X / 2d * unitPerPixel)) + 1), Math.Min(settings.SoupSizeY - 1, (int)Math.Ceiling(cameraPosition.Y + (imageSize.Y / 2d * unitPerPixel)) + 1));
 
                             for (int x = soupViewStartTilePosition.X; x <= soupViewEndTilePosition.X; x++)
                             {
@@ -78,11 +79,13 @@ namespace Paramecium.Rendering
                                     int tileIndex = soup.GetTileIndexFromTilePosition(new Int2d(x, y));
                                     Tile targetTile = soup.Tiles[tileIndex];
 
-                                    for (int i = 0; i < targetTile.AnimalPopulation; i++)
+                                    List<int> targetTileAnimalIndexes = new List<int>(targetTile.AnimalIndexes);
+
+                                    for (int i = 0; i < targetTileAnimalIndexes.Count; i++)
                                     {
                                         try
                                         {
-                                            int targetAnimal2Index = targetTile.AnimalIndexes[i];
+                                            int targetAnimal2Index = targetTileAnimalIndexes[i];
                                             Animal? targetAnimal2 = soup.Animals[targetAnimal2Index];
 
                                             if (targetAnimal2 is not null)
@@ -101,18 +104,19 @@ namespace Paramecium.Rendering
                             // 選択されているセルを強調表示する
                             SoupViewRenderer.DrawEllipse(imageSize, graphics, cameraPosition, unitPerPixel, targetAnimal.Position, targetAnimal.Radius + 0.5d, _selectedCellPen);
 
+                            // 選択されているセルの情報を表示する
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Animal #{Soup.StringFromCellId(targetAnimal.Id)}");
-                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Species Sig. : ({targetAnimal.SpeciesSignature.X.ToString("0.000")}, {targetAnimal.SpeciesSignature.Y.ToString("0.000")}, {targetAnimal.SpeciesSignature.Z.ToString("0.000")}, {targetAnimal.SpeciesSignature.W.ToString("0.000")})", (Color)new Double4d(1d, targetAnimal.SpeciesSignature.Y, targetAnimal.SpeciesSignature.Z, targetAnimal.SpeciesSignature.W), 1d);
+                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Species Sig. : #{Soup.StringFromSpeciesSignature(targetAnimal.SpeciesSignature)}", (Color)new Double4d(1d, targetAnimal.SpeciesSignature.Y, targetAnimal.SpeciesSignature.Z, targetAnimal.SpeciesSignature.W), 1d);
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Total Mutation : {targetAnimal.MutationCount}");
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Generation : {targetAnimal.Generation}");
                             if (targetAnimal.Age >= 0) SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Age : {targetAnimal.Age} / {settings.AnimalLifespan}", SoupViewOverlayRenderer.OverlayGaugeColor1, targetAnimal.Age / (double)settings.AnimalLifespan);
                             else SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Hatching : {settings.AnimalEggHatchingTime + targetAnimal.Age} / {settings.AnimalEggHatchingTime}", SoupViewOverlayRenderer.OverlayGaugeColor1, (settings.AnimalEggHatchingTime + targetAnimal.Age) / (double)settings.AnimalEggHatchingTime);
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Offspring : {targetAnimal.OffspringCount}");
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Position : ({targetAnimal.Position.X.ToString("0.000")}, {targetAnimal.Position.Y.ToString("0.000")})");
-                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Velocity : ({targetAnimal.Velocity.X.ToString("0.000")}, {targetAnimal.Velocity.Y.ToString("0.000")}) / {targetAnimal.Velocity.Magnitude.ToString("0.000")} u/step", SoupViewOverlayRenderer.OverlayGaugeColor1, targetAnimal.Velocity.Magnitude / settings.MaximumEffectiveVelocity);
+                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Velocity : ({targetAnimal.Velocity.X.ToString("0.000")}, {targetAnimal.Velocity.Y.ToString("0.000")}) / {targetAnimal.Velocity.Magnitude.ToString("0.000")} u/step", SoupViewOverlayRenderer.OverlayGaugeColor1, targetAnimal.Velocity.Magnitude / settings.SoupMaximumEffectiveVelocity);
                             SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Angle : {(targetAnimal.Angle + 0.5d).ToString("0.000")}");
-                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Angular Velocity : {targetAnimal.AngularVelocity.ToString("+0.000;-0.000;0.000")} rot/step", SoupViewOverlayRenderer.OverlayGaugeColor1, double.Abs(targetAnimal.AngularVelocity) / settings.MaximumEffectiveAngularVelocity);
-                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Element : {targetAnimal.Element.ToString("0.000")} / {(settings.AnimalMaximumElementAmount).ToString("0.000")} ({targetAnimal.ElementLossRate.ToString("+0.000;-0.000;0.000")}/step)", SoupViewOverlayRenderer.OverlayGaugeColor1, targetAnimal.Element / settings.AnimalReproductionCost);
+                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Angular Velocity : {targetAnimal.AngularVelocity.ToString("+0.000;-0.000;0.000")} rot/step", SoupViewOverlayRenderer.OverlayGaugeColor1, double.Abs(targetAnimal.AngularVelocity) / settings.SoupMaximumEffectiveAngularVelocity);
+                            SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Element : {targetAnimal.Element.ToString("0.000")} / {(settings.AnimalMaximumElementAmount).ToString("0.000")} ({(targetAnimal.ElementGainLoss + targetAnimal.ElementCostPerStep).ToString("+0.000;-0.000;0.000")}/step)", SoupViewOverlayRenderer.OverlayGaugeColor1, targetAnimal.Element / settings.AnimalReproductionCost);
                             SoupViewOverlayRenderer.OverlayDrawInformationWithGauge(overlayDrawInfo, graphics, $"Reproduction : {targetAnimal.ReproductionProgress.ToString("0.000")} / {(settings.AnimalReproductionCost).ToString("0.000")} ({targetAnimal.ReproductionRate.ToString("+0.000;-0.000;0.000")}/step)", SoupViewOverlayRenderer.OverlayGaugeColor1, targetAnimal.ReproductionProgress / settings.AnimalReproductionCost);
 
                             overlayDrawInfo.NextColumn();
@@ -129,15 +133,15 @@ namespace Paramecium.Rendering
                             SoupViewOverlayRenderer.OverlayFillRectangle(overlayDrawInfo, graphics, SoupViewOverlayRenderer.OverlayBackgroundBrush);
                             SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, $"Brain Diagram", SoupViewOverlayRenderer.OverlayTextBrush);
 
-                            SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, $"Node : {targetAnimal.Brain.Nodes.Count}", SoupViewOverlayRenderer.OverlayTextBrush, new Int2d(0, 388));
-                            SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, $"Connection : {targetAnimal.Brain.Connections.Count}", SoupViewOverlayRenderer.OverlayTextBrush, new Int2d(0, 404));
+                            SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, $"Nodes : {targetAnimal.Brain.Nodes.Count}", SoupViewOverlayRenderer.OverlayTextBrush, new Int2d(0, 388));
+                            SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, $"Connections : {targetAnimal.Brain.Connections.Count}", SoupViewOverlayRenderer.OverlayTextBrush, new Int2d(0, 404));
 
                             for (int i = 0; i < targetAnimal.Brain.Connections.Count; i++)
                             {
                                 BrainNodeConnection targetConnection = targetAnimal.Brain.Connections[i];
 
-                                Double2d originPos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * targetConnection.OriginIndex) * 180d + new Double2d(250, 220);
-                                Double2d targetPos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * targetConnection.TargetIndex) * 180d + new Double2d(250, 220);
+                                Double2d originPos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * targetConnection.OriginIndex) * 180d + new Double2d(250, 210);
+                                Double2d targetPos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * targetConnection.TargetIndex) * 180d + new Double2d(250, 210);
 
                                 Double2d arrowVector = (targetPos - originPos).Normalized;
                                 Double2d arrowLineVector1 = Double2d.Rotate01(arrowVector, 0.375);
@@ -157,7 +161,7 @@ namespace Paramecium.Rendering
                             {
                                 BrainNode targetNode = targetAnimal.Brain.Nodes[i];
 
-                                Double2d nodePos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * i) * 180d + new Double2d(250, 220);
+                                Double2d nodePos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * i) * 180d + new Double2d(250, 210);
 
                                 Double4d nodeColor = _brainDiagramNodeNeutralOutputColor;
                                 if (targetNode.IsOutput)
@@ -177,7 +181,7 @@ namespace Paramecium.Rendering
                             {
                                 BrainNode targetNode = targetAnimal.Brain.Nodes[i];
 
-                                Double2d nodePos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * i) * 180d + new Double2d(250, 220);
+                                Double2d nodePos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * i) * 180d + new Double2d(250, 210);
 
                                 if (targetNode.Function == BrainNodeFunction.NonOperation) SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 8, $"#{i} Nop", SoupViewOverlayRenderer.OverlayTextBrush, new Int2d((int)(nodePos.X + 7), (int)(nodePos.Y + 7)));
                                 if (targetNode.IsInput) SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 8, $"#{i} Input", SoupViewOverlayRenderer.OverlayTextBrush, new Int2d((int)(nodePos.X + 7), (int)(nodePos.Y + 7)));
@@ -190,57 +194,54 @@ namespace Paramecium.Rendering
 
                         if ((overlayToggles & OverlayToggles.AnimalBrainInputOutput) == OverlayToggles.AnimalBrainInputOutput)
                         {
-                            overlayDrawInfo.ItemSize = new Int2d(200, 420);
+                            overlayDrawInfo.ItemSize = new Int2d(200, 16);
+                            SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Brain Inputs : ");
 
-                            SoupViewOverlayRenderer.OverlayFillRectangle(overlayDrawInfo, graphics, SoupViewOverlayRenderer.OverlayBackgroundBrush);
                             overlayDrawInfo.ItemSize = new Int2d(overlayDrawInfo.ItemSize.X, 19);
-
-                            SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, $"Brain Inputs : ", SoupViewOverlayRenderer.OverlayTextBrush);
-
-                            overlayDrawInfo.NextLine();
                             if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Bias))
                             {
-                                if (targetAnimal.Age >= 0) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Bias.ToString()}", 1d, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                                else SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Bias.ToString()}", 0d, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
+                                if (targetAnimal.Age >= 0) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Bias.ToString()}", 1d);
+                                else OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Bias.ToString()}", 0d);
                             }
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Velocity)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Velocity.ToString()}", targetAnimal.Brain.Input.Velocity, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AngularVelocity)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AngularVelocity.ToString()}", targetAnimal.Brain.Input.AngularVelocity, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Element)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Element.ToString()}", targetAnimal.Brain.Input.Element, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_ReproductionProgress)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_ReproductionProgress.ToString()}", targetAnimal.Brain.Input.ReproductionProgress, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Age)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Age.ToString()}", targetAnimal.Brain.Input.Age, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Ate)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Ate.ToString()}", targetAnimal.Brain.Input.Ate, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Attacked)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Attacked.ToString()}", targetAnimal.Brain.Input.Attacked, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AttackdAngle)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AttackdAngle.ToString()}", targetAnimal.Brain.Input.AttackedAngle, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AttackSuccessful)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AttackSuccessful.ToString()}", targetAnimal.Brain.Input.AttackSuccessful, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_WallWAvgAngle)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_WallWAvgAngle.ToString()}", targetAnimal.Brain.Input.VisionData.WallWAvgAngle, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_WallWAvgProximity)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_WallWAvgProximity.ToString()}", targetAnimal.Brain.Input.VisionData.WallWAvgProximity, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_WallWAvgDistance)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_WallWAvgDistance.ToString()}", targetAnimal.Brain.Input.VisionData.WallWAvgDistance, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PlantWAvgAngle)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PlantWAvgAngle.ToString()}", targetAnimal.Brain.Input.VisionData.PlantWAvgAngle, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PlantWAvgProximity)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PlantWAvgProximity.ToString()}", targetAnimal.Brain.Input.VisionData.PlantWAvgProximity, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PlantWAvgDistance)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PlantWAvgDistance.ToString()}", targetAnimal.Brain.Input.VisionData.PlantWAvgDistance, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AnimalWAvgAngle)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AnimalWAvgAngle.ToString()}", targetAnimal.Brain.Input.VisionData.AnimalWAvgAngle, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AnimalWAvgProximity)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AnimalWAvgProximity.ToString()}", targetAnimal.Brain.Input.VisionData.AnimalWAvgProximity, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AnimalWAvgDistance)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AnimalWAvgDistance.ToString()}", targetAnimal.Brain.Input.VisionData.AnimalWAvgDistance, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AnimalWAvgSpeciesSigDiff)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AnimalWAvgSpeciesSigDiff.ToString()}", targetAnimal.Brain.Input.VisionData.AnimalWAvgSpeciesSigDiff, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneRedConcentration)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneRedConcentration.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneRedConcentration, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneRedGradAngle)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneRedGradAngle.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneRedGradAngle, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneGreenConcentration)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneGreenConcentration.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneGreenConcentration, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneGreenGradAngle)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneGreenGradAngle.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneGreenGradAngle, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneBlueConcentration)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneBlueConcentration.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneBlueConcentration, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneBlueGradAngle)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneBlueGradAngle.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneBlueGradAngle, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Velocity)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Velocity.ToString()}", targetAnimal.Brain.Input.Velocity);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AngularVelocity)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AngularVelocity.ToString()}", targetAnimal.Brain.Input.AngularVelocity);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Element)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Element.ToString()}", targetAnimal.Brain.Input.Element);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_ReproductionProgress)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_ReproductionProgress.ToString()}", targetAnimal.Brain.Input.ReproductionProgress);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Age)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Age.ToString()}", targetAnimal.Brain.Input.Age);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Ate)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Ate.ToString()}", targetAnimal.Brain.Input.Ate);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_Attacked)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_Attacked.ToString()}", targetAnimal.Brain.Input.Attacked);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AttackdAngle)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AttackdAngle.ToString()}", targetAnimal.Brain.Input.AttackedAngle);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AttackSuccessful)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AttackSuccessful.ToString()}", targetAnimal.Brain.Input.AttackSuccessful);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_WallWAvgAngle)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_WallWAvgAngle.ToString()}", targetAnimal.Brain.Input.VisionData.WallWAvgAngle);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_WallWAvgProximity)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_WallWAvgProximity.ToString()}", targetAnimal.Brain.Input.VisionData.WallWAvgProximity);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_WallWAvgDistance)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_WallWAvgDistance.ToString()}", targetAnimal.Brain.Input.VisionData.WallWAvgDistance);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PlantWAvgAngle)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PlantWAvgAngle.ToString()}", targetAnimal.Brain.Input.VisionData.PlantWAvgAngle);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PlantWAvgProximity)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PlantWAvgProximity.ToString()}", targetAnimal.Brain.Input.VisionData.PlantWAvgProximity);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PlantWAvgDistance)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PlantWAvgDistance.ToString()}", targetAnimal.Brain.Input.VisionData.PlantWAvgDistance);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AnimalWAvgAngle)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AnimalWAvgAngle.ToString()}", targetAnimal.Brain.Input.VisionData.AnimalWAvgAngle);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AnimalWAvgProximity)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AnimalWAvgProximity.ToString()}", targetAnimal.Brain.Input.VisionData.AnimalWAvgProximity);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AnimalWAvgDistance)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AnimalWAvgDistance.ToString()}", targetAnimal.Brain.Input.VisionData.AnimalWAvgDistance);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_AnimalWAvgSpeciesSigDiff)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_AnimalWAvgSpeciesSigDiff.ToString()}", targetAnimal.Brain.Input.VisionData.AnimalWAvgSpeciesSigDiff);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneRedConcentration)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneRedConcentration.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneRedConcentration);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneRedGradAngle)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneRedGradAngle.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneRedGradAngle);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneGreenConcentration)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneGreenConcentration.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneGreenConcentration);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneGreenGradAngle)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneGreenGradAngle.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneGreenGradAngle);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneBlueConcentration)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneBlueConcentration.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneBlueConcentration);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Input_PheromoneBlueGradAngle)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Input_PheromoneBlueGradAngle.ToString()}", targetAnimal.Brain.Input.VisionData.PheromoneBlueGradAngle);
 
-                            overlayDrawInfo.NextLine(); ;
-                            SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 12, $"Brain Outputs : ", SoupViewOverlayRenderer.OverlayTextBrush);
+                            overlayDrawInfo.ItemSize = new Int2d(overlayDrawInfo.ItemSize.X, 16);
+                            SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, string.Empty);
+                            SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Brain Outputs : ");
 
-                            overlayDrawInfo.NextLine(); ;
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Acceleration)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Acceleration.ToString()}", targetAnimal.Brain.Output.Acceleration, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Rotation)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Rotation.ToString()}", targetAnimal.Brain.Output.Rotation, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Eat)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Eat.ToString()}", targetAnimal.Brain.Output.Eat, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Attack)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Attack.ToString()}", targetAnimal.Brain.Output.Attack, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Reproduction)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Reproduction.ToString()}", targetAnimal.Brain.Output.Reproduction, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_PheromoneRedProduction)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_PheromoneRedProduction.ToString()}", targetAnimal.Brain.Output.PheromoneRedProduction, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_PheromoneGreenProduction)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_PheromoneGreenProduction.ToString()}", targetAnimal.Brain.Output.PheromoneGreenProduction, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
-                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_PheromoneBlueProduction)) SoupViewOverlayRenderer.OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_PheromoneBlueProduction.ToString()}", targetAnimal.Brain.Output.PheromoneBlueProduction, _brainDiagramNodeNeutralOutputColor, _brainDiagramNodeNegativeOutputColor, _brainDiagramNodePositiveOutputColor, _nodeOutlineAndConnectionPen);
+                            overlayDrawInfo.ItemSize = new Int2d(overlayDrawInfo.ItemSize.X, 19);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Acceleration)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Acceleration.ToString()}", targetAnimal.Brain.Output.Acceleration);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Rotation)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Rotation.ToString()}", targetAnimal.Brain.Output.Rotation);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Eat)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Eat.ToString()}", targetAnimal.Brain.Output.Eat);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Attack)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Attack.ToString()}", targetAnimal.Brain.Output.Attack);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_Reproduction)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_Reproduction.ToString()}", targetAnimal.Brain.Output.Reproduction);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_PheromoneRedProduction)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_PheromoneRedProduction.ToString()}", targetAnimal.Brain.Output.PheromoneRedProduction);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_PheromoneGreenProduction)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_PheromoneGreenProduction.ToString()}", targetAnimal.Brain.Output.PheromoneGreenProduction);
+                            if (targetAnimal.Brain.ContainNodeFunction(BrainNodeFunction.Output_PheromoneBlueProduction)) OverlayDrawAnimalBrainInOutInfomation(overlayDrawInfo, graphics, $"{BrainNodeFunction.Output_PheromoneBlueProduction.ToString()}", targetAnimal.Brain.Output.PheromoneBlueProduction);
                         }
 
                         if ((overlayToggles & OverlayToggles.AnimalBrainDiagram) == OverlayToggles.AnimalBrainDiagram)
@@ -250,7 +251,7 @@ namespace Paramecium.Rendering
                             {
                                 BrainNode targetNode = targetAnimal.Brain.Nodes[i];
 
-                                Double2d nodePos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * i) * 180d + new Double2d(250, 220);
+                                Double2d nodePos = Double2d.FromAngle01(-0.5d + 1d / targetAnimal.Brain.Nodes.Count * i) * 180d + new Double2d(250, 210);
 
                                 if (Double2d.DistanceSquared(nodePos, new Double2d(mousePosition.X - overlay2ndLayerDrawInfo.OriginOffset.X, mousePosition.Y - overlay2ndLayerDrawInfo.OriginOffset.Y)) < 7d * 7d)
                                 {
@@ -327,10 +328,10 @@ namespace Paramecium.Rendering
                     SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Tile #{targetTile.Index}");
                     SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Position : ({targetTile.Position.X}, {targetTile.Position.Y})");
                     SoupViewOverlayRenderer.OverlayDrawInformation(overlayDrawInfo, graphics, $"Type : {targetTile.Type.ToString()}");
-                    SoupViewOverlayRenderer.OverlayDrawInformationWith2Gauges(overlayDrawInfo, graphics, $"Element : {targetTile.Element.ToString("0.000")}", SoupViewOverlayRenderer.OverlayGaugeColor1, targetTile.Element / settings.ElementPerTile, SoupViewOverlayRenderer.OverlayGaugeColor2, (targetTile.Element - settings.ElementPerTile) / settings.ElementPerTile / 3d);
-                    SoupViewOverlayRenderer.OverlayDrawInformationWith2Gauges(overlayDrawInfo, graphics, $"Red Pheromone : {targetTile.PheromoneRed.ToString("0.000")} (eff. : {Math.Sqrt(targetTile.PheromoneRed / settings.MaximumEffectivePheromoneAmount).ToString("0.000")})", (Color)_pheromoneRedEffectiveColor, Math.Sqrt(targetTile.PheromoneRed / settings.MaximumEffectivePheromoneAmount), (Color)_pheromoneRedColor, targetTile.PheromoneRed / settings.MaximumEffectivePheromoneAmount);
-                    SoupViewOverlayRenderer.OverlayDrawInformationWith2Gauges(overlayDrawInfo, graphics, $"Green Pheromone : {targetTile.PheromoneGreen.ToString("0.000")} (eff. : {Math.Sqrt(targetTile.PheromoneGreen / settings.MaximumEffectivePheromoneAmount).ToString("0.000")})", (Color)_pheromoneGreenEffectiveColor, Math.Sqrt(targetTile.PheromoneGreen / settings.MaximumEffectivePheromoneAmount), (Color)_pheromoneGreenColor, targetTile.PheromoneGreen / settings.MaximumEffectivePheromoneAmount);
-                    SoupViewOverlayRenderer.OverlayDrawInformationWith2Gauges(overlayDrawInfo, graphics, $"Blue Pheromone : {targetTile.PheromoneBlue.ToString("0.000")} (eff. : {Math.Sqrt(targetTile.PheromoneBlue / settings.MaximumEffectivePheromoneAmount).ToString("0.000")})", (Color)_pheromoneBlueEffectiveColor, Math.Sqrt(targetTile.PheromoneBlue / settings.MaximumEffectivePheromoneAmount), (Color)_pheromoneBlueColor, targetTile.PheromoneBlue / settings.MaximumEffectivePheromoneAmount);
+                    SoupViewOverlayRenderer.OverlayDrawInformationWith2Gauges(overlayDrawInfo, graphics, $"Element : {targetTile.Element.ToString("0.000")}", SoupViewOverlayRenderer.OverlayGaugeColor1, targetTile.Element / settings.SoupElementPerTile, SoupViewOverlayRenderer.OverlayGaugeColor2, (targetTile.Element - settings.SoupElementPerTile) / settings.SoupElementPerTile / 3d);
+                    SoupViewOverlayRenderer.OverlayDrawInformationWith2Gauges(overlayDrawInfo, graphics, $"Red Pheromone : {targetTile.PheromoneRed.ToString("0.000")} (eff. : {Math.Sqrt(targetTile.PheromoneRed / settings.SoupMaximumEffectivePheromoneAmount).ToString("0.000")})", (Color)_pheromoneRedEffectiveColor, Math.Sqrt(targetTile.PheromoneRed / settings.SoupMaximumEffectivePheromoneAmount), (Color)_pheromoneRedColor, targetTile.PheromoneRed / settings.SoupMaximumEffectivePheromoneAmount);
+                    SoupViewOverlayRenderer.OverlayDrawInformationWith2Gauges(overlayDrawInfo, graphics, $"Green Pheromone : {targetTile.PheromoneGreen.ToString("0.000")} (eff. : {Math.Sqrt(targetTile.PheromoneGreen / settings.SoupMaximumEffectivePheromoneAmount).ToString("0.000")})", (Color)_pheromoneGreenEffectiveColor, Math.Sqrt(targetTile.PheromoneGreen / settings.SoupMaximumEffectivePheromoneAmount), (Color)_pheromoneGreenColor, targetTile.PheromoneGreen / settings.SoupMaximumEffectivePheromoneAmount);
+                    SoupViewOverlayRenderer.OverlayDrawInformationWith2Gauges(overlayDrawInfo, graphics, $"Blue Pheromone : {targetTile.PheromoneBlue.ToString("0.000")} (eff. : {Math.Sqrt(targetTile.PheromoneBlue / settings.SoupMaximumEffectivePheromoneAmount).ToString("0.000")})", (Color)_pheromoneBlueEffectiveColor, Math.Sqrt(targetTile.PheromoneBlue / settings.SoupMaximumEffectivePheromoneAmount), (Color)_pheromoneBlueColor, targetTile.PheromoneBlue / settings.SoupMaximumEffectivePheromoneAmount);
                 }
             }
 
@@ -376,14 +377,15 @@ namespace Paramecium.Rendering
             overlayDrawInfo.NextLine();
         }
 
-        public static void OverlayDrawAnimalBrainInOutInfomation(SoupViewOverlayRenderer.OverlayDrawInfo overlayDrawInfo, Graphics graphics, string nodeName, double value, Double4d neutralOutputColor, Double4d negativeOutputColor, Double4d positiveOutputColor, Pen nodeOutlinePen)
+        public static void OverlayDrawAnimalBrainInOutInfomation(SoupViewOverlayRenderer.OverlayDrawInfo overlayDrawInfo, Graphics graphics, string nodeName, double value)
         {
-            Double4d color = neutralOutputColor;
-            if (value < 0) color = Double4d.Lerp(color, negativeOutputColor, double.Min(1d, -value));
-            if (value > 0) color = Double4d.Lerp(color, positiveOutputColor, double.Min(1d, value));
+            Double4d color = _brainDiagramNodeNeutralOutputColor;
+            if (value < 0) color = Double4d.Lerp(color, _brainDiagramNodeNegativeOutputColor, double.Min(1d, -value));
+            if (value > 0) color = Double4d.Lerp(color, _brainDiagramNodePositiveOutputColor, double.Min(1d, value));
 
+            SoupViewOverlayRenderer.OverlayFillRectangle(overlayDrawInfo, graphics, SoupViewOverlayRenderer.OverlayBackgroundBrush);
             SoupViewOverlayRenderer.OverlayFillEllipse(overlayDrawInfo, graphics, (Color)color, new Int2d(8, 8), 7);
-            SoupViewOverlayRenderer.OverlayDrawEllipse(overlayDrawInfo, graphics, nodeOutlinePen, new Int2d(8, 8), 7);
+            SoupViewOverlayRenderer.OverlayDrawEllipse(overlayDrawInfo, graphics, _nodeOutlineAndConnectionPen, new Int2d(8, 8), 7);
             SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 8, $"{nodeName}", SoupViewOverlayRenderer.OverlayTextBrush, new Int2d(18, 0));
             SoupViewOverlayRenderer.OverlayDrawString(overlayDrawInfo, graphics, "MS UI Gothic", 8, $"{value.ToString("0.000")}", SoupViewOverlayRenderer.OverlayTextBrush, new Int2d(18, 9));
             overlayDrawInfo.NextLine();

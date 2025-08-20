@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Paramecium.Rendering
 {
+    // オーバーレイの表示/非表示を管理するフラグ
     [Flags]
     public enum OverlayToggles
     {
@@ -13,6 +14,7 @@ namespace Paramecium.Rendering
         SelectedObject = 1 << 1,
         AnimalBrainDiagram = 1 << 2,
         AnimalBrainInputOutput = 1 << 3,
-        FullScreenOverlay = 1 << 4
+        LogOverlay = 1 << 8,
+        FullScreenOverlay = 1 << 9
     }
 }

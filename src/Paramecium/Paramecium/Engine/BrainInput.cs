@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Paramecium.Engine
 {
+    // 脳へ入力するデータを格納するクラス
     public class BrainInput
     {
         public AnimalVisionOutput VisionData { get; set; } = new AnimalVisionOutput();

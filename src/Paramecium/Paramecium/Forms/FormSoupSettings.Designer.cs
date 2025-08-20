@@ -30,66 +30,66 @@
         {
             PanelSoupBasicSettings = new Panel();
             PanelSoupBasicSettingsPheromone = new Panel();
-            SoupSettingsItem_MinimumEffectivePheromoneAmount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_MaximumEffectivePheromoneAmount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_PheromoneDecayRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupPheromoneDecayRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel23 = new Paramecium.Forms.Controls.SoupSettingsLabel();
-            SoupSettingsItem_PheromoneFlowRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupPheromoneFlowRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             PanelSoupBasicSettingsPhysics = new Panel();
-            SoupSettingsItem_RestitutionCoefficient = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupRestitutionCoefficient = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel5 = new Paramecium.Forms.Controls.SoupSettingsLabel();
-            SoupSettingsItem_MaximumEffectiveAngularVelocity = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_Drag = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_MaximumEffectiveVelocity = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AngularVelocityDrag = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupDrag = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupMaximumEffectiveVelocity = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupAngularVelocityDrag = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             PanelSoupBasicSettingsElement = new Panel();
             soupSettingsLabel4 = new Paramecium.Forms.Controls.SoupSettingsLabel();
-            SoupSettingsItem_TotalElementAmount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupTotalElementAmount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             SoupSettingsItem_ElementFlowRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             PanelSoupBasicSettingsWall = new Panel();
             ButtonRandomizeWallNoiseOffset = new Button();
             soupSettingsLabel3 = new Paramecium.Forms.Controls.SoupSettingsLabel();
-            SoupSettingsItem_WallNoiseOffsetX = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_WallEnabled = new Paramecium.Forms.Controls.SoupSettingsItemCheckbox();
-            SoupSettingsItem_WallNoiseOffsetY = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_WallNoiseOffsetZ = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_WallNoiseSamplingInterval = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_WallNoiseOctave = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_WallThickness = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupWallNoiseOffsetX = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupWallEnabled = new Paramecium.Forms.Controls.SoupSettingsItemCheckbox();
+            SoupSettingsItem_SoupWallNoiseOffsetY = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupWallNoiseOffsetZ = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupWallNoiseSamplingInterval = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupWallNoiseOctave = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupWallThickness = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             PanelSoupBasicSettingsSoupSize = new Panel();
             soupSettingsLabel2 = new Paramecium.Forms.Controls.SoupSettingsLabel();
-            SoupSettingsItem_SizeX = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_SizeY = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupSizeX = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_SoupSizeY = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel1 = new Paramecium.Forms.Controls.SoupSettingsLabel();
             PanelSettingItems = new Panel();
             PanelAnimalBrainSettings = new Panel();
             PanelAnimalBrainSettingsNodeAndConnection = new Panel();
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel18 = new Paramecium.Forms.Controls.SoupSettingsLabel();
-            SoupSettingsItem_AnimalMaximumNodeCount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalBrainMaximumNodeCount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel17 = new Paramecium.Forms.Controls.SoupSettingsLabel();
             PanelAnimalMutationSettings = new Panel();
             PanelAnimalMutationSettingsNodeTypeWeights = new Panel();
-            SoupSettingsItem_AnimalNodeTypeOutputWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalNodeTypeInputWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel21 = new Paramecium.Forms.Controls.SoupSettingsLabel();
             PanelAnimalMutationSettingsMutationTypeWeights = new Panel();
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalMutationAddConnectionWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel20 = new Paramecium.Forms.Controls.SoupSettingsLabel();
-            SoupSettingsItem_AnimalMutationAddNodeWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             PanelAnimalMutationSettingsMutationRateAndCount = new Panel();
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation = new Paramecium.Forms.Controls.SoupSettingsItemCheckbox();
-            SoupSettingsItem_AnimalMutationCountFactor = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_AnimalMaximumMutationCount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation = new Paramecium.Forms.Controls.SoupSettingsItemCheckbox();
+            SoupSettingsItem_AnimalMutationMutationCountFactor = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMaximumMutationCount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel19 = new Paramecium.Forms.Controls.SoupSettingsLabel();
-            SoupSettingsItem_AnimalMutationRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_AnimalMutationMutationRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel8 = new Paramecium.Forms.Controls.SoupSettingsLabel();
             PanelAnimalBasicSettings = new Panel();
             AnimalBasicSettingsPhysics = new Panel();
@@ -135,7 +135,7 @@
             SoupSettingsItem_PlantDivisionCountMin = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             PanelPlantSettingsElement = new Panel();
             SoupSettingsItem_PlantUnderAttackTime = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
-            SoupSettingsItem_ElementCollectRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
+            SoupSettingsItem_PlantElementCollectRate = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             soupSettingsLabel10 = new Paramecium.Forms.Controls.SoupSettingsLabel();
             SoupSettingsItem_PlantMaximumElementAmount = new Paramecium.Forms.Controls.SoupSettingsItemNumUpDown();
             PanelPlantSettingsPopulation = new Panel();
@@ -192,64 +192,64 @@
             // PanelSoupBasicSettingsPheromone
             // 
             PanelSoupBasicSettingsPheromone.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            PanelSoupBasicSettingsPheromone.Controls.Add(SoupSettingsItem_MinimumEffectivePheromoneAmount);
-            PanelSoupBasicSettingsPheromone.Controls.Add(SoupSettingsItem_MaximumEffectivePheromoneAmount);
-            PanelSoupBasicSettingsPheromone.Controls.Add(SoupSettingsItem_PheromoneDecayRate);
+            PanelSoupBasicSettingsPheromone.Controls.Add(SoupSettingsItem_SoupMinimumEffectivePheromoneAmount);
+            PanelSoupBasicSettingsPheromone.Controls.Add(SoupSettingsItem_SoupMaximumEffectivePheromoneAmount);
+            PanelSoupBasicSettingsPheromone.Controls.Add(SoupSettingsItem_SoupPheromoneDecayRate);
             PanelSoupBasicSettingsPheromone.Controls.Add(soupSettingsLabel23);
-            PanelSoupBasicSettingsPheromone.Controls.Add(SoupSettingsItem_PheromoneFlowRate);
+            PanelSoupBasicSettingsPheromone.Controls.Add(SoupSettingsItem_SoupPheromoneFlowRate);
             PanelSoupBasicSettingsPheromone.Location = new Point(18, 567);
             PanelSoupBasicSettingsPheromone.Margin = new Padding(3, 0, 3, 15);
             PanelSoupBasicSettingsPheromone.Name = "PanelSoupBasicSettingsPheromone";
             PanelSoupBasicSettingsPheromone.Size = new Size(556, 173);
             PanelSoupBasicSettingsPheromone.TabIndex = 6;
             // 
-            // SoupSettingsItem_MinimumEffectivePheromoneAmount
+            // SoupSettingsItem_SoupMinimumEffectivePheromoneAmount
             // 
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.DecimalPlaces = 6;
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.DefaultValue = new decimal(new int[] { 1, 0, 0, 262144 });
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Editable = true;
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.ItemName = "Minimum Effective Pheromone Concentration";
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Location = new Point(18, 71);
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Name = "SoupSettingsItem_MinimumEffectivePheromoneAmount";
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.Size = new Size(535, 31);
-            SoupSettingsItem_MinimumEffectivePheromoneAmount.TabIndex = 17;
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.DecimalPlaces = 6;
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.DefaultValue = new decimal(new int[] { 1, 0, 0, 262144 });
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Editable = true;
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.ItemName = "Minimum Effective Pheromone Concentration";
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Location = new Point(18, 71);
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Name = "SoupSettingsItem_SoupMinimumEffectivePheromoneAmount";
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.Size = new Size(535, 31);
+            SoupSettingsItem_SoupMinimumEffectivePheromoneAmount.TabIndex = 17;
             // 
-            // SoupSettingsItem_MaximumEffectivePheromoneAmount
+            // SoupSettingsItem_SoupMaximumEffectivePheromoneAmount
             // 
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.DecimalPlaces = 6;
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Editable = true;
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.ItemName = "Maximum Effective Pheromone Concentration";
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Location = new Point(18, 37);
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Name = "SoupSettingsItem_MaximumEffectivePheromoneAmount";
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.Size = new Size(535, 31);
-            SoupSettingsItem_MaximumEffectivePheromoneAmount.TabIndex = 16;
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.DecimalPlaces = 6;
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Editable = true;
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.ItemName = "Maximum Effective Pheromone Concentration";
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Location = new Point(18, 37);
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Name = "SoupSettingsItem_SoupMaximumEffectivePheromoneAmount";
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.Size = new Size(535, 31);
+            SoupSettingsItem_SoupMaximumEffectivePheromoneAmount.TabIndex = 16;
             // 
-            // SoupSettingsItem_PheromoneDecayRate
+            // SoupSettingsItem_SoupPheromoneDecayRate
             // 
-            SoupSettingsItem_PheromoneDecayRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_PheromoneDecayRate.DecimalPlaces = 6;
-            SoupSettingsItem_PheromoneDecayRate.DefaultValue = new decimal(new int[] { 1, 0, 0, 131072 });
-            SoupSettingsItem_PheromoneDecayRate.Editable = true;
-            SoupSettingsItem_PheromoneDecayRate.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_PheromoneDecayRate.ItemName = "Pheromone Decay Rate";
-            SoupSettingsItem_PheromoneDecayRate.Location = new Point(18, 139);
-            SoupSettingsItem_PheromoneDecayRate.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_PheromoneDecayRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_PheromoneDecayRate.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_PheromoneDecayRate.Name = "SoupSettingsItem_PheromoneDecayRate";
-            SoupSettingsItem_PheromoneDecayRate.Size = new Size(535, 31);
-            SoupSettingsItem_PheromoneDecayRate.TabIndex = 15;
+            SoupSettingsItem_SoupPheromoneDecayRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupPheromoneDecayRate.DecimalPlaces = 6;
+            SoupSettingsItem_SoupPheromoneDecayRate.DefaultValue = new decimal(new int[] { 1, 0, 0, 131072 });
+            SoupSettingsItem_SoupPheromoneDecayRate.Editable = true;
+            SoupSettingsItem_SoupPheromoneDecayRate.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupPheromoneDecayRate.ItemName = "Pheromone Decay Rate";
+            SoupSettingsItem_SoupPheromoneDecayRate.Location = new Point(18, 139);
+            SoupSettingsItem_SoupPheromoneDecayRate.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupPheromoneDecayRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupPheromoneDecayRate.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupPheromoneDecayRate.Name = "SoupSettingsItem_SoupPheromoneDecayRate";
+            SoupSettingsItem_SoupPheromoneDecayRate.Size = new Size(535, 31);
+            SoupSettingsItem_SoupPheromoneDecayRate.TabIndex = 15;
             // 
             // soupSettingsLabel23
             // 
@@ -263,52 +263,52 @@
             soupSettingsLabel23.Size = new Size(550, 31);
             soupSettingsLabel23.TabIndex = 12;
             // 
-            // SoupSettingsItem_PheromoneFlowRate
+            // SoupSettingsItem_SoupPheromoneFlowRate
             // 
-            SoupSettingsItem_PheromoneFlowRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_PheromoneFlowRate.DecimalPlaces = 6;
-            SoupSettingsItem_PheromoneFlowRate.DefaultValue = new decimal(new int[] { 4, 0, 0, 65536 });
-            SoupSettingsItem_PheromoneFlowRate.Editable = true;
-            SoupSettingsItem_PheromoneFlowRate.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_PheromoneFlowRate.ItemName = "Pheromone Flow Rate";
-            SoupSettingsItem_PheromoneFlowRate.Location = new Point(18, 105);
-            SoupSettingsItem_PheromoneFlowRate.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_PheromoneFlowRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_PheromoneFlowRate.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_PheromoneFlowRate.Name = "SoupSettingsItem_PheromoneFlowRate";
-            SoupSettingsItem_PheromoneFlowRate.Size = new Size(535, 31);
-            SoupSettingsItem_PheromoneFlowRate.TabIndex = 14;
+            SoupSettingsItem_SoupPheromoneFlowRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupPheromoneFlowRate.DecimalPlaces = 6;
+            SoupSettingsItem_SoupPheromoneFlowRate.DefaultValue = new decimal(new int[] { 4, 0, 0, 65536 });
+            SoupSettingsItem_SoupPheromoneFlowRate.Editable = true;
+            SoupSettingsItem_SoupPheromoneFlowRate.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupPheromoneFlowRate.ItemName = "Pheromone Flow Rate";
+            SoupSettingsItem_SoupPheromoneFlowRate.Location = new Point(18, 105);
+            SoupSettingsItem_SoupPheromoneFlowRate.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupPheromoneFlowRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupPheromoneFlowRate.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupPheromoneFlowRate.Name = "SoupSettingsItem_SoupPheromoneFlowRate";
+            SoupSettingsItem_SoupPheromoneFlowRate.Size = new Size(535, 31);
+            SoupSettingsItem_SoupPheromoneFlowRate.TabIndex = 14;
             // 
             // PanelSoupBasicSettingsPhysics
             // 
             PanelSoupBasicSettingsPhysics.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_RestitutionCoefficient);
+            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_SoupRestitutionCoefficient);
             PanelSoupBasicSettingsPhysics.Controls.Add(soupSettingsLabel5);
-            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_MaximumEffectiveAngularVelocity);
-            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_Drag);
-            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_MaximumEffectiveVelocity);
-            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_AngularVelocityDrag);
+            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_SoupMaximumEffectiveAngularVelocity);
+            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_SoupDrag);
+            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_SoupMaximumEffectiveVelocity);
+            PanelSoupBasicSettingsPhysics.Controls.Add(SoupSettingsItem_SoupAngularVelocityDrag);
             PanelSoupBasicSettingsPhysics.Location = new Point(18, 755);
             PanelSoupBasicSettingsPhysics.Margin = new Padding(3, 0, 3, 15);
             PanelSoupBasicSettingsPhysics.Name = "PanelSoupBasicSettingsPhysics";
             PanelSoupBasicSettingsPhysics.Size = new Size(556, 207);
             PanelSoupBasicSettingsPhysics.TabIndex = 5;
             // 
-            // SoupSettingsItem_RestitutionCoefficient
+            // SoupSettingsItem_SoupRestitutionCoefficient
             // 
-            SoupSettingsItem_RestitutionCoefficient.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_RestitutionCoefficient.DecimalPlaces = 6;
-            SoupSettingsItem_RestitutionCoefficient.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
-            SoupSettingsItem_RestitutionCoefficient.Editable = true;
-            SoupSettingsItem_RestitutionCoefficient.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_RestitutionCoefficient.ItemName = "Restitution Coefficient";
-            SoupSettingsItem_RestitutionCoefficient.Location = new Point(18, 173);
-            SoupSettingsItem_RestitutionCoefficient.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_RestitutionCoefficient.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_RestitutionCoefficient.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_RestitutionCoefficient.Name = "SoupSettingsItem_RestitutionCoefficient";
-            SoupSettingsItem_RestitutionCoefficient.Size = new Size(535, 31);
-            SoupSettingsItem_RestitutionCoefficient.TabIndex = 20;
+            SoupSettingsItem_SoupRestitutionCoefficient.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupRestitutionCoefficient.DecimalPlaces = 6;
+            SoupSettingsItem_SoupRestitutionCoefficient.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
+            SoupSettingsItem_SoupRestitutionCoefficient.Editable = true;
+            SoupSettingsItem_SoupRestitutionCoefficient.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupRestitutionCoefficient.ItemName = "Restitution Coefficient";
+            SoupSettingsItem_SoupRestitutionCoefficient.Location = new Point(18, 173);
+            SoupSettingsItem_SoupRestitutionCoefficient.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupRestitutionCoefficient.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupRestitutionCoefficient.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupRestitutionCoefficient.Name = "SoupSettingsItem_SoupRestitutionCoefficient";
+            SoupSettingsItem_SoupRestitutionCoefficient.Size = new Size(535, 31);
+            SoupSettingsItem_SoupRestitutionCoefficient.TabIndex = 20;
             // 
             // soupSettingsLabel5
             // 
@@ -322,75 +322,75 @@
             soupSettingsLabel5.Size = new Size(550, 31);
             soupSettingsLabel5.TabIndex = 15;
             // 
-            // SoupSettingsItem_MaximumEffectiveAngularVelocity
+            // SoupSettingsItem_SoupMaximumEffectiveAngularVelocity
             // 
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.DecimalPlaces = 6;
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Editable = true;
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.ItemName = "Maximum Effective Angular Velocity (rot/step)";
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Location = new Point(18, 139);
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Name = "SoupSettingsItem_MaximumEffectiveAngularVelocity";
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.Size = new Size(535, 31);
-            SoupSettingsItem_MaximumEffectiveAngularVelocity.TabIndex = 19;
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.DecimalPlaces = 6;
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Editable = true;
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.ItemName = "Maximum Effective Angular Velocity (rot/step)";
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Location = new Point(18, 139);
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Name = "SoupSettingsItem_SoupMaximumEffectiveAngularVelocity";
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.Size = new Size(535, 31);
+            SoupSettingsItem_SoupMaximumEffectiveAngularVelocity.TabIndex = 19;
             // 
-            // SoupSettingsItem_Drag
+            // SoupSettingsItem_SoupDrag
             // 
-            SoupSettingsItem_Drag.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_Drag.DecimalPlaces = 6;
-            SoupSettingsItem_Drag.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
-            SoupSettingsItem_Drag.Editable = true;
-            SoupSettingsItem_Drag.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_Drag.ItemName = "Drag";
-            SoupSettingsItem_Drag.Location = new Point(18, 37);
-            SoupSettingsItem_Drag.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_Drag.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_Drag.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_Drag.Name = "SoupSettingsItem_Drag";
-            SoupSettingsItem_Drag.Size = new Size(535, 31);
-            SoupSettingsItem_Drag.TabIndex = 16;
+            SoupSettingsItem_SoupDrag.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupDrag.DecimalPlaces = 6;
+            SoupSettingsItem_SoupDrag.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
+            SoupSettingsItem_SoupDrag.Editable = true;
+            SoupSettingsItem_SoupDrag.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupDrag.ItemName = "Drag";
+            SoupSettingsItem_SoupDrag.Location = new Point(18, 37);
+            SoupSettingsItem_SoupDrag.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupDrag.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupDrag.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupDrag.Name = "SoupSettingsItem_SoupDrag";
+            SoupSettingsItem_SoupDrag.Size = new Size(535, 31);
+            SoupSettingsItem_SoupDrag.TabIndex = 16;
             // 
-            // SoupSettingsItem_MaximumEffectiveVelocity
+            // SoupSettingsItem_SoupMaximumEffectiveVelocity
             // 
-            SoupSettingsItem_MaximumEffectiveVelocity.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_MaximumEffectiveVelocity.DecimalPlaces = 6;
-            SoupSettingsItem_MaximumEffectiveVelocity.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
-            SoupSettingsItem_MaximumEffectiveVelocity.Editable = true;
-            SoupSettingsItem_MaximumEffectiveVelocity.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_MaximumEffectiveVelocity.ItemName = "Maximum Effective Velocity (u/step)";
-            SoupSettingsItem_MaximumEffectiveVelocity.Location = new Point(18, 105);
-            SoupSettingsItem_MaximumEffectiveVelocity.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_MaximumEffectiveVelocity.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_MaximumEffectiveVelocity.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_MaximumEffectiveVelocity.Name = "SoupSettingsItem_MaximumEffectiveVelocity";
-            SoupSettingsItem_MaximumEffectiveVelocity.Size = new Size(535, 31);
-            SoupSettingsItem_MaximumEffectiveVelocity.TabIndex = 18;
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.DecimalPlaces = 6;
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Editable = true;
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.ItemName = "Maximum Effective Velocity (u/step)";
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Location = new Point(18, 105);
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Name = "SoupSettingsItem_SoupMaximumEffectiveVelocity";
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.Size = new Size(535, 31);
+            SoupSettingsItem_SoupMaximumEffectiveVelocity.TabIndex = 18;
             // 
-            // SoupSettingsItem_AngularVelocityDrag
+            // SoupSettingsItem_SoupAngularVelocityDrag
             // 
-            SoupSettingsItem_AngularVelocityDrag.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AngularVelocityDrag.DecimalPlaces = 6;
-            SoupSettingsItem_AngularVelocityDrag.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
-            SoupSettingsItem_AngularVelocityDrag.Editable = true;
-            SoupSettingsItem_AngularVelocityDrag.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AngularVelocityDrag.ItemName = "Angular Velocity Drag";
-            SoupSettingsItem_AngularVelocityDrag.Location = new Point(18, 71);
-            SoupSettingsItem_AngularVelocityDrag.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AngularVelocityDrag.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AngularVelocityDrag.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AngularVelocityDrag.Name = "SoupSettingsItem_AngularVelocityDrag";
-            SoupSettingsItem_AngularVelocityDrag.Size = new Size(535, 31);
-            SoupSettingsItem_AngularVelocityDrag.TabIndex = 17;
+            SoupSettingsItem_SoupAngularVelocityDrag.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupAngularVelocityDrag.DecimalPlaces = 6;
+            SoupSettingsItem_SoupAngularVelocityDrag.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
+            SoupSettingsItem_SoupAngularVelocityDrag.Editable = true;
+            SoupSettingsItem_SoupAngularVelocityDrag.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupAngularVelocityDrag.ItemName = "Angular Velocity Drag";
+            SoupSettingsItem_SoupAngularVelocityDrag.Location = new Point(18, 71);
+            SoupSettingsItem_SoupAngularVelocityDrag.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupAngularVelocityDrag.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupAngularVelocityDrag.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupAngularVelocityDrag.Name = "SoupSettingsItem_SoupAngularVelocityDrag";
+            SoupSettingsItem_SoupAngularVelocityDrag.Size = new Size(535, 31);
+            SoupSettingsItem_SoupAngularVelocityDrag.TabIndex = 17;
             // 
             // PanelSoupBasicSettingsElement
             // 
             PanelSoupBasicSettingsElement.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             PanelSoupBasicSettingsElement.Controls.Add(soupSettingsLabel4);
-            PanelSoupBasicSettingsElement.Controls.Add(SoupSettingsItem_TotalElementAmount);
+            PanelSoupBasicSettingsElement.Controls.Add(SoupSettingsItem_SoupTotalElementAmount);
             PanelSoupBasicSettingsElement.Controls.Add(SoupSettingsItem_ElementFlowRate);
             PanelSoupBasicSettingsElement.Location = new Point(18, 447);
             PanelSoupBasicSettingsElement.Margin = new Padding(3, 0, 3, 15);
@@ -410,21 +410,21 @@
             soupSettingsLabel4.Size = new Size(550, 31);
             soupSettingsLabel4.TabIndex = 12;
             // 
-            // SoupSettingsItem_TotalElementAmount
+            // SoupSettingsItem_SoupTotalElementAmount
             // 
-            SoupSettingsItem_TotalElementAmount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_TotalElementAmount.DecimalPlaces = 0;
-            SoupSettingsItem_TotalElementAmount.DefaultValue = new decimal(new int[] { 65536, 0, 0, 0 });
-            SoupSettingsItem_TotalElementAmount.Editable = true;
-            SoupSettingsItem_TotalElementAmount.Increment = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_TotalElementAmount.ItemName = "Total Element Amount";
-            SoupSettingsItem_TotalElementAmount.Location = new Point(18, 37);
-            SoupSettingsItem_TotalElementAmount.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_TotalElementAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
-            SoupSettingsItem_TotalElementAmount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_TotalElementAmount.Name = "SoupSettingsItem_TotalElementAmount";
-            SoupSettingsItem_TotalElementAmount.Size = new Size(535, 31);
-            SoupSettingsItem_TotalElementAmount.TabIndex = 13;
+            SoupSettingsItem_SoupTotalElementAmount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupTotalElementAmount.DecimalPlaces = 0;
+            SoupSettingsItem_SoupTotalElementAmount.DefaultValue = new decimal(new int[] { 65536, 0, 0, 0 });
+            SoupSettingsItem_SoupTotalElementAmount.Editable = true;
+            SoupSettingsItem_SoupTotalElementAmount.Increment = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupTotalElementAmount.ItemName = "Total Element Amount";
+            SoupSettingsItem_SoupTotalElementAmount.Location = new Point(18, 37);
+            SoupSettingsItem_SoupTotalElementAmount.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupTotalElementAmount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            SoupSettingsItem_SoupTotalElementAmount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupTotalElementAmount.Name = "SoupSettingsItem_SoupTotalElementAmount";
+            SoupSettingsItem_SoupTotalElementAmount.Size = new Size(535, 31);
+            SoupSettingsItem_SoupTotalElementAmount.TabIndex = 13;
             // 
             // SoupSettingsItem_ElementFlowRate
             // 
@@ -447,13 +447,13 @@
             PanelSoupBasicSettingsWall.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             PanelSoupBasicSettingsWall.Controls.Add(ButtonRandomizeWallNoiseOffset);
             PanelSoupBasicSettingsWall.Controls.Add(soupSettingsLabel3);
-            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_WallNoiseOffsetX);
-            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_WallEnabled);
-            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_WallNoiseOffsetY);
-            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_WallNoiseOffsetZ);
-            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_WallNoiseSamplingInterval);
-            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_WallNoiseOctave);
-            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_WallThickness);
+            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_SoupWallNoiseOffsetX);
+            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_SoupWallEnabled);
+            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_SoupWallNoiseOffsetY);
+            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_SoupWallNoiseOffsetZ);
+            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_SoupWallNoiseSamplingInterval);
+            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_SoupWallNoiseOctave);
+            PanelSoupBasicSettingsWall.Controls.Add(SoupSettingsItem_SoupWallThickness);
             PanelSoupBasicSettingsWall.Location = new Point(18, 157);
             PanelSoupBasicSettingsWall.Margin = new Padding(3, 0, 3, 15);
             PanelSoupBasicSettingsWall.Name = "PanelSoupBasicSettingsWall";
@@ -482,120 +482,120 @@
             soupSettingsLabel3.Size = new Size(550, 31);
             soupSettingsLabel3.TabIndex = 4;
             // 
-            // SoupSettingsItem_WallNoiseOffsetX
+            // SoupSettingsItem_SoupWallNoiseOffsetX
             // 
-            SoupSettingsItem_WallNoiseOffsetX.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_WallNoiseOffsetX.DecimalPlaces = 6;
-            SoupSettingsItem_WallNoiseOffsetX.DefaultValue = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetX.Editable = true;
-            SoupSettingsItem_WallNoiseOffsetX.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_WallNoiseOffsetX.ItemName = "Noise Offset X";
-            SoupSettingsItem_WallNoiseOffsetX.Location = new Point(18, 71);
-            SoupSettingsItem_WallNoiseOffsetX.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_WallNoiseOffsetX.Maximum = new decimal(new int[] { 256, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetX.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetX.Name = "SoupSettingsItem_WallNoiseOffsetX";
-            SoupSettingsItem_WallNoiseOffsetX.Size = new Size(535, 31);
-            SoupSettingsItem_WallNoiseOffsetX.TabIndex = 5;
+            SoupSettingsItem_SoupWallNoiseOffsetX.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupWallNoiseOffsetX.DecimalPlaces = 6;
+            SoupSettingsItem_SoupWallNoiseOffsetX.DefaultValue = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetX.Editable = true;
+            SoupSettingsItem_SoupWallNoiseOffsetX.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupWallNoiseOffsetX.ItemName = "Noise Offset X";
+            SoupSettingsItem_SoupWallNoiseOffsetX.Location = new Point(18, 71);
+            SoupSettingsItem_SoupWallNoiseOffsetX.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupWallNoiseOffsetX.Maximum = new decimal(new int[] { 256, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetX.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetX.Name = "SoupSettingsItem_SoupWallNoiseOffsetX";
+            SoupSettingsItem_SoupWallNoiseOffsetX.Size = new Size(535, 31);
+            SoupSettingsItem_SoupWallNoiseOffsetX.TabIndex = 5;
             // 
-            // SoupSettingsItem_WallEnabled
+            // SoupSettingsItem_SoupWallEnabled
             // 
-            SoupSettingsItem_WallEnabled.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_WallEnabled.DefaultValue = true;
-            SoupSettingsItem_WallEnabled.Editable = true;
-            SoupSettingsItem_WallEnabled.ItemName = "Enabled";
-            SoupSettingsItem_WallEnabled.Location = new Point(18, 37);
-            SoupSettingsItem_WallEnabled.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_WallEnabled.Name = "SoupSettingsItem_WallEnabled";
-            SoupSettingsItem_WallEnabled.Size = new Size(535, 31);
-            SoupSettingsItem_WallEnabled.TabIndex = 6;
+            SoupSettingsItem_SoupWallEnabled.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupWallEnabled.DefaultValue = true;
+            SoupSettingsItem_SoupWallEnabled.Editable = true;
+            SoupSettingsItem_SoupWallEnabled.ItemName = "Enabled";
+            SoupSettingsItem_SoupWallEnabled.Location = new Point(18, 37);
+            SoupSettingsItem_SoupWallEnabled.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupWallEnabled.Name = "SoupSettingsItem_SoupWallEnabled";
+            SoupSettingsItem_SoupWallEnabled.Size = new Size(535, 31);
+            SoupSettingsItem_SoupWallEnabled.TabIndex = 6;
             // 
-            // SoupSettingsItem_WallNoiseOffsetY
+            // SoupSettingsItem_SoupWallNoiseOffsetY
             // 
-            SoupSettingsItem_WallNoiseOffsetY.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_WallNoiseOffsetY.DecimalPlaces = 6;
-            SoupSettingsItem_WallNoiseOffsetY.DefaultValue = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetY.Editable = true;
-            SoupSettingsItem_WallNoiseOffsetY.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_WallNoiseOffsetY.ItemName = "Noise Offset Y";
-            SoupSettingsItem_WallNoiseOffsetY.Location = new Point(18, 105);
-            SoupSettingsItem_WallNoiseOffsetY.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_WallNoiseOffsetY.Maximum = new decimal(new int[] { 256, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetY.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetY.Name = "SoupSettingsItem_WallNoiseOffsetY";
-            SoupSettingsItem_WallNoiseOffsetY.Size = new Size(535, 31);
-            SoupSettingsItem_WallNoiseOffsetY.TabIndex = 7;
+            SoupSettingsItem_SoupWallNoiseOffsetY.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupWallNoiseOffsetY.DecimalPlaces = 6;
+            SoupSettingsItem_SoupWallNoiseOffsetY.DefaultValue = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetY.Editable = true;
+            SoupSettingsItem_SoupWallNoiseOffsetY.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupWallNoiseOffsetY.ItemName = "Noise Offset Y";
+            SoupSettingsItem_SoupWallNoiseOffsetY.Location = new Point(18, 105);
+            SoupSettingsItem_SoupWallNoiseOffsetY.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupWallNoiseOffsetY.Maximum = new decimal(new int[] { 256, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetY.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetY.Name = "SoupSettingsItem_SoupWallNoiseOffsetY";
+            SoupSettingsItem_SoupWallNoiseOffsetY.Size = new Size(535, 31);
+            SoupSettingsItem_SoupWallNoiseOffsetY.TabIndex = 7;
             // 
-            // SoupSettingsItem_WallNoiseOffsetZ
+            // SoupSettingsItem_SoupWallNoiseOffsetZ
             // 
-            SoupSettingsItem_WallNoiseOffsetZ.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_WallNoiseOffsetZ.DecimalPlaces = 6;
-            SoupSettingsItem_WallNoiseOffsetZ.DefaultValue = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetZ.Editable = true;
-            SoupSettingsItem_WallNoiseOffsetZ.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_WallNoiseOffsetZ.ItemName = "Noise Offset Z";
-            SoupSettingsItem_WallNoiseOffsetZ.Location = new Point(18, 139);
-            SoupSettingsItem_WallNoiseOffsetZ.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_WallNoiseOffsetZ.Maximum = new decimal(new int[] { 256, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetZ.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOffsetZ.Name = "SoupSettingsItem_WallNoiseOffsetZ";
-            SoupSettingsItem_WallNoiseOffsetZ.Size = new Size(535, 31);
-            SoupSettingsItem_WallNoiseOffsetZ.TabIndex = 8;
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupWallNoiseOffsetZ.DecimalPlaces = 6;
+            SoupSettingsItem_SoupWallNoiseOffsetZ.DefaultValue = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Editable = true;
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupWallNoiseOffsetZ.ItemName = "Noise Offset Z";
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Location = new Point(18, 139);
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Maximum = new decimal(new int[] { 256, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Name = "SoupSettingsItem_SoupWallNoiseOffsetZ";
+            SoupSettingsItem_SoupWallNoiseOffsetZ.Size = new Size(535, 31);
+            SoupSettingsItem_SoupWallNoiseOffsetZ.TabIndex = 8;
             // 
-            // SoupSettingsItem_WallNoiseSamplingInterval
+            // SoupSettingsItem_SoupWallNoiseSamplingInterval
             // 
-            SoupSettingsItem_WallNoiseSamplingInterval.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_WallNoiseSamplingInterval.DecimalPlaces = 6;
-            SoupSettingsItem_WallNoiseSamplingInterval.DefaultValue = new decimal(new int[] { 3, 0, 0, 131072 });
-            SoupSettingsItem_WallNoiseSamplingInterval.Editable = true;
-            SoupSettingsItem_WallNoiseSamplingInterval.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_WallNoiseSamplingInterval.ItemName = "Noise Sampling Interval";
-            SoupSettingsItem_WallNoiseSamplingInterval.Location = new Point(18, 173);
-            SoupSettingsItem_WallNoiseSamplingInterval.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_WallNoiseSamplingInterval.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseSamplingInterval.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseSamplingInterval.Name = "SoupSettingsItem_WallNoiseSamplingInterval";
-            SoupSettingsItem_WallNoiseSamplingInterval.Size = new Size(535, 31);
-            SoupSettingsItem_WallNoiseSamplingInterval.TabIndex = 9;
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.DecimalPlaces = 6;
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.DefaultValue = new decimal(new int[] { 3, 0, 0, 131072 });
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Editable = true;
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.ItemName = "Noise Sampling Interval";
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Location = new Point(18, 173);
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Name = "SoupSettingsItem_SoupWallNoiseSamplingInterval";
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.Size = new Size(535, 31);
+            SoupSettingsItem_SoupWallNoiseSamplingInterval.TabIndex = 9;
             // 
-            // SoupSettingsItem_WallNoiseOctave
+            // SoupSettingsItem_SoupWallNoiseOctave
             // 
-            SoupSettingsItem_WallNoiseOctave.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_WallNoiseOctave.DecimalPlaces = 0;
-            SoupSettingsItem_WallNoiseOctave.DefaultValue = new decimal(new int[] { 4, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOctave.Editable = true;
-            SoupSettingsItem_WallNoiseOctave.Increment = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOctave.ItemName = "Noise Octave";
-            SoupSettingsItem_WallNoiseOctave.Location = new Point(18, 207);
-            SoupSettingsItem_WallNoiseOctave.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_WallNoiseOctave.Maximum = new decimal(new int[] { 16, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOctave.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_WallNoiseOctave.Name = "SoupSettingsItem_WallNoiseOctave";
-            SoupSettingsItem_WallNoiseOctave.Size = new Size(535, 31);
-            SoupSettingsItem_WallNoiseOctave.TabIndex = 10;
+            SoupSettingsItem_SoupWallNoiseOctave.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupWallNoiseOctave.DecimalPlaces = 0;
+            SoupSettingsItem_SoupWallNoiseOctave.DefaultValue = new decimal(new int[] { 4, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOctave.Editable = true;
+            SoupSettingsItem_SoupWallNoiseOctave.Increment = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOctave.ItemName = "Noise Octave";
+            SoupSettingsItem_SoupWallNoiseOctave.Location = new Point(18, 207);
+            SoupSettingsItem_SoupWallNoiseOctave.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupWallNoiseOctave.Maximum = new decimal(new int[] { 16, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOctave.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupWallNoiseOctave.Name = "SoupSettingsItem_SoupWallNoiseOctave";
+            SoupSettingsItem_SoupWallNoiseOctave.Size = new Size(535, 31);
+            SoupSettingsItem_SoupWallNoiseOctave.TabIndex = 10;
             // 
-            // SoupSettingsItem_WallThickness
+            // SoupSettingsItem_SoupWallThickness
             // 
-            SoupSettingsItem_WallThickness.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_WallThickness.DecimalPlaces = 6;
-            SoupSettingsItem_WallThickness.DefaultValue = new decimal(new int[] { 1125, 0, 0, 327680 });
-            SoupSettingsItem_WallThickness.Editable = true;
-            SoupSettingsItem_WallThickness.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_WallThickness.ItemName = "Wall Thickness";
-            SoupSettingsItem_WallThickness.Location = new Point(18, 241);
-            SoupSettingsItem_WallThickness.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_WallThickness.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_WallThickness.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_WallThickness.Name = "SoupSettingsItem_WallThickness";
-            SoupSettingsItem_WallThickness.Size = new Size(535, 31);
-            SoupSettingsItem_WallThickness.TabIndex = 11;
+            SoupSettingsItem_SoupWallThickness.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupWallThickness.DecimalPlaces = 6;
+            SoupSettingsItem_SoupWallThickness.DefaultValue = new decimal(new int[] { 1125, 0, 0, 327680 });
+            SoupSettingsItem_SoupWallThickness.Editable = true;
+            SoupSettingsItem_SoupWallThickness.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_SoupWallThickness.ItemName = "Wall Thickness";
+            SoupSettingsItem_SoupWallThickness.Location = new Point(18, 241);
+            SoupSettingsItem_SoupWallThickness.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupWallThickness.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupWallThickness.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_SoupWallThickness.Name = "SoupSettingsItem_SoupWallThickness";
+            SoupSettingsItem_SoupWallThickness.Size = new Size(535, 31);
+            SoupSettingsItem_SoupWallThickness.TabIndex = 11;
             // 
             // PanelSoupBasicSettingsSoupSize
             // 
             PanelSoupBasicSettingsSoupSize.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             PanelSoupBasicSettingsSoupSize.Controls.Add(soupSettingsLabel2);
-            PanelSoupBasicSettingsSoupSize.Controls.Add(SoupSettingsItem_SizeX);
-            PanelSoupBasicSettingsSoupSize.Controls.Add(SoupSettingsItem_SizeY);
+            PanelSoupBasicSettingsSoupSize.Controls.Add(SoupSettingsItem_SoupSizeX);
+            PanelSoupBasicSettingsSoupSize.Controls.Add(SoupSettingsItem_SoupSizeY);
             PanelSoupBasicSettingsSoupSize.Location = new Point(18, 37);
             PanelSoupBasicSettingsSoupSize.Margin = new Padding(3, 0, 3, 15);
             PanelSoupBasicSettingsSoupSize.Name = "PanelSoupBasicSettingsSoupSize";
@@ -614,37 +614,37 @@
             soupSettingsLabel2.Size = new Size(550, 31);
             soupSettingsLabel2.TabIndex = 1;
             // 
-            // SoupSettingsItem_SizeX
+            // SoupSettingsItem_SoupSizeX
             // 
-            SoupSettingsItem_SizeX.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_SizeX.DecimalPlaces = 0;
-            SoupSettingsItem_SizeX.DefaultValue = new decimal(new int[] { 256, 0, 0, 0 });
-            SoupSettingsItem_SizeX.Editable = true;
-            SoupSettingsItem_SizeX.Increment = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_SizeX.ItemName = "Width";
-            SoupSettingsItem_SizeX.Location = new Point(18, 37);
-            SoupSettingsItem_SizeX.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_SizeX.Maximum = new decimal(new int[] { 32768, 0, 0, 0 });
-            SoupSettingsItem_SizeX.Minimum = new decimal(new int[] { 16, 0, 0, 0 });
-            SoupSettingsItem_SizeX.Name = "SoupSettingsItem_SizeX";
-            SoupSettingsItem_SizeX.Size = new Size(535, 31);
-            SoupSettingsItem_SizeX.TabIndex = 2;
+            SoupSettingsItem_SoupSizeX.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupSizeX.DecimalPlaces = 0;
+            SoupSettingsItem_SoupSizeX.DefaultValue = new decimal(new int[] { 256, 0, 0, 0 });
+            SoupSettingsItem_SoupSizeX.Editable = true;
+            SoupSettingsItem_SoupSizeX.Increment = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupSizeX.ItemName = "Width";
+            SoupSettingsItem_SoupSizeX.Location = new Point(18, 37);
+            SoupSettingsItem_SoupSizeX.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupSizeX.Maximum = new decimal(new int[] { 32768, 0, 0, 0 });
+            SoupSettingsItem_SoupSizeX.Minimum = new decimal(new int[] { 16, 0, 0, 0 });
+            SoupSettingsItem_SoupSizeX.Name = "SoupSettingsItem_SoupSizeX";
+            SoupSettingsItem_SoupSizeX.Size = new Size(535, 31);
+            SoupSettingsItem_SoupSizeX.TabIndex = 2;
             // 
-            // SoupSettingsItem_SizeY
+            // SoupSettingsItem_SoupSizeY
             // 
-            SoupSettingsItem_SizeY.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_SizeY.DecimalPlaces = 0;
-            SoupSettingsItem_SizeY.DefaultValue = new decimal(new int[] { 256, 0, 0, 0 });
-            SoupSettingsItem_SizeY.Editable = true;
-            SoupSettingsItem_SizeY.Increment = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_SizeY.ItemName = "Height";
-            SoupSettingsItem_SizeY.Location = new Point(18, 71);
-            SoupSettingsItem_SizeY.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_SizeY.Maximum = new decimal(new int[] { 32768, 0, 0, 0 });
-            SoupSettingsItem_SizeY.Minimum = new decimal(new int[] { 16, 0, 0, 0 });
-            SoupSettingsItem_SizeY.Name = "SoupSettingsItem_SizeY";
-            SoupSettingsItem_SizeY.Size = new Size(535, 31);
-            SoupSettingsItem_SizeY.TabIndex = 3;
+            SoupSettingsItem_SoupSizeY.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_SoupSizeY.DecimalPlaces = 0;
+            SoupSettingsItem_SoupSizeY.DefaultValue = new decimal(new int[] { 256, 0, 0, 0 });
+            SoupSettingsItem_SoupSizeY.Editable = true;
+            SoupSettingsItem_SoupSizeY.Increment = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_SoupSizeY.ItemName = "Height";
+            SoupSettingsItem_SoupSizeY.Location = new Point(18, 71);
+            SoupSettingsItem_SoupSizeY.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_SoupSizeY.Maximum = new decimal(new int[] { 32768, 0, 0, 0 });
+            SoupSettingsItem_SoupSizeY.Minimum = new decimal(new int[] { 16, 0, 0, 0 });
+            SoupSettingsItem_SoupSizeY.Name = "SoupSettingsItem_SoupSizeY";
+            SoupSettingsItem_SoupSizeY.Size = new Size(535, 31);
+            SoupSettingsItem_SoupSizeY.TabIndex = 3;
             // 
             // soupSettingsLabel1
             // 
@@ -684,30 +684,30 @@
             // PanelAnimalBrainSettingsNodeAndConnection
             // 
             PanelAnimalBrainSettingsNodeAndConnection.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            PanelAnimalBrainSettingsNodeAndConnection.Controls.Add(SoupSettingsItem_AnimalMaximumConnectionCountPerNode);
+            PanelAnimalBrainSettingsNodeAndConnection.Controls.Add(SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode);
             PanelAnimalBrainSettingsNodeAndConnection.Controls.Add(soupSettingsLabel18);
-            PanelAnimalBrainSettingsNodeAndConnection.Controls.Add(SoupSettingsItem_AnimalMaximumNodeCount);
+            PanelAnimalBrainSettingsNodeAndConnection.Controls.Add(SoupSettingsItem_AnimalBrainMaximumNodeCount);
             PanelAnimalBrainSettingsNodeAndConnection.Location = new Point(18, 37);
             PanelAnimalBrainSettingsNodeAndConnection.Margin = new Padding(3, 0, 3, 15);
             PanelAnimalBrainSettingsNodeAndConnection.Name = "PanelAnimalBrainSettingsNodeAndConnection";
             PanelAnimalBrainSettingsNodeAndConnection.Size = new Size(556, 105);
             PanelAnimalBrainSettingsNodeAndConnection.TabIndex = 18;
             // 
-            // SoupSettingsItem_AnimalMaximumConnectionCountPerNode
+            // SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode
             // 
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.DecimalPlaces = 0;
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.DefaultValue = new decimal(new int[] { 2, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Editable = true;
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Increment = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.ItemName = "Maximum Connection Count (per node)";
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Location = new Point(18, 71);
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Name = "SoupSettingsItem_AnimalMaximumConnectionCountPerNode";
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMaximumConnectionCountPerNode.TabIndex = 14;
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.DecimalPlaces = 0;
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.DefaultValue = new decimal(new int[] { 2, 0, 0, 0 });
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Editable = true;
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Increment = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.ItemName = "Maximum Connection Count (per node)";
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Location = new Point(18, 71);
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Name = "SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode";
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode.TabIndex = 14;
             // 
             // soupSettingsLabel18
             // 
@@ -721,21 +721,21 @@
             soupSettingsLabel18.Size = new Size(550, 31);
             soupSettingsLabel18.TabIndex = 12;
             // 
-            // SoupSettingsItem_AnimalMaximumNodeCount
+            // SoupSettingsItem_AnimalBrainMaximumNodeCount
             // 
-            SoupSettingsItem_AnimalMaximumNodeCount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMaximumNodeCount.DecimalPlaces = 0;
-            SoupSettingsItem_AnimalMaximumNodeCount.DefaultValue = new decimal(new int[] { 32, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumNodeCount.Editable = true;
-            SoupSettingsItem_AnimalMaximumNodeCount.Increment = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumNodeCount.ItemName = "Maximum Node Count";
-            SoupSettingsItem_AnimalMaximumNodeCount.Location = new Point(18, 37);
-            SoupSettingsItem_AnimalMaximumNodeCount.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMaximumNodeCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumNodeCount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumNodeCount.Name = "SoupSettingsItem_AnimalMaximumNodeCount";
-            SoupSettingsItem_AnimalMaximumNodeCount.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMaximumNodeCount.TabIndex = 13;
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.DecimalPlaces = 0;
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.DefaultValue = new decimal(new int[] { 32, 0, 0, 0 });
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Editable = true;
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Increment = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.ItemName = "Maximum Node Count";
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Location = new Point(18, 37);
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Name = "SoupSettingsItem_AnimalBrainMaximumNodeCount";
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalBrainMaximumNodeCount.TabIndex = 13;
             // 
             // soupSettingsLabel17
             // 
@@ -764,9 +764,9 @@
             // PanelAnimalMutationSettingsNodeTypeWeights
             // 
             PanelAnimalMutationSettingsNodeTypeWeights.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            PanelAnimalMutationSettingsNodeTypeWeights.Controls.Add(SoupSettingsItem_AnimalNodeTypeOutputWeight);
-            PanelAnimalMutationSettingsNodeTypeWeights.Controls.Add(SoupSettingsItem_AnimalNodeTypeHiddenWeight);
-            PanelAnimalMutationSettingsNodeTypeWeights.Controls.Add(SoupSettingsItem_AnimalNodeTypeInputWeight);
+            PanelAnimalMutationSettingsNodeTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationNodeTypeOutputWeight);
+            PanelAnimalMutationSettingsNodeTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight);
+            PanelAnimalMutationSettingsNodeTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationNodeTypeInputWeight);
             PanelAnimalMutationSettingsNodeTypeWeights.Controls.Add(soupSettingsLabel21);
             PanelAnimalMutationSettingsNodeTypeWeights.Location = new Point(18, 549);
             PanelAnimalMutationSettingsNodeTypeWeights.Margin = new Padding(3, 0, 3, 15);
@@ -774,53 +774,53 @@
             PanelAnimalMutationSettingsNodeTypeWeights.Size = new Size(556, 139);
             PanelAnimalMutationSettingsNodeTypeWeights.TabIndex = 21;
             // 
-            // SoupSettingsItem_AnimalNodeTypeOutputWeight
+            // SoupSettingsItem_AnimalMutationNodeTypeOutputWeight
             // 
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Editable = true;
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.ItemName = "Node Type Weight : Output";
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Location = new Point(18, 105);
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Name = "SoupSettingsItem_AnimalNodeTypeOutputWeight";
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalNodeTypeOutputWeight.TabIndex = 18;
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.ItemName = "Node Type Weight : Output";
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Location = new Point(18, 105);
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Name = "SoupSettingsItem_AnimalMutationNodeTypeOutputWeight";
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationNodeTypeOutputWeight.TabIndex = 18;
             // 
-            // SoupSettingsItem_AnimalNodeTypeHiddenWeight
+            // SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight
             // 
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Editable = true;
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.ItemName = "Node Type Weight : Hidden";
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Location = new Point(18, 71);
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Name = "SoupSettingsItem_AnimalNodeTypeHiddenWeight";
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalNodeTypeHiddenWeight.TabIndex = 17;
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.ItemName = "Node Type Weight : Hidden";
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Location = new Point(18, 71);
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Name = "SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight";
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight.TabIndex = 17;
             // 
-            // SoupSettingsItem_AnimalNodeTypeInputWeight
+            // SoupSettingsItem_AnimalMutationNodeTypeInputWeight
             // 
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalNodeTypeInputWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalNodeTypeInputWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Editable = true;
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalNodeTypeInputWeight.ItemName = "Node Type Weight : Input";
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Location = new Point(18, 37);
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Name = "SoupSettingsItem_AnimalNodeTypeInputWeight";
-            SoupSettingsItem_AnimalNodeTypeInputWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalNodeTypeInputWeight.TabIndex = 16;
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.ItemName = "Node Type Weight : Input";
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Location = new Point(18, 37);
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Name = "SoupSettingsItem_AnimalMutationNodeTypeInputWeight";
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationNodeTypeInputWeight.TabIndex = 16;
             // 
             // soupSettingsLabel21
             // 
@@ -837,132 +837,132 @@
             // PanelAnimalMutationSettingsMutationTypeWeights
             // 
             PanelAnimalMutationSettingsMutationTypeWeights.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationChangeConnectionWeight);
-            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationChangeConnectionTarget);
-            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationChangeConnectionOrigin);
-            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationRemoveConnectionWeight);
-            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationAddConnectionWeight);
-            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationChangeNodeTypeWeight);
-            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationRemoveNodeWeight);
+            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight);
+            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight);
+            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight);
+            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight);
+            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight);
+            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight);
+            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight);
             PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(soupSettingsLabel20);
-            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationAddNodeWeight);
+            PanelAnimalMutationSettingsMutationTypeWeights.Controls.Add(SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight);
             PanelAnimalMutationSettingsMutationTypeWeights.Location = new Point(18, 225);
             PanelAnimalMutationSettingsMutationTypeWeights.Margin = new Padding(3, 0, 3, 15);
             PanelAnimalMutationSettingsMutationTypeWeights.Name = "PanelAnimalMutationSettingsMutationTypeWeights";
             PanelAnimalMutationSettingsMutationTypeWeights.Size = new Size(556, 309);
             PanelAnimalMutationSettingsMutationTypeWeights.TabIndex = 20;
             // 
-            // SoupSettingsItem_AnimalMutationChangeConnectionWeight
+            // SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight
             // 
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Editable = true;
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.ItemName = "Mutation Type Weight : Change Random Connection Weight";
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Location = new Point(18, 275);
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Name = "SoupSettingsItem_AnimalMutationChangeConnectionWeight";
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationChangeConnectionWeight.TabIndex = 20;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.ItemName = "Mutation Type Weight : Change Random Connection Weight";
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Location = new Point(18, 275);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Name = "SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight";
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight.TabIndex = 20;
             // 
-            // SoupSettingsItem_AnimalMutationChangeConnectionTarget
+            // SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight
             // 
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Editable = true;
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.ItemName = "Mutation Type Weight : Change Random Connection Target";
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Location = new Point(18, 241);
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Name = "SoupSettingsItem_AnimalMutationChangeConnectionTarget";
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationChangeConnectionTarget.TabIndex = 19;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.ItemName = "Mutation Type Weight : Change Random Connection Target";
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Location = new Point(18, 241);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Name = "SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight";
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight.TabIndex = 19;
             // 
-            // SoupSettingsItem_AnimalMutationChangeConnectionOrigin
+            // SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight
             // 
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Editable = true;
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.ItemName = "Mutation Type Weight : Change Random Connection Origin";
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Location = new Point(18, 207);
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Name = "SoupSettingsItem_AnimalMutationChangeConnectionOrigin";
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationChangeConnectionOrigin.TabIndex = 18;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.ItemName = "Mutation Type Weight : Change Random Connection Origin";
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Location = new Point(18, 207);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Name = "SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight";
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight.TabIndex = 18;
             // 
-            // SoupSettingsItem_AnimalMutationRemoveConnectionWeight
+            // SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight
             // 
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Editable = true;
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.ItemName = "Mutation Type Weight : Remove Random Connection";
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Location = new Point(18, 173);
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Name = "SoupSettingsItem_AnimalMutationRemoveConnectionWeight";
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationRemoveConnectionWeight.TabIndex = 17;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.ItemName = "Mutation Type Weight : Remove Random Connection";
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Location = new Point(18, 173);
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Name = "SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight";
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight.TabIndex = 17;
             // 
-            // SoupSettingsItem_AnimalMutationAddConnectionWeight
+            // SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight
             // 
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Editable = true;
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.ItemName = "Mutation Type Weight : Add Random Connection";
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Location = new Point(18, 139);
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Name = "SoupSettingsItem_AnimalMutationAddConnectionWeight";
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationAddConnectionWeight.TabIndex = 16;
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.ItemName = "Mutation Type Weight : Add Random Connection";
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Location = new Point(18, 139);
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Name = "SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight";
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight.TabIndex = 16;
             // 
-            // SoupSettingsItem_AnimalMutationChangeNodeTypeWeight
+            // SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight
             // 
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.DefaultValue = new decimal(new int[] { 5, 0, 0, 65536 });
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Editable = true;
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.ItemName = "Mutation Type Weight : Change Random Node Function";
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Location = new Point(18, 105);
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Name = "SoupSettingsItem_AnimalMutationChangeNodeTypeWeight";
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationChangeNodeTypeWeight.TabIndex = 15;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.DefaultValue = new decimal(new int[] { 5, 0, 0, 65536 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.ItemName = "Mutation Type Weight : Change Random Node Function";
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Location = new Point(18, 105);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Name = "SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight";
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight.TabIndex = 15;
             // 
-            // SoupSettingsItem_AnimalMutationRemoveNodeWeight
+            // SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight
             // 
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Editable = true;
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.ItemName = "Mutation Type Weight : Remove Random Node";
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Location = new Point(18, 71);
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Name = "SoupSettingsItem_AnimalMutationRemoveNodeWeight";
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationRemoveNodeWeight.TabIndex = 14;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.ItemName = "Mutation Type Weight : Remove Random Node";
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Location = new Point(18, 71);
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Name = "SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight";
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight.TabIndex = 14;
             // 
             // soupSettingsLabel20
             // 
@@ -976,79 +976,79 @@
             soupSettingsLabel20.Size = new Size(550, 31);
             soupSettingsLabel20.TabIndex = 12;
             // 
-            // SoupSettingsItem_AnimalMutationAddNodeWeight
+            // SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight
             // 
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationAddNodeWeight.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationAddNodeWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Editable = true;
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationAddNodeWeight.ItemName = "Mutation Type Weight : Add Random Node";
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Location = new Point(18, 37);
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Name = "SoupSettingsItem_AnimalMutationAddNodeWeight";
-            SoupSettingsItem_AnimalMutationAddNodeWeight.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationAddNodeWeight.TabIndex = 13;
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.DefaultValue = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.ItemName = "Mutation Type Weight : Add Random Node";
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Location = new Point(18, 37);
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Name = "SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight";
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight.TabIndex = 13;
             // 
             // PanelAnimalMutationSettingsMutationRateAndCount
             // 
             PanelAnimalMutationSettingsMutationRateAndCount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation);
-            PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(SoupSettingsItem_AnimalMutationCountFactor);
-            PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(SoupSettingsItem_AnimalMaximumMutationCount);
+            PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation);
+            PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(SoupSettingsItem_AnimalMutationMutationCountFactor);
+            PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(SoupSettingsItem_AnimalMutationMaximumMutationCount);
             PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(soupSettingsLabel19);
-            PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(SoupSettingsItem_AnimalMutationRate);
+            PanelAnimalMutationSettingsMutationRateAndCount.Controls.Add(SoupSettingsItem_AnimalMutationMutationRate);
             PanelAnimalMutationSettingsMutationRateAndCount.Location = new Point(18, 37);
             PanelAnimalMutationSettingsMutationRateAndCount.Margin = new Padding(3, 0, 3, 15);
             PanelAnimalMutationSettingsMutationRateAndCount.Name = "PanelAnimalMutationSettingsMutationRateAndCount";
             PanelAnimalMutationSettingsMutationRateAndCount.Size = new Size(556, 173);
             PanelAnimalMutationSettingsMutationRateAndCount.TabIndex = 19;
             // 
-            // SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation
+            // SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation
             // 
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.DefaultValue = false;
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Editable = true;
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.ItemName = "Disable Species Sig. Change by Mutation";
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Location = new Point(18, 139);
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Name = "SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation";
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation.TabIndex = 16;
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.DefaultValue = false;
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.Editable = true;
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.ItemName = "Disable Species Sig. Change by Mutation";
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.Location = new Point(18, 139);
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.Name = "SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation";
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation.TabIndex = 16;
             // 
-            // SoupSettingsItem_AnimalMutationCountFactor
+            // SoupSettingsItem_AnimalMutationMutationCountFactor
             // 
-            SoupSettingsItem_AnimalMutationCountFactor.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationCountFactor.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationCountFactor.DefaultValue = new decimal(new int[] { 5, 0, 0, 65536 });
-            SoupSettingsItem_AnimalMutationCountFactor.Editable = true;
-            SoupSettingsItem_AnimalMutationCountFactor.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationCountFactor.ItemName = "Mutation Count Factor";
-            SoupSettingsItem_AnimalMutationCountFactor.Location = new Point(18, 105);
-            SoupSettingsItem_AnimalMutationCountFactor.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationCountFactor.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationCountFactor.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationCountFactor.Name = "SoupSettingsItem_AnimalMutationCountFactor";
-            SoupSettingsItem_AnimalMutationCountFactor.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationCountFactor.TabIndex = 15;
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationCountFactor.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationCountFactor.DefaultValue = new decimal(new int[] { 5, 0, 0, 65536 });
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationCountFactor.ItemName = "Mutation Count Factor";
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Location = new Point(18, 105);
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Name = "SoupSettingsItem_AnimalMutationMutationCountFactor";
+            SoupSettingsItem_AnimalMutationMutationCountFactor.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationCountFactor.TabIndex = 15;
             // 
-            // SoupSettingsItem_AnimalMaximumMutationCount
+            // SoupSettingsItem_AnimalMutationMaximumMutationCount
             // 
-            SoupSettingsItem_AnimalMaximumMutationCount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMaximumMutationCount.DecimalPlaces = 0;
-            SoupSettingsItem_AnimalMaximumMutationCount.DefaultValue = new decimal(new int[] { 8, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumMutationCount.Editable = true;
-            SoupSettingsItem_AnimalMaximumMutationCount.Increment = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumMutationCount.ItemName = "Maximum Mutation Count (per fork)";
-            SoupSettingsItem_AnimalMaximumMutationCount.Location = new Point(18, 71);
-            SoupSettingsItem_AnimalMaximumMutationCount.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMaximumMutationCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumMutationCount.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMaximumMutationCount.Name = "SoupSettingsItem_AnimalMaximumMutationCount";
-            SoupSettingsItem_AnimalMaximumMutationCount.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMaximumMutationCount.TabIndex = 14;
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.DecimalPlaces = 0;
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.DefaultValue = new decimal(new int[] { 8, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Editable = true;
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Increment = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.ItemName = "Maximum Mutation Count (per fork)";
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Location = new Point(18, 71);
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Maximum = new decimal(new int[] { int.MaxValue, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Name = "SoupSettingsItem_AnimalMutationMaximumMutationCount";
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMaximumMutationCount.TabIndex = 14;
             // 
             // soupSettingsLabel19
             // 
@@ -1062,21 +1062,21 @@
             soupSettingsLabel19.Size = new Size(550, 31);
             soupSettingsLabel19.TabIndex = 12;
             // 
-            // SoupSettingsItem_AnimalMutationRate
+            // SoupSettingsItem_AnimalMutationMutationRate
             // 
-            SoupSettingsItem_AnimalMutationRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_AnimalMutationRate.DecimalPlaces = 6;
-            SoupSettingsItem_AnimalMutationRate.DefaultValue = new decimal(new int[] { 25, 0, 0, 131072 });
-            SoupSettingsItem_AnimalMutationRate.Editable = true;
-            SoupSettingsItem_AnimalMutationRate.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_AnimalMutationRate.ItemName = "Mutation Rate";
-            SoupSettingsItem_AnimalMutationRate.Location = new Point(18, 37);
-            SoupSettingsItem_AnimalMutationRate.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_AnimalMutationRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationRate.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_AnimalMutationRate.Name = "SoupSettingsItem_AnimalMutationRate";
-            SoupSettingsItem_AnimalMutationRate.Size = new Size(535, 31);
-            SoupSettingsItem_AnimalMutationRate.TabIndex = 13;
+            SoupSettingsItem_AnimalMutationMutationRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_AnimalMutationMutationRate.DecimalPlaces = 6;
+            SoupSettingsItem_AnimalMutationMutationRate.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
+            SoupSettingsItem_AnimalMutationMutationRate.Editable = true;
+            SoupSettingsItem_AnimalMutationMutationRate.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_AnimalMutationMutationRate.ItemName = "Mutation Rate";
+            SoupSettingsItem_AnimalMutationMutationRate.Location = new Point(18, 37);
+            SoupSettingsItem_AnimalMutationMutationRate.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_AnimalMutationMutationRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationRate.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_AnimalMutationMutationRate.Name = "SoupSettingsItem_AnimalMutationMutationRate";
+            SoupSettingsItem_AnimalMutationMutationRate.Size = new Size(535, 31);
+            SoupSettingsItem_AnimalMutationMutationRate.TabIndex = 13;
             // 
             // soupSettingsLabel8
             // 
@@ -1697,7 +1697,7 @@
             // 
             PanelPlantSettingsElement.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             PanelPlantSettingsElement.Controls.Add(SoupSettingsItem_PlantUnderAttackTime);
-            PanelPlantSettingsElement.Controls.Add(SoupSettingsItem_ElementCollectRate);
+            PanelPlantSettingsElement.Controls.Add(SoupSettingsItem_PlantElementCollectRate);
             PanelPlantSettingsElement.Controls.Add(soupSettingsLabel10);
             PanelPlantSettingsElement.Controls.Add(SoupSettingsItem_PlantMaximumElementAmount);
             PanelPlantSettingsElement.Location = new Point(18, 123);
@@ -1722,21 +1722,21 @@
             SoupSettingsItem_PlantUnderAttackTime.Size = new Size(535, 31);
             SoupSettingsItem_PlantUnderAttackTime.TabIndex = 16;
             // 
-            // SoupSettingsItem_ElementCollectRate
+            // SoupSettingsItem_PlantElementCollectRate
             // 
-            SoupSettingsItem_ElementCollectRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            SoupSettingsItem_ElementCollectRate.DecimalPlaces = 6;
-            SoupSettingsItem_ElementCollectRate.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
-            SoupSettingsItem_ElementCollectRate.Editable = true;
-            SoupSettingsItem_ElementCollectRate.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
-            SoupSettingsItem_ElementCollectRate.ItemName = "Element Collect Rate";
-            SoupSettingsItem_ElementCollectRate.Location = new Point(18, 71);
-            SoupSettingsItem_ElementCollectRate.Margin = new Padding(3, 0, 3, 3);
-            SoupSettingsItem_ElementCollectRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            SoupSettingsItem_ElementCollectRate.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
-            SoupSettingsItem_ElementCollectRate.Name = "SoupSettingsItem_ElementCollectRate";
-            SoupSettingsItem_ElementCollectRate.Size = new Size(535, 31);
-            SoupSettingsItem_ElementCollectRate.TabIndex = 14;
+            SoupSettingsItem_PlantElementCollectRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            SoupSettingsItem_PlantElementCollectRate.DecimalPlaces = 6;
+            SoupSettingsItem_PlantElementCollectRate.DefaultValue = new decimal(new int[] { 1, 0, 0, 65536 });
+            SoupSettingsItem_PlantElementCollectRate.Editable = true;
+            SoupSettingsItem_PlantElementCollectRate.Increment = new decimal(new int[] { 1, 0, 0, 393216 });
+            SoupSettingsItem_PlantElementCollectRate.ItemName = "Element Collect Rate";
+            SoupSettingsItem_PlantElementCollectRate.Location = new Point(18, 71);
+            SoupSettingsItem_PlantElementCollectRate.Margin = new Padding(3, 0, 3, 3);
+            SoupSettingsItem_PlantElementCollectRate.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
+            SoupSettingsItem_PlantElementCollectRate.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
+            SoupSettingsItem_PlantElementCollectRate.Name = "SoupSettingsItem_PlantElementCollectRate";
+            SoupSettingsItem_PlantElementCollectRate.Size = new Size(535, 31);
+            SoupSettingsItem_PlantElementCollectRate.TabIndex = 14;
             // 
             // soupSettingsLabel10
             // 
@@ -1916,26 +1916,26 @@
 
         private Panel PanelSoupBasicSettings;
         private Controls.SoupSettingsLabel soupSettingsLabel1;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_RestitutionCoefficient;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_MaximumEffectiveAngularVelocity;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_MaximumEffectiveVelocity;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AngularVelocityDrag;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_Drag;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupRestitutionCoefficient;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupMaximumEffectiveAngularVelocity;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupMaximumEffectiveVelocity;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupAngularVelocityDrag;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupDrag;
         private Controls.SoupSettingsLabel soupSettingsLabel5;
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_ElementFlowRate;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_TotalElementAmount;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupTotalElementAmount;
         private Controls.SoupSettingsLabel soupSettingsLabel4;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_WallThickness;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_WallNoiseOctave;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_WallNoiseSamplingInterval;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_WallNoiseOffsetZ;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_WallNoiseOffsetY;
-        private Controls.SoupSettingsItemCheckbox SoupSettingsItem_WallEnabled;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupWallThickness;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupWallNoiseOctave;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupWallNoiseSamplingInterval;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupWallNoiseOffsetZ;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupWallNoiseOffsetY;
+        private Controls.SoupSettingsItemCheckbox SoupSettingsItem_SoupWallEnabled;
         private Controls.SoupSettingsLabel soupSettingsLabel3;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_WallNoiseOffsetX;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SizeY;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupWallNoiseOffsetX;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupSizeY;
         private Controls.SoupSettingsLabel soupSettingsLabel2;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SizeX;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupSizeX;
         private Panel PanelSettingItems;
         private Panel PanelSoupBasicSettingsSoupSize;
         private Panel PanelSoupBasicSettingsWall;
@@ -1951,7 +1951,7 @@
         private Controls.SoupSettingsLabel soupSettingsLabel9;
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_PlantInitialPopulation;
         private Panel PanelPlantSettingsElement;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_ElementCollectRate;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_PlantElementCollectRate;
         private Controls.SoupSettingsLabel soupSettingsLabel10;
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_PlantMaximumElementAmount;
         private Panel PanelPlantSettingsDivision;
@@ -1986,27 +1986,27 @@
         private Controls.SoupSettingsLabel soupSettingsLabel17;
         private Panel PanelAnimalBrainSettingsNodeAndConnection;
         private Controls.SoupSettingsLabel soupSettingsLabel18;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMaximumNodeCount;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMaximumConnectionCountPerNode;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalBrainMaximumNodeCount;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalBrainMaximumConnectionCountPerNode;
         private Panel PanelAnimalMutationSettingsMutationRateAndCount;
         private Controls.SoupSettingsLabel soupSettingsLabel19;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationRate;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMaximumMutationCount;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationCountFactor;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationRate;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMaximumMutationCount;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationCountFactor;
         private Panel PanelAnimalMutationSettingsMutationTypeWeights;
         private Controls.SoupSettingsLabel soupSettingsLabel20;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationAddNodeWeight;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationChangeConnectionWeight;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationChangeConnectionTarget;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationChangeConnectionOrigin;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationRemoveConnectionWeight;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationAddConnectionWeight;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationChangeNodeTypeWeight;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationRemoveNodeWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationTypeAddNodeWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionWeightWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionTargetWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationTypeChangeConnectionOriginWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationTypeRemoveConnectionWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationTypeAddConnectionWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationTypeChangeNodeTypeWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationMutationTypeRemoveNodeWeight;
         private Panel PanelAnimalMutationSettingsNodeTypeWeights;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalNodeTypeOutputWeight;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalNodeTypeHiddenWeight;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalNodeTypeInputWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationNodeTypeOutputWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationNodeTypeHiddenWeight;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMutationNodeTypeInputWeight;
         private Controls.SoupSettingsLabel soupSettingsLabel21;
         private Button ButtonImportPreset;
         private Button ButtonExportPreset;
@@ -2022,16 +2022,16 @@
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalPheromoneProductionRate;
         private Panel PanelSoupBasicSettingsPheromone;
         private Controls.SoupSettingsLabel soupSettingsLabel23;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_PheromoneDecayRate;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_PheromoneFlowRate;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_MaximumEffectivePheromoneAmount;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupPheromoneDecayRate;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupPheromoneFlowRate;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupMaximumEffectivePheromoneAmount;
         private Panel AnimalBasicSettingsPhysics;
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMaximumAngularAcceleration;
         private Controls.SoupSettingsLabel soupSettingsLabel24;
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMaximumAcceleration;
-        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_MinimumEffectivePheromoneAmount;
+        private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_SoupMinimumEffectivePheromoneAmount;
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_PlantUnderAttackTime;
-        private Controls.SoupSettingsItemCheckbox SoupSettingsItem_AnimalDisableSpeciesSigChangeByMutation;
+        private Controls.SoupSettingsItemCheckbox SoupSettingsItem_AnimalMutationDisableSpeciesSigChangeByMutation;
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMaximumElementAmount;
         private Controls.SoupSettingsItemNumUpDown SoupSettingsItem_AnimalMaximumReproductionRate;
     }
