@@ -1,5 +1,4 @@
 ﻿using Paramecium.Variables;
-using System.Text.Json.Serialization;
 
 namespace Paramecium.Engine
 {
@@ -12,7 +11,7 @@ namespace Paramecium.Engine
         public long Id { get; set; } = -1;                          // セルのID
 
         public Double4d SpeciesSignature { get; set; } = new Double4d(1d, 1d, 1d, 1d);      // セルの種族シグネチャ
-        public int Generation { get; set; } = 1;                    // セルの世代数
+        public long Generation { get; set; } = 1;                   // セルの世代数
         public long MutationCount { get; set; } = 0;                // セルの累計突然変異数
         public int Age { get; set; } = 0;                           // セルの年齢
         public int OffspringCount { get; set; } = 0;                // 子孫の数
@@ -130,7 +129,7 @@ namespace Paramecium.Engine
                 AngularVelocityBuffer *= 1d - settings.SoupAngularVelocityDrag;
 
                 if (VelocityBuffer.MagnitudeSquared < 0.000001d * 0.000001d) VelocityBuffer = Double2d.Zero;
-                if (AngularVelocityBuffer < 0.000001d) AngularVelocityBuffer = 0d;
+                if (double.Abs(AngularVelocityBuffer) < 0.000001d) AngularVelocityBuffer = 0d;
             }
         }
 

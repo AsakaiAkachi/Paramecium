@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.7.0 indev-4] - 2025-08-30
+
+### Added
+ - Added a warning to `FormObjectEditor` indicating that the feature is intended for advanced users.
+ - Added the ability to record and display statistical data.
+
+### Changed
+ - The default soup settings have been changed.
+
 ## [0.7.0 indev-3] - 2025-08-21
 
 ### Added

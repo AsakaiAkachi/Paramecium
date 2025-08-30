@@ -11,7 +11,7 @@ namespace Paramecium.Engine
         public int Index { get; set; } = -1;                        // セルのインデックス
         public long Id { get; set; } = -1;                          // セルのID
 
-        public int Generation { get; set; } = 1;                    // セルの世代数
+        public long Generation { get; set; } = 1;                   // セルの世代数
         public int Age { get; set; } = 0;                           // セルの年齢
 
         public Double2d Position { get; set; } = Double2d.Zero;     // セルの位置

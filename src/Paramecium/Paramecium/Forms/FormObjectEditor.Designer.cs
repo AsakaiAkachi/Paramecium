@@ -32,8 +32,9 @@
             LabelTargetObject = new Label();
             RichTextBoxEditingObjectRawJson = new RichTextBox();
             panel3 = new Panel();
-            ButtonSave = new Button();
+            label1 = new Label();
             ButtonReload = new Button();
+            ButtonSave = new Button();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
             SuspendLayout();
@@ -68,6 +69,7 @@
             // 
             // panel3
             // 
+            panel3.Controls.Add(label1);
             panel3.Controls.Add(ButtonReload);
             panel3.Controls.Add(ButtonSave);
             panel3.Location = new Point(0, 660);
@@ -75,17 +77,14 @@
             panel3.Size = new Size(530, 60);
             panel3.TabIndex = 2;
             // 
-            // ButtonSave
+            // label1
             // 
-            ButtonSave.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            ButtonSave.Location = new Point(395, 15);
-            ButtonSave.Margin = new Padding(0);
-            ButtonSave.Name = "ButtonSave";
-            ButtonSave.Size = new Size(120, 30);
-            ButtonSave.TabIndex = 2;
-            ButtonSave.Text = "Save";
-            ButtonSave.UseVisualStyleBackColor = true;
-            ButtonSave.Click += ButtonSave_Click;
+            label1.AutoSize = true;
+            label1.Location = new Point(10, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(244, 60);
+            label1.TabIndex = 4;
+            label1.Text = "[WARNING]\r\nThis feature is intended for advanced users.\r\nInappropriate parameter editing may result in\r\nunexpected malfunctions.";
             // 
             // ButtonReload
             // 
@@ -98,6 +97,18 @@
             ButtonReload.Text = "Reload";
             ButtonReload.UseVisualStyleBackColor = true;
             ButtonReload.Click += ButtonReload_Click;
+            // 
+            // ButtonSave
+            // 
+            ButtonSave.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            ButtonSave.Location = new Point(395, 15);
+            ButtonSave.Margin = new Padding(0);
+            ButtonSave.Name = "ButtonSave";
+            ButtonSave.Size = new Size(120, 30);
+            ButtonSave.TabIndex = 2;
+            ButtonSave.Text = "Save";
+            ButtonSave.UseVisualStyleBackColor = true;
+            ButtonSave.Click += ButtonSave_Click;
             // 
             // FormObjectEditor
             // 
@@ -116,6 +127,7 @@
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             panel3.ResumeLayout(false);
+            panel3.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -126,5 +138,6 @@
         private Button ButtonSave;
         private Label LabelTargetObject;
         private Button ButtonReload;
+        private Label label1;
     }
 }

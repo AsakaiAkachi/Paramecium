@@ -20,7 +20,7 @@ namespace Paramecium.Engine
         public double SoupWallThickness { get; set; } = 0.01125d;   // 壁の厚さ
 
         public double SoupTotalElementAmount { get; set; } = 65536d;    // スープ全体のエレメント総量
-        public double SoupElementFlowRate { get; set; } = 0.01d;        // タイル間でエレメントが移動する速度
+        public double SoupElementFlowRate { get; set; } = 0.0125d;      // タイル間でエレメントが移動する速度
         [JsonIgnore]
         public double SoupElementPerTile { get { return SoupTotalElementAmount / SoupArea; } }  // タイル当たりのエレメント量
 

@@ -49,6 +49,7 @@
             TopMenu_Edit_CutSelectedCell = new ToolStripMenuItem();
             TopMenu_Edit_PasteSelectedCell = new ToolStripMenuItem();
             TopMenu_Edit_KillSelectedCell = new ToolStripMenuItem();
+            TopMenu_Edit_Separator1 = new ToolStripSeparator();
             TopMenu_Edit_MoveSelectedCell = new ToolStripMenuItem();
             TopMenu_View = new ToolStripMenuItem();
             TopMenu_View_ZoomIn = new ToolStripMenuItem();
@@ -67,6 +68,7 @@
             TopMenu_View_ToggleOverlays_BrainInputOutput = new ToolStripMenuItem();
             TopMenu_View_ToggleOverlays_FullScreenOverlay = new ToolStripMenuItem();
             TopMenu_Window = new ToolStripMenuItem();
+            TopMenu_Window_Statistics = new ToolStripMenuItem();
             TopMenu_Window_AutosaveSettings = new ToolStripMenuItem();
             TopMenu_Window_ObjectEditor = new ToolStripMenuItem();
             TopMenu_Help = new ToolStripMenuItem();
@@ -82,7 +84,6 @@
             SoupView = new PictureBox();
             LoadSoupDialog = new OpenFileDialog();
             SaveSoupDialog = new SaveFileDialog();
-            TopMenu_Edit_Separator1 = new ToolStripSeparator();
             TopMenu.SuspendLayout();
             BottomStat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SoupView).BeginInit();
@@ -244,6 +245,11 @@
             TopMenu_Edit_KillSelectedCell.Text = "Kill Selected Cell";
             TopMenu_Edit_KillSelectedCell.Click += TopMenu_Edit_KillSelectedCell_Click;
             // 
+            // TopMenu_Edit_Separator1
+            // 
+            TopMenu_Edit_Separator1.Name = "TopMenu_Edit_Separator1";
+            TopMenu_Edit_Separator1.Size = new Size(208, 6);
+            // 
             // TopMenu_Edit_MoveSelectedCell
             // 
             TopMenu_Edit_MoveSelectedCell.Name = "TopMenu_Edit_MoveSelectedCell";
@@ -374,16 +380,25 @@
             // 
             // TopMenu_Window
             // 
-            TopMenu_Window.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Window_AutosaveSettings, TopMenu_Window_ObjectEditor });
+            TopMenu_Window.DropDownItems.AddRange(new ToolStripItem[] { TopMenu_Window_Statistics, TopMenu_Window_AutosaveSettings, TopMenu_Window_ObjectEditor });
             TopMenu_Window.Enabled = false;
             TopMenu_Window.Name = "TopMenu_Window";
             TopMenu_Window.Size = new Size(63, 20);
             TopMenu_Window.Text = "Window";
             // 
+            // TopMenu_Window_Statistics
+            // 
+            TopMenu_Window_Statistics.Name = "TopMenu_Window_Statistics";
+            TopMenu_Window_Statistics.ShortcutKeyDisplayString = "Crtl+Shift+T";
+            TopMenu_Window_Statistics.Size = new Size(241, 22);
+            TopMenu_Window_Statistics.Text = "Statistics";
+            TopMenu_Window_Statistics.Click += TopMenu_Window_Statistics_Click;
+            // 
             // TopMenu_Window_AutosaveSettings
             // 
             TopMenu_Window_AutosaveSettings.Name = "TopMenu_Window_AutosaveSettings";
-            TopMenu_Window_AutosaveSettings.Size = new Size(214, 22);
+            TopMenu_Window_AutosaveSettings.ShortcutKeyDisplayString = "Crtl+Shift+A";
+            TopMenu_Window_AutosaveSettings.Size = new Size(241, 22);
             TopMenu_Window_AutosaveSettings.Text = "Autosave Settings";
             TopMenu_Window_AutosaveSettings.Click += TopMenu_Window_AutosaveSettings_Click;
             // 
@@ -391,7 +406,7 @@
             // 
             TopMenu_Window_ObjectEditor.Name = "TopMenu_Window_ObjectEditor";
             TopMenu_Window_ObjectEditor.ShortcutKeyDisplayString = "Crtl+Shift+E";
-            TopMenu_Window_ObjectEditor.Size = new Size(214, 22);
+            TopMenu_Window_ObjectEditor.Size = new Size(241, 22);
             TopMenu_Window_ObjectEditor.Text = "Object Editor";
             TopMenu_Window_ObjectEditor.Click += TopMenuWindowObjectEditor_Click;
             // 
@@ -495,11 +510,6 @@
             SaveSoupDialog.FileName = "untitled.soup";
             SaveSoupDialog.Filter = "Paramecium Soup File|*.soup|All FIles|*.*";
             // 
-            // TopMenu_Edit_Separator1
-            // 
-            TopMenu_Edit_Separator1.Name = "TopMenu_Edit_Separator1";
-            TopMenu_Edit_Separator1.Size = new Size(208, 6);
-            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -581,5 +591,6 @@
         private ToolStripMenuItem TopMenu_Edit_KillSelectedCell;
         private ToolStripMenuItem TopMenu_Edit_MoveSelectedCell;
         private ToolStripSeparator TopMenu_Edit_Separator1;
+        private ToolStripMenuItem TopMenu_Window_Statistics;
     }
 }

@@ -40,6 +40,7 @@ namespace Paramecium.Forms
         private Size _prevClientSize;
 
         // サブウィンドウ
+        private FormStatistics _formStatistics = new FormStatistics();
         private FormAutosaveSettings _formAutosaveSettings = new FormAutosaveSettings();
         private FormObjectEditor _formObjectEditor = new FormObjectEditor();
         private FormAboutParamecium _formAboutParamecium = new FormAboutParamecium();
@@ -300,11 +301,12 @@ namespace Paramecium.Forms
                         break;
                     case Keys.S:
                         if (ModifierKeys == Keys.None) _cameraPosition = new Double2d(double.Floor(_cameraPosition.X) + 0.5, double.Min(soup.Settings.SoupSizeY - 1, double.Floor(_cameraPosition.Y + 1)) + 0.5);   // カメラを下方向に移動
-                        else if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) SaveAsSoup();  // スープを上書き保存
-                        else if ((ModifierKeys & Keys.Control) == Keys.Control) SaveSoup();                                                 // スープを名前を付けて保存
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) SaveAsSoup();  // スープを名前を付けて保存
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control) SaveSoup();                                                 // スープを上書き保存
                         break;
                     case Keys.A:
                         if (ModifierKeys == Keys.None) _cameraPosition = new Double2d(double.Max(0, double.Floor(_cameraPosition.X - 1)) + 0.5, double.Floor(_cameraPosition.Y) + 0.5);                         // カメラを左方向に移動
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) ShowFormAutosaveSettings();    // オートセーブ設定を表示する
                         break;
                     case Keys.D:
                         if (ModifierKeys == Keys.None) _cameraPosition = new Double2d(double.Min(soup.Settings.SoupSizeX - 1, double.Floor(_cameraPosition.X + 1)) + 0.5, double.Floor(_cameraPosition.Y) + 0.5);   // カメラを右方向に移動
@@ -338,9 +340,13 @@ namespace Paramecium.Forms
                     case Keys.V:
                         if ((ModifierKeys & Keys.Control) == Keys.Control) PasteClipboardCell(mousePositionInSoup); // クリップボードからセルをペーストする
                         break;
-                    case Keys.T:            // カメラの追跡モードを「選択中のセルの追跡」に変更、または追跡を無効化
-                        if (_trackingMode == CameraTrackingMode.TrackingSelectedCell) _trackingMode = CameraTrackingMode.Disabled;
-                        else _trackingMode = CameraTrackingMode.TrackingSelectedCell;
+                    case Keys.T:
+                        if (ModifierKeys == Keys.None)  // カメラの追跡モードを「選択中のセルの追跡」に変更、または追跡を無効化
+                        {
+                            if (_trackingMode == CameraTrackingMode.TrackingSelectedCell) _trackingMode = CameraTrackingMode.Disabled;
+                            else _trackingMode = CameraTrackingMode.TrackingSelectedCell;
+                        }
+                        else if ((ModifierKeys & Keys.Control) == Keys.Control && (ModifierKeys & Keys.Shift) == Keys.Shift) ShowFormStatistics();  // 統計ウィンドウを表示する
                         break;
                     case Keys.R:
                         if (ModifierKeys == Keys.None)                              // カメラの追跡モードを「ランダムな動物の追跡」に変更、または追跡を無効化
@@ -935,6 +941,11 @@ namespace Paramecium.Forms
             ShowFormAutosaveSettings();
         }
 
+        private void TopMenu_Window_Statistics_Click(object sender, EventArgs e)
+        {
+            ShowFormStatistics();
+        }
+
         private void TopMenuWindowObjectEditor_Click(object sender, EventArgs e)
         {
             ShowFormObjectEditor();
@@ -942,10 +953,7 @@ namespace Paramecium.Forms
 
         private void TopMenu_Help_AboutParamecium_Click(object sender, EventArgs e)
         {
-            if (_formAboutParamecium.IsDisposed) _formAboutParamecium = new FormAboutParamecium();
-
-            if (!_formAboutParamecium.Visible) _formAboutParamecium.Show(this);
-            else _formAboutParamecium.Focus();
+            ShowFormAboutParamecium();
         }
 
         private void NewSoup()
@@ -1381,6 +1389,25 @@ namespace Paramecium.Forms
             }
         }
 
+        private void ShowFormStatistics()
+        {
+            Soup? soup = Globals.Soup;
+
+            if (soup is not null)
+            {
+                if (_formStatistics.IsDisposed) _formStatistics = new FormStatistics();
+
+                if (!_formStatistics.Visible)
+                {
+                    _formStatistics.Show(this);
+                }
+                else
+                {
+                    _formStatistics.Focus();
+                }
+            }
+        }
+
         private void ShowFormObjectEditor()
         {
             Soup? soup = Globals.Soup;
@@ -1399,6 +1426,14 @@ namespace Paramecium.Forms
                     _formObjectEditor.Focus();
                 }
             }
+        }
+
+        private void ShowFormAboutParamecium()
+        {
+            if (_formAboutParamecium.IsDisposed) _formAboutParamecium = new FormAboutParamecium();
+
+            if (!_formAboutParamecium.Visible) _formAboutParamecium.Show(this);
+            else _formAboutParamecium.Focus();
         }
 
         private void ToggleFullScreen()

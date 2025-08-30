@@ -6,7 +6,7 @@ namespace Paramecium
     public static class Globals
     {
         public static string AppName = "Paramecium";        // このアプリの名前
-        public static string AppVersion = "0.7.0 indev-3";  // アプリのバージョン
+        public static string AppVersion = "0.7.0 indev-4";  // アプリのバージョン
 
         public static string SavesDirectoryPath = $@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves";                // セーブデータのデフォルトの保存先
         public static string AutosavesDirectoryPath = $@"{Path.GetDirectoryName(Application.ExecutablePath)}\saves\autosaves";  // オートセーブされたセーブデータの保存先

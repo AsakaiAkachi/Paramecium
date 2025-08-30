@@ -1,9 +1,7 @@
-﻿using Paramecium.Rendering;
-using Paramecium.Utils;
+﻿using Paramecium.Utils;
 using Paramecium.Variables;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace Paramecium.Engine
 {
@@ -53,15 +51,18 @@ namespace Paramecium.Engine
         public int PlantPopulation { get; set; } = 0;                           // スープ内の植物の個体数
         public int AnimalPopulation { get; set; } = 0;                          // スープ内の動物の個体数
 
+        // 統計
+        public SoupStatistics SoupStatistics { get; set; } = new SoupStatistics();      // 統計データ
+
         // タイル
         public Tile[] Tiles { get; set; } = Array.Empty<Tile>();                // スープ内のタイルのデータ
 
         // 植物
-        public List<Plant?> Plants { get; set; } = new List<Plant?>();            // スープ内の植物のデータ
+        public List<Plant?> Plants { get; set; } = new List<Plant?>();          // スープ内の植物のデータ
         public List<int> PlantUnusedIndexes { get; set; } = new List<int>();    // 植物の未使用状態のインデックス
 
         // 動物
-        public List<Animal?> Animals { get; set; } = new List<Animal?>();         // スープ内の動物のデータ
+        public List<Animal?> Animals { get; set; } = new List<Animal?>();       // スープ内の動物のデータ
         public List<int> AnimalUnusedIndexes { get; set; } = new List<int>();   // 動物の未使用状態のインデックス
 
 
@@ -544,7 +545,7 @@ namespace Paramecium.Engine
                                 }
                             }
 
-                            int latestGenerationBuffer = 0;
+                            long latestGenerationBuffer = 0;
                             for (int i = 0; i < Animals.Count; i++)
                             {
                                 Animal? targetAnimal = Animals[i];
@@ -565,6 +566,9 @@ namespace Paramecium.Engine
                             if (SoupState == SoupState.StepRun) SoupState = SoupState.Pause;
 
                             ElapsedTimeSteps++;
+
+                            SoupStatistics.ChangeOverTimeData.UpdateChangeOverTimeData(this);
+                            SoupStatistics.DistributionData.UpdateDistributionData(this);
 
                             Modified = true;
 
